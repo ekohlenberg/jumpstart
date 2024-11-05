@@ -1,0 +1,81 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using $(${namespace});
+
+
+namespace $($namespace)
+{
+    public partial class $($domainObj)Test : BaseTest
+    {
+    
+        public static List<$($domainObj)> testSelect()
+        {
+            Console.WriteLine("Processing $($domainObj)Logic select List" );
+
+            List<$($domainObj)> $($domainVar)s = [];
+
+            void $($domainVar)Callback(System.Data.Common.DbDataReader rdr) 
+            {
+                $($domainObj) $($domainVar) = [];
+
+                DBPersist.autoAssign(rdr, $($domainVar));
+
+                $($domainVar)s.Add($($domainVar));
+            };
+
+            DBPersist.select($($domainVar)Callback, "select * from $($schemaName).$($tableName)");
+
+            return $($domainVar)s;
+        }
+
+        
+        public static $($domainObj) testGet(long id)
+        {
+            Console.WriteLine("Processing $($domainObj)Logic get ID=" + id.ToString());
+
+            $($domainObj) $($domainVar) = [];
+            $($domainVar).id = id;
+
+            DBPersist.get($($domainVar));
+
+            return $($domainVar);
+        }
+
+        
+        public static void testInsert()
+        {
+            Console.WriteLine("Testing $($domainObj)Logic insert: " + $($domainVar).ToString()  );
+
+            $($domainObj) $($domainVar) = new $($domainObj)();
+
+            $(${columns} | ForEach {
+@"    
+                ${$_.column_name} = Get-Random${$_.column_name}()
+"@
+            })
+
+            
+            $($domainObj).insert($($domainVar));
+
+            last$($domainObj).Push($($domainVar));
+            map($domainObj).Add($($domainVar).id, $($domainVar) );
+        }
+
+       
+        public static void testUpdate(long id,  $($domainObj) $($domainVar))
+        {
+             Console.WriteLine("Processing $($domainObj)Logic update: ID = " + id.ToString() + "\n" + $($domainVar).ToString()  );
+
+            $($domainVar).id = id;
+            DBPersist.update($($domainVar));
+        }
+
+        
+        public static void testDelete(long id)
+        {
+        }
+    }
+}
