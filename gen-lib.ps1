@@ -169,16 +169,22 @@ function Generate-AppLevel {
     param(
         [array]$domainObjects,
         [string]$templateFile,
-        [string]$outputFolder,
-        [string]$targetFile
+        [string]$outputFolder
     )
-
+    $namespace = $domainObjects.Group[0].table_catalog
     
+
     $templatePath = $PSScriptRoot + "/templates/" + $templateFile
 
     $template = Get-Content -path $templatePath -Raw
+    $template = $template.Replace("@""", "")
+    $template = $template.Replace("""@", "")
 
     $generatedCode = $ExecutionContext.InvokeCommand.ExpandString($template)
+
+
+    $targetFile = Split-Path -Path $templatePath -Leaf
+    $targetFile = $targetFile.Replace( "template",$namespace).Replace(".ps1", "")
 
     $outputPath = Join-Path -Path $outputFolder -ChildPath $targetFile
     

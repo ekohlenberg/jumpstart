@@ -67,7 +67,7 @@ foreach ($schema in $schemaMetadata) {
 
 # Generate single files once for the application
 
-#Generate-AppLevel -domainObjects $groupedMetadata -templateFile "template-test-base.cs.ps1"
+Generate-AppLevel -domainObjects $groupedMetadata -templateFile "server/test/BaseTest.generated.cs.ps1" -outputFolder "./server/test" -force $true
 
 }
 catch 

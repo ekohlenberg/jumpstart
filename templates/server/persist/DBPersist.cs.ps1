@@ -1,4 +1,5 @@
-﻿using System;
+﻿@"
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Configuration;
@@ -7,7 +8,7 @@ using System.Collections.Immutable;
 using Npgsql;
 using System.Linq;
 
-namespace legr
+namespace $($namespace)
 {
     public class DBPersist
     {
@@ -397,3 +398,4 @@ namespace legr
 
     }
 }
+"@
