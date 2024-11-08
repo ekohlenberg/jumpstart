@@ -188,6 +188,12 @@ function Generate-AppLevel {
 
     $outputPath = Join-Path -Path $outputFolder -ChildPath $targetFile
     
+    # Check if the folder exists
+    if (-Not (Test-Path -Path $outputFolder)) {
+        # Folder doesn't exist, so create it
+        New-Item -ItemType Directory -Path $outputFolder
+    } 
+    
     # conditionally write the user-maintained code
     # Check if the file exists
     if ( -not (Test-Path -Path $outputPath) -or ($force) ) {

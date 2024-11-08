@@ -6,7 +6,7 @@ param (
 #import shared functions
 . "$PSScriptRoot/gen-lib.ps1"
 
-function Init-Template-Def {
+function Init-Object-Level-Templates {
     # Initialize an empty list (array)
     $templateList = @()
     
@@ -25,6 +25,22 @@ function Init-Template-Def {
     
     }
 
+function Init-App-Level-Templates {
+
+     # Initialize an empty list (array)
+     $templateList = @()
+    
+     $templateList += [templateDefinition]::new("server/test/BaseTest.generated.cs.ps1", "./server/test", $true)
+     $templateList += [templateDefinition]::new("server/persist/DBPersist.generated.cs.ps1", "./server/persist", $true)
+     $templateList += [templateDefinition]::new("server/common/Config.generated.cs.ps1", "./server/common", $true)
+     $templateList += [templateDefinition]::new("server/common/Logic.generated.cs.ps1", "./server/common", $true)
+     $templateList += [templateDefinition]::new("server/common/Tuple.generated.cs.ps1", "./server/common", $true)
+     $templateList += [templateDefinition]::new("server/common/Util.generated.cs.ps1", "./server/common", $true)
+     
+     return $templateList
+}
+
+
 # Read the CSV file
 $metadata = Import-Csv -Path $modelPath
 
@@ -39,7 +55,7 @@ try
 {
 # Generate files for each class
 
-$templateList = Init-Template-Def
+$templateList = Init-Object-Level-Templates
 
 foreach ($group in $groupedMetadata) {
 
@@ -66,8 +82,17 @@ foreach ($schema in $schemaMetadata) {
 
 
 # Generate single files once for the application
+$appTemplates = Init-App-Level-Templates
 
-Generate-AppLevel -domainObjects $groupedMetadata -templateFile "server/test/BaseTest.generated.cs.ps1" -outputFolder "./server/test" -force $true
+foreach($appTemplateDef in $appTemplates) {
+    $currentTemplate = $appTemplateDef
+
+    Write-Output "Processing template $($currentTemplate.templateFile)"
+       
+    
+    Generate-AppLevel -domainObjects $groupedMetadata -templateFile $currentTemplate.templateFile -outputFolder $currentTemplate.outFolder -force $currentTemplate.force
+}
+
 
 }
 catch 

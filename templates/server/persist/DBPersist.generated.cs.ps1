@@ -243,7 +243,7 @@ namespace $($namespace)
 
         static public void put(Tuple tuple, string rwkCol)
         {
-            string sql = "select * from $(tableName) where $(rwkCol) = $(rwkValue)";
+            string sql = "select * from ^(tableName) where ^(rwkCol) = ^(rwkValue)";
             bool found = false;
 
             Tuple filter = new Tuple();
@@ -271,7 +271,7 @@ namespace $($namespace)
 
         static public void put(Tuple tuple)
         {
-            string sql = "select * from $(tableName) where $(expression)";
+            string sql = "select * from ^(tableName) where ^(expression)";
             int count = 0;
             StringBuilder expression = new StringBuilder();
 
@@ -329,8 +329,8 @@ namespace $($namespace)
             
 
             string sqlTemplate = @"with ver_check as (
-            select max(version) as v from $(table)
-            where id=$(id)
+            select max(version) as v from ^(table)
+            where id=^(id)
             union all select 0 as v
             )
             select max(v)+1 from ver_check";
@@ -359,7 +359,7 @@ namespace $($namespace)
         }
         static string getSql( Tuple t)
         {
-            string sqlTemplate = "select * from $(table) where id=$(id)";
+            string sqlTemplate = "select * from ^(table) where id=^(id)";
 
             legr.Tuple p = new Tuple();
 
@@ -389,7 +389,7 @@ namespace $($namespace)
                 object v = string.Empty;
                 parameters.TryGetValue(k, out v);
 
-                string paramName = "$(" + k + ")";
+                string paramName = "^(" + k + ")";
                 sb.Replace(paramName, v.ToString());
             }
 
