@@ -84,7 +84,11 @@ class TemplateDefinition {
     }
 }
 
+class SchemaInfo {
+    [string]$schemaName
+    [string]$namespace
 
+}
 
 
 
@@ -165,6 +169,45 @@ function Generate-Object {
 
 }
 
+
+function Generate-SchemaLevel { 
+    param(
+        [string]$schemaName,
+        [string]$namespace,
+        [string]$templateFile,
+        [string]$outputFolder
+    )
+    
+    $templatePath = $PSScriptRoot + "/templates/" + $templateFile
+
+    $template = Get-Content -path $templatePath -Raw
+    $template = $template.Replace("@""", "")
+    $template = $template.Replace("""@", "")
+
+    $generatedCode = $ExecutionContext.InvokeCommand.ExpandString($template)
+
+
+    $targetFile = Split-Path -Path $templatePath -Leaf
+    $targetFile = $targetFile.Replace( "template",$schema).Replace(".ps1", "")
+
+    $outputPath = Join-Path -Path $outputFolder -ChildPath $targetFile
+    
+    # Check if the folder exists
+    if (-Not (Test-Path -Path $outputFolder)) {
+        # Folder doesn't exist, so create it
+        New-Item -ItemType Directory -Path $outputFolder
+    } 
+
+    # conditionally write the user-maintained code
+    # Check if the file exists
+    if ( -not (Test-Path -Path $outputPath) -or ($force) ) {
+        $generatedCode | Out-File -FilePath $outputPath -Encoding utf8
+    } 
+    
+}
+
+
+
 function Generate-AppLevel { 
     param(
         [array]$domainObjects,
@@ -193,7 +236,7 @@ function Generate-AppLevel {
         # Folder doesn't exist, so create it
         New-Item -ItemType Directory -Path $outputFolder
     } 
-    
+
     # conditionally write the user-maintained code
     # Check if the file exists
     if ( -not (Test-Path -Path $outputPath) -or ($force) ) {

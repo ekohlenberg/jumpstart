@@ -1,8 +1,4 @@
 @"
-
-
-GRANT USAGE ON SCHEMA app TO legr; 
-GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA app TO legr;
-
-
+GRANT USAGE ON SCHEMA $($schemaName) TO $($namespace); 
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA $($schemaName) TO $($namespace);
 "@

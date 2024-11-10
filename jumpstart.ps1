@@ -30,6 +30,9 @@ function Init-App-Level-Templates {
      # Initialize an empty list (array)
      $templateList = @()
     
+     $templateList += [templateDefinition]::new("database/template.database.create.generated.sql.ps1", "./server/database", $true)
+     $templateList += [templateDefinition]::new("database/template.connection.grants.generated.sql.ps1", "./server/database", $true)
+     
      $templateList += [templateDefinition]::new("server/test/BaseTest.generated.cs.ps1", "./server/test", $true)
      $templateList += [templateDefinition]::new("server/persist/DBPersist.generated.cs.ps1", "./server/persist", $true)
      $templateList += [templateDefinition]::new("server/common/Config.generated.cs.ps1", "./server/common", $true)
@@ -38,6 +41,45 @@ function Init-App-Level-Templates {
      $templateList += [templateDefinition]::new("server/common/Util.generated.cs.ps1", "./server/common", $true)
      
      return $templateList
+}
+
+function Init-Schema-Level-Templates {
+    # Initialize an empty list (array)
+    $templateList = @()
+        
+    $templateList += [templateDefinition]::new("database/template.schema.create.generated.sql.ps1", "./server/database", $true)
+    $templateList += [templateDefinition]::new("database/template.schema.grants.generated.sql.ps1", "./server/database", $true)
+
+    return $templateList
+}
+
+function Get-UniqueCatalogSchemaNames {
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]$Metadata
+    )
+
+    # Filter out rows without both table_catalog and schemaName values
+    $filteredData = $Metadata | Where-Object { 
+        $_.table_catalog -ne $null -and $_.table_catalog -ne "" -and
+        $_.table_schema -ne $null -and $_.table_schema -ne "" 
+    }
+
+    # Collect unique pairs of table_catalog and schemaName
+    $uniqueCatalogSchemaNames = $filteredData | ForEach-Object {
+        "$($_.table_catalog),$($_.table_schema)"
+    } | Sort-Object -Unique
+
+    # Convert the list back to a custom object for easier access
+    $result = $uniqueCatalogSchemaNames | ForEach-Object {
+        $parts = $_ -split ","
+        [PSCustomObject]@{
+            table_catalog = $parts[0]
+            table_schema = $parts[1]
+        }
+    }
+
+    return $result
 }
 
 
@@ -69,16 +111,20 @@ foreach ($group in $groupedMetadata) {
 
 }
     
-
+$schemaTemplates = Init-Schema-Level-Templates
 # Generate files for each schema
-$schemaMetadata = $metadata | Group-Object -Property table_schema
-foreach ($schema in $schemaMetadata) {
+$uniqueCatalogSchemas = Get-UniqueCatalogSchemaNames -Metadata $metadata
+foreach ($catalogSchema in $uniqueCatalogSchemas) {
+    $schemaName = $catalogSchema.table_schema
+    $namespace = $catalogSchema.table_catalog
 
-    Write-Output $schema.table_schema
+    foreach($schemaTemplate in $schemaTemplates) {
+        $currentTemplate = $schemaTemplate
+        Write-Output "Processing template $($currentTemplate.templateFile) for schema $($schemaName)"
+        Generate-SchemaLevel -schemaName $schemaName -namespace $namespace -templateFile $currentTemplate.templateFile -outputFolder $currentTemplate.outFolder -force $currentTemplate.force
+    }
 
 }
-
-
 
 
 # Generate single files once for the application
@@ -87,7 +133,7 @@ $appTemplates = Init-App-Level-Templates
 foreach($appTemplateDef in $appTemplates) {
     $currentTemplate = $appTemplateDef
 
-    Write-Output "Processing template $($currentTemplate.templateFile)"
+    Write-Output "Processing template $($currentTemplate.templateFile) for application"
        
     
     Generate-AppLevel -domainObjects $groupedMetadata -templateFile $currentTemplate.templateFile -outputFolder $currentTemplate.outFolder -force $currentTemplate.force
