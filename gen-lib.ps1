@@ -84,12 +84,30 @@ class TemplateDefinition {
     }
 }
 
-class SchemaInfo {
-    [string]$schemaName
-    [string]$namespace
 
+
+# Initialize an empty outputFolderMap
+$outputFolderMap = @{}
+
+# Function to add a string to a list in the outputFolderMap
+function Add-To-OutputFolderMap {
+    param (
+        [string]$outputFolder,     # The outputFolderMap outputFolder
+        [string]$outputFile    # The string to add to the list
+    )
+
+    $filename = Split-Path -Path $outputFile -Leaf
+
+    # Check if the outputFolder already exists in the outputFolderMap
+    if ($outputFolderMap.ContainsKey($outputFolder)) {
+        # outputFolder exists, so retrieve the list and add the new string
+        $outputFolderMap[$outputFolder].Add($filename)
+    }
+    else {
+        # outputFolder does not exist, so create a new list with the string
+        $outputFolderMap[$outputFolder] = [System.Collections.Generic.List[string]]@($filename)
+    }
 }
-
 
 
 function Convert-ToPascalCase {
@@ -165,6 +183,7 @@ function Generate-Object {
         if ( -not (Test-Path -Path $outputPath) -or ($force) ) {
             $generatedCode | Out-File -FilePath $outputPath -Encoding utf8
         } 
+        Add-To-OutputFolderMap -outputFolder $outputFolder -outputFile $outputPath
     }
 
 }
@@ -204,6 +223,8 @@ function Generate-SchemaLevel {
         $generatedCode | Out-File -FilePath $outputPath -Encoding utf8
     } 
     
+    Add-To-OutputFolderMap -outputFolder $outputFolder -outputFile $outputPath
+
 }
 
 
@@ -212,7 +233,8 @@ function Generate-AppLevel {
     param(
         [array]$domainObjects,
         [string]$templateFile,
-        [string]$outputFolder
+        [string]$outputFolder,
+        [Boolean]$force=$false
     )
     $namespace = $domainObjects.Group[0].table_catalog
     
@@ -231,6 +253,8 @@ function Generate-AppLevel {
 
     $outputPath = Join-Path -Path $outputFolder -ChildPath $targetFile
     
+    [System.Collections.Generic.List[string]]$outputFiles = [System.Collections.Generic.List[string]] $outputFolderMap[$outputFolder]
+
     # Check if the folder exists
     if (-Not (Test-Path -Path $outputFolder)) {
         # Folder doesn't exist, so create it
@@ -243,5 +267,7 @@ function Generate-AppLevel {
         $generatedCode | Out-File -FilePath $outputPath -Encoding utf8
     } 
     
+    Add-To-OutputFolderMap -outputFolder $outputFolder -outputFile $outputPath
+
 }
 

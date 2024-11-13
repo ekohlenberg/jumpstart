@@ -53,6 +53,19 @@ function Init-Schema-Level-Templates {
     return $templateList
 }
 
+
+function Init-Build-Templates {
+
+    # Initialize an empty list (array)
+    $templateList = @()
+
+    $templateList += [templateDefinition]::new("database/template.build.generated.sh.ps1", "./server/database", $true)
+
+    return $templateList
+
+}
+
+   
 function Get-UniqueCatalogSchemaNames {
     param (
         [Parameter(Mandatory = $true)]
@@ -91,25 +104,24 @@ $groupedMetadata = $metadata | Group-Object -Property table_name, table_catalog
 
 # Read the Global metadata file (these attributes apply to all domain objects)
 #$globalMetadata = Import-Csv -Path $csvGlobal
-[TemplateDefinition]$currentTemplate = $null
+[templateDefinition]$currentTemplate = $null
 
 try
 {
-# Generate files for each class
+# Generate single files once for the application
+$appTemplates = Init-App-Level-Templates
 
-$templateList = Init-Object-Level-Templates
+foreach($appTemplateDef in $appTemplates) {
+    $currentTemplate = $appTemplateDef
 
-foreach ($group in $groupedMetadata) {
-
-    # Traverse the list and read attributes
-    foreach ($template in $templateList) {
-        $currentTemplate = $template
-        Write-Output "Processing template $($template.templateFile) for object $($group.Group[0].table_name)"
-        Generate-Object  -columns $group.Group -templateFile $template.templateFile -outputFolder $template.outFolder -force $template.force
+    Write-Output "Processing template $($currentTemplate.templateFile) for application"
+       
     
-    }
-
+    Generate-AppLevel -domainObjects $groupedMetadata -templateFile $currentTemplate.templateFile -outputFolder $currentTemplate.outFolder -force $currentTemplate.force
 }
+
+
+
     
 $schemaTemplates = Init-Schema-Level-Templates
 # Generate files for each schema
@@ -127,17 +139,34 @@ foreach ($catalogSchema in $uniqueCatalogSchemas) {
 }
 
 
-# Generate single files once for the application
-$appTemplates = Init-App-Level-Templates
+    # Generate files for each class
 
-foreach($appTemplateDef in $appTemplates) {
-    $currentTemplate = $appTemplateDef
+    $templateList = Init-Object-Level-Templates
 
-    Write-Output "Processing template $($currentTemplate.templateFile) for application"
-       
+    foreach ($template in $templateList) {
+        
+        foreach ($group in $groupedMetadata) {
     
-    Generate-AppLevel -domainObjects $groupedMetadata -templateFile $currentTemplate.templateFile -outputFolder $currentTemplate.outFolder -force $currentTemplate.force
-}
+        # Traverse the list and read attributes
+    
+            $currentTemplate = $template
+            Write-Output "Processing template $($template.templateFile) for object $($group.Group[0].table_name)"
+            Generate-Object  -columns $group.Group -templateFile $template.templateFile -outputFolder $template.outFolder -force $template.force
+        
+        }
+    
+    }
+
+    $buildTemplates = Init-Build-Templates
+    foreach($buildTemplate in $buildTemplates) {
+        $currentTemplate = $buildTemplate
+    
+        Write-Output "Processing build template $($currentTemplate.templateFile) for application"
+           
+        
+        Generate-AppLevel -domainObjects $groupedMetadata -templateFile $currentTemplate.templateFile -outputFolder $currentTemplate.outFolder -force $currentTemplate.force
+    }
+    
 
 
 }
