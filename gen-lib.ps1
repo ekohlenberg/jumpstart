@@ -207,7 +207,7 @@ function Generate-SchemaLevel {
 
 
     $targetFile = Split-Path -Path $templatePath -Leaf
-    $targetFile = $targetFile.Replace( "template",$schema).Replace(".ps1", "")
+    $targetFile = $targetFile.Replace( "template",$schemaName).Replace(".ps1", "")
 
     $outputPath = Join-Path -Path $outputFolder -ChildPath $targetFile
     
@@ -238,13 +238,14 @@ function Generate-AppLevel {
     )
     $namespace = $domainObjects.Group[0].table_catalog
     
-
     $templatePath = $PSScriptRoot + "/templates/" + $templateFile
 
     $template = Get-Content -path $templatePath -Raw
     $template = $template.Replace("@""", "")
     $template = $template.Replace("""@", "")
-
+    
+    [System.Collections.Generic.List[string]]$outputFiles = [System.Collections.Generic.List[string]] $outputFolderMap[$outputFolder]
+    
     $generatedCode = $ExecutionContext.InvokeCommand.ExpandString($template)
 
 
@@ -253,7 +254,7 @@ function Generate-AppLevel {
 
     $outputPath = Join-Path -Path $outputFolder -ChildPath $targetFile
     
-    [System.Collections.Generic.List[string]]$outputFiles = [System.Collections.Generic.List[string]] $outputFolderMap[$outputFolder]
+
 
     # Check if the folder exists
     if (-Not (Test-Path -Path $outputFolder)) {

@@ -10,10 +10,10 @@ function Init-Object-Level-Templates {
     # Initialize an empty list (array)
     $templateList = @()
     
-    $templateList += [templateDefinition]::new("database/template.table.generated.sql.ps1", "./server/database", $true)
-    $templateList += [templateDefinition]::new("database/template.audit.generated.sql.ps1", "./server/database", $true)
-    $templateList += [templateDefinition]::new("database/template.sequence.generated.sql.ps1", "./server/database", $true)
-    $templateList += [templateDefinition]::new("database/template.rwkindex.generated.sql.ps1", "./server/database", $true)
+    $templateList += [templateDefinition]::new("database/pgsql/template.table.generated.sql.ps1", "./database", $true)
+    $templateList += [templateDefinition]::new("database/pgsql/template.audit.generated.sql.ps1", "./database", $true)
+    $templateList += [templateDefinition]::new("database/pgsql/template.sequence.generated.sql.ps1", "./database", $true)
+    $templateList += [templateDefinition]::new("database/pgsql/template.rwkindex.generated.sql.ps1", "./database", $true)
     $templateList += [templateDefinition]::new("server/domain/template.generated.cs.ps1", "./server/domain", $true)
     $templateList += [templateDefinition]::new("server/logic/templateLogic.generated.cs.ps1", "./server/logic", $true)
     $templateList += [templateDefinition]::new("server/logic/templateLogic.user.cs.ps1", "./server/logic", $false)
@@ -30,8 +30,11 @@ function Init-App-Level-Templates {
      # Initialize an empty list (array)
      $templateList = @()
     
-     $templateList += [templateDefinition]::new("database/template.database.create.generated.sql.ps1", "./server/database", $true)
-     $templateList += [templateDefinition]::new("database/template.connection.grants.generated.sql.ps1", "./server/database", $true)
+     $templateList += [templateDefinition]::new("database/pgsql/template.database.create.generated.sql.ps1", "./database", $true)
+     $templateList += [templateDefinition]::new("database/pgsql/template.connection.grants.generated.sql.ps1", "./database", $true)
+     $templateList += [templateDefinition]::new("database/pgsql/audit.schema.create.generated.sql.ps1", "./database", $true)
+     $templateList += [templateDefinition]::new("database/pgsql/audit.schema.grants.generated.sql.ps1", "./database", $true)
+
      
      $templateList += [templateDefinition]::new("server/test/BaseTest.generated.cs.ps1", "./server/test", $true)
      $templateList += [templateDefinition]::new("server/persist/DBPersist.generated.cs.ps1", "./server/persist", $true)
@@ -47,9 +50,9 @@ function Init-Schema-Level-Templates {
     # Initialize an empty list (array)
     $templateList = @()
         
-    $templateList += [templateDefinition]::new("database/template.schema.create.generated.sql.ps1", "./server/database", $true)
-    $templateList += [templateDefinition]::new("database/template.schema.grants.generated.sql.ps1", "./server/database", $true)
-
+    $templateList += [templateDefinition]::new("database/pgsql/template.schema.create.generated.sql.ps1", "./database", $true)
+    $templateList += [templateDefinition]::new("database/pgsql/template.schema.grants.generated.sql.ps1", "./database", $true)
+    
     return $templateList
 }
 
@@ -59,7 +62,7 @@ function Init-Build-Templates {
     # Initialize an empty list (array)
     $templateList = @()
 
-    $templateList += [templateDefinition]::new("database/template.build.generated.sh.ps1", "./server/database", $true)
+    $templateList += [templateDefinition]::new("database/pgsql/template.build.generated.sh.ps1", "./database", $true)
 
     return $templateList
 
