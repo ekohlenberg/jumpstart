@@ -6,7 +6,9 @@ $(
     #Write-Error $outputFiles.Count
     for($i = 0; $i -lt $outputFiles.Count; $i++) {
     $outputFile = $outputFiles[$i]  
-    "`$PSQLCMD --file=./" + $($outputFile) + $cr
+    if ($outputFile -ne "$($namespace).database.create.generated.sql") {
+        "`$PSQLCMD --file=./" + $($outputFile) + $cr
+        }
     }
 )
 "@
