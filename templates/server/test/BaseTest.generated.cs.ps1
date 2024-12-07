@@ -9,10 +9,9 @@ namespace $($namespace)
     public class BaseTest
     {
         $(
-            foreach ($group in $domainObjects) {
-                
-                $tableName = $group.Group[0].table_name
-                $schemaName = $group.Group[0].table_schema
+            foreach ($tableName in $metadata.Keys) {
+              
+                $schemaName = $metadata[$tableName][0].table_schema
                 $domainObj = Convert-ToPascalCase -inputString $tableName
                 $domainVar = $domainObj.ToLower()
                 "protected static Stack <" + $domainObj + ">last" + $domainObj + " = new Stack<" + $domainObj+ ">();" + $cr
