@@ -5,164 +5,132 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace jumpstart {
-public class Generator
-{
-    private readonly RazorLightEngine razorEngine;
-    private Dictionary<string, List<Dictionary<string, string>>> metadataMap = new();
-    private Dictionary<string, List<string>> outputFolderMap = new();
 
-    public Generator()
-    {
-        razorEngine = new RazorLightEngineBuilder()
-            .UseEmbeddedResourcesProject(typeof(Generator))
-            .SetOperatingAssembly(typeof(Generator).Assembly)
-            .UseMemoryCachingProvider()
-            .Build();
-    }
-
-    public void AddToMetadataMap(string tableName, Dictionary<string, string> columnData)
-    {
-        if (!metadataMap.ContainsKey(tableName))
-        {
-            metadataMap[tableName] = new List<Dictionary<string, string>>();
-        }
-        metadataMap[tableName].Add(columnData);
-    }
-
-    public void AddToOutputFolderMap(string outputFolder, string outputFile)
-    {
-        if (!outputFolderMap.ContainsKey(outputFolder))
-        {
-            outputFolderMap[outputFolder] = new List<string>();
-        }
-        outputFolderMap[outputFolder].Add(Path.GetFileName(outputFile));
-    }
-
-    public string ConvertToPascalCase(string input)
-    {
-        var parts = input.Split('_');
-        for (int i = 0; i < parts.Length; i++)
-        {
-            parts[i] = char.ToUpper(parts[i][0]) + parts[i].Substring(1).ToLower();
-        }
-        return string.Join(string.Empty, parts);
-    }
-
-    public async Task GenerateObjectAsync(List<Dictionary<string, string>> columns, string templateFile, string outputFolder, bool force = false)
-    {
-        string tableName = columns[0]["table_name"];
-        string schemaName = columns[0]["table_schema"];
-        string namespaceName = columns[0]["table_catalog"];
-        string domainObj = ConvertToPascalCase(tableName);
-        string domainVar = domainObj.ToLower();
-
-        string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", templateFile);
-
-        if (!File.Exists(templatePath))
-        {
-            throw new FileNotFoundException($"Template not found: {templatePath}");
+public enum TemplateType {
+            domainobject,
+            application,
+            schema,
+            build
         }
 
-        string template = File.ReadAllText(templatePath);
+    public class TemplateDef
+    {
+        public string type {get;set;}
+        public string templateFile {get;set;}
+        public string outputFolder {get;set;}
+        public bool force {get;set;}
+    }
 
-        var model = new
+
+    public class Generator
+    {   
+        
+        private readonly RazorLightEngine razorEngine;
+        
+        private Dictionary<string, List<string>> outputFolderMap = new();
+        private Dictionary<TemplateType, List<TemplateDef>> templates = new();
+
+    
+
+        public Generator()
         {
-            TableName = tableName,
-            SchemaName = schemaName,
-            Namespace = namespaceName,
-            DomainObj = domainObj,
-            DomainVar = domainVar,
-        };
+            razorEngine = new RazorLightEngineBuilder()
+                .UseEmbeddedResourcesProject(typeof(Generator))
+                .SetOperatingAssembly(typeof(Generator).Assembly)
+                .UseMemoryCachingProvider()
+                .Build();
+        }
 
-        string generatedCode = await razorEngine.CompileRenderStringAsync(templateFile, template, model);
-
-        if (generatedCode.Length > 0)
+        public void AddTemplate(TemplateType templateType, TemplateDef templateDef)
         {
-            string targetFile = templateFile.Replace("template", domainObj).Replace(".ps1", ".cs");
-            string outputPath = Path.Combine(outputFolder, targetFile);
-
-            if (!Directory.Exists(outputFolder))
+            if (!templates.ContainsKey(templateType))
             {
-                Directory.CreateDirectory(outputFolder);
+                templates[templateType] = new List<TemplateDef>();
+            }
+            templates[templateType].Add(templateDef);
+        }
+
+        
+
+        private void AddToOutputFolderMap(string outputFolder, string outputFile)
+        {
+            if (!outputFolderMap.ContainsKey(outputFolder))
+            {
+                outputFolderMap[outputFolder] = new List<string>();
+            }
+            outputFolderMap[outputFolder].Add(Path.GetFileName(outputFile));
+        }
+
+
+        public async Task GenerateObjects( MetaModel metaModel )
+        {
+            foreach (MetaObject metaObject in metaModel.Objects.Values)
+            {
+                
+
+                await GenTemplates( metaObject, TemplateType.domainobject);
+            }
+            
+        }
+
+        public async Task  GenerateSchemas( MetaModel metaModel )
+        {
+            foreach (MetaSchema metaSchema in metaModel.Schemas.Values)
+            {
+    
+                await GenTemplates( metaSchema, TemplateType.schema);
+            }
+            
+        }
+
+        public async Task GenerateApp( MetaModel metaModel)
+        {
+            MetaModel model = metaModel;
+
+            await GenTemplates( model, TemplateType.application);
+        }
+
+        protected async Task GenTemplates( MetaBaseElement model, TemplateType templateType )
+        {
+            List<TemplateDef> schemaTemplates =  templates[templateType];
+            foreach( TemplateDef td in schemaTemplates)
+            {
+                await GenCode   ( model, td);
+            }
+        }
+
+        protected async Task GenCode(MetaBaseElement model, TemplateDef td)
+        {
+            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
+
+            if (!File.Exists(templatePath))
+            {
+                throw new FileNotFoundException($"Template not found: {templatePath}");
             }
 
-            if (!File.Exists(outputPath) || force)
+            string template = File.ReadAllText(templatePath);
+
+            string generatedCode = await razorEngine.CompileRenderAsync(td.templateFile, model);
+
+            if (generatedCode.Length > 0)
             {
-                File.WriteAllText(outputPath, generatedCode);
+
+                string targetFile = td.templateFile.Replace("template", model.Name).Replace(".cshtml", "");
+                string outputPath = Path.Combine(td.outputFolder, targetFile);
+
+                if (!Directory.Exists(td.outputFolder))
+                {
+                    Directory.CreateDirectory(td.outputFolder);
+                }
+
+                if (!File.Exists(outputPath) || td.force)
+                {
+                    File.WriteAllText(outputPath, generatedCode);
+                }
+
+                AddToOutputFolderMap(td.outputFolder, outputPath);
             }
-
-            AddToOutputFolderMap(outputFolder, outputPath);
         }
+
     }
-
-    public async Task GenerateSchemaLevelAsync(string schemaName, string namespaceName, string templateFile, string outputFolder)
-    {
-        string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", templateFile);
-
-        if (!File.Exists(templatePath))
-        {
-            throw new FileNotFoundException($"Template not found: {templatePath}");
-        }
-
-        string template = File.ReadAllText(templatePath);
-
-        var model = new
-        {
-            SchemaName = schemaName,
-            Namespace = namespaceName,
-        };
-
-        string generatedCode = await razorEngine.CompileRenderStringAsync(templateFile, template, model);
-
-        string targetFile = templateFile.Replace("template", schemaName).Replace(".ps1", ".cs");
-        string outputPath = Path.Combine(outputFolder, targetFile);
-
-        if (!Directory.Exists(outputFolder))
-        {
-            Directory.CreateDirectory(outputFolder);
-        }
-
-        if (!File.Exists(outputPath))
-        {
-            File.WriteAllText(outputPath, generatedCode);
-        }
-
-        AddToOutputFolderMap(outputFolder, outputPath);
-    }
-
-    public async Task GenerateAppLevelAsync(Dictionary<string, string> metadata, string templateFile, string outputFolder, bool force = false)
-    {
-        string namespaceName = metadata["table_catalog"];
-        string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", templateFile);
-
-        if (!File.Exists(templatePath))
-        {
-            throw new FileNotFoundException($"Template not found: {templatePath}");
-        }
-
-        string template = File.ReadAllText(templatePath);
-
-        var model = new
-        {
-            Namespace = namespaceName,
-        };
-
-        string generatedCode = await razorEngine.CompileRenderStringAsync(templateFile, template, model);
-
-        string targetFile = templateFile.Replace("template", namespaceName).Replace(".ps1", "");
-        string outputPath = Path.Combine(outputFolder, targetFile);
-
-        if (!Directory.Exists(outputFolder))
-        {
-            Directory.CreateDirectory(outputFolder);
-        }
-
-        if (!File.Exists(outputPath) || force)
-        {
-            File.WriteAllText(outputPath, generatedCode);
-        }
-
-        AddToOutputFolderMap(outputFolder, outputPath);
-    }
-}
 }

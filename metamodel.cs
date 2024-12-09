@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace jumpstart {
+
 public static class TypeMapping
 {
     public static readonly Dictionary<string, string> DataTypeMap = new()
@@ -28,9 +29,13 @@ public static class TypeMapping
     };
 }
 
-public class MetaAttribute
+public class MetaBaseElement
 {
-    public string Name { get; set; }
+    public string Name{get;set;}
+}
+public class MetaAttribute : MetaBaseElement
+{
+    
     public string DataType { get; set; }
     public string Length { get; set; }
     public string Label { get; set; }
@@ -42,7 +47,7 @@ public class MetaAttribute
     }
 }
 
-public class MetaObject
+public class MetaObject : MetaBaseElement
 {
     public string DomainObj { get; private set; }
     public string DomainVar { get; private set; }
@@ -54,6 +59,7 @@ public class MetaObject
         TableName = tableName;
         DomainObj = ConvertToPascalCase(tableName);
         DomainVar = DomainObj.ToLower();
+        Name = DomainObj;
     }
 
     public override string ToString()
@@ -73,9 +79,9 @@ public class MetaObject
     }
 }
 
-public class MetaSchema
+public class MetaSchema : MetaBaseElement
 {
-    public string Name { get; set; }
+   
     public SortedDictionary<string, MetaObject> Objects { get; private set; } = new();
 
     public MetaSchema(string name)
@@ -94,10 +100,22 @@ public class MetaSchema
     }
 }
 
-public class MetaModel
+
+public class MetaModel : MetaBaseElement
 {
     public string Namespace { get; set; }
+   
+
     public Dictionary<string, MetaSchema> Schemas { get; private set; } = new();
+    public Dictionary<string, MetaObject> Objects { get; private set; } = new();
+
+    
+
+    public MetaModel(string _namespace)
+    {
+        Name = _namespace;
+        Namespace = _namespace;
+    }
 
     public override string ToString()
     {

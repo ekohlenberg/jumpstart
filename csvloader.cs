@@ -71,21 +71,28 @@ public class CSVLoader
 
     private void AddSchema(MetaModel metaModel, MetadataRecord mr)
     {
-        if (!metaModel.Schemas.TryGetValue(mr.TABLE_SCHEMA, out var schema))
+        MetaSchema schema=null;
+
+        if (!metaModel.Schemas.TryGetValue(mr.TABLE_SCHEMA, out schema))
         {
             schema = new MetaSchema(mr.TABLE_SCHEMA);
             metaModel.Schemas[mr.TABLE_SCHEMA] = schema;
         }
 
-        AddObject(schema, mr);
+        AddObject(metaModel, schema, mr);
     }
 
-    private void AddObject(MetaSchema schema, MetadataRecord mr)
+    private void AddObject(MetaModel metaModel, MetaSchema schema, MetadataRecord mr)
     {
         if (!schema.Objects.TryGetValue(mr.TABLE_NAME, out var metaObject))
         {
             metaObject = new MetaObject(mr.TABLE_NAME);
             schema.Objects[mr.TABLE_NAME] = metaObject;
+        }
+
+        if (!metaModel.Objects.ContainsKey(mr.TABLE_NAME))
+        {
+            metaModel.Objects[mr.TABLE_NAME] = metaObject;
         }
 
         AddAttributes(metaObject, mr);
