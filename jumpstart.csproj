@@ -7,17 +7,26 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
 <!--    <Nullable>enable</Nullable>-->
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+
   </PropertyGroup>
 
+<!--
 <ItemGroup>
   <Content Remove="./templates/*" />
   <Compile Remove="./templates/*" />
   <EmbeddedResource Remove="./templates/*" />
   <None Remove="./templates/*" />
 </ItemGroup>
+-->
 
 <ItemGroup>
   <PackageReference Include="CsvHelper" Version="33.0.1" />
   <PackageReference Include="razorlight" Version="2.3.1" />
 </ItemGroup>
+<Target Name="CopyFiles">
+<Copy
+      SourceFiles="$(SourceDir)\templates"
+      DestinationFolder="$(TargetDir)\templates" />
+</Target>
 </Project>

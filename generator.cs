@@ -15,7 +15,12 @@ public enum TemplateType {
 
     public class TemplateDef
     {
-        public string type {get;set;}
+        public TemplateDef( string templateFile, string outputFolder, bool force)
+        {
+            this.templateFile = templateFile;
+            this.outputFolder = outputFolder;
+            this.force = force;
+        }
         public string templateFile {get;set;}
         public string outputFolder {get;set;}
         public bool force {get;set;}
@@ -34,9 +39,10 @@ public enum TemplateType {
 
         public Generator()
         {
+            
             razorEngine = new RazorLightEngineBuilder()
-                .UseEmbeddedResourcesProject(typeof(Generator))
-                .SetOperatingAssembly(typeof(Generator).Assembly)
+                .UseEmbeddedResourcesProject(typeof(MetaObject))
+                .SetOperatingAssembly(typeof(MetaObject).Assembly)
                 .UseMemoryCachingProvider()
                 .Build();
         }
@@ -72,7 +78,7 @@ public enum TemplateType {
             }
             
         }
-
+/*
         public async Task  GenerateSchemas( MetaModel metaModel )
         {
             foreach (MetaSchema metaSchema in metaModel.Schemas.Values)
@@ -82,15 +88,17 @@ public enum TemplateType {
             }
             
         }
+*/
 
+/*
         public async Task GenerateApp( MetaModel metaModel)
         {
             MetaModel model = metaModel;
 
             await GenTemplates( model, TemplateType.application);
         }
-
-        protected async Task GenTemplates( MetaBaseElement model, TemplateType templateType )
+*/
+        protected async Task GenTemplates( MetaObject model, TemplateType templateType )
         {
             List<TemplateDef> schemaTemplates =  templates[templateType];
             foreach( TemplateDef td in schemaTemplates)
@@ -99,7 +107,7 @@ public enum TemplateType {
             }
         }
 
-        protected async Task GenCode(MetaBaseElement model, TemplateDef td)
+        protected async Task GenCode(MetaObject model, TemplateDef td)
         {
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
 
@@ -110,12 +118,12 @@ public enum TemplateType {
 
             string template = File.ReadAllText(templatePath);
 
-            string generatedCode = await razorEngine.CompileRenderAsync(td.templateFile, model);
+            string generatedCode = await razorEngine.CompileRenderStringAsync<MetaObject>(td.templateFile, template, model );
 
             if (generatedCode.Length > 0)
             {
-
-                string targetFile = td.templateFile.Replace("template", model.Name).Replace(".cshtml", "");
+                string templateFile = Path.GetFileName(td.templateFile);
+                string targetFile = templateFile.Replace("template", model.Name).Replace(".cshtml", "");
                 string outputPath = Path.Combine(td.outputFolder, targetFile);
 
                 if (!Directory.Exists(td.outputFolder))
@@ -130,6 +138,50 @@ public enum TemplateType {
 
                 AddToOutputFolderMap(td.outputFolder, outputPath);
             }
+        }
+
+        public async Task GenBuild(MetaModel metaModel)
+        {
+            List<TemplateDef> buildTemplates = templates[TemplateType.build];
+
+            foreach( TemplateDef buildTemplate in buildTemplates)
+            {
+                List<string> outputFiles = outputFolderMap[buildTemplate.outputFolder];
+                await GenBuildCode( metaModel, buildTemplate, outputFiles );
+            }
+        }
+
+        protected async Task GenBuildCode( MetaModel metaModel, TemplateDef td, List<string> outputFiles )
+        {
+            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
+
+            if (!File.Exists(templatePath))
+            {
+                throw new FileNotFoundException($"Template not found: {templatePath}");
+            }
+
+            string template = File.ReadAllText(templatePath);
+
+            string generatedCode = await razorEngine.CompileRenderAsync(td.templateFile, outputFiles);
+
+            if (generatedCode.Length > 0)
+            {
+
+                string targetFile = td.templateFile.Replace("template", metaModel.Name).Replace(".cshtml", "");
+                string outputPath = Path.Combine(td.outputFolder, targetFile);
+
+                if (!Directory.Exists(td.outputFolder))
+                {
+                    Directory.CreateDirectory(td.outputFolder);
+                }
+
+                if (!File.Exists(outputPath) || td.force)
+                {
+                    File.WriteAllText(outputPath, generatedCode);
+                }
+
+                AddToOutputFolderMap(td.outputFolder, outputPath);
+            }           
         }
 
     }

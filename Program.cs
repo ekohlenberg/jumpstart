@@ -8,12 +8,12 @@ namespace jumpstart {
 
     class Program
     {
-        static int Main(string[] args)
+        static async Task Main(string[] args)
         {
             if (args.Length == 0)
             {
                 Console.WriteLine("Usage: jumpstart <modelPath>");
-                return 1;
+                return;
             }
 
             string modelPath = args[0];
@@ -21,7 +21,7 @@ namespace jumpstart {
             if (!File.Exists(modelPath))
             {
                 Console.WriteLine($"Error: File not found at path {modelPath}");
-                return 1;
+                return;
             }
 
             try
@@ -35,6 +35,12 @@ namespace jumpstart {
                 // Load the model from the specified path
                 csvLoader.Load(modelPath, metaModel);
 
+                Generator g = new Generator();
+
+                g.AddTemplate( TemplateType.domainobject, new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database", true));
+
+                await g.GenerateObjects(metaModel);
+
                 // Output the string representation of the metaModel
                 Console.WriteLine(metaModel.ToString());
             }
@@ -43,7 +49,7 @@ namespace jumpstart {
                 Console.WriteLine($"Error: {ex.Message}");
             }
 
-                return 0;
+                return;
         }
     }
 }
