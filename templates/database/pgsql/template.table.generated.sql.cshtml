@@ -2,30 +2,34 @@
 create table @Model.SchemaName.@Model.TableName (
 
 
-    @for (int i = 0; i < Model.Attributes.Count; i++) {
-        var column = Model.Attributes[i];
-        var pk = "";
-        if (column.Name == "id"){
-            pk = "PRIMARY KEY";
-        }
+@for (int i = 0; i < Model.Attributes.Count; i++) {
+    var column = Model.Attributes[i];
+    var pk = "";
+    if (column.Name == "id"){
+        pk = "PRIMARY KEY";
+    }
 
-        var len = "";
-        if ((column.Length) != "NULL") {
-            len = "(" + column.Length + ")";
-        }
+    var len = "";
+    if ((column.Length) != "NULL") {
+        len = "(" + column.Length + ")";
+    }
 
-        var nullable = "";
-        if (column.RWK == "1") {
-            nullable = " not null";
-        }
+    var nullable = "";
+    if (column.RWK == "1") {
+        nullable = " not null";
+    }
 
-        var comma = "";
-        if (i < Model.Attributes.Count - 1) {
-            comma = ",";
-        } 
-        
-        @(column.Name + " " + column.DataType + len + " " + pk + nullable + comma + "\n");
-        
+    var comma = "";
+    if (i < Model.Attributes.Count - 1) {
+        comma = ",";
+    } 
+
+    @(
+column.Name + " " + column.DataType + len + " " + pk + nullable + comma + @"
+"
+)
+    ;
+
         
     }
 
