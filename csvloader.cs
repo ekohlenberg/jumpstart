@@ -86,7 +86,7 @@ public class CSVLoader
     {
         if (!schema.Objects.TryGetValue(mr.TABLE_NAME, out var metaObject))
         {
-            metaObject = new MetaObject(mr.TABLE_NAME);
+            metaObject = new MetaObject(mr.TABLE_NAME, mr.TABLE_SCHEMA);
             schema.Objects[mr.TABLE_NAME] = metaObject;
         }
 
@@ -100,7 +100,7 @@ public class CSVLoader
 
     private void AddAttributes(MetaObject metaObject, MetadataRecord mr)
     {
-        if (!metaObject.Attributes.ContainsKey(mr.COLUMN_NAME))
+        if (!metaObject.Attributes.Any(attr => attr.Name == mr.COLUMN_NAME))
         {
             var attribute = new MetaAttribute
             {
@@ -110,7 +110,7 @@ public class CSVLoader
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
             };
-            metaObject.Attributes[mr.COLUMN_NAME] = attribute;
+            metaObject.Attributes.Add( attribute );
         }
     }
 }

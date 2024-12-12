@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Intrinsics.Arm;
 
 namespace jumpstart {
 
@@ -32,6 +33,7 @@ public static class TypeMapping
 public class MetaBaseElement
 {
     public string Name{get;set;}
+    public readonly string  CR = "\n";
 }
 public class MetaAttribute : MetaBaseElement
 {
@@ -52,20 +54,23 @@ public class MetaObject : MetaBaseElement
     public string DomainObj { get; private set; }
     public string DomainVar { get; private set; }
     public string TableName { get; private set; }
-    public SortedDictionary<string, MetaAttribute> Attributes { get; private set; } = new();
 
-    public MetaObject(string tableName)
+    public string SchemaName {get; set;}
+    public List<MetaAttribute> Attributes { get; private set; } = new();
+
+    public MetaObject(string tableName, string schemaName)
     {
         TableName = tableName;
         DomainObj = ConvertToPascalCase(tableName);
         DomainVar = DomainObj.ToLower();
         Name = DomainObj;
+        SchemaName = schemaName;
     }
 
     public override string ToString()
     {
         string result = $"Domain Obj: {DomainObj}\nDomain Var: {DomainVar}\nTable Name: {TableName}\n";
-        foreach (var attribute in Attributes.Values)
+        foreach (var attribute in Attributes)
         {
             result += attribute.ToString();
         }

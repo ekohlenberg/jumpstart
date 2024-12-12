@@ -122,6 +122,8 @@ public enum TemplateType {
 
             if (generatedCode.Length > 0)
             {
+                generatedCode = generatedCode.Replace("&#xD;", "\r");
+                generatedCode = generatedCode.Replace("&#xA;", "\n");
                 string templateFile = Path.GetFileName(td.templateFile);
                 string targetFile = templateFile.Replace("template", model.Name).Replace(".cshtml", "");
                 string outputPath = Path.Combine(td.outputFolder, targetFile);
