@@ -37,7 +37,9 @@ namespace jumpstart {
 
                 Generator g = new Generator();
 
-                g.AddTemplate( TemplateType.domainobject, new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database", true));
+                g.OnFileWriteEvent += metaModel.build.AddToOutputFolderMap;
+
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database", true));
 
                 await g.GenerateObjects(metaModel);
 

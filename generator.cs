@@ -6,12 +6,6 @@ using System.Threading.Tasks;
 
 namespace jumpstart {
 
-public enum TemplateType {
-            domainobject,
-            application,
-            schema,
-            build
-        }
 
     public class TemplateDef
     {
@@ -33,10 +27,16 @@ public enum TemplateType {
         private readonly RazorLightEngine razorEngine;
         
         private Dictionary<string, List<string>> outputFolderMap = new();
-        private Dictionary<TemplateType, List<TemplateDef>> templates = new();
+        private Dictionary<Type, List<TemplateDef>> templates = new();
 
-    
+        public delegate void FileWrittenEventHandler(string outputFolder, string outputFile);
+        
+        public event FileWrittenEventHandler OnFileWriteEvent;
 
+        protected virtual void FireFileWriteEvent(string outputFolder, string outputFile)
+        {
+            OnFileWriteEvent?.Invoke(outputFolder, outputFile);
+        }
         public Generator()
         {
             
@@ -47,7 +47,7 @@ public enum TemplateType {
                 .Build();
         }
 
-        public void AddTemplate(TemplateType templateType, TemplateDef templateDef)
+        public void AddTemplate(Type templateType, TemplateDef templateDef)
         {
             if (!templates.ContainsKey(templateType))
             {
@@ -58,23 +58,14 @@ public enum TemplateType {
 
         
 
-        private void AddToOutputFolderMap(string outputFolder, string outputFile)
-        {
-            if (!outputFolderMap.ContainsKey(outputFolder))
-            {
-                outputFolderMap[outputFolder] = new List<string>();
-            }
-            outputFolderMap[outputFolder].Add(Path.GetFileName(outputFile));
-        }
+       
 
 
         public async Task GenerateObjects( MetaModel metaModel )
         {
-            foreach (MetaObject metaObject in metaModel.Objects.Values)
+            foreach (MetaObject metaObject in metaModel.Objects)
             {
-                
-
-                await GenTemplates( metaObject, TemplateType.domainobject);
+                await GenTemplates(metaObject);
             }
             
         }
@@ -98,9 +89,9 @@ public enum TemplateType {
             await GenTemplates( model, TemplateType.application);
         }
 */
-        protected async Task GenTemplates( MetaObject model, TemplateType templateType )
+        protected async Task GenTemplates( MetaObject model)
         {
-            List<TemplateDef> schemaTemplates =  templates[templateType];
+            List<TemplateDef> schemaTemplates =  templates[model.GetType()];
             foreach( TemplateDef td in schemaTemplates)
             {
                 await GenCode   ( model, td);
@@ -124,6 +115,8 @@ public enum TemplateType {
             {
                 generatedCode = generatedCode.Replace("&#xD;", "\r");
                 generatedCode = generatedCode.Replace("&#xA;", "\n");
+                generatedCode = generatedCode.Replace("&#x9;", "\t");
+              
                 string templateFile = Path.GetFileName(td.templateFile);
                 string targetFile = templateFile.Replace("template", model.Name).Replace(".cshtml", "");
                 string outputPath = Path.Combine(td.outputFolder, targetFile);
@@ -138,13 +131,13 @@ public enum TemplateType {
                     File.WriteAllText(outputPath, generatedCode);
                 }
 
-                AddToOutputFolderMap(td.outputFolder, outputPath);
+                FireFileWriteEvent(td.outputFolder, outputPath);
             }
         }
 
         public async Task GenBuild(MetaModel metaModel)
         {
-            List<TemplateDef> buildTemplates = templates[TemplateType.build];
+            List<TemplateDef> buildTemplates = templates[metaModel.GetType()];
 
             foreach( TemplateDef buildTemplate in buildTemplates)
             {
@@ -182,7 +175,7 @@ public enum TemplateType {
                     File.WriteAllText(outputPath, generatedCode);
                 }
 
-                AddToOutputFolderMap(td.outputFolder, outputPath);
+                FireFileWriteEvent(td.outputFolder, outputPath);
             }           
         }
 

@@ -84,15 +84,18 @@ public class CSVLoader
 
     private void AddObject(MetaModel metaModel, MetaSchema schema, MetadataRecord mr)
     {
-        if (!schema.Objects.TryGetValue(mr.TABLE_NAME, out var metaObject))
+        MetaObject metaObject = null;
+
+        if (!schema.Objects.TryGetValue(mr.TABLE_NAME, out metaObject))
         {
-            metaObject = new MetaObject(mr.TABLE_NAME, mr.TABLE_SCHEMA);
+            metaObject = new MetaObject(mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);
             schema.Objects[mr.TABLE_NAME] = metaObject;
         }
 
-        if (!metaModel.Objects.ContainsKey(mr.TABLE_NAME))
+ 
+        if (!metaModel.Objects.Any(obj => obj.Name == mr.TABLE_NAME))
         {
-            metaModel.Objects[mr.TABLE_NAME] = metaObject;
+            metaModel.Objects.Add(metaObject);
         }
 
         AddAttributes(metaObject, mr);
@@ -105,10 +108,14 @@ public class CSVLoader
             var attribute = new MetaAttribute
             {
                 Name = mr.COLUMN_NAME,
-                DataType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
+                SqlDataType = mr.DATA_TYPE,
                 Length = mr.CHARACTER_MAXIMUM_LENGTH,
+                NetDataType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
+                ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), ""),
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
+                FkObject= mr.FK_OBJECT,
+                FkType=mr.FK_TYPE
             };
             metaObject.Attributes.Add( attribute );
         }
