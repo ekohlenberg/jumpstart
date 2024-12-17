@@ -58,47 +58,43 @@ namespace jumpstart {
 
         
 
-       
+       public async Task GenerateApp( MetaModel metaModel )
+        {
+            await GenTemplates<MetaModel>(metaModel);
+            
+        }
 
 
         public async Task GenerateObjects( MetaModel metaModel )
         {
             foreach (MetaObject metaObject in metaModel.Objects)
             {
-                await GenTemplates(metaObject);
+                await GenTemplates<MetaObject>(metaObject);
             }
             
         }
-/*
+
         public async Task  GenerateSchemas( MetaModel metaModel )
         {
             foreach (MetaSchema metaSchema in metaModel.Schemas.Values)
             {
-    
-                await GenTemplates( metaSchema, TemplateType.schema);
+                await GenTemplates<MetaSchema>( metaSchema);
             }
             
         }
-*/
 
-/*
-        public async Task GenerateApp( MetaModel metaModel)
-        {
-            MetaModel model = metaModel;
+        
 
-            await GenTemplates( model, TemplateType.application);
-        }
-*/
-        protected async Task GenTemplates( MetaObject model)
+        protected async Task GenTemplates<T>( T model) where T : MetaBaseElement
         {
             List<TemplateDef> schemaTemplates =  templates[model.GetType()];
             foreach( TemplateDef td in schemaTemplates)
             {
-                await GenCode   ( model, td);
+                await GenCode<T>( model, td);
             }
         }
 
-        protected async Task GenCode(MetaObject model, TemplateDef td)
+        protected async Task GenCode<T>(T model, TemplateDef td) where T : MetaBaseElement
         {
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
 
@@ -109,7 +105,7 @@ namespace jumpstart {
 
             string template = File.ReadAllText(templatePath);
 
-            string generatedCode = await razorEngine.CompileRenderStringAsync<MetaObject>(td.templateFile, template, model );
+            string generatedCode = await razorEngine.CompileRenderStringAsync<T>(td.templateFile, template, model );
 
             if (generatedCode.Length > 0)
             {
@@ -117,6 +113,7 @@ namespace jumpstart {
                 generatedCode = generatedCode.Replace("&#xA;", "\n");
                 generatedCode = generatedCode.Replace("&#x9;", "\t");
               
+                MetaBaseElement metaType = (MetaBaseElement) model;
                 string templateFile = Path.GetFileName(td.templateFile);
                 string targetFile = templateFile.Replace("template", model.Name).Replace(".cshtml", "");
                 string outputPath = Path.Combine(td.outputFolder, targetFile);
