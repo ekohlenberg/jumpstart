@@ -151,6 +151,8 @@ namespace jumpstart {
     public class MetaBuild : MetaBaseElement
     {
         public Dictionary<string,List<string>> outputFolderMap = [];
+        public List<string> sourceFiles = new();
+
 
         public void AddToOutputFolderMap(string outputFolder, string outputFile)
         {
@@ -158,7 +160,24 @@ namespace jumpstart {
             {
                 outputFolderMap[outputFolder] = new List<string>();
             }
-            outputFolderMap[outputFolder].Add(Path.GetFileName(outputFile));
+
+            List<string> sourceFiles = outputFolderMap[outputFolder];
+
+            string sourceFile = Path.GetFileName(outputFile);
+
+            if (!sourceFiles.Any(f => f == sourceFile))
+            {
+                sourceFiles.Add(sourceFile);
+            }
+        }
+
+        public void SetOutputFolder( string outputDir )
+        {
+            if (outputFolderMap.ContainsKey(outputDir))
+            {
+                sourceFiles = outputFolderMap[outputDir];
+                
+            }
         }
     }
 
@@ -177,6 +196,7 @@ namespace jumpstart {
         {
             Name = _namespace;
             Namespace = _namespace;
+            build.Name = Name;
         }
 
         public override string ToString()

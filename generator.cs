@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using RazorLight;
 using System;
 using System.Collections.Generic;
+using System.Formats.Tar;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -26,7 +28,7 @@ namespace jumpstart {
         
         private readonly RazorLightEngine razorEngine;
         
-        private Dictionary<string, List<string>> outputFolderMap = new();
+    
         private Dictionary<Type, List<TemplateDef>> templates = new();
 
         public delegate void FileWrittenEventHandler(string outputFolder, string outputFile);
@@ -65,6 +67,15 @@ namespace jumpstart {
         }
 
 
+        public async Task  GenerateSchemas( MetaModel metaModel )
+        {
+            foreach (MetaSchema metaSchema in metaModel.Schemas.Values)
+            {
+                await GenTemplates<MetaSchema>( metaSchema);
+            }
+            
+        }        
+
         public async Task GenerateObjects( MetaModel metaModel )
         {
             foreach (MetaObject metaObject in metaModel.Objects)
@@ -74,28 +85,41 @@ namespace jumpstart {
             
         }
 
-        public async Task  GenerateSchemas( MetaModel metaModel )
-        {
-            foreach (MetaSchema metaSchema in metaModel.Schemas.Values)
-            {
-                await GenTemplates<MetaSchema>( metaSchema);
-            }
-            
-        }
 
+        public async Task GenerateBuild( MetaModel metaModel )
+        {
+            List<TemplateDef> templateList =  templates[metaModel.build.GetType()];
+            foreach( TemplateDef td in templateList)
+            {
+                metaModel.build.SetOutputFolder( td.outputFolder );
+                await GenCode<MetaBuild>( metaModel.build, td);
+            }
+        }
         
 
         protected async Task GenTemplates<T>( T model) where T : MetaBaseElement
         {
-            List<TemplateDef> schemaTemplates =  templates[model.GetType()];
-            foreach( TemplateDef td in schemaTemplates)
+            List<TemplateDef> templateList =  templates[model.GetType()];
+            foreach( TemplateDef td in templateList)
             {
                 await GenCode<T>( model, td);
             }
         }
 
+    
+
         protected async Task GenCode<T>(T model, TemplateDef td) where T : MetaBaseElement
         {
+            if (model == null)
+            {
+                throw new Exception("Model is null.");
+            }
+
+            if (td == null)
+            {
+                throw new Exception("Template Definition is null.");
+            }
+
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
 
             if (!File.Exists(templatePath))
@@ -103,7 +127,14 @@ namespace jumpstart {
                 throw new FileNotFoundException($"Template not found: {templatePath}");
             }
 
+            
+
             string template = File.ReadAllText(templatePath);
+
+            if (string.IsNullOrEmpty(template))
+            {
+                throw new Exception($"Template content is null or empty. Cannot read template {templatePath}");
+            }
 
             string generatedCode = await razorEngine.CompileRenderStringAsync<T>(td.templateFile, template, model );
 
@@ -132,49 +163,7 @@ namespace jumpstart {
             }
         }
 
-        public async Task GenBuild(MetaModel metaModel)
-        {
-            List<TemplateDef> buildTemplates = templates[metaModel.GetType()];
 
-            foreach( TemplateDef buildTemplate in buildTemplates)
-            {
-                List<string> outputFiles = outputFolderMap[buildTemplate.outputFolder];
-                await GenBuildCode( metaModel, buildTemplate, outputFiles );
-            }
-        }
-
-        protected async Task GenBuildCode( MetaModel metaModel, TemplateDef td, List<string> outputFiles )
-        {
-            string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
-
-            if (!File.Exists(templatePath))
-            {
-                throw new FileNotFoundException($"Template not found: {templatePath}");
-            }
-
-            string template = File.ReadAllText(templatePath);
-
-            string generatedCode = await razorEngine.CompileRenderAsync(td.templateFile, outputFiles);
-
-            if (generatedCode.Length > 0)
-            {
-
-                string targetFile = td.templateFile.Replace("template", metaModel.Name).Replace(".cshtml", "");
-                string outputPath = Path.Combine(td.outputFolder, targetFile);
-
-                if (!Directory.Exists(td.outputFolder))
-                {
-                    Directory.CreateDirectory(td.outputFolder);
-                }
-
-                if (!File.Exists(outputPath) || td.force)
-                {
-                    File.WriteAllText(outputPath, generatedCode);
-                }
-
-                FireFileWriteEvent(td.outputFolder, outputPath);
-            }           
-        }
-
+        
     }
 }

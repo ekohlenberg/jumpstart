@@ -10,20 +10,30 @@ namespace jumpstart {
     {
         static async Task Main(string[] args)
         {
+            /*
             if (args.Length == 0)
             {
                 Console.WriteLine("Usage: jumpstart <modelPath>");
                 return;
             }
+            */
+            string modelPath = "./test.csv";
 
-            string modelPath = args[0];
-
-            if (!File.Exists(modelPath))
+            if (args.Length > 0)
             {
+                modelPath = args[0];
+
+                if (!File.Exists(modelPath))
+                {
                 Console.WriteLine($"Error: File not found at path {modelPath}");
+
                 return;
+                }
+
             }
 
+            Console.WriteLine($"Using model path {modelPath}");
+           
             try
             {
                 // Create an instance of the CSVLoader
@@ -45,16 +55,26 @@ namespace jumpstart {
 
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database", true));
 
+                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/template.build.generated.sh.cshtml", "./database", true));
+
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);
                 await g.GenerateObjects(metaModel);
+                await g.GenerateBuild(metaModel);
 
                 // Output the string representation of the metaModel
                 Console.WriteLine(metaModel.ToString());
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                
+                Exception x = ex;
+                while(x != null)
+                {
+                    Console.WriteLine($"Error: {x.Message}\n{x.StackTrace}");
+
+                    x = x.InnerException;
+                }
             }
 
                 return;
