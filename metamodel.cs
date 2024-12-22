@@ -104,7 +104,7 @@ namespace jumpstart {
             TableName = tableName;
             DomainObj = ConvertToPascalCase(tableName);
             DomainVar = DomainObj.ToLower();
-            Name = DomainObj;
+            Name = tableName;
             Label = label;
             Primary = primary;
             SchemaName = schemaName;

@@ -45,6 +45,9 @@ namespace jumpstart {
                 // Load the model from the specified path
                 csvLoader.Load(modelPath, metaModel);
 
+                GlobalCSVLoader gloader = new GlobalCSVLoader();
+                gloader.Load( "global.csv", metaModel);
+
                 Generator g = new Generator();
 
                 g.OnFileWriteEvent += metaModel.build.AddToOutputFolderMap;
