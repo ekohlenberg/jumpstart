@@ -88,7 +88,7 @@ public class CSVLoader
 
         if (!schema.Objects.TryGetValue(mr.TABLE_NAME, out metaObject))
         {
-            metaObject = new MetaObject(mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);
+            metaObject = new MetaObject(mr.TABLE_CATALOG, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);
             schema.Objects[mr.TABLE_NAME] = metaObject;
         }
 

@@ -89,6 +89,7 @@ namespace jumpstart {
 
     public class MetaObject : MetaBaseElement
     {
+        public string Namespace {get; private set;}
         public string DomainObj { get; private set; }
         public string DomainVar { get; private set; }
         public string TableName { get; private set; }
@@ -99,8 +100,9 @@ namespace jumpstart {
         public string Primary {get;set;}
         public List<MetaAttribute> Attributes { get; private set; } = new();
 
-        public MetaObject(string tableName, string schemaName, string label, string primary)
+        public MetaObject(string _namespace, string tableName, string schemaName, string label, string primary)
         {
+            Namespace = _namespace;
             TableName = tableName;
             DomainObj = ConvertToPascalCase(tableName);
             DomainVar = DomainObj.ToLower();

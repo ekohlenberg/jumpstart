@@ -1,0 +1,23 @@
+@{
+    var nrwk = 0;
+    var indexColumns = new System.Collections.Generic.List<string>(); // Initialize a list to store column names with rwk = 1
+
+    // Count columns with rwk flag set to 1
+    foreach (var attr in @Model.Attributes) {
+        if (attr.RWK == "1") {
+            nrwk++;
+            indexColumns.Add(attr.Name); // Add the column name to the list
+        }
+    }
+
+    // If any column has rwk flag = 1, build the CREATE UNIQUE INDEX statement
+    string createIndexStatement = "";
+    if (nrwk > 0) {
+        createIndexStatement = $"CREATE UNIQUE INDEX rwk_{Model.SchemaName}_{Model.TableName} ON {Model.SchemaName}.{Model.TableName} (" + 
+            string.Join(", ", indexColumns) + ");" + @"
+";
+    }
+}
+
+@createIndexStatement
+
