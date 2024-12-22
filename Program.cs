@@ -60,6 +60,7 @@ namespace jumpstart {
 
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.audit.generated.sql.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.sequence.generated.sql.cshtml", "./database", true));
 
 
                 g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/template.build.generated.sh.cshtml", "./database", true));
