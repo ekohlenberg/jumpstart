@@ -75,7 +75,7 @@ public class CSVLoader
 
         if (!metaModel.Schemas.TryGetValue(mr.TABLE_SCHEMA, out schema))
         {
-            schema = new MetaSchema(mr.TABLE_SCHEMA);
+            schema = new MetaSchema(mr.TABLE_SCHEMA, mr.TABLE_CATALOG);
             metaModel.Schemas[mr.TABLE_SCHEMA] = schema;
         }
 

@@ -129,12 +129,13 @@ namespace jumpstart {
 
     public class MetaSchema : MetaBaseElement
     {
-    
+        
         public SortedDictionary<string, MetaObject> Objects { get; private set; } = new();
-
-        public MetaSchema(string name)
+        public string Namespace {get; set;}
+        public MetaSchema(string name, string _namespace)
         {
             Name = name;
+            Namespace = _namespace;
         }
 
         public override string ToString()

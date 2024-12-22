@@ -1,4 +1,0 @@
-@"
-GRANT USAGE ON SCHEMA audit TO $($namespace); 
-GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA audit TO $($namespace);
-"@

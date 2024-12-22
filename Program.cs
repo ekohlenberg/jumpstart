@@ -53,10 +53,14 @@ namespace jumpstart {
                 g.OnFileWriteEvent += metaModel.build.AddToOutputFolderMap;
 
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.database.create.generated.sql.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/audit.schema.create.generated.sql.cshtml", "./database", true));
+
 
                 g.AddTemplate( typeof(MetaSchema), new TemplateDef("database/pgsql/template.schema.create.generated.sql.cshtml", "./database", true));
 
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.audit.generated.sql.cshtml", "./database", true));
+
 
                 g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/template.build.generated.sh.cshtml", "./database", true));
 
