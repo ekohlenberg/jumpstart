@@ -64,7 +64,7 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.rwkindex.generated.sql.cshtml", "./database", true));
 
 
-                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/template.build.generated.sh.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.sh.cshtml", "./database", true));
 
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);
