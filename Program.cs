@@ -67,18 +67,35 @@ namespace jumpstart {
 
 
                 /* dotnet server templates */
+                /* common */
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Config.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Util.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseObject.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseLogic.generated.cs.cshtml", "./server/common", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/common.csproj.cshtml", "./server/common", true));
+              
+                /* persist */
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/persist/DBPersist.generated.cs.cshtml", "./server/persist", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/persist/persist.csproj.cshtml", "./server/persist", true));
              
+                /* domain */
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/domain/template.generated.cs.cshtml", "./server/domain", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/domain/template.user.cs.cshtml", "./server/domain", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/domain/domain.csproj.cshtml", "./server/domain", true));
+
+                /* logic */
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.generated.cs.cshtml", "./server/logic", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.user.cs.cshtml", "./server/logic", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/logic.csproj.cshtml", "./server/logic", true));
+            
+                /* api */
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/api/template.api.generated.cs.cshtml", "./server/api", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/Program.cs.cshtml", "./server/api", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.json.cshtml", "./server/api", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.Development.json.cshtml", "./server/api", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/Properties/launchSettings.json.cshtml", "./server/api/Properties", false));
 
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/api.csproj.cshtml", "./server/api", true));
 
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);
