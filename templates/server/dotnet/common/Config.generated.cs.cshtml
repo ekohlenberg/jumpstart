@@ -1,4 +1,4 @@
-﻿@"
+﻿
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using System.Data.Common;
 
-namespace $($namespace)
+namespace @Model.Name
 {
     public class Config
     {
@@ -47,10 +47,10 @@ namespace $($namespace)
             string dbcon = "Host=^server;Username=^username;Password=^password;Database=^database;";
            // string dbcon = "Server=^server;Database=^database;User Id=^username;Password=^password";
 
-            string server = Environment.GetEnvironmentVariable("SQLCMDSERVER");
-            string database = Environment.GetEnvironmentVariable("SQLCMDDATABASE");
-            string username = Environment.GetEnvironmentVariable("SQLCMDUSER");
-            string password = Environment.GetEnvironmentVariable("SQLCMDPASSWORD");
+            string server = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()DBSERVER");
+            string database = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()DATABASE");
+            string username = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()USER");
+            string password = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()PASSWORD");
 
             dbcon = dbcon.Replace("^server", server);
             dbcon = dbcon.Replace("^database", database);
@@ -69,4 +69,3 @@ namespace $($namespace)
         }
     }
 }
-"@

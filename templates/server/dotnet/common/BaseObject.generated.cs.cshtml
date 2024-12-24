@@ -1,16 +1,14 @@
-﻿
-@"
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace $($namespace)
+namespace @Model.Name
 {
-    public class Tuple : Dictionary<string, object>
+    public class BaseObject : Dictionary<string, object>
     {
-        public Tuple() { }
+        public BaseObject() { }
 
-        public Tuple( Tuple t)
+        public BaseObject( BaseObject t)
         {
             foreach( string k in t.Keys)
             {
@@ -64,4 +62,3 @@ namespace $($namespace)
         }
     }
 }
-"@

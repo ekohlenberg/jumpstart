@@ -53,7 +53,7 @@ public class GlobalCSVLoader
                 Name = mr.COLUMN_NAME,
                 SqlDataType = mr.DATA_TYPE,
                 Length = mr.CHARACTER_MAXIMUM_LENGTH,
-                NetDataType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
+                DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
                 ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), ""),
                 Label = mr.COLUMN_LABEL,
             };

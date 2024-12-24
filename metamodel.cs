@@ -72,7 +72,7 @@ namespace jumpstart {
     {
         
         public string SqlDataType { get; set; }
-        public string NetDataType {get;set;}
+        public string DotNetType {get;set;}
 
         public string ConvertMethod {get;set;}
         public string Length { get; set; }

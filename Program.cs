@@ -52,9 +52,9 @@ namespace jumpstart {
 
                 g.OnFileWriteEvent += metaModel.build.AddToOutputFolderMap;
 
+                /* database templates */
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.database.create.generated.sql.cshtml", "./database", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/audit.schema.create.generated.sql.cshtml", "./database", true));
-
 
                 g.AddTemplate( typeof(MetaSchema), new TemplateDef("database/pgsql/template.schema.create.generated.sql.cshtml", "./database", true));
 
@@ -63,8 +63,18 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.sequence.generated.sql.cshtml", "./database", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.rwkindex.generated.sql.cshtml", "./database", true));
 
-
                 g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.sh.cshtml", "./database", true));
+
+
+                /* dotnet server templates */
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Config.generated.cs.cshtml", "./server/common", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Util.generated.cs.cshtml", "./server/common", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseObject.generated.cs.cshtml", "./server/common", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseLogic.generated.cs.cshtml", "./server/common", true));
+              
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/domain/template.generated.cs.cshtml", "./server/domain", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/domain/template.user.cs.cshtml", "./server/domain", false));
+
 
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);

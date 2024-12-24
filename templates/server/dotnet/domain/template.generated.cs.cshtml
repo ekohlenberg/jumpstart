@@ -1,0 +1,51 @@
+@{
+    string namespaceName = @Model.Namespace; // Replace with your namespace
+    string className = @Model.DomainObj; // Replace with your class name
+    string schemaName = @Model.SchemaName; // Replace with your schema name
+    string tableName = @Model.TableName; // Replace with your table name
+   
+}
+
+using System;
+using System.Reflection;
+
+namespace @namespaceName
+{
+    public partial class @className : BaseModel
+    {
+        protected void initialize()
+        {
+            // Default initializer
+            tableName = "@schemaName.@tableName";
+            tableBaseName = "@tableName";
+            auditTableName = "audit.@tableName";
+
+            @foreach (var attr in Model.Attributes)
+            {
+                if (attr.RWK == "1")
+                {
+                    <text>rwk.Add("@attr.Name");</text>
+                }
+            }
+        }
+
+        @foreach (var attr in Model.Attributes)
+        {
+            
+            
+            <text>
+            public @attr.DotNetType @attr.Name
+            {
+                get
+                {
+                    return Convert.@(attr.ConvertMethod)(getPropValue("@attr.Name"));
+                }
+                set
+                {
+                    setPropValue("@attr.Name", value);
+                }
+            }
+            </text>
+        }
+    }
+}
