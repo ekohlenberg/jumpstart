@@ -1,4 +1,4 @@
-﻿@"
+﻿
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 using Npgsql;
 using System.Linq;
 
-namespace $($namespace)
+namespace @Model.Name
 {
     public class DBPersist
     {
@@ -327,14 +327,14 @@ namespace $($namespace)
             int ver = 0;
 
             
-
-            string sqlTemplate = @"with ver_check as (
+            
+            string sqlTemplate = @@"with ver_check as (
             select max(version) as v from ^(table)
             where id=^(id)
             union all select 0 as v
             )
             select max(v)+1 from ver_check";
-
+            
             legr.Tuple p = new Tuple();
             
             long id = 0;
@@ -398,4 +398,3 @@ namespace $($namespace)
 
     }
 }
-"@

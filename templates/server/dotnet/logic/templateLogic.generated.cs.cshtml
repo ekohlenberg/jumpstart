@@ -1,0 +1,75 @@
+﻿@{
+    string namespaceName = @Model.Namespace; 
+    string domainObj = @Model.DomainObj;      
+    string domainVar = @Model.DomainVar;    
+    string schemaName = @Model.SchemaName;  
+    string tableName = @Model.TableName;    
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using @namespaceName;
+
+namespace @namespaceName
+{
+    public partial class @(domainObj)Logic : BaseLogic
+    {
+        public static List<@(domainObj)> select()
+        {
+            Console.WriteLine("Processing @(domainObj)Logic select List");
+
+            List<@(domainObj)> @(domainVar)s = new List<@(domainObj)>();
+
+            void @(domainVar)Callback(System.Data.Common.DbDataReader rdr)
+            {
+                @(domainObj) @(domainVar) = new @(domainObj)();
+
+                DBPersist.autoAssign(rdr, @(domainVar));
+
+                @(domainVar)s.Add(@(domainVar));
+            };
+
+            DBPersist.select(@(domainVar)Callback, $"select * from @schemaName.@tableName");
+
+            return @(domainVar)s;
+        }
+
+        public static @(domainObj) get(long id)
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic get ID={id}");
+
+            @(domainObj) @(domainVar) = new @(domainObj)();
+            @(domainVar).id = id;
+
+            DBPersist.get(@(domainVar));
+
+            return @(domainVar);
+        }
+
+        public static void insert(@(domainObj) @(domainVar))
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic insert: {@(domainVar)}");
+
+            @(domainVar).is_active = "Y";
+
+            DBPersist.insert(@(domainVar));
+        }
+
+        public static void update(long id, @(domainObj) @(domainVar))
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic update: ID = {id}\n{@(domainVar)}");
+
+            @(domainVar).id = id;
+            DBPersist.update(@(domainVar));
+        }
+
+        public static void delete(long id)
+        {
+            @(domainObj) @(domainVar) = get(id);
+            @(domainVar).is_active = "N";
+            DBPersist.update(@(domainVar));
+        }
+    }
+}
