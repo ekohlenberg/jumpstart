@@ -23,13 +23,26 @@
      - Distributed custom script processing (e.g. Powershell or Python)
 
 ## Technical Details
-6. **Languages and Frameworks**  
+6. **Jumpstart Architecture**  
    - Jumpstart is written in C# and RazorLight
+   - Metadata application definition
+   - MetaModel Representation
+     - MetaModel
+     - MetaSchema
+     - MetaObject
+     - MetaAttribute
+     - MetaBuild
+   - Type Mapping and Conversion
+   - Template types
+     - Application
+     - Schema
+     - Object
+     - Build
 
 7. **Database Support**  
-   - Currently only supports Postgres, but MS SQL and SQLite should follow soon.
+   - Jumpstart itself does not use a database.  Generated applications currently only support Postgres, but MS SQL and SQLite should follow soon.
 
-8. **Architectural Overview**  
+8. **Generated Application Architectural Overview**  
    - Database
      - Table design
        - Primary Keys

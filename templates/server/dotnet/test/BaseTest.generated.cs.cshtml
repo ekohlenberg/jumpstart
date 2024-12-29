@@ -1,0 +1,23 @@
+@using System;
+@using System.Collections.Generic;
+
+namespace @Model.Namespace
+{
+    public class BaseTest
+    {
+        @foreach (var baseObject in Model.Objects)
+        {
+            var tableName = baseObject.TableName;
+            var schemaName = baseObject.SchemaName;
+            var domainObj = baseObject.DomainObj;
+            var domainVar = baseObject.DomainVar;
+
+            <text>
+            protected static Stack<@(domainObj)> last@(domainObj) = new Stack<@(domainObj)>();
+            protected static Dictionary<long, @(domainObj)> map@(domainObj) = new Dictionary<long, @(domainObj)>();
+            </text>
+        }
+    }
+}
+
+
