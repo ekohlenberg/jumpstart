@@ -49,57 +49,57 @@ namespace @Model.Name
             }
         }
 
-        static public void select( SelectCallback selectCallback, string sqlTemplate, Tuple filter)
+        static public void select( SelectCallback selectCallback, string sqlTemplate, BaseObject filter)
         {
             string sql = substituteTemplate(filter, sqlTemplate);
 
             select(selectCallback, sql);
         }
 
-        static public long insert( Tuple tuple )
+        static public long insert( BaseObject baseObject )
         {
             long id = identity();
-            int ver = version(tuple);
+            int ver = version(baseObject);
 
-            tuple.setPropValue("id", id);
-            tuple.setPropValue("version", ver);
-            tuple.setPropValue("last_updated", DateTime.Now);
-            tuple.setPropValue("last_updated_by", Environment.UserName);
-            string sql = insertSql(tuple, tuple.tableName);
+            baseObject.setPropValue("id", id);
+            baseObject.setPropValue("version", ver);
+            baseObject.setPropValue("last_updated", DateTime.Now);
+            baseObject.setPropValue("last_updated_by", Environment.UserName);
+            string sql = insertSql(baseObject, baseObject.tableName);
             execCmd(sql);
 
-            audit(tuple);
+            audit(baseObject);
 
             return id;
         }
 
-        static public long audit( Tuple tuple )
+        static public long audit( BaseObject baseObject )
         {
-            Tuple auditTuple = new Tuple(tuple);
+            BaseObject auditBaseObject = new BaseObject(baseObject);
 
-            string auditFKCol = tuple.tableBaseName + "_id";
-            auditTuple.setPropValue(auditFKCol, tuple["id"]);
+            string auditFKCol = baseObject.tableBaseName + "_id";
+            auditBaseObject.setPropValue(auditFKCol, baseObject["id"]);
             long id = identity();
-            auditTuple.setPropValue("id", id);
+            auditBaseObject.setPropValue("id", id);
 
-            Console.WriteLine("Audit: " + auditTuple.ToString());
+            Console.WriteLine("Audit: " + auditBaseObject.ToString());
 
-            string sql = insertSql(auditTuple, tuple.auditTableName);
+            string sql = insertSql(auditBaseObject, baseObject.auditTableName);
             execCmd(sql);
 
             return id;
         }
-        static public void update(Tuple tuple)
+        static public void update(BaseObject baseObject)
         {
-            tuple.setPropValue("version", version(tuple));
+            baseObject.setPropValue("version", version(baseObject));
 
-            string sql = updateSql(tuple);
+            string sql = updateSql(baseObject);
             execCmd(sql);
 
-            audit(tuple);
+            audit(baseObject);
         }
 
-        public static void execCmd( Tuple parameters, string sqlTemplate)
+        public static void execCmd( BaseObject parameters, string sqlTemplate)
         {
             string sql = substituteTemplate(parameters, sqlTemplate);
             execCmd(sql);
@@ -126,17 +126,17 @@ namespace @Model.Name
             }
         }
 
-        static string insertSql( Tuple tuple, string tableName )
+        static string insertSql( BaseObject baseObject, string tableName )
         {
             StringBuilder sql = new StringBuilder("insert into " + tableName + " ");
             StringBuilder cols = new StringBuilder("");
             StringBuilder vals = new StringBuilder("");
 
-            foreach (string k in tuple.Keys)
+            foreach (string k in baseObject.Keys)
             {
                 //if (k != "id")
                 //{
-                    object v = tuple[k];
+                    object v = baseObject[k];
 
                     if (cols.Length > 0)
                     {
@@ -157,16 +157,16 @@ namespace @Model.Name
             return sql.ToString();
         }
 
-        static string updateSql( Tuple tuple)
+        static string updateSql( BaseObject baseObject)
         {
-            StringBuilder sql = new StringBuilder("update " + tuple.tableName + " set ");
+            StringBuilder sql = new StringBuilder("update " + baseObject.tableName + " set ");
             StringBuilder expressions = new StringBuilder();
             StringBuilder where = new StringBuilder();
 
-            exprSql(tuple, tuple.Keys, ", ", expressions);
+            exprSql(baseObject, baseObject.Keys, ", ", expressions);
 
             where.Append(" where id=");
-            where.Append(toSql(tuple["id"]));
+            where.Append(toSql(baseObject["id"]));
 
             sql.Append(expressions);
             sql.Append(where);
@@ -175,7 +175,7 @@ namespace @Model.Name
             return sql.ToString();
         }
 
-        private static void exprSql(Tuple tuple, IEnumerable<string> attrList, string sepToken, StringBuilder expressions)
+        private static void exprSql(BaseObject baseObject, IEnumerable<string> attrList, string sepToken, StringBuilder expressions)
         {
             foreach (string k in attrList)
             {
@@ -188,7 +188,7 @@ namespace @Model.Name
                     string expr = string.Empty;
                     expr += bracket(k);
                     expr += "=";
-                    expr += toSql(tuple[k]);
+                    expr += toSql(baseObject[k]);
 
                     expressions.Append(expr);
                 }
@@ -228,7 +228,7 @@ namespace @Model.Name
           
         }
 
-        static public void get(Tuple t)
+        static public void get(BaseObject t)
         {
             string sql = getSql(t);
 
@@ -241,67 +241,67 @@ namespace @Model.Name
         }
 
 
-        static public void put(Tuple tuple, string rwkCol)
+        static public void put(BaseObject baseObject, string rwkCol)
         {
             string sql = "select * from ^(tableName) where ^(rwkCol) = ^(rwkValue)";
             bool found = false;
 
-            Tuple filter = new Tuple();
-            filter["tableName"] = tuple.tableName;
+            BaseObject filter = new BaseObject();
+            filter["tableName"] = baseObject.tableName;
             filter["rwkCol"] = rwkCol;
-            filter["rwkValue"] = toSql(tuple[rwkCol].ToString());
+            filter["rwkValue"] = toSql(baseObject[rwkCol].ToString());
 
             SelectCallback scb = (rdr) =>
             {
                 found = true;
-                tuple["id"] = rdr["id"];
+                baseObject["id"] = rdr["id"];
             };
 
             select(scb, sql, filter);
 
             if (found)
             {
-                update(tuple);
+                update(baseObject);
             }
             else
             {
-                insert(tuple);
+                insert(baseObject);
             }
         }
 
-        static public void put(Tuple tuple)
+        static public void put(BaseObject baseObject)
         {
             string sql = "select * from ^(tableName) where ^(expression)";
             int count = 0;
             StringBuilder expression = new StringBuilder();
 
-            if (tuple.getRwk().Count <= 0) throw new Exception(tuple.GetType().Name + ".rwk list is empty. DBPersist.put(Tuple) requires at least one attribute in the rwk list.");
+            if (baseObject.getRwk().Count <= 0) throw new Exception(baseObject.GetType().Name + ".rwk list is empty. DBPersist.put(BaseObject) requires at least one attribute in the rwk list.");
 
-            exprSql(tuple, tuple.getRwk(), " and ", expression);
+            exprSql(baseObject, baseObject.getRwk(), " and ", expression);
 
-            Tuple filter = new Tuple();
-            filter["tableName"] = tuple.tableName;
+            BaseObject filter = new BaseObject();
+            filter["tableName"] = baseObject.tableName;
             filter["expression"] = expression.ToString();
 
             SelectCallback scb = (rdr) =>
             {
                 count++;
-                tuple["id"] = rdr["id"];
+                baseObject["id"] = rdr["id"];
             };
 
             select(scb, sql, filter);
 
             if (count == 1)
             {
-                update(tuple);
+                update(baseObject);
             }
             else if (count == 0)
             {
-                insert(tuple);
+                insert(baseObject);
             }
             else
             {
-                throw new Exception(tuple.GetType().Name + ".rwk returned more that one row. sql=" + sql); ;
+                throw new Exception(baseObject.GetType().Name + ".rwk returned more that one row. sql=" + sql); ;
             }
         }
 
@@ -322,7 +322,7 @@ namespace @Model.Name
             return id;
         }
 
-        static int version(Tuple tuple)
+        static int version(BaseObject baseObject)
         {
             int ver = 0;
 
@@ -335,16 +335,16 @@ namespace @Model.Name
             )
             select max(v)+1 from ver_check";
             
-            legr.Tuple p = new Tuple();
+            BaseObject p = new BaseObject();
             
             long id = 0;
-            if (tuple.ContainsKey("id"))
+            if (baseObject.ContainsKey("id"))
             {
-                id = Convert.ToInt64(tuple["id"]);
+                id = Convert.ToInt64(baseObject["id"]);
             }
                 
             
-            p["table"] = tuple.tableName;
+            p["table"] = baseObject.tableName;
             p["id"] = id;
             string sql = substituteTemplate(p, sqlTemplate);
 
@@ -357,11 +357,11 @@ namespace @Model.Name
 
             return ver;
         }
-        static string getSql( Tuple t)
+        static string getSql( BaseObject t)
         {
             string sqlTemplate = "select * from ^(table) where id=^(id)";
 
-            legr.Tuple p = new Tuple();
+            BaseObject p = new BaseObject();
 
             p["id"] = t["id"];
             p["table"] = t.tableName;
@@ -370,7 +370,7 @@ namespace @Model.Name
 
         }
 
-        public static void autoAssign( DbDataReader rdr, Tuple t)
+        public static void autoAssign( DbDataReader rdr, BaseObject t)
         {
             for (int i = 0; i < rdr.FieldCount; i++)
             {
@@ -380,7 +380,7 @@ namespace @Model.Name
             }
         }
 
-        protected static string substituteTemplate( Tuple parameters, string sqlTemplate)
+        protected static string substituteTemplate( BaseObject parameters, string sqlTemplate)
         {
             StringBuilder sb = new StringBuilder(sqlTemplate);
 

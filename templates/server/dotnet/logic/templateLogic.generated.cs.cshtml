@@ -52,7 +52,7 @@ namespace @namespaceName
         {
             Console.WriteLine($"Processing @(domainObj)Logic insert: {@(domainVar)}");
 
-            @(domainVar).is_active = "Y";
+            @(domainVar).is_active = 1;
 
             DBPersist.insert(@(domainVar));
         }
@@ -68,7 +68,7 @@ namespace @namespaceName
         public static void delete(long id)
         {
             @(domainObj) @(domainVar) = get(id);
-            @(domainVar).is_active = "N";
+            @(domainVar).is_active = 0;
             DBPersist.update(@(domainVar));
         }
     }

@@ -96,7 +96,8 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/Properties/launchSettings.json.cshtml", "./server/api/Properties", false));
 
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/api.csproj.cshtml", "./server/api", true));
-
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/server.sln.cshtml", "./server", true));
+                
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);
                 await g.GenerateObjects(metaModel);
