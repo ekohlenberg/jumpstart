@@ -1,79 +1,83 @@
-﻿@using System;
-@using System.Collections.Generic;
-@using System.Linq;
-@using System.Threading.Tasks;
-@using @Model.Namespace;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using @Model.Namespace;
 
 namespace @Model.Namespace
 {
-    public partial class @Model.DomainObjTest : BaseTest
+    public partial class @(Model.DomainObj)Test : BaseTest
     {
         public static void testInsert()
         {
-            var @Model.DomainVar = new @Model.DomainObj();
+            var @(Model.DomainVar) = new @(Model.DomainObj)();
 
-            @foreach (var column in Model.Columns)
+            @foreach (var attr in Model.Attributes)
             {
-                if (column.ColumnName.EndsWith("id"))
+                if (attr.Name.EndsWith("id"))
                 {
-                    if (!string.IsNullOrEmpty(column.FkObject))
+                    if (!string.IsNullOrEmpty(attr.FkObject))
                     {
                         <text>
-                            @Model.DomainVar.@column.ColumnName = BaseTest.getLastId("@column.FkObject");
+                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
                         </text>
                     }
                 }
                 else
                 {
                     var testDataSet = "random";
-                    if (!string.IsNullOrEmpty(column.TestDataSet))
+                    if (!string.IsNullOrEmpty(attr.TestDataSet))
                     {
-                        testDataSet = column.TestDataSet;
+                        testDataSet = attr.TestDataSet;
                     }
                     <text>
-                        @Model.DomainVar.@column.ColumnName = (@Model.TypeMapping[column.DataType]) BaseTest.getTestData(@Model.DomainVar, "@column.DataType", TestDataType.@testDataSet);
+                        @(Model.DomainVar).@attr.Name = (@attr.DotNetType) BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet);
                     </text>
                 }
             }
+            @{
             <text>
-                Console.WriteLine("Testing @Model.DomainObjLogic insert: " + @Model.DomainVar.ToString());
-                @Model.DomainObjLogic.insert(@Model.DomainVar);
-                BaseTest.addLastId("@Model.DomainObj", @Model.DomainVar.Id);
+                Console.WriteLine("Testing @(Model.DomainObj)Logic insert: " + @(Model.DomainVar).ToString());
+                @(Model.DomainObj)Logic.insert(@(Model.DomainVar));
+                BaseTest.addLastId("@(Model.DomainObj)", @(Model.DomainVar).id);
             </text>
+            }
         }
 
         public static void testUpdate()
         {
-            long lastId = BaseTest.getLastId("@Model.DomainObj");
-            var @Model.DomainVar = @Model.DomainObjLogic.get(lastId);
+            long lastId = BaseTest.getLastId("@(Model.DomainObj)");
+            var @(Model.DomainVar) = @(Model.DomainObj)Logic.get(lastId);
 
-            @foreach (var column in Model.Columns)
+            @foreach (var attr in Model.Attributes)
             {
-                if (column.ColumnName.EndsWith("id"))
+                if (attr.Name.EndsWith("id"))
                 {
-                    if (!string.IsNullOrEmpty(column.FkObject))
+                    if (!string.IsNullOrEmpty(attr.FkObject))
                     {
                         <text>
-                            @Model.DomainVar.@column.ColumnName = BaseTest.getLastId("@column.FkObject");
+                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
                         </text>
                     }
                 }
                 else
                 {
                     var testDataSet = "random";
-                    if (!string.IsNullOrEmpty(column.TestDataSet))
+                    if (!string.IsNullOrEmpty(attr.TestDataSet))
                     {
-                        testDataSet = column.TestDataSet;
+                        testDataSet = attr.TestDataSet;
                     }
                     <text>
-                        @Model.DomainVar.@column.ColumnName = (@Model.TypeMapping[column.DataType]) BaseTest.getTestData(@Model.DomainVar, "@column.DataType", TestDataType.@testDataSet);
+                        @(Model.DomainVar).@attr.Name = (@attr.DotNetType) BaseTest.getTestData(@(Model.DomainVar), "@attr.DotNetType", TestDataType.@testDataSet);
                     </text>
                 }
             }
+            @{
             <text>
-                Console.WriteLine("Testing @Model.DomainObjLogic update: " + @Model.DomainVar.ToString());
-                @Model.DomainObjLogic.update(lastId, @Model.DomainVar);
+                Console.WriteLine("Testing @(Model.DomainObj)Logic update: " + @(Model.DomainVar).ToString());
+                @(Model.DomainObj)Logic.update(lastId, @(Model.DomainVar));
             </text>
+            }
         }
     }
 }

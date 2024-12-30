@@ -81,6 +81,7 @@ namespace jumpstart {
         public string FkType {get;set;}
         public string FkObject {get;set;}
 
+        public string TestDataSet{get;set;}
         public override string ToString()
         {
             return $"Name: {Name}\nDataType: {SqlDataType}\nLength: {Length}\nLabel: {Label}\nRWK: {RWK}\n";
@@ -211,6 +212,81 @@ namespace jumpstart {
             }
             return result;
         }
+
+        public void SortMetaObjectsByReference()
+        {
+            this.Objects = SortMetaObjectsByReference( this.Objects );
+        }
+        protected  List<MetaObject> SortMetaObjectsByReference(List<MetaObject> metaObjects)
+        {
+            // Build a dependency graph
+            var graph = new Dictionary<MetaObject, List<MetaObject>>();
+            var inDegree = new Dictionary<MetaObject, int>();
+            
+            // Initialize graph and in-degree map
+            foreach (var metaObject in metaObjects)
+            {
+                graph[metaObject] = new List<MetaObject>();
+                inDegree[metaObject] = 0;
+            }
+
+            // Populate the graph based on foreign key dependencies
+            foreach (var metaObject in metaObjects)
+            {
+                foreach (var attribute in metaObject.Attributes)
+                {
+                    if (!string.IsNullOrEmpty(attribute.FkObject))
+                    {
+                        var fkObject = metaObjects.FirstOrDefault(mo => mo.Name == attribute.FkObject);
+                        if (fkObject != null)
+                        {
+                            graph[fkObject].Add(metaObject);
+                            inDegree[metaObject]++;
+                        }
+                    }
+                }
+            }
+
+            // Perform topological sort using Kahn's algorithm
+            var sorted = new List<MetaObject>();
+            var queue = new Queue<MetaObject>();
+
+            // Add all nodes with in-degree 0 to the queue
+            foreach (var kvp in inDegree)
+            {
+                if (kvp.Value == 0)
+                {
+                    queue.Enqueue(kvp.Key);
+                }
+            }
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                sorted.Add(current);
+
+                // Reduce the in-degree of neighbors
+                foreach (var neighbor in graph[current])
+                {
+                    inDegree[neighbor]--;
+                    if (inDegree[neighbor] == 0)
+                    {
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+
+            // Check for circular dependencies
+            if (sorted.Count != metaObjects.Count)
+            {
+                throw new InvalidOperationException("Circular dependency detected among MetaObjects.");
+            }
+
+            return sorted;
+        }
+
+
+
     }
 
 

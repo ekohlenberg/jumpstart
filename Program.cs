@@ -100,7 +100,9 @@ namespace jumpstart {
                 
                 /* test */
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/BaseTest.generated.cs.cshtml", "./server/test", true));
-                
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/test/template.test.generated.cs.cshtml", "./server/test", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/test.csproj.cshtml", "./server/test", true));
+               
 
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);

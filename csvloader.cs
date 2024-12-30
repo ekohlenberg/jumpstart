@@ -49,15 +49,17 @@ public class CSVLoader
         {
             var records = csv.GetRecords<MetadataRecord>();
             foreach (MetadataRecord mr in records)
-                    {
-                       
-                        // Assuming the fields contain attributes like schema, table, column, etc
+            {
+                
+                // Assuming the fields contain attributes like schema, table, column, etc
 
-                        SetNamespace(metaModel, mr.TABLE_CATALOG);
-                        AddSchema(metaModel, mr);
-                    }
+                SetNamespace(metaModel, mr.TABLE_CATALOG);
+                AddSchema(metaModel, mr);
+            }
 
         }
+
+        metaModel.SortMetaObjectsByReference();
         
     }
 
@@ -115,7 +117,8 @@ public class CSVLoader
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
                 FkObject= mr.FK_OBJECT,
-                FkType=mr.FK_TYPE
+                FkType=mr.FK_TYPE,
+                TestDataSet=mr.TEST_DATA_SET
             };
             metaObject.Attributes.Add( attribute );
         }
