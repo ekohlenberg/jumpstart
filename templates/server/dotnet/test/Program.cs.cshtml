@@ -7,40 +7,31 @@ namespace @Model.Namespace
 {
     class Program
     {
-
         static void Main(string[] args)
         {
-					try
-					{
-    				@foreach (var baseObject in Model.Objects)
-                    {
-                        var tableName = baseObject.TableName;
-                        var schemaName = baseObject.SchemaName;
-                        var domainObj = baseObject.DomainObj;
-                        var domainVar = baseObject.DomainVar;
+            try
+            {
+            @foreach (var baseObject in Model.Objects)
+            {
+                var domainObj = baseObject.DomainObj;
+                <text>
+                @(domainObj)Test.testInsert();            
+                @(domainObj)Test.testUpdate();            
+                </text>
+            }
+            }
+            catch( Exception x)
+            {
+                Console.WriteLine(x.Message);
+                Console.WriteLine(x.StackTrace);
 
-                        <text>
-                        @(domainObj)Test.testInsert();            
-                        @(domainObj)Test.testUpdate();            
-                        </text>
-                    }
-
-
-					}
-					catch( Exception x)
-					{
-						Console.WriteLine(x.Message);
-						Console.WriteLine(x.StackTrace);
-
-						if (x.InnerException != null)
-						{
-							x = x.InnerException;
-							Console.WriteLine(x.Message);
-							Console.WriteLine(x.StackTrace);
-						}	
-
-        }
-       
-			}
+                if (x.InnerException != null)
+                {
+                    x = x.InnerException;
+                    Console.WriteLine(x.Message);
+                    Console.WriteLine(x.StackTrace);
+                }	
+            }
+		}
     }
 }

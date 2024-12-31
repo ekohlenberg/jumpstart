@@ -58,7 +58,7 @@ namespace @Model.Name
 
         static public long insert( BaseObject baseObject )
         {
-            long id = identity();
+            long id = identity(baseObject);
             int ver = version(baseObject);
 
             baseObject.setPropValue("id", id);
@@ -79,7 +79,7 @@ namespace @Model.Name
 
             string auditFKCol = baseObject.tableBaseName + "_id";
             auditBaseObject.setPropValue(auditFKCol, baseObject["id"]);
-            long id = identity();
+            long id = identity(baseObject);
             auditBaseObject.setPropValue("id", id);
 
             Console.WriteLine("Audit: " + auditBaseObject.ToString());
@@ -305,12 +305,13 @@ namespace @Model.Name
             }
         }
 
-        static long identity()
+        static long identity(BaseObject baseObject)
         {
             long id = 0;
 
             //string sql = "select next value for object_identity";
-            string sql = "SELECT nextval('object_identity');";
+            string sql = "SELECT nextval('$(tableName)_identity');";
+            sql = sql.Replace("$(tableName)", baseObject.tableName);
 
             SelectCallback scb = (rdr) =>
             {

@@ -205,7 +205,7 @@ namespace @Model.Namespace
                     }
                     else
                     {
-                        switch (baseDataType)
+                        switch (baseDataType.ToUpper())
                         {
                             case "BIGINT":
                             case "INTEGER":
@@ -232,7 +232,7 @@ namespace @Model.Namespace
                                 result = getRandomString();
                                 break;
                             default:
-                                break;
+                                throw new Exception("Cannot Generate data for " + baseDataType);
                             
                         }
                     }

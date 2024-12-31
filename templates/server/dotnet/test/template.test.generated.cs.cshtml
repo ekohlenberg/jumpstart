@@ -14,6 +14,8 @@ namespace @Model.Namespace
 
             @foreach (var attr in Model.Attributes)
             {
+                if (attr.IsGlobal()) continue;
+                
                 if (attr.Name.EndsWith("id"))
                 {
                     if (!string.IsNullOrEmpty(attr.FkObject))
@@ -31,7 +33,7 @@ namespace @Model.Namespace
                         testDataSet = attr.TestDataSet;
                     }
                     <text>
-                        @(Model.DomainVar).@attr.Name = (@attr.DotNetType) BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet);
+                        @(Model.DomainVar).@attr.Name = Convert.@(attr.ConvertMethod)(BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet));
                     </text>
                 }
             }
@@ -51,6 +53,8 @@ namespace @Model.Namespace
 
             @foreach (var attr in Model.Attributes)
             {
+                if (attr.IsGlobal()) continue;
+                
                 if (attr.Name.EndsWith("id"))
                 {
                     if (!string.IsNullOrEmpty(attr.FkObject))

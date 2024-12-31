@@ -82,6 +82,12 @@ namespace jumpstart {
         public string FkObject {get;set;}
 
         public string TestDataSet{get;set;}
+
+         bool _IsGlobal{get;set;} = false;
+
+        public bool IsGlobal() { return _IsGlobal;}
+        public void SetGlobal() { _IsGlobal = true;}
+
         public override string ToString()
         {
             return $"Name: {Name}\nDataType: {SqlDataType}\nLength: {Length}\nLabel: {Label}\nRWK: {RWK}\n";
@@ -193,7 +199,12 @@ namespace jumpstart {
         public Dictionary<string, MetaSchema> Schemas { get; private set; } = new();
         public List<MetaObject> Objects { get; private set; } = new();
 
-        
+        public List<MetaAttribute> GlobalAttributes {get; private set;} = new();
+
+        public bool ContainsGlobalAttribute(string name)
+        {
+            return GlobalAttributes.Any(attr => attr.Name == name);
+        }
         public MetaBuild build = new MetaBuild();
         
         public MetaModel(string _namespace)

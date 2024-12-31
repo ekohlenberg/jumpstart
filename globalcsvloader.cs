@@ -32,11 +32,24 @@ public class GlobalCSVLoader
             foreach (GlobalMetaRecord mr in records)
                     {
                         // Assuming the fields contain attributes like schema, table, column, etc
+                        MetaAttribute a = new MetaAttribute
+                        {
+                            Name = mr.COLUMN_NAME,
+                            SqlDataType = mr.DATA_TYPE,
+                            Length = mr.CHARACTER_MAXIMUM_LENGTH,
+                            DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
+                            ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), ""),
+                            Label = mr.COLUMN_LABEL
+                        };
+                        
+                        a.SetGlobal();
 
                         foreach(MetaObject metaObject in metaModel.Objects)
                         {
-                            AddAttributes(metaObject, mr);
+                            AddAttributes(metaObject, a);
                         }
+
+                        AddGlobalAttribute( metaModel, a);
                         
                     }
 
@@ -44,23 +57,20 @@ public class GlobalCSVLoader
         
     }
 
-    private void AddAttributes(MetaObject metaObject, GlobalMetaRecord mr)
+    private void AddAttributes(MetaObject metaObject, MetaAttribute attribute)
     {
-        if (!metaObject.Attributes.Any(attr => attr.Name == mr.COLUMN_NAME))
-        {
-            var attribute = new MetaAttribute
-            {
-                Name = mr.COLUMN_NAME,
-                SqlDataType = mr.DATA_TYPE,
-                Length = mr.CHARACTER_MAXIMUM_LENGTH,
-                DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
-                ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), ""),
-                Label = mr.COLUMN_LABEL,
-            };
+        if (!metaObject.Attributes.Any(attr => attr.Name == attribute.Name))
+        {            
             metaObject.Attributes.Add( attribute );
         }
     }
-
+    private void AddGlobalAttribute(MetaModel metaModel, MetaAttribute attribute)
+    {
+        if (!metaModel.GlobalAttributes.Any(attr => attr.Name == attribute.Name))
+        {            
+            metaModel.GlobalAttributes.Add( attribute );
+        }
+    }
    
 }
 }
