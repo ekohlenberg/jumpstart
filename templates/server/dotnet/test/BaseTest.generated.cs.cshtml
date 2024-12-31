@@ -208,6 +208,8 @@ namespace @Model.Namespace
                         switch (baseDataType.ToUpper())
                         {
                             case "BIGINT":
+                                 result = Convert.ToInt64(getRandomInteger());
+                                 break;
                             case "INTEGER":
                             case "SMALLINT":
                                 result = getRandomInteger();

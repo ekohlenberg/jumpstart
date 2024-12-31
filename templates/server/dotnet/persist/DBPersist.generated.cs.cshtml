@@ -18,39 +18,47 @@ namespace @Model.Name
         {
             // Retrieve all rows
             /*
+            
 
-            await using var conn = new NpgsqlConnection(connString);
-            await conn.OpenAsync();
+                await using var conn = new NpgsqlConnection(connString);
+                await conn.OpenAsync();
 
-            await using (var cmd = new NpgsqlCommand("SELECT some_field FROM data", conn))
-            await using (var reader = await cmd.ExecuteReaderAsync())
-            {
-            while (await reader.ReadAsync())
-                Console.WriteLine(reader.GetString(0));
-            }
-            */
-
-            string connectionStr = Config.getString("db.connection");
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(connectionStr))
-            {
-                connection.Open();
-
-                using (DbCommand command = (DbCommand) new NpgsqlCommand(sql, connection))
+                await using (var cmd = new NpgsqlCommand("SELECT some_field FROM data", conn))
+                await using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    using (DbDataReader rdr = (DbDataReader) command.ExecuteReader())
+                while (await reader.ReadAsync())
+                    Console.WriteLine(reader.GetString(0));
+                }
+                */
+                try
+                {
+                string connectionStr = Config.getString("db.connection");
+
+                using (NpgsqlConnection connection = new NpgsqlConnection(connectionStr))
+                {
+                    connection.Open();
+
+                    using (DbCommand command = (DbCommand) new NpgsqlCommand(sql, connection))
                     {
-                        while (rdr.Read())
+                        using (DbDataReader rdr = (DbDataReader) command.ExecuteReader())
                         {
-                            selectCallback(rdr);
+                            while (rdr.Read())
+                            {
+                                selectCallback(rdr);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error executing sql " + sql, ex);
             }
         }
 
         static public void select( SelectCallback selectCallback, string sqlTemplate, BaseObject filter)
         {
+
             string sql = substituteTemplate(filter, sqlTemplate);
 
             select(selectCallback, sql);
@@ -63,6 +71,7 @@ namespace @Model.Name
 
             baseObject.setPropValue("id", id);
             baseObject.setPropValue("version", ver);
+            baseObject.setPropValue("created_by", Environment.UserName);
             baseObject.setPropValue("last_updated", DateTime.Now);
             baseObject.setPropValue("last_updated_by", Environment.UserName);
             string sql = insertSql(baseObject, baseObject.tableName);
@@ -92,6 +101,8 @@ namespace @Model.Name
         static public void update(BaseObject baseObject)
         {
             baseObject.setPropValue("version", version(baseObject));
+            baseObject.setPropValue("last_updated", DateTime.Now);
+            baseObject.setPropValue("last_updated_by", Environment.UserName);
 
             string sql = updateSql(baseObject);
             execCmd(sql);
@@ -137,6 +148,10 @@ namespace @Model.Name
                 //if (k != "id")
                 //{
                     object v = baseObject[k];
+                    
+                    if (v == null) continue;
+                    if (v == DBNull.Value) continue;
+                    if (string.IsNullOrEmpty(v.ToString())) continue;
 
                     if (cols.Length > 0)
                     {
@@ -181,6 +196,11 @@ namespace @Model.Name
             {
                 if (k != "id")
                 {
+                    object v = toSql(baseObject[k]);
+                    if (v == null) continue;
+                    if (v == DBNull.Value) continue;
+                    if (string.IsNullOrEmpty(v.ToString())) continue;
+
                     if (expressions.Length > 0)
                     {
                         expressions.Append(sepToken);
@@ -188,7 +208,7 @@ namespace @Model.Name
                     string expr = string.Empty;
                     expr += bracket(k);
                     expr += "=";
-                    expr += toSql(baseObject[k]);
+                    expr += v;
 
                     expressions.Append(expr);
                 }
@@ -205,6 +225,7 @@ namespace @Model.Name
         static string toSql( object v)
         {
             string result = string.Empty;
+            if (v == null) return result;
 
             if (v.GetType().Equals(typeof(DateTime)))
             {

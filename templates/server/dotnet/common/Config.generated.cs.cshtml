@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Configuration;
@@ -42,25 +43,41 @@ namespace @Model.Name
         }
 
         static public string getDbConnection()
-        {
-            // var connString = "Host=myserver;Username=mylogin;Password=mypass;Database=mydatabase";
-            string dbcon = "Host=^server;Username=^username;Password=^password;Database=^database;";
-           // string dbcon = "Server=^server;Database=^database;User Id=^username;Password=^password";
+{
+    // Path to the .legr3 file in the user's home directory
+    string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    string filePath = Path.Combine(homeDirectory, ".@(Model.Name)");
 
-            string server = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()DBSERVER");
-            string database = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()DATABASE");
-            string username = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()USER");
-            string password = Environment.GetEnvironmentVariable("@Model.Name.ToUpper()PASSWORD");
+    // Check if the file exists
+    if (!File.Exists(filePath))
+    {
+        throw new FileNotFoundException("The .@(Model.Name) file was not found in the user's home directory.", filePath);
+    }
 
-            dbcon = dbcon.Replace("^server", server);
-            dbcon = dbcon.Replace("^database", database);
-            dbcon = dbcon.Replace("^username", username);
-            dbcon = dbcon.Replace("^password", password);
+    // Read the file content
+    string fileContent = File.ReadAllText(filePath).Trim();
 
+    // Split the content by colon (:) to extract parameters
+    string[] parameters = fileContent.Split(':');
+    if (parameters.Length != 4)
+    {
+        throw new FormatException("The .@(Model.Name) file must contain exactly four parameters separated by colons (:).");
+    }
 
-            return dbcon;
+    string server = parameters[0];
+    string database = parameters[1];
+    string username = parameters[2];
+    string password = parameters[3];
 
-        }
+    // Create the connection string
+    string dbcon = "Host=^server;Username=^username;Password=^password;Database=^database;";
+    dbcon = dbcon.Replace("^server", server)
+                 .Replace("^database", database)
+                 .Replace("^username", username)
+                 .Replace("^password", password);
+
+    return dbcon;
+}
         static public int getInt(string param)
         {
             IConfigurationSection section = getConfigBuilder().GetSection("appsettings");
