@@ -2,7 +2,7 @@
 
 
 1. **Purpose**  
-    - Jumpstart is meant to help enterprise application developers create realistic prototypes that be used as the foundatio for real applications.
+    - Jumpstart is meant to help enterprise application developers create realistic prototypes that can be used as the foundation for real applications.
 
 2. **Problem Solved** 
    - This project generates a full stack application from metadata input.
