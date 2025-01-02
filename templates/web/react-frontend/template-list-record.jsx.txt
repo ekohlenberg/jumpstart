@@ -1,0 +1,1 @@
+                                             <td> {@(Model.DomainVar).^(column-name)} </td>   

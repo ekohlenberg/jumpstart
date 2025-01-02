@@ -1,0 +1,34 @@
+import axios from 'axios';
+
+//const @(Model.DomainConst)_API_BASE_URL = "http://localhost:5000/api/@(Model.DomainVar)";
+const { apiProtocol } = window['runConfig'];
+const { apiHost } = window['runConfig'];
+const { apiPort } = window['runConfig'];
+
+const @(Model.DomainConst)_API_BASE_URL = apiProtocol + '://' + apiHost +':' +  apiPort + '/api/@(Model.DomainVar)';
+
+
+class @(Model.DomainObj)Service {
+
+    get@(Model.DomainObj)s(){
+        return axios.get(@(Model.DomainConst)_API_BASE_URL);
+    }
+
+    create@(Model.DomainObj)(@(Model.DomainVar)){
+        return axios.post(@(Model.DomainConst)_API_BASE_URL, @(Model.DomainVar));
+    }
+
+    get@(Model.DomainObj)ById(@(Model.DomainVar)Id){
+        return axios.get(@(Model.DomainConst)_API_BASE_URL + '/' + @(Model.DomainVar)Id);
+    }
+
+    update@(Model.DomainObj)(@(Model.DomainVar), @(Model.DomainVar)Id){
+        return axios.put(@(Model.DomainConst)_API_BASE_URL + '/' + @(Model.DomainVar)Id, @(Model.DomainVar));
+    }
+
+    delete@(Model.DomainObj)(@(Model.DomainVar)Id){
+        return axios.delete(@(Model.DomainConst)_API_BASE_URL + '/' + @(Model.DomainVar)Id);
+    }
+}
+
+export default new @(Model.DomainObj)Service()

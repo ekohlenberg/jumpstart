@@ -1,2 +1,0 @@
-            ^(column-name): ^(domain-var).^(column-name)^(comma)
-                    

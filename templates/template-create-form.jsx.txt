@@ -1,7 +1,0 @@
-                                        <div className = "form-group">
-                                            <br/>
-                                            <label> ^(column-label): </label>
-                                            <input placeholder="" name="^(column-name)" className="form-control" 
-                                                value={this.state.^(column-name)} onChange={this.change^(obj-attr)Handler}/>
-                                        </div>
-

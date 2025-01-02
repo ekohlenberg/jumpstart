@@ -58,8 +58,8 @@ function Generate-List-Component {
 
     $content = $template
 
-    $content = $content.Replace("^(domain-obj)", $domainObj)
-    $content = $content.Replace("^(domain-var)", $domainVar)
+    $content = $content.Replace("@(Model.DomainObj)", $domainObj)
+    $content = $content.Replace("@(Model.DomainVar)", $domainVar)
     $content = $content.Replace("^(namespace)", $namespace)
     $content = $content.Replace("^(tableName)", $tableName)
     $content = $content.Replace("^(schemaName)", $schemaName)
@@ -72,7 +72,7 @@ function Generate-List-Component {
         $column = $columns[$i]
         $headerContent = $headerContent + $headerTemplate.Replace("^(column-label)", $column.column_label)
         $recordContent = $recordContent + $recordTemplate.Replace("^(column-name)", $column.column_name)
-        $recordContent = $recordContent.Replace( "^(domain-var)", $domainVar )
+        $recordContent = $recordContent.Replace( "@(Model.DomainVar)", $domainVar )
     }
 
     $content = $content.Replace( "^(list-header-partial)", $headerContent)
@@ -128,8 +128,8 @@ function Generate-Create-Component {
 
     $content = $template
 
-    $content = $content.Replace("^(domain-obj)", $domainObj)
-    $content = $content.Replace("^(domain-var)", $domainVar)
+    $content = $content.Replace("@(Model.DomainObj)", $domainObj)
+    $content = $content.Replace("@(Model.DomainVar)", $domainVar)
     $content = $content.Replace("^(namespace)", $namespace)
     $content = $content.Replace("^(tableName)", $tableName)
     $content = $content.Replace("^(schemaName)", $schemaName)
@@ -169,7 +169,7 @@ function Generate-Create-Component {
         $saveContent = $saveContent.Replace("^(comma)", $comma)
  
         $setstateContent = $setstateContent + $setstateTemplate.Replace("^(column-name)", $column.column_name )
-        $setstateContent = $setstateContent.Replace("^(domain-var)", $domainVar)
+        $setstateContent = $setstateContent.Replace("@(Model.DomainVar)", $domainVar)
         $setstateContent = $setstateContent.Replace("^(comma)", $comma)
  
     }
@@ -180,8 +180,8 @@ function Generate-Create-Component {
     $content = $content.Replace( "^(create-setstate-partial)", $setstateContent)
     $content = $content.Replace( "^(create-save-partial)", $saveContent)
     $content = $content.Replace( "^(create-form-partial)", $formContent)
-    $content = $content.Replace("^(domain-obj)", $domainObj)
-    $content = $content.Replace("^(domain-var)", $domainVar)
+    $content = $content.Replace("@(Model.DomainObj)", $domainObj)
+    $content = $content.Replace("@(Model.DomainVar)", $domainVar)
     
 
     # Output the list to a .jsx file
@@ -216,8 +216,8 @@ function Generate-Service {
 
     $content = $template
 
-    $content = $content.Replace("^(domain-obj)", $domainObj)
-    $content = $content.Replace("^(domain-var)", $domainVar)
+    $content = $content.Replace("@(Model.DomainObj)", $domainObj)
+    $content = $content.Replace("@(Model.DomainVar)", $domainVar)
     $content = $content.Replace("^(domain-const)", $domainConst)
     $content = $content.Replace("^(namespace)", $namespace)
     $content = $content.Replace("^(tableName)", $tableName)
@@ -268,13 +268,13 @@ foreach ($group in $groupedMetadata) {
         Generate-List-Component -tableName $tableName -namespace $namespace -columns $group.Group -action "list"
         Generate-Create-Component -tableName $tableName -namespace $namespace -columns $group.Group -action "create"
 
-        $headerNavContent = $headerNavContent + $headerNavTemplate.Replace("^(domain-obj)", $domainObj)
-        $headerNavContent = $headerNavContent.Replace("^(domain-var)", $domainVar)
+        $headerNavContent = $headerNavContent + $headerNavTemplate.Replace("@(Model.DomainObj)", $domainObj)
+        $headerNavContent = $headerNavContent.Replace("@(Model.DomainVar)", $domainVar)
 
-        $routeContent = $routeContent + $routeTemplate.Replace("^(domain-obj)", $domainObj)
-        $routeContent = $routeContent.Replace("^(domain-var)", $domainVar)
+        $routeContent = $routeContent + $routeTemplate.Replace("@(Model.DomainObj)", $domainObj)
+        $routeContent = $routeContent.Replace("@(Model.DomainVar)", $domainVar)
 
-        $importContent = $importContent + $importTemplate.Replace("^(domain-obj)", $domainObj )
+        $importContent = $importContent + $importTemplate.Replace("@(Model.DomainObj)", $domainObj )
 
     }
    

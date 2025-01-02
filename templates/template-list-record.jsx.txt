@@ -1,1 +1,0 @@
-                                             <td> {^(domain-var).^(column-name)} </td>   

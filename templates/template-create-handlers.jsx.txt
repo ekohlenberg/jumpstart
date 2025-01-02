@@ -1,1 +1,0 @@
-        this.change^(obj-attr)Handler = this.change^(obj-attr)Handler.bind(this);

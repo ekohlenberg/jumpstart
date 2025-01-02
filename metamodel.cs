@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.Arm;
 
 namespace jumpstart {
@@ -67,13 +68,24 @@ namespace jumpstart {
     {
         public string Name{get;set;}
         public readonly string  CR = "\n";
+        protected static string ConvertToPascalCase(string input)
+        {
+            string[] parts = input.Split('_');
+            return string.Concat(Array.ConvertAll(parts, part => char.ToUpper(part[0]) + part.Substring(1).ToLower()));
+        }
     }
     public class MetaAttribute : MetaBaseElement
     {
-        
+        private string _pascalName = null; 
         public string SqlDataType { get; set; }
         public string DotNetType {get;set;}
 
+        public string PascalName {
+            get {
+                if (_pascalName == null) _pascalName =  ConvertToPascalCase(Name);
+                return _pascalName;
+            }
+        }
         public string ConvertMethod {get;set;}
         public string Length { get; set; }
         public string Label { get; set; }
@@ -96,8 +108,15 @@ namespace jumpstart {
 
     public class MetaObject : MetaBaseElement
     {
+        private List<MetaAttribute> _userAttributes = null;
         public string Namespace {get; private set;}
         public string DomainObj { get; private set; }
+
+        public string DomainConst {
+            get {
+                return DomainObj.ToUpper();
+            }
+        }
         public string DomainVar { get; private set; }
         public string TableName { get; private set; }
 
@@ -107,6 +126,20 @@ namespace jumpstart {
         public string Primary {get;set;}
         public List<MetaAttribute> Attributes { get; private set; } = new();
 
+        public List<MetaAttribute> UserAttributes {
+            get 
+            {
+                if (_userAttributes == null)
+                {
+                    _userAttributes = new List<MetaAttribute>();
+                    foreach(MetaAttribute a in Attributes)
+                    {
+                        if (!a.IsGlobal()) _userAttributes.Add(a);
+                    }
+                }
+                return _userAttributes;
+            }
+        }
         public MetaObject(string _namespace, string tableName, string schemaName, string label, string primary)
         {
             Namespace = _namespace;
@@ -129,11 +162,7 @@ namespace jumpstart {
             return result;
         }
 
-        private static string ConvertToPascalCase(string input)
-        {
-            string[] parts = input.Split('_');
-            return string.Concat(Array.ConvertAll(parts, part => char.ToUpper(part[0]) + part.Substring(1).ToLower()));
-        }
+        
     }
 
     public class MetaSchema : MetaBaseElement

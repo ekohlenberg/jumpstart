@@ -1,0 +1,2 @@
+import @(Model.DomainObj)ListComponent from './components/@(Model.DomainObj)ListComponent';
+import @(Model.DomainObj)CreateComponent from './components/@(Model.DomainObj)CreateComponent';

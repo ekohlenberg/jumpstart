@@ -1,1 +1,0 @@
-<div><a style={{marginLeft: "10px"}}className="navbar" href="/^(domain-var)">^(domain-obj)</a></div>

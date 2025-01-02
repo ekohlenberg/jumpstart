@@ -1,5 +1,0 @@
-
-           protected static Stack<^(domain-obj)> last^(domain-obj) = new Stack<^(domain-obj)>();
-           protected static Dictionary< long, ^(domain-obj)> map^(domain-obj) = new Dictionary<long, ^(domain-obj)>();
-       
-       

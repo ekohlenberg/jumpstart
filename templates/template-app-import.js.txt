@@ -1,2 +1,0 @@
-import ^(domain-obj)ListComponent from './components/^(domain-obj)ListComponent';
-import ^(domain-obj)CreateComponent from './components/^(domain-obj)CreateComponent';

@@ -1,5 +1,0 @@
-change^(obj-attr)Handler= (event) => {
-        this.setState({^(column-name): event.target.value});
-    }
-
- 

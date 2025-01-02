@@ -94,9 +94,8 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.json.cshtml", "./server/api", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.Development.json.cshtml", "./server/api", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/Properties/launchSettings.json.cshtml", "./server/api/Properties", false));
-
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/api.csproj.cshtml", "./server/api", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/server.sln.cshtml", "./server", true));
+
                 
                 /* test */
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/BaseTest.generated.cs.cshtml", "./server/test", true));
@@ -105,6 +104,13 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/Program.cs.cshtml", "./server/test", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/test.csproj.cshtml", "./server/test", true));
                
+               /* server solution */
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/server.sln.cshtml", "./server", true));
+
+                /* react templates */
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/components/template-create.jsx.cshtml", "./web/react-frontend/src/components", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/components/template-list.jsx.cshtml", "./web/react-frontend/src/components", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/services/template-service.js.cshtml", "./web/react-frontend/src/services", true));
 
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);
