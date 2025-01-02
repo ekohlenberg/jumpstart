@@ -1,2 +1,0 @@
-    <th>^(column-label)</th>
-    

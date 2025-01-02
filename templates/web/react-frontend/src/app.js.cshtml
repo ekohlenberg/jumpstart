@@ -7,8 +7,14 @@ import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 // metric status (home page)
 import HeaderComponent from './components/HeaderComponent';
 
-^(app-import-partial)
 
+@foreach( var obj in @Model.Objects)
+{
+  <text>
+  import @(obj.DomainObj)ListComponent from './components/@(obj.DomainObj)ListComponent';
+  import @(obj.DomainObj)CreateComponent from './components/@(obj.DomainObj)CreateComponent';
+  </text>
+}
 
 // footer
 import FooterComponent from './components/FooterComponent';
@@ -22,7 +28,13 @@ function App() {
                     <Switch> 
                          <Route path = "/" exact component = {OrgListComponent}></Route>
                     
-                           ^(app-route-partial) 
+                          //^(app-route-partial) 
+                          @foreach( var obj in Model.Objects) 
+                          {
+                            <Route path = "/@(obj.DomainVar)" component = {@(obj.DomainObj)ListComponent}></Route>
+                            <Route path = "/add-@(obj.DomainVar)/:id" component = {@(obj.DomainObj)CreateComponent}></Route>
+                          }
+
                     </Switch>
                 </div>
               <FooterComponent />

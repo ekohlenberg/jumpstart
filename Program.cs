@@ -108,9 +108,21 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/server.sln.cshtml", "./server", true));
 
                 /* react templates */
+                /* components */
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/components/template-create.jsx.cshtml", "./web/react-frontend/src/components", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/components/template-list.jsx.cshtml", "./web/react-frontend/src/components", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/components/template-header.jsx.cshtml", "./web/react-frontend/src/components", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/components/template-footer.jsx.cshtml", "./web/react-frontend/src/components", true));
+
+                /* services */
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/services/template-service.js.cshtml", "./web/react-frontend/src/services", true));
+
+                /* application */
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/app.js.cshtml", "./web/react-frontend/src", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/app.css.cshtml", "./web/react-frontend/src", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/index.js.cshtml", "./web/react-frontend/src", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/index.css.cshtml", "./web/react-frontend/src", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/logo.svg.cshtml", "./web/react-frontend/src", false));
 
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);

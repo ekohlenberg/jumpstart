@@ -122,6 +122,8 @@ namespace jumpstart {
 
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
 
+            Console.WriteLine("Processing template " + templatePath);
+
             if (!File.Exists(templatePath))
             {
                 throw new FileNotFoundException($"Template not found: {templatePath}");

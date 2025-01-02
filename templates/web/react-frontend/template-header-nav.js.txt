@@ -1,1 +1,0 @@
-<div><a style={{marginLeft: "10px"}}className="navbar" href="/@(Model.DomainVar)">@(Model.DomainObj)</a></div>

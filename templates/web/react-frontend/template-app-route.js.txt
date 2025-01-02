@@ -1,3 +1,0 @@
-                          
-                          <Route path = "/@(Model.DomainVar)" component = {@(Model.DomainObj)ListComponent}></Route>
-                          <Route path = "/add-@(Model.DomainVar)/:id" component = {@(Model.DomainObj)CreateComponent}></Route>
