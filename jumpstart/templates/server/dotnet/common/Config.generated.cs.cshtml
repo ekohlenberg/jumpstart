@@ -59,22 +59,24 @@ namespace @Model.Name
 
     // Split the content by colon (:) to extract parameters
     string[] parameters = fileContent.Split(':');
-    if (parameters.Length != 4)
+    if (parameters.Length != 5)
     {
-        throw new FormatException("The .@(Model.Name) file must contain exactly four parameters separated by colons (:).");
+        throw new FormatException("The .@(Model.Name) file must contain exactly five parameters separated by colons (:).\nserver:port:database:user:password");
     }
 
     string server = parameters[0];
-    string database = parameters[1];
-    string username = parameters[2];
-    string password = parameters[3];
+    string port = parameters[1];
+    string database = parameters[2];
+    string username = parameters[3];
+    string password = parameters[4];
 
     // Create the connection string
-    string dbcon = "Host=^server;Username=^username;Password=^password;Database=^database;";
+    string dbcon = "Host=^server;Port=^port;Username=^username;Password=^password;Database=^database;";
     dbcon = dbcon.Replace("^server", server)
-                 .Replace("^database", database)
-                 .Replace("^username", username)
-                 .Replace("^password", password);
+                .Replace("^port", port)
+                .Replace("^database", database)
+                .Replace("^username", username)
+                .Replace("^password", password);
 
     return dbcon;
 }

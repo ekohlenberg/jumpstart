@@ -131,7 +131,7 @@ namespace jumpstart {
                 await g.GenerateBuild(metaModel);
 
                 // Output the string representation of the metaModel
-                Console.WriteLine(metaModel.ToString());
+                //Console.WriteLine(metaModel.ToString());
             }
             catch (Exception ex)
             {
