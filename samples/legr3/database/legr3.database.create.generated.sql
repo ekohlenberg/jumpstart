@@ -1,0 +1,16 @@
+
+
+DROP DATABASE IF EXISTS legr3 WITH ( FORCE );
+
+CREATE DATABASE legr3
+    WITH
+    OWNER = legr3
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'C'
+    LC_CTYPE = 'C'
+    LOCALE_PROVIDER = 'libc'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+    
+GRANT CONNECT ON DATABASE legr3 TO legr3;

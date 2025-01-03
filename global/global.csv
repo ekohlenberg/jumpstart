@@ -1,6 +1,0 @@
-COLUMN_NAME,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,COLUMN_LABEL
-is_active,NULL,NO,integer,NULL,Active
-created_by,NULL,NO,varchar,50,Created By
-last_updated,(getdate()),YES,timestamp,NULL,Last Updated
-last_updated_by,NULL,NO,varchar,50,Last Updated By
-version,NULL,YES,integer,NULL,Version
