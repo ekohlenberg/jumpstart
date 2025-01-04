@@ -119,9 +119,10 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/services/template-service.js.cshtml", "./web/react-frontend/src/services", true));
 
                 /* application */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/app.js.cshtml", "./web/react-frontend/src", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/app.css.cshtml", "./web/react-frontend/src", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/App.js.cshtml", "./web/react-frontend/src", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/App.css.cshtml", "./web/react-frontend/src", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/index.js.cshtml", "./web/react-frontend/src", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/run-config.js.cshtml", "./web/react-frontend/src", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/index.css.cshtml", "./web/react-frontend/src", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/logo.svg.cshtml", "./web/react-frontend/src", false));
 

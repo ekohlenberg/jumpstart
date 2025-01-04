@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import @(Model.DomainObj)Service from '../services/@(Model.DomainObj)Service';
+import @(Model.DomainObj)Service from '../services/@(Model.Name)-service';
 
 class @(Model.DomainObj)ListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class @(Model.DomainObj)ListComponent extends Component {
 
     delete@(Model.DomainObj)(id){
         @(Model.DomainObj)Service.delete@(Model.DomainObj)(id).then( res => {
-            this.setState({@(Model.DomainVar)s: this.state.@(Model.DomainVar)s.filter(@(Model.DomainVar) => @(Model.DomainVar).id !== id)});
+            this.setState({ @(Model.DomainVar)s: this.state.@(Model.DomainVar)s.filter(@(Model.DomainVar) => @(Model.DomainVar).id !== id) });
         });
     }
     view@(Model.DomainObj)(id){
@@ -62,11 +62,11 @@ class @(Model.DomainObj)ListComponent extends Component {
                                 {
                                     this.state.@(Model.DomainVar)s.map(
                                         @(Model.DomainVar) => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { @(Model.DomainVar).id }>
                                             @foreach(var attr in Model.Attributes)
                                             {
                                                 <text>
-                                                <td> {@(Model.DomainVar).@(attr.Name))} </td>  
+                                                <td> { @(Model.DomainVar).@(attr.Name) } </td>  
                                                 </text>
                                             }
                                              <td>

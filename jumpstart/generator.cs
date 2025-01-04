@@ -145,6 +145,8 @@ namespace jumpstart {
                 generatedCode = generatedCode.Replace("&#xD;", "\r");
                 generatedCode = generatedCode.Replace("&#xA;", "\n");
                 generatedCode = generatedCode.Replace("&#x9;", "\t");
+                generatedCode = generatedCode.Replace("&lt;", "<");
+                generatedCode = generatedCode.Replace("&gt;", ">");
               
                 MetaBaseElement metaType = (MetaBaseElement) model;
                 string templateFile = Path.GetFileName(td.templateFile);
