@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import CustomerService from '../services/CustomerService';
+import CustomerService from '../services/customer-service';
 
 class CustomerListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class CustomerListComponent extends Component {
 
     deleteCustomer(id){
         CustomerService.deleteCustomer(id).then( res => {
-            this.setState({customers: this.state.customers.filter(customer => customer.id !== id)});
+            this.setState({ customers: this.state.customers.filter(customer => customer.id !== id) });
         });
     }
     viewCustomer(id){
@@ -86,37 +86,37 @@ class CustomerListComponent extends Component {
                                 {
                                     this.state.customers.map(
                                         customer => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { customer.id }>
 
-                                                <td> {customer.id)} </td>  
+                                                <td> { customer.id } </td>  
                                                 
-                                                <td> {customer.org_id)} </td>  
+                                                <td> { customer.org_id } </td>  
                                                 
-                                                <td> {customer.customer_name)} </td>  
+                                                <td> { customer.customer_name } </td>  
                                                 
-                                                <td> {customer.first_name)} </td>  
+                                                <td> { customer.first_name } </td>  
                                                 
-                                                <td> {customer.last_name)} </td>  
+                                                <td> { customer.last_name } </td>  
                                                 
-                                                <td> {customer.email)} </td>  
+                                                <td> { customer.email } </td>  
                                                 
-                                                <td> {customer.phone)} </td>  
+                                                <td> { customer.phone } </td>  
                                                 
-                                                <td> {customer.billing_address)} </td>  
+                                                <td> { customer.billing_address } </td>  
                                                 
-                                                <td> {customer.shipping_address)} </td>  
+                                                <td> { customer.shipping_address } </td>  
                                                 
-                                                <td> {customer.created_date)} </td>  
+                                                <td> { customer.created_date } </td>  
                                                 
-                                                <td> {customer.is_active)} </td>  
+                                                <td> { customer.is_active } </td>  
                                                 
-                                                <td> {customer.created_by)} </td>  
+                                                <td> { customer.created_by } </td>  
                                                 
-                                                <td> {customer.last_updated)} </td>  
+                                                <td> { customer.last_updated } </td>  
                                                 
-                                                <td> {customer.last_updated_by)} </td>  
+                                                <td> { customer.last_updated_by } </td>  
                                                 
-                                                <td> {customer.version)} </td>  
+                                                <td> { customer.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editCustomer(customer.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteCustomer(customer.id)} className="btn btn-danger">Delete </button>

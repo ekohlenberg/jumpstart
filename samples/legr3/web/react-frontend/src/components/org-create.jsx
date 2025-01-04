@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import OrgService from '../services/OrgService';
+import OrgService from '../services/org-service';
 
 
 

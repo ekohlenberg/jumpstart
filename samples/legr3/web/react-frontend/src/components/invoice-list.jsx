@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import InvoiceService from '../services/InvoiceService';
+import InvoiceService from '../services/invoice-service';
 
 class InvoiceListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class InvoiceListComponent extends Component {
 
     deleteInvoice(id){
         InvoiceService.deleteInvoice(id).then( res => {
-            this.setState({invoices: this.state.invoices.filter(invoice => invoice.id !== id)});
+            this.setState({ invoices: this.state.invoices.filter(invoice => invoice.id !== id) });
         });
     }
     viewInvoice(id){
@@ -84,35 +84,35 @@ class InvoiceListComponent extends Component {
                                 {
                                     this.state.invoices.map(
                                         invoice => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { invoice.id }>
 
-                                                <td> {invoice.id)} </td>  
+                                                <td> { invoice.id } </td>  
                                                 
-                                                <td> {invoice.customer_id)} </td>  
+                                                <td> { invoice.customer_id } </td>  
                                                 
-                                                <td> {invoice.org_id)} </td>  
+                                                <td> { invoice.org_id } </td>  
                                                 
-                                                <td> {invoice.invoice_number)} </td>  
+                                                <td> { invoice.invoice_number } </td>  
                                                 
-                                                <td> {invoice.invoice_date)} </td>  
+                                                <td> { invoice.invoice_date } </td>  
                                                 
-                                                <td> {invoice.due_date)} </td>  
+                                                <td> { invoice.due_date } </td>  
                                                 
-                                                <td> {invoice.total_amount)} </td>  
+                                                <td> { invoice.total_amount } </td>  
                                                 
-                                                <td> {invoice.status)} </td>  
+                                                <td> { invoice.status } </td>  
                                                 
-                                                <td> {invoice.created_date)} </td>  
+                                                <td> { invoice.created_date } </td>  
                                                 
-                                                <td> {invoice.is_active)} </td>  
+                                                <td> { invoice.is_active } </td>  
                                                 
-                                                <td> {invoice.created_by)} </td>  
+                                                <td> { invoice.created_by } </td>  
                                                 
-                                                <td> {invoice.last_updated)} </td>  
+                                                <td> { invoice.last_updated } </td>  
                                                 
-                                                <td> {invoice.last_updated_by)} </td>  
+                                                <td> { invoice.last_updated_by } </td>  
                                                 
-                                                <td> {invoice.version)} </td>  
+                                                <td> { invoice.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editInvoice(invoice.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteInvoice(invoice.id)} className="btn btn-danger">Delete </button>

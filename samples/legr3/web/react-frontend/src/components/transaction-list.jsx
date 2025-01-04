@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import TransactionService from '../services/TransactionService';
+import TransactionService from '../services/transaction-service';
 
 class TransactionListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class TransactionListComponent extends Component {
 
     deleteTransaction(id){
         TransactionService.deleteTransaction(id).then( res => {
-            this.setState({transactions: this.state.transactions.filter(transaction => transaction.id !== id)});
+            this.setState({ transactions: this.state.transactions.filter(transaction => transaction.id !== id) });
         });
     }
     viewTransaction(id){
@@ -82,33 +82,33 @@ class TransactionListComponent extends Component {
                                 {
                                     this.state.transactions.map(
                                         transaction => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { transaction.id }>
 
-                                                <td> {transaction.id)} </td>  
+                                                <td> { transaction.id } </td>  
                                                 
-                                                <td> {transaction.account_id)} </td>  
+                                                <td> { transaction.account_id } </td>  
                                                 
-                                                <td> {transaction.org_id)} </td>  
+                                                <td> { transaction.org_id } </td>  
                                                 
-                                                <td> {transaction.transaction_date)} </td>  
+                                                <td> { transaction.transaction_date } </td>  
                                                 
-                                                <td> {transaction.amount)} </td>  
+                                                <td> { transaction.amount } </td>  
                                                 
-                                                <td> {transaction.transaction_type)} </td>  
+                                                <td> { transaction.transaction_type } </td>  
                                                 
-                                                <td> {transaction.description)} </td>  
+                                                <td> { transaction.description } </td>  
                                                 
-                                                <td> {transaction.created_date)} </td>  
+                                                <td> { transaction.created_date } </td>  
                                                 
-                                                <td> {transaction.is_active)} </td>  
+                                                <td> { transaction.is_active } </td>  
                                                 
-                                                <td> {transaction.created_by)} </td>  
+                                                <td> { transaction.created_by } </td>  
                                                 
-                                                <td> {transaction.last_updated)} </td>  
+                                                <td> { transaction.last_updated } </td>  
                                                 
-                                                <td> {transaction.last_updated_by)} </td>  
+                                                <td> { transaction.last_updated_by } </td>  
                                                 
-                                                <td> {transaction.version)} </td>  
+                                                <td> { transaction.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editTransaction(transaction.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteTransaction(transaction.id)} className="btn btn-danger">Delete </button>

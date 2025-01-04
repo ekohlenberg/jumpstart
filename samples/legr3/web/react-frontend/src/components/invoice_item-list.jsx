@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import InvoiceItemService from '../services/InvoiceItemService';
+import InvoiceItemService from '../services/invoice_item-service';
 
 class InvoiceItemListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class InvoiceItemListComponent extends Component {
 
     deleteInvoiceItem(id){
         InvoiceItemService.deleteInvoiceItem(id).then( res => {
-            this.setState({invoiceitems: this.state.invoiceitems.filter(invoiceitem => invoiceitem.id !== id)});
+            this.setState({ invoiceitems: this.state.invoiceitems.filter(invoiceitem => invoiceitem.id !== id) });
         });
     }
     viewInvoiceItem(id){
@@ -78,29 +78,29 @@ class InvoiceItemListComponent extends Component {
                                 {
                                     this.state.invoiceitems.map(
                                         invoiceitem => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { invoiceitem.id }>
 
-                                                <td> {invoiceitem.id)} </td>  
+                                                <td> { invoiceitem.id } </td>  
                                                 
-                                                <td> {invoiceitem.invoice_id)} </td>  
+                                                <td> { invoiceitem.invoice_id } </td>  
                                                 
-                                                <td> {invoiceitem.description)} </td>  
+                                                <td> { invoiceitem.description } </td>  
                                                 
-                                                <td> {invoiceitem.quantity)} </td>  
+                                                <td> { invoiceitem.quantity } </td>  
                                                 
-                                                <td> {invoiceitem.unit_price)} </td>  
+                                                <td> { invoiceitem.unit_price } </td>  
                                                 
-                                                <td> {invoiceitem.total_amount)} </td>  
+                                                <td> { invoiceitem.total_amount } </td>  
                                                 
-                                                <td> {invoiceitem.is_active)} </td>  
+                                                <td> { invoiceitem.is_active } </td>  
                                                 
-                                                <td> {invoiceitem.created_by)} </td>  
+                                                <td> { invoiceitem.created_by } </td>  
                                                 
-                                                <td> {invoiceitem.last_updated)} </td>  
+                                                <td> { invoiceitem.last_updated } </td>  
                                                 
-                                                <td> {invoiceitem.last_updated_by)} </td>  
+                                                <td> { invoiceitem.last_updated_by } </td>  
                                                 
-                                                <td> {invoiceitem.version)} </td>  
+                                                <td> { invoiceitem.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editInvoiceItem(invoiceitem.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteInvoiceItem(invoiceitem.id)} className="btn btn-danger">Delete </button>

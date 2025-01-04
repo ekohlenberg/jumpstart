@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 //const PAYMENT_API_BASE_URL = "http://localhost:5000/api/payment";
-const { apiProtocol } = window['runConfig'];
-const { apiHost } = window['runConfig'];
-const { apiPort } = window['runConfig'];
+const apiProtocol = process.env.REACT_APP_API_PROTOCOL;
+const apiHost = process.env.REACT_APP_API_HOST;
+const apiPort = process.env.REACT_APP_API_PORT;
+
+console.log(`API Endpoint: ${apiProtocol}://${apiHost}:${apiPort}`);
 
 const PAYMENT_API_BASE_URL = apiProtocol + '://' + apiHost +':' +  apiPort + '/api/payment';
 
@@ -31,4 +33,5 @@ class PaymentService {
     }
 }
 
+//const exportedPaymentService =  new PaymentService()
 export default new PaymentService()

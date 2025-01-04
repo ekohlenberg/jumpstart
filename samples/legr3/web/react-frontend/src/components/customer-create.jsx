@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import CustomerService from '../services/CustomerService';
+import CustomerService from '../services/customer-service';
 
 
 

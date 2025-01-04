@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import VendorService from '../services/VendorService';
+import VendorService from '../services/vendor-service';
 
 
 

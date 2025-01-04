@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import PaymentService from '../services/PaymentService';
+import PaymentService from '../services/payment-service';
 
 
 

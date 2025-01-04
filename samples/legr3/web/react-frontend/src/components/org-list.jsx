@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import OrgService from '../services/OrgService';
+import OrgService from '../services/org-service';
 
 class OrgListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class OrgListComponent extends Component {
 
     deleteOrg(id){
         OrgService.deleteOrg(id).then( res => {
-            this.setState({orgs: this.state.orgs.filter(org => org.id !== id)});
+            this.setState({ orgs: this.state.orgs.filter(org => org.id !== id) });
         });
     }
     viewOrg(id){
@@ -70,21 +70,21 @@ class OrgListComponent extends Component {
                                 {
                                     this.state.orgs.map(
                                         org => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { org.id }>
 
-                                                <td> {org.id)} </td>  
+                                                <td> { org.id } </td>  
                                                 
-                                                <td> {org.name)} </td>  
+                                                <td> { org.name } </td>  
                                                 
-                                                <td> {org.is_active)} </td>  
+                                                <td> { org.is_active } </td>  
                                                 
-                                                <td> {org.created_by)} </td>  
+                                                <td> { org.created_by } </td>  
                                                 
-                                                <td> {org.last_updated)} </td>  
+                                                <td> { org.last_updated } </td>  
                                                 
-                                                <td> {org.last_updated_by)} </td>  
+                                                <td> { org.last_updated_by } </td>  
                                                 
-                                                <td> {org.version)} </td>  
+                                                <td> { org.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editOrg(org.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteOrg(org.id)} className="btn btn-danger">Delete </button>

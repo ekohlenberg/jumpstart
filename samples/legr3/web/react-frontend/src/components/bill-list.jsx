@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import BillService from '../services/BillService';
+import BillService from '../services/bill-service';
 
 class BillListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class BillListComponent extends Component {
 
     deleteBill(id){
         BillService.deleteBill(id).then( res => {
-            this.setState({bills: this.state.bills.filter(bill => bill.id !== id)});
+            this.setState({ bills: this.state.bills.filter(bill => bill.id !== id) });
         });
     }
     viewBill(id){
@@ -84,35 +84,35 @@ class BillListComponent extends Component {
                                 {
                                     this.state.bills.map(
                                         bill => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { bill.id }>
 
-                                                <td> {bill.id)} </td>  
+                                                <td> { bill.id } </td>  
                                                 
-                                                <td> {bill.vendor_id)} </td>  
+                                                <td> { bill.vendor_id } </td>  
                                                 
-                                                <td> {bill.org_id)} </td>  
+                                                <td> { bill.org_id } </td>  
                                                 
-                                                <td> {bill.bill_number)} </td>  
+                                                <td> { bill.bill_number } </td>  
                                                 
-                                                <td> {bill.bill_date)} </td>  
+                                                <td> { bill.bill_date } </td>  
                                                 
-                                                <td> {bill.due_date)} </td>  
+                                                <td> { bill.due_date } </td>  
                                                 
-                                                <td> {bill.total_amount)} </td>  
+                                                <td> { bill.total_amount } </td>  
                                                 
-                                                <td> {bill.status)} </td>  
+                                                <td> { bill.status } </td>  
                                                 
-                                                <td> {bill.created_date)} </td>  
+                                                <td> { bill.created_date } </td>  
                                                 
-                                                <td> {bill.is_active)} </td>  
+                                                <td> { bill.is_active } </td>  
                                                 
-                                                <td> {bill.created_by)} </td>  
+                                                <td> { bill.created_by } </td>  
                                                 
-                                                <td> {bill.last_updated)} </td>  
+                                                <td> { bill.last_updated } </td>  
                                                 
-                                                <td> {bill.last_updated_by)} </td>  
+                                                <td> { bill.last_updated_by } </td>  
                                                 
-                                                <td> {bill.version)} </td>  
+                                                <td> { bill.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editBill(bill.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteBill(bill.id)} className="btn btn-danger">Delete </button>

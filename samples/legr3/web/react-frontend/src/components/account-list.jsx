@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import AccountService from '../services/AccountService';
+import AccountService from '../services/account-service';
 
 class AccountListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class AccountListComponent extends Component {
 
     deleteAccount(id){
         AccountService.deleteAccount(id).then( res => {
-            this.setState({accounts: this.state.accounts.filter(account => account.id !== id)});
+            this.setState({ accounts: this.state.accounts.filter(account => account.id !== id) });
         });
     }
     viewAccount(id){
@@ -78,29 +78,29 @@ class AccountListComponent extends Component {
                                 {
                                     this.state.accounts.map(
                                         account => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { account.id }>
 
-                                                <td> {account.id)} </td>  
+                                                <td> { account.id } </td>  
                                                 
-                                                <td> {account.org_id)} </td>  
+                                                <td> { account.org_id } </td>  
                                                 
-                                                <td> {account.account_name)} </td>  
+                                                <td> { account.account_name } </td>  
                                                 
-                                                <td> {account.account_type)} </td>  
+                                                <td> { account.account_type } </td>  
                                                 
-                                                <td> {account.balance)} </td>  
+                                                <td> { account.balance } </td>  
                                                 
-                                                <td> {account.created_date)} </td>  
+                                                <td> { account.created_date } </td>  
                                                 
-                                                <td> {account.is_active)} </td>  
+                                                <td> { account.is_active } </td>  
                                                 
-                                                <td> {account.created_by)} </td>  
+                                                <td> { account.created_by } </td>  
                                                 
-                                                <td> {account.last_updated)} </td>  
+                                                <td> { account.last_updated } </td>  
                                                 
-                                                <td> {account.last_updated_by)} </td>  
+                                                <td> { account.last_updated_by } </td>  
                                                 
-                                                <td> {account.version)} </td>  
+                                                <td> { account.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editAccount(account.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteAccount(account.id)} className="btn btn-danger">Delete </button>

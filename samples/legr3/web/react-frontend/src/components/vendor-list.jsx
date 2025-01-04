@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import VendorService from '../services/VendorService';
+import VendorService from '../services/vendor-service';
 
 class VendorListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class VendorListComponent extends Component {
 
     deleteVendor(id){
         VendorService.deleteVendor(id).then( res => {
-            this.setState({vendors: this.state.vendors.filter(vendor => vendor.id !== id)});
+            this.setState({ vendors: this.state.vendors.filter(vendor => vendor.id !== id) });
         });
     }
     viewVendor(id){
@@ -84,35 +84,35 @@ class VendorListComponent extends Component {
                                 {
                                     this.state.vendors.map(
                                         vendor => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { vendor.id }>
 
-                                                <td> {vendor.id)} </td>  
+                                                <td> { vendor.id } </td>  
                                                 
-                                                <td> {vendor.org_id)} </td>  
+                                                <td> { vendor.org_id } </td>  
                                                 
-                                                <td> {vendor.vendor_name)} </td>  
+                                                <td> { vendor.vendor_name } </td>  
                                                 
-                                                <td> {vendor.first_name)} </td>  
+                                                <td> { vendor.first_name } </td>  
                                                 
-                                                <td> {vendor.last_name)} </td>  
+                                                <td> { vendor.last_name } </td>  
                                                 
-                                                <td> {vendor.email)} </td>  
+                                                <td> { vendor.email } </td>  
                                                 
-                                                <td> {vendor.phone)} </td>  
+                                                <td> { vendor.phone } </td>  
                                                 
-                                                <td> {vendor.billing_address)} </td>  
+                                                <td> { vendor.billing_address } </td>  
                                                 
-                                                <td> {vendor.created_date)} </td>  
+                                                <td> { vendor.created_date } </td>  
                                                 
-                                                <td> {vendor.is_active)} </td>  
+                                                <td> { vendor.is_active } </td>  
                                                 
-                                                <td> {vendor.created_by)} </td>  
+                                                <td> { vendor.created_by } </td>  
                                                 
-                                                <td> {vendor.last_updated)} </td>  
+                                                <td> { vendor.last_updated } </td>  
                                                 
-                                                <td> {vendor.last_updated_by)} </td>  
+                                                <td> { vendor.last_updated_by } </td>  
                                                 
-                                                <td> {vendor.version)} </td>  
+                                                <td> { vendor.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editVendor(vendor.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteVendor(vendor.id)} className="btn btn-danger">Delete </button>

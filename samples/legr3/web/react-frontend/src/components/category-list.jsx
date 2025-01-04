@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import CategoryService from '../services/CategoryService';
+import CategoryService from '../services/category-service';
 
 class CategoryListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class CategoryListComponent extends Component {
 
     deleteCategory(id){
         CategoryService.deleteCategory(id).then( res => {
-            this.setState({categorys: this.state.categorys.filter(category => category.id !== id)});
+            this.setState({ categorys: this.state.categorys.filter(category => category.id !== id) });
         });
     }
     viewCategory(id){
@@ -74,25 +74,25 @@ class CategoryListComponent extends Component {
                                 {
                                     this.state.categorys.map(
                                         category => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { category.id }>
 
-                                                <td> {category.id)} </td>  
+                                                <td> { category.id } </td>  
                                                 
-                                                <td> {category.org_id)} </td>  
+                                                <td> { category.org_id } </td>  
                                                 
-                                                <td> {category.category_name)} </td>  
+                                                <td> { category.category_name } </td>  
                                                 
-                                                <td> {category.category_type)} </td>  
+                                                <td> { category.category_type } </td>  
                                                 
-                                                <td> {category.is_active)} </td>  
+                                                <td> { category.is_active } </td>  
                                                 
-                                                <td> {category.created_by)} </td>  
+                                                <td> { category.created_by } </td>  
                                                 
-                                                <td> {category.last_updated)} </td>  
+                                                <td> { category.last_updated } </td>  
                                                 
-                                                <td> {category.last_updated_by)} </td>  
+                                                <td> { category.last_updated_by } </td>  
                                                 
-                                                <td> {category.version)} </td>  
+                                                <td> { category.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editCategory(category.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteCategory(category.id)} className="btn btn-danger">Delete </button>

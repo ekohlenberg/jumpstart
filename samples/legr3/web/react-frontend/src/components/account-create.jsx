@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import AccountService from '../services/AccountService';
+import AccountService from '../services/account-service';
 
 
 

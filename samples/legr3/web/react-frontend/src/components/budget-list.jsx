@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import BudgetService from '../services/BudgetService';
+import BudgetService from '../services/budget-service';
 
 class BudgetListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class BudgetListComponent extends Component {
 
     deleteBudget(id){
         BudgetService.deleteBudget(id).then( res => {
-            this.setState({budgets: this.state.budgets.filter(budget => budget.id !== id)});
+            this.setState({ budgets: this.state.budgets.filter(budget => budget.id !== id) });
         });
     }
     viewBudget(id){
@@ -78,29 +78,29 @@ class BudgetListComponent extends Component {
                                 {
                                     this.state.budgets.map(
                                         budget => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { budget.id }>
 
-                                                <td> {budget.id)} </td>  
+                                                <td> { budget.id } </td>  
                                                 
-                                                <td> {budget.org_id)} </td>  
+                                                <td> { budget.org_id } </td>  
                                                 
-                                                <td> {budget.category_id)} </td>  
+                                                <td> { budget.category_id } </td>  
                                                 
-                                                <td> {budget.amount)} </td>  
+                                                <td> { budget.amount } </td>  
                                                 
-                                                <td> {budget.start_date)} </td>  
+                                                <td> { budget.start_date } </td>  
                                                 
-                                                <td> {budget.end_date)} </td>  
+                                                <td> { budget.end_date } </td>  
                                                 
-                                                <td> {budget.is_active)} </td>  
+                                                <td> { budget.is_active } </td>  
                                                 
-                                                <td> {budget.created_by)} </td>  
+                                                <td> { budget.created_by } </td>  
                                                 
-                                                <td> {budget.last_updated)} </td>  
+                                                <td> { budget.last_updated } </td>  
                                                 
-                                                <td> {budget.last_updated_by)} </td>  
+                                                <td> { budget.last_updated_by } </td>  
                                                 
-                                                <td> {budget.version)} </td>  
+                                                <td> { budget.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editBudget(budget.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteBudget(budget.id)} className="btn btn-danger">Delete </button>

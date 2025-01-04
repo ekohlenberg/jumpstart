@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import UserOrgService from '../services/UserOrgService';
+import UserOrgService from '../services/user_org-service';
 
 class UserOrgListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class UserOrgListComponent extends Component {
 
     deleteUserOrg(id){
         UserOrgService.deleteUserOrg(id).then( res => {
-            this.setState({userorgs: this.state.userorgs.filter(userorg => userorg.id !== id)});
+            this.setState({ userorgs: this.state.userorgs.filter(userorg => userorg.id !== id) });
         });
     }
     viewUserOrg(id){
@@ -72,23 +72,23 @@ class UserOrgListComponent extends Component {
                                 {
                                     this.state.userorgs.map(
                                         userorg => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { userorg.id }>
 
-                                                <td> {userorg.id)} </td>  
+                                                <td> { userorg.id } </td>  
                                                 
-                                                <td> {userorg.org_id)} </td>  
+                                                <td> { userorg.org_id } </td>  
                                                 
-                                                <td> {userorg.user_id)} </td>  
+                                                <td> { userorg.user_id } </td>  
                                                 
-                                                <td> {userorg.is_active)} </td>  
+                                                <td> { userorg.is_active } </td>  
                                                 
-                                                <td> {userorg.created_by)} </td>  
+                                                <td> { userorg.created_by } </td>  
                                                 
-                                                <td> {userorg.last_updated)} </td>  
+                                                <td> { userorg.last_updated } </td>  
                                                 
-                                                <td> {userorg.last_updated_by)} </td>  
+                                                <td> { userorg.last_updated_by } </td>  
                                                 
-                                                <td> {userorg.version)} </td>  
+                                                <td> { userorg.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editUserOrg(userorg.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteUserOrg(userorg.id)} className="btn btn-danger">Delete </button>

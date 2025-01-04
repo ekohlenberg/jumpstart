@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import PaymentService from '../services/PaymentService';
+import PaymentService from '../services/payment-service';
 
 class PaymentListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class PaymentListComponent extends Component {
 
     deletePayment(id){
         PaymentService.deletePayment(id).then( res => {
-            this.setState({payments: this.state.payments.filter(payment => payment.id !== id)});
+            this.setState({ payments: this.state.payments.filter(payment => payment.id !== id) });
         });
     }
     viewPayment(id){
@@ -80,31 +80,31 @@ class PaymentListComponent extends Component {
                                 {
                                     this.state.payments.map(
                                         payment => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { payment.id }>
 
-                                                <td> {payment.id)} </td>  
+                                                <td> { payment.id } </td>  
                                                 
-                                                <td> {payment.invoice_id)} </td>  
+                                                <td> { payment.invoice_id } </td>  
                                                 
-                                                <td> {payment.org_id)} </td>  
+                                                <td> { payment.org_id } </td>  
                                                 
-                                                <td> {payment.payment_date)} </td>  
+                                                <td> { payment.payment_date } </td>  
                                                 
-                                                <td> {payment.amount)} </td>  
+                                                <td> { payment.amount } </td>  
                                                 
-                                                <td> {payment.payment_method)} </td>  
+                                                <td> { payment.payment_method } </td>  
                                                 
-                                                <td> {payment.created_date)} </td>  
+                                                <td> { payment.created_date } </td>  
                                                 
-                                                <td> {payment.is_active)} </td>  
+                                                <td> { payment.is_active } </td>  
                                                 
-                                                <td> {payment.created_by)} </td>  
+                                                <td> { payment.created_by } </td>  
                                                 
-                                                <td> {payment.last_updated)} </td>  
+                                                <td> { payment.last_updated } </td>  
                                                 
-                                                <td> {payment.last_updated_by)} </td>  
+                                                <td> { payment.last_updated_by } </td>  
                                                 
-                                                <td> {payment.version)} </td>  
+                                                <td> { payment.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editPayment(payment.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deletePayment(payment.id)} className="btn btn-danger">Delete </button>

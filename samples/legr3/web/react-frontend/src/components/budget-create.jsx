@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import BudgetService from '../services/BudgetService';
+import BudgetService from '../services/budget-service';
 
 
 

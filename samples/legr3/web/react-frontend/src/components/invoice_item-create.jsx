@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import InvoiceItemService from '../services/InvoiceItemService';
+import InvoiceItemService from '../services/invoice_item-service';
 
 
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import BillItemService from '../services/BillItemService';
+import BillItemService from '../services/bill_item-service';
 
 
 

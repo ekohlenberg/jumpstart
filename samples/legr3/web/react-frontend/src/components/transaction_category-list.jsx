@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import TransactionCategoryService from '../services/TransactionCategoryService';
+import TransactionCategoryService from '../services/transaction_category-service';
 
 class TransactionCategoryListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class TransactionCategoryListComponent extends Component {
 
     deleteTransactionCategory(id){
         TransactionCategoryService.deleteTransactionCategory(id).then( res => {
-            this.setState({transactioncategorys: this.state.transactioncategorys.filter(transactioncategory => transactioncategory.id !== id)});
+            this.setState({ transactioncategorys: this.state.transactioncategorys.filter(transactioncategory => transactioncategory.id !== id) });
         });
     }
     viewTransactionCategory(id){
@@ -72,23 +72,23 @@ class TransactionCategoryListComponent extends Component {
                                 {
                                     this.state.transactioncategorys.map(
                                         transactioncategory => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { transactioncategory.id }>
 
-                                                <td> {transactioncategory.id)} </td>  
+                                                <td> { transactioncategory.id } </td>  
                                                 
-                                                <td> {transactioncategory.transaction_id)} </td>  
+                                                <td> { transactioncategory.transaction_id } </td>  
                                                 
-                                                <td> {transactioncategory.category_id)} </td>  
+                                                <td> { transactioncategory.category_id } </td>  
                                                 
-                                                <td> {transactioncategory.is_active)} </td>  
+                                                <td> { transactioncategory.is_active } </td>  
                                                 
-                                                <td> {transactioncategory.created_by)} </td>  
+                                                <td> { transactioncategory.created_by } </td>  
                                                 
-                                                <td> {transactioncategory.last_updated)} </td>  
+                                                <td> { transactioncategory.last_updated } </td>  
                                                 
-                                                <td> {transactioncategory.last_updated_by)} </td>  
+                                                <td> { transactioncategory.last_updated_by } </td>  
                                                 
-                                                <td> {transactioncategory.version)} </td>  
+                                                <td> { transactioncategory.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editTransactionCategory(transactioncategory.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteTransactionCategory(transactioncategory.id)} className="btn btn-danger">Delete </button>

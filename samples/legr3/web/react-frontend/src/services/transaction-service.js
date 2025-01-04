@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 //const TRANSACTION_API_BASE_URL = "http://localhost:5000/api/transaction";
-const { apiProtocol } = window['runConfig'];
-const { apiHost } = window['runConfig'];
-const { apiPort } = window['runConfig'];
+const apiProtocol = process.env.REACT_APP_API_PROTOCOL;
+const apiHost = process.env.REACT_APP_API_HOST;
+const apiPort = process.env.REACT_APP_API_PORT;
+
+console.log(`API Endpoint: ${apiProtocol}://${apiHost}:${apiPort}`);
 
 const TRANSACTION_API_BASE_URL = apiProtocol + '://' + apiHost +':' +  apiPort + '/api/transaction';
 
@@ -31,4 +33,5 @@ class TransactionService {
     }
 }
 
+//const exportedTransactionService =  new TransactionService()
 export default new TransactionService()

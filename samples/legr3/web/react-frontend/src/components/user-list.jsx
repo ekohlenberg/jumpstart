@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import UserService from '../services/UserService';
+import UserService from '../services/user-service';
 
 class UserListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class UserListComponent extends Component {
 
     deleteUser(id){
         UserService.deleteUser(id).then( res => {
-            this.setState({users: this.state.users.filter(user => user.id !== id)});
+            this.setState({ users: this.state.users.filter(user => user.id !== id) });
         });
     }
     viewUser(id){
@@ -82,33 +82,33 @@ class UserListComponent extends Component {
                                 {
                                     this.state.users.map(
                                         user => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { user.id }>
 
-                                                <td> {user.id)} </td>  
+                                                <td> { user.id } </td>  
                                                 
-                                                <td> {user.password_hash)} </td>  
+                                                <td> { user.password_hash } </td>  
                                                 
-                                                <td> {user.first_name)} </td>  
+                                                <td> { user.first_name } </td>  
                                                 
-                                                <td> {user.last_name)} </td>  
+                                                <td> { user.last_name } </td>  
                                                 
-                                                <td> {user.username)} </td>  
+                                                <td> { user.username } </td>  
                                                 
-                                                <td> {user.email)} </td>  
+                                                <td> { user.email } </td>  
                                                 
-                                                <td> {user.created_date)} </td>  
+                                                <td> { user.created_date } </td>  
                                                 
-                                                <td> {user.last_login_date)} </td>  
+                                                <td> { user.last_login_date } </td>  
                                                 
-                                                <td> {user.is_active)} </td>  
+                                                <td> { user.is_active } </td>  
                                                 
-                                                <td> {user.created_by)} </td>  
+                                                <td> { user.created_by } </td>  
                                                 
-                                                <td> {user.last_updated)} </td>  
+                                                <td> { user.last_updated } </td>  
                                                 
-                                                <td> {user.last_updated_by)} </td>  
+                                                <td> { user.last_updated_by } </td>  
                                                 
-                                                <td> {user.version)} </td>  
+                                                <td> { user.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editUser(user.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteUser(user.id)} className="btn btn-danger">Delete </button>

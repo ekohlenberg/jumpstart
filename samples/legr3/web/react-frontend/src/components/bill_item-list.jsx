@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import BillItemService from '../services/BillItemService';
+import BillItemService from '../services/bill_item-service';
 
 class BillItemListComponent extends Component {
     constructor(props) {
@@ -15,7 +15,7 @@ class BillItemListComponent extends Component {
 
     deleteBillItem(id){
         BillItemService.deleteBillItem(id).then( res => {
-            this.setState({billitems: this.state.billitems.filter(billitem => billitem.id !== id)});
+            this.setState({ billitems: this.state.billitems.filter(billitem => billitem.id !== id) });
         });
     }
     viewBillItem(id){
@@ -78,29 +78,29 @@ class BillItemListComponent extends Component {
                                 {
                                     this.state.billitems.map(
                                         billitem => 
-                                        <tr key = {@(Model.DomainVar).id}>
+                                        <tr key = { billitem.id }>
 
-                                                <td> {billitem.id)} </td>  
+                                                <td> { billitem.id } </td>  
                                                 
-                                                <td> {billitem.bill_id)} </td>  
+                                                <td> { billitem.bill_id } </td>  
                                                 
-                                                <td> {billitem.description)} </td>  
+                                                <td> { billitem.description } </td>  
                                                 
-                                                <td> {billitem.quantity)} </td>  
+                                                <td> { billitem.quantity } </td>  
                                                 
-                                                <td> {billitem.unit_price)} </td>  
+                                                <td> { billitem.unit_price } </td>  
                                                 
-                                                <td> {billitem.total_amount)} </td>  
+                                                <td> { billitem.total_amount } </td>  
                                                 
-                                                <td> {billitem.is_active)} </td>  
+                                                <td> { billitem.is_active } </td>  
                                                 
-                                                <td> {billitem.created_by)} </td>  
+                                                <td> { billitem.created_by } </td>  
                                                 
-                                                <td> {billitem.last_updated)} </td>  
+                                                <td> { billitem.last_updated } </td>  
                                                 
-                                                <td> {billitem.last_updated_by)} </td>  
+                                                <td> { billitem.last_updated_by } </td>  
                                                 
-                                                <td> {billitem.version)} </td>  
+                                                <td> { billitem.version } </td>  
                                                                                              <td>
                                                  <button onClick={ () => this.editBillItem(billitem.id)} className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteBillItem(billitem.id)} className="btn btn-danger">Delete </button>

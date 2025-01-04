@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import UserOrgService from '../services/UserOrgService';
+import UserOrgService from '../services/user_org-service';
 
 
 
