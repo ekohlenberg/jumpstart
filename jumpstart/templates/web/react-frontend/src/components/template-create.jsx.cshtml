@@ -81,11 +81,11 @@ class @(Model.DomainObj)CreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             @(Model.DomainObj)Service.create@(Model.DomainObj)(@(Model.DomainVar)).then(res =>{
-                this.props.history.push('/@(Model.DomainVar)');
+                this.props.navigate('/@(Model.DomainVar)');
             });
         }else{
             @(Model.DomainObj)Service.update@(Model.DomainObj)(@(Model.DomainVar), this.state.id).then( res => {
-                this.props.history.push('/@(Model.DomainVar)');
+                this.props.navigate('/@(Model.DomainVar)');
             });
         }
     }
@@ -102,7 +102,7 @@ class @(Model.DomainObj)CreateComponent extends Component {
         </text>
     }
     cancel(){
-        this.props.history.push('/@(Model.DomainVar)');
+        this.props.navigate('/@(Model.DomainVar)');
     }
 
     getTitle(){
