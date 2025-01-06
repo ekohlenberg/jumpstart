@@ -122,7 +122,7 @@ namespace jumpstart {
 
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
 
-            Console.WriteLine("Processing template " + templatePath);
+            Console.WriteLine("Processing " + td.templateFile);
 
             if (!File.Exists(templatePath))
             {

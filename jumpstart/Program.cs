@@ -125,6 +125,7 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/run-config.js.cshtml", "./web/react-frontend/src", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/index.css.cshtml", "./web/react-frontend/src", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/logo.svg.cshtml", "./web/react-frontend/src", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/components/with-navigation.jsx.cshtml", "./web/react-frontend/src/components", true));
 
                 await g.GenerateApp(metaModel);
                 await g.GenerateSchemas(metaModel);

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.Arm;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace jumpstart {
 
@@ -124,6 +126,18 @@ namespace jumpstart {
         public string SchemaName {get; set;}
 
         public string Primary {get;set;}
+
+        public bool IsPrimary
+        {
+            get {
+                bool result = false;
+
+                if (Primary == "1") result = true;
+
+                return result;
+            }
+        }
+        
         public List<MetaAttribute> Attributes { get; private set; } = new();
 
         public List<MetaAttribute> UserAttributes {

@@ -14,13 +14,16 @@ class HeaderComponent extends Component {
             <div>
                 <header>
                     <nav className="navbar navbar-expand-md navbar-dark bg-dark">
-                    <div><a style={{marginLeft: "10px"}} className="navbar-brand">^(namespace)</a></div>
+                    <div><a style={{marginLeft: "10px"}} className="navbar-brand">@Model.Name</a></div>
                     
                     @foreach(var obj in Model.Objects)
                     {
+                        if (obj.IsPrimary)
+                        {
                         <text>
                         <div><a style={{marginLeft: "10px"}}className="navbar" href="/@(obj.DomainVar)">@(obj.Label)</a></div>
                         </text>
+                        }
                     }
 
                     </nav>

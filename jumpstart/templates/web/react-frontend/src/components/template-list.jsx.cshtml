@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import @(Model.DomainObj)Service from '../services/@(Model.Name)-service';
 
 class @(Model.DomainObj)ListComponent extends Component {
@@ -19,11 +21,11 @@ class @(Model.DomainObj)ListComponent extends Component {
         });
     }
     view@(Model.DomainObj)(id){
-        this.props.history.push(`/view-@(Model.DomainVar)/${id}`);
+        this.props.navigate(`/view-@(Model.DomainVar)/${id}`);
     }
     edit@(Model.DomainObj)(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-@(Model.DomainVar)/${id}`);
+        this.props.navigate(`/add-@(Model.DomainVar)/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class @(Model.DomainObj)ListComponent extends Component {
     }
 
     add@(Model.DomainObj)(){
-        this.props.history.push('/add-@(Model.DomainVar)/_add');
+        this.props.navigate('/add-@(Model.DomainVar)/_add');
     }
 
     render() {
@@ -87,4 +89,4 @@ class @(Model.DomainObj)ListComponent extends Component {
     }
 }
 
-export default @(Model.DomainObj)ListComponent;
+export default withNavigation(@(Model.DomainObj)ListComponent);

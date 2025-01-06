@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import @(Model.DomainObj)Service from '../services/@(Model.Name)-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class @(Model.DomainObj)CreateComponent extends Component {
@@ -9,10 +9,13 @@ class @(Model.DomainObj)CreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
             @for( int i = 0; i < Model.UserAttributes.Count; i++)
             {
+                
                 var attr = Model.UserAttributes[i];
+                if (attr.Name == "id") continue;
+                
                 var comma = (i < Model.UserAttributes.Count - 1 ? "," : "");
                 <text>
                     @attr.Name: '' @comma
@@ -148,4 +151,4 @@ class @(Model.DomainObj)CreateComponent extends Component {
     }
 }
 
-export default @(Model.DomainObj)CreateComponent;
+export default withNavigation(@(Model.DomainObj)CreateComponent);
