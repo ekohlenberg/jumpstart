@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import BudgetService from '../services/budget-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class BudgetCreateComponent extends Component {
@@ -9,10 +9,8 @@ class BudgetCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     org_id: '' ,
                 
                     category_id: '' ,
@@ -75,16 +73,16 @@ class BudgetCreateComponent extends Component {
         e.preventDefault();
         let budget = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     category_id: this.state.category_id , 
-                
+                            
                     amount: this.state.amount , 
-                
+                            
                     start_date: this.state.start_date , 
-                
+                            
                     end_date: this.state.end_date  
                         };
         console.log('budget => ' + JSON.stringify(budget));
@@ -92,11 +90,11 @@ class BudgetCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             BudgetService.createBudget(budget).then(res =>{
-                this.props.history.push('/budget');
+                this.props.navigate('/budget');
             });
         }else{
             BudgetService.updateBudget(budget, this.state.id).then( res => {
-                this.props.history.push('/budget');
+                this.props.navigate('/budget');
             });
         }
     }
@@ -126,7 +124,7 @@ class BudgetCreateComponent extends Component {
             this.setState({end_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/budget');
+        this.props.navigate('/budget');
     }
 
     getTitle(){
@@ -204,4 +202,4 @@ class BudgetCreateComponent extends Component {
     }
 }
 
-export default BudgetCreateComponent;
+export default withNavigation(BudgetCreateComponent);

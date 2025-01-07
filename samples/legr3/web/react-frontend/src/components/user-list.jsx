@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import UserService from '../services/user-service';
 
 class UserListComponent extends Component {
@@ -19,11 +21,11 @@ class UserListComponent extends Component {
         });
     }
     viewUser(id){
-        this.props.history.push(`/view-user/${id}`);
+        this.props.navigate(`/view-user/${id}`);
     }
     editUser(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-user/${id}`);
+        this.props.navigate(`/add-user/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class UserListComponent extends Component {
     }
 
     addUser(){
-        this.props.history.push('/add-user/_add');
+        this.props.navigate('/add-user/_add');
     }
 
     render() {
@@ -127,4 +129,4 @@ class UserListComponent extends Component {
     }
 }
 
-export default UserListComponent;
+export default withNavigation(UserListComponent);

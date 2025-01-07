@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import CustomerService from '../services/customer-service';
 
 class CustomerListComponent extends Component {
@@ -19,11 +21,11 @@ class CustomerListComponent extends Component {
         });
     }
     viewCustomer(id){
-        this.props.history.push(`/view-customer/${id}`);
+        this.props.navigate(`/view-customer/${id}`);
     }
     editCustomer(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-customer/${id}`);
+        this.props.navigate(`/add-customer/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class CustomerListComponent extends Component {
     }
 
     addCustomer(){
-        this.props.history.push('/add-customer/_add');
+        this.props.navigate('/add-customer/_add');
     }
 
     render() {
@@ -135,4 +137,4 @@ class CustomerListComponent extends Component {
     }
 }
 
-export default CustomerListComponent;
+export default withNavigation(CustomerListComponent);

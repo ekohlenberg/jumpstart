@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import BillService from '../services/bill-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class BillCreateComponent extends Component {
@@ -9,10 +9,8 @@ class BillCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     vendor_id: '' ,
                 
                     org_id: '' ,
@@ -93,22 +91,22 @@ class BillCreateComponent extends Component {
         e.preventDefault();
         let bill = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     vendor_id: this.state.vendor_id , 
-                
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     bill_number: this.state.bill_number , 
-                
+                            
                     bill_date: this.state.bill_date , 
-                
+                            
                     due_date: this.state.due_date , 
-                
+                            
                     total_amount: this.state.total_amount , 
-                
+                            
                     status: this.state.status , 
-                
+                            
                     created_date: this.state.created_date  
                         };
         console.log('bill => ' + JSON.stringify(bill));
@@ -116,11 +114,11 @@ class BillCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             BillService.createBill(bill).then(res =>{
-                this.props.history.push('/bill');
+                this.props.navigate('/bill');
             });
         }else{
             BillService.updateBill(bill, this.state.id).then( res => {
-                this.props.history.push('/bill');
+                this.props.navigate('/bill');
             });
         }
     }
@@ -162,7 +160,7 @@ class BillCreateComponent extends Component {
             this.setState({created_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/bill');
+        this.props.navigate('/bill');
     }
 
     getTitle(){
@@ -261,4 +259,4 @@ class BillCreateComponent extends Component {
     }
 }
 
-export default BillCreateComponent;
+export default withNavigation(BillCreateComponent);

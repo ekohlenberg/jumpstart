@@ -128,6 +128,7 @@ namespace legr3
                     using (DbCommand command = (DbCommand) new NpgsqlCommand(sql, connection))
                     {
                         command.ExecuteNonQuery();
+                        Console.WriteLine(sql);
                     }
                 }
             }
@@ -362,7 +363,10 @@ namespace legr3
             long id = 0;
             if (baseObject.ContainsKey("id"))
             {
-                id = Convert.ToInt64(baseObject["id"]);
+                if (!Int64.TryParse(baseObject["id"].ToString(), out id))
+                {
+                    id = 0;
+                }
             }
                 
             

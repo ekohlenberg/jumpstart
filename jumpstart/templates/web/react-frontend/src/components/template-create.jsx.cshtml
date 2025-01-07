@@ -70,10 +70,18 @@ class @(Model.DomainObj)CreateComponent extends Component {
             {
                 var attr = Model.UserAttributes[i];
                 var comma = (i < Model.UserAttributes.Count - 1 ? "," : "");
-
+                if (attr.Name == "id")
+                {
                 <text>
+                   id: this.state.id === '_add' ?  '0' : this.state.id @(comma)
+                </text>
+                }
+                else
+                {
+                <text>            
                     @(attr.Name): this.state.@(attr.Name) @(comma) 
                 </text>
+                }
             }
         };
         console.log('@(Model.DomainVar) => ' + JSON.stringify(@(Model.DomainVar)));

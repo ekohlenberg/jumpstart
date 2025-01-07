@@ -1,7 +1,17 @@
 import React, { Component } from 'react'
-import { withNavigation } from './with-navigation';
-
 import OrgService from '../services/org-service';
+
+
+import { useNavigate } from 'react-router-dom';
+
+// Functional wrapper to provide `navigate` to the class component
+const OrgNavigate = (WrappedComponent) => {
+    return (props) => {
+        const navigate = useNavigate(); // Call `useNavigate` directly in the functional wrapper
+        return <WrappedComponent {...props} navigate={navigate} />;
+    };
+};
+
 
 class OrgListComponent extends Component {
     constructor(props) {
@@ -65,7 +75,7 @@ class OrgListComponent extends Component {
                                     <th>Last Updated By</th>
                                     
                                     <th>Version</th>
-                                        
+                                                                        <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,7 +98,7 @@ class OrgListComponent extends Component {
                                                 
                                                 <td> { org.version } </td>  
                                                                                              <td>
-                                                 <button onClick={ () => this.editOrg(org.id)} className="btn btn-info">Update </button>
+                                                 <button onClick={ () => this.editOrg(org.id) } className="btn btn-info">Update </button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteOrg(org.id)} className="btn btn-danger">Delete </button>
                                                 
                                              </td>
@@ -105,4 +115,4 @@ class OrgListComponent extends Component {
     }
 }
 
-export default withNavigation(OrgListComponent);
+export default OrgNavigate(OrgListComponent);

@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import CategoryService from '../services/category-service';
 
 class CategoryListComponent extends Component {
@@ -19,11 +21,11 @@ class CategoryListComponent extends Component {
         });
     }
     viewCategory(id){
-        this.props.history.push(`/view-category/${id}`);
+        this.props.navigate(`/view-category/${id}`);
     }
     editCategory(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-category/${id}`);
+        this.props.navigate(`/add-category/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class CategoryListComponent extends Component {
     }
 
     addCategory(){
-        this.props.history.push('/add-category/_add');
+        this.props.navigate('/add-category/_add');
     }
 
     render() {
@@ -111,4 +113,4 @@ class CategoryListComponent extends Component {
     }
 }
 
-export default CategoryListComponent;
+export default withNavigation(CategoryListComponent);

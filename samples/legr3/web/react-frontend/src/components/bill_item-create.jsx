@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import BillItemService from '../services/bill_item-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class BillItemCreateComponent extends Component {
@@ -9,10 +9,8 @@ class BillItemCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     bill_id: '' ,
                 
                     description: '' ,
@@ -75,16 +73,16 @@ class BillItemCreateComponent extends Component {
         e.preventDefault();
         let billitem = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     bill_id: this.state.bill_id , 
-                
+                            
                     description: this.state.description , 
-                
+                            
                     quantity: this.state.quantity , 
-                
+                            
                     unit_price: this.state.unit_price , 
-                
+                            
                     total_amount: this.state.total_amount  
                         };
         console.log('billitem => ' + JSON.stringify(billitem));
@@ -92,11 +90,11 @@ class BillItemCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             BillItemService.createBillItem(billitem).then(res =>{
-                this.props.history.push('/billitem');
+                this.props.navigate('/billitem');
             });
         }else{
             BillItemService.updateBillItem(billitem, this.state.id).then( res => {
-                this.props.history.push('/billitem');
+                this.props.navigate('/billitem');
             });
         }
     }
@@ -126,7 +124,7 @@ class BillItemCreateComponent extends Component {
             this.setState({total_amount: event.target.value});
         }
             cancel(){
-        this.props.history.push('/billitem');
+        this.props.navigate('/billitem');
     }
 
     getTitle(){
@@ -204,4 +202,4 @@ class BillItemCreateComponent extends Component {
     }
 }
 
-export default BillItemCreateComponent;
+export default withNavigation(BillItemCreateComponent);

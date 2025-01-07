@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import BillService from '../services/bill-service';
 
 class BillListComponent extends Component {
@@ -19,11 +21,11 @@ class BillListComponent extends Component {
         });
     }
     viewBill(id){
-        this.props.history.push(`/view-bill/${id}`);
+        this.props.navigate(`/view-bill/${id}`);
     }
     editBill(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-bill/${id}`);
+        this.props.navigate(`/add-bill/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class BillListComponent extends Component {
     }
 
     addBill(){
-        this.props.history.push('/add-bill/_add');
+        this.props.navigate('/add-bill/_add');
     }
 
     render() {
@@ -131,4 +133,4 @@ class BillListComponent extends Component {
     }
 }
 
-export default BillListComponent;
+export default withNavigation(BillListComponent);

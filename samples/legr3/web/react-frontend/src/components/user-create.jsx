@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import UserService from '../services/user-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class UserCreateComponent extends Component {
@@ -9,10 +9,8 @@ class UserCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     password_hash: '' ,
                 
                     first_name: '' ,
@@ -87,20 +85,20 @@ class UserCreateComponent extends Component {
         e.preventDefault();
         let user = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     password_hash: this.state.password_hash , 
-                
+                            
                     first_name: this.state.first_name , 
-                
+                            
                     last_name: this.state.last_name , 
-                
+                            
                     username: this.state.username , 
-                
+                            
                     email: this.state.email , 
-                
+                            
                     created_date: this.state.created_date , 
-                
+                            
                     last_login_date: this.state.last_login_date  
                         };
         console.log('user => ' + JSON.stringify(user));
@@ -108,11 +106,11 @@ class UserCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             UserService.createUser(user).then(res =>{
-                this.props.history.push('/user');
+                this.props.navigate('/user');
             });
         }else{
             UserService.updateUser(user, this.state.id).then( res => {
-                this.props.history.push('/user');
+                this.props.navigate('/user');
             });
         }
     }
@@ -150,7 +148,7 @@ class UserCreateComponent extends Component {
             this.setState({last_login_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/user');
+        this.props.navigate('/user');
     }
 
     getTitle(){
@@ -242,4 +240,4 @@ class UserCreateComponent extends Component {
     }
 }
 
-export default UserCreateComponent;
+export default withNavigation(UserCreateComponent);

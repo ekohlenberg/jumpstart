@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import UserOrgService from '../services/user_org-service';
 
 class UserOrgListComponent extends Component {
@@ -19,11 +21,11 @@ class UserOrgListComponent extends Component {
         });
     }
     viewUserOrg(id){
-        this.props.history.push(`/view-userorg/${id}`);
+        this.props.navigate(`/view-userorg/${id}`);
     }
     editUserOrg(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-userorg/${id}`);
+        this.props.navigate(`/add-userorg/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class UserOrgListComponent extends Component {
     }
 
     addUserOrg(){
-        this.props.history.push('/add-userorg/_add');
+        this.props.navigate('/add-userorg/_add');
     }
 
     render() {
@@ -107,4 +109,4 @@ class UserOrgListComponent extends Component {
     }
 }
 
-export default UserOrgListComponent;
+export default withNavigation(UserOrgListComponent);

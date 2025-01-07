@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PaymentService from '../services/payment-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class PaymentCreateComponent extends Component {
@@ -9,10 +9,8 @@ class PaymentCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     invoice_id: '' ,
                 
                     org_id: '' ,
@@ -81,18 +79,18 @@ class PaymentCreateComponent extends Component {
         e.preventDefault();
         let payment = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     invoice_id: this.state.invoice_id , 
-                
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     payment_date: this.state.payment_date , 
-                
+                            
                     amount: this.state.amount , 
-                
+                            
                     payment_method: this.state.payment_method , 
-                
+                            
                     created_date: this.state.created_date  
                         };
         console.log('payment => ' + JSON.stringify(payment));
@@ -100,11 +98,11 @@ class PaymentCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             PaymentService.createPayment(payment).then(res =>{
-                this.props.history.push('/payment');
+                this.props.navigate('/payment');
             });
         }else{
             PaymentService.updatePayment(payment, this.state.id).then( res => {
-                this.props.history.push('/payment');
+                this.props.navigate('/payment');
             });
         }
     }
@@ -138,7 +136,7 @@ class PaymentCreateComponent extends Component {
             this.setState({created_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/payment');
+        this.props.navigate('/payment');
     }
 
     getTitle(){
@@ -223,4 +221,4 @@ class PaymentCreateComponent extends Component {
     }
 }
 
-export default PaymentCreateComponent;
+export default withNavigation(PaymentCreateComponent);

@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import BudgetService from '../services/budget-service';
 
 class BudgetListComponent extends Component {
@@ -19,11 +21,11 @@ class BudgetListComponent extends Component {
         });
     }
     viewBudget(id){
-        this.props.history.push(`/view-budget/${id}`);
+        this.props.navigate(`/view-budget/${id}`);
     }
     editBudget(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-budget/${id}`);
+        this.props.navigate(`/add-budget/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class BudgetListComponent extends Component {
     }
 
     addBudget(){
-        this.props.history.push('/add-budget/_add');
+        this.props.navigate('/add-budget/_add');
     }
 
     render() {
@@ -119,4 +121,4 @@ class BudgetListComponent extends Component {
     }
 }
 
-export default BudgetListComponent;
+export default withNavigation(BudgetListComponent);

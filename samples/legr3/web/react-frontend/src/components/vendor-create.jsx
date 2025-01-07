@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import VendorService from '../services/vendor-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class VendorCreateComponent extends Component {
@@ -9,10 +9,8 @@ class VendorCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     org_id: '' ,
                 
                     vendor_name: '' ,
@@ -93,22 +91,22 @@ class VendorCreateComponent extends Component {
         e.preventDefault();
         let vendor = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     vendor_name: this.state.vendor_name , 
-                
+                            
                     first_name: this.state.first_name , 
-                
+                            
                     last_name: this.state.last_name , 
-                
+                            
                     email: this.state.email , 
-                
+                            
                     phone: this.state.phone , 
-                
+                            
                     billing_address: this.state.billing_address , 
-                
+                            
                     created_date: this.state.created_date  
                         };
         console.log('vendor => ' + JSON.stringify(vendor));
@@ -116,11 +114,11 @@ class VendorCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             VendorService.createVendor(vendor).then(res =>{
-                this.props.history.push('/vendor');
+                this.props.navigate('/vendor');
             });
         }else{
             VendorService.updateVendor(vendor, this.state.id).then( res => {
-                this.props.history.push('/vendor');
+                this.props.navigate('/vendor');
             });
         }
     }
@@ -162,7 +160,7 @@ class VendorCreateComponent extends Component {
             this.setState({created_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/vendor');
+        this.props.navigate('/vendor');
     }
 
     getTitle(){
@@ -261,4 +259,4 @@ class VendorCreateComponent extends Component {
     }
 }
 
-export default VendorCreateComponent;
+export default withNavigation(VendorCreateComponent);

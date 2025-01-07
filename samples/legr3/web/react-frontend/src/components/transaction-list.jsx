@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import TransactionService from '../services/transaction-service';
 
 class TransactionListComponent extends Component {
@@ -19,11 +21,11 @@ class TransactionListComponent extends Component {
         });
     }
     viewTransaction(id){
-        this.props.history.push(`/view-transaction/${id}`);
+        this.props.navigate(`/view-transaction/${id}`);
     }
     editTransaction(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-transaction/${id}`);
+        this.props.navigate(`/add-transaction/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class TransactionListComponent extends Component {
     }
 
     addTransaction(){
-        this.props.history.push('/add-transaction/_add');
+        this.props.navigate('/add-transaction/_add');
     }
 
     render() {
@@ -127,4 +129,4 @@ class TransactionListComponent extends Component {
     }
 }
 
-export default TransactionListComponent;
+export default withNavigation(TransactionListComponent);

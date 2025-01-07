@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import UserOrgService from '../services/user_org-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class UserOrgCreateComponent extends Component {
@@ -9,10 +9,8 @@ class UserOrgCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     org_id: '' ,
                 
                     user_id: '' 
@@ -57,10 +55,10 @@ class UserOrgCreateComponent extends Component {
         e.preventDefault();
         let userorg = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     user_id: this.state.user_id  
                         };
         console.log('userorg => ' + JSON.stringify(userorg));
@@ -68,11 +66,11 @@ class UserOrgCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             UserOrgService.createUserOrg(userorg).then(res =>{
-                this.props.history.push('/userorg');
+                this.props.navigate('/userorg');
             });
         }else{
             UserOrgService.updateUserOrg(userorg, this.state.id).then( res => {
-                this.props.history.push('/userorg');
+                this.props.navigate('/userorg');
             });
         }
     }
@@ -90,7 +88,7 @@ class UserOrgCreateComponent extends Component {
             this.setState({user_id: event.target.value});
         }
             cancel(){
-        this.props.history.push('/userorg');
+        this.props.navigate('/userorg');
     }
 
     getTitle(){
@@ -147,4 +145,4 @@ class UserOrgCreateComponent extends Component {
     }
 }
 
-export default UserOrgCreateComponent;
+export default withNavigation(UserOrgCreateComponent);

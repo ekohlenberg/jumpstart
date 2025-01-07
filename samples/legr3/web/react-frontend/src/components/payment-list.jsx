@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import PaymentService from '../services/payment-service';
 
 class PaymentListComponent extends Component {
@@ -19,11 +21,11 @@ class PaymentListComponent extends Component {
         });
     }
     viewPayment(id){
-        this.props.history.push(`/view-payment/${id}`);
+        this.props.navigate(`/view-payment/${id}`);
     }
     editPayment(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-payment/${id}`);
+        this.props.navigate(`/add-payment/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class PaymentListComponent extends Component {
     }
 
     addPayment(){
-        this.props.history.push('/add-payment/_add');
+        this.props.navigate('/add-payment/_add');
     }
 
     render() {
@@ -123,4 +125,4 @@ class PaymentListComponent extends Component {
     }
 }
 
-export default PaymentListComponent;
+export default withNavigation(PaymentListComponent);

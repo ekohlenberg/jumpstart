@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import CustomerService from '../services/customer-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class CustomerCreateComponent extends Component {
@@ -9,10 +9,8 @@ class CustomerCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     org_id: '' ,
                 
                     customer_name: '' ,
@@ -99,24 +97,24 @@ class CustomerCreateComponent extends Component {
         e.preventDefault();
         let customer = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     customer_name: this.state.customer_name , 
-                
+                            
                     first_name: this.state.first_name , 
-                
+                            
                     last_name: this.state.last_name , 
-                
+                            
                     email: this.state.email , 
-                
+                            
                     phone: this.state.phone , 
-                
+                            
                     billing_address: this.state.billing_address , 
-                
+                            
                     shipping_address: this.state.shipping_address , 
-                
+                            
                     created_date: this.state.created_date  
                         };
         console.log('customer => ' + JSON.stringify(customer));
@@ -124,11 +122,11 @@ class CustomerCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             CustomerService.createCustomer(customer).then(res =>{
-                this.props.history.push('/customer');
+                this.props.navigate('/customer');
             });
         }else{
             CustomerService.updateCustomer(customer, this.state.id).then( res => {
-                this.props.history.push('/customer');
+                this.props.navigate('/customer');
             });
         }
     }
@@ -174,7 +172,7 @@ class CustomerCreateComponent extends Component {
             this.setState({created_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/customer');
+        this.props.navigate('/customer');
     }
 
     getTitle(){
@@ -280,4 +278,4 @@ class CustomerCreateComponent extends Component {
     }
 }
 
-export default CustomerCreateComponent;
+export default withNavigation(CustomerCreateComponent);

@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import VendorService from '../services/vendor-service';
 
 class VendorListComponent extends Component {
@@ -19,11 +21,11 @@ class VendorListComponent extends Component {
         });
     }
     viewVendor(id){
-        this.props.history.push(`/view-vendor/${id}`);
+        this.props.navigate(`/view-vendor/${id}`);
     }
     editVendor(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-vendor/${id}`);
+        this.props.navigate(`/add-vendor/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class VendorListComponent extends Component {
     }
 
     addVendor(){
-        this.props.history.push('/add-vendor/_add');
+        this.props.navigate('/add-vendor/_add');
     }
 
     render() {
@@ -131,4 +133,4 @@ class VendorListComponent extends Component {
     }
 }
 
-export default VendorListComponent;
+export default withNavigation(VendorListComponent);

@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import AccountService from '../services/account-service';
 
 class AccountListComponent extends Component {
@@ -19,11 +21,11 @@ class AccountListComponent extends Component {
         });
     }
     viewAccount(id){
-        this.props.history.push(`/view-account/${id}`);
+        this.props.navigate(`/view-account/${id}`);
     }
     editAccount(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-account/${id}`);
+        this.props.navigate(`/add-account/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class AccountListComponent extends Component {
     }
 
     addAccount(){
-        this.props.history.push('/add-account/_add');
+        this.props.navigate('/add-account/_add');
     }
 
     render() {
@@ -119,4 +121,4 @@ class AccountListComponent extends Component {
     }
 }
 
-export default AccountListComponent;
+export default withNavigation(AccountListComponent);

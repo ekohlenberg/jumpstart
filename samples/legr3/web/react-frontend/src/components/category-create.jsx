@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import CategoryService from '../services/category-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class CategoryCreateComponent extends Component {
@@ -9,10 +9,8 @@ class CategoryCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     org_id: '' ,
                 
                     category_name: '' ,
@@ -63,12 +61,12 @@ class CategoryCreateComponent extends Component {
         e.preventDefault();
         let category = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     category_name: this.state.category_name , 
-                
+                            
                     category_type: this.state.category_type  
                         };
         console.log('category => ' + JSON.stringify(category));
@@ -76,11 +74,11 @@ class CategoryCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             CategoryService.createCategory(category).then(res =>{
-                this.props.history.push('/category');
+                this.props.navigate('/category');
             });
         }else{
             CategoryService.updateCategory(category, this.state.id).then( res => {
-                this.props.history.push('/category');
+                this.props.navigate('/category');
             });
         }
     }
@@ -102,7 +100,7 @@ class CategoryCreateComponent extends Component {
             this.setState({category_type: event.target.value});
         }
             cancel(){
-        this.props.history.push('/category');
+        this.props.navigate('/category');
     }
 
     getTitle(){
@@ -166,4 +164,4 @@ class CategoryCreateComponent extends Component {
     }
 }
 
-export default CategoryCreateComponent;
+export default withNavigation(CategoryCreateComponent);

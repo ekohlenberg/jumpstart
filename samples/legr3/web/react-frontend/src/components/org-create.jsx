@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import OrgService from '../services/org-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class OrgCreateComponent extends Component {
@@ -9,10 +9,8 @@ class OrgCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     name: '' 
                             
         }
@@ -51,8 +49,8 @@ class OrgCreateComponent extends Component {
         e.preventDefault();
         let org = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     name: this.state.name  
                         };
         console.log('org => ' + JSON.stringify(org));
@@ -60,11 +58,11 @@ class OrgCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             OrgService.createOrg(org).then(res =>{
-                this.props.history.push('/org');
+                this.props.navigate('/org');
             });
         }else{
             OrgService.updateOrg(org, this.state.id).then( res => {
-                this.props.history.push('/org');
+                this.props.navigate('/org');
             });
         }
     }
@@ -78,7 +76,7 @@ class OrgCreateComponent extends Component {
             this.setState({name: event.target.value});
         }
             cancel(){
-        this.props.history.push('/org');
+        this.props.navigate('/org');
     }
 
     getTitle(){
@@ -128,4 +126,4 @@ class OrgCreateComponent extends Component {
     }
 }
 
-export default OrgCreateComponent;
+export default withNavigation(OrgCreateComponent);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import InvoiceService from '../services/invoice-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class InvoiceCreateComponent extends Component {
@@ -9,10 +9,8 @@ class InvoiceCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     customer_id: '' ,
                 
                     org_id: '' ,
@@ -93,22 +91,22 @@ class InvoiceCreateComponent extends Component {
         e.preventDefault();
         let invoice = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     customer_id: this.state.customer_id , 
-                
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     invoice_number: this.state.invoice_number , 
-                
+                            
                     invoice_date: this.state.invoice_date , 
-                
+                            
                     due_date: this.state.due_date , 
-                
+                            
                     total_amount: this.state.total_amount , 
-                
+                            
                     status: this.state.status , 
-                
+                            
                     created_date: this.state.created_date  
                         };
         console.log('invoice => ' + JSON.stringify(invoice));
@@ -116,11 +114,11 @@ class InvoiceCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             InvoiceService.createInvoice(invoice).then(res =>{
-                this.props.history.push('/invoice');
+                this.props.navigate('/invoice');
             });
         }else{
             InvoiceService.updateInvoice(invoice, this.state.id).then( res => {
-                this.props.history.push('/invoice');
+                this.props.navigate('/invoice');
             });
         }
     }
@@ -162,7 +160,7 @@ class InvoiceCreateComponent extends Component {
             this.setState({created_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/invoice');
+        this.props.navigate('/invoice');
     }
 
     getTitle(){
@@ -261,4 +259,4 @@ class InvoiceCreateComponent extends Component {
     }
 }
 
-export default InvoiceCreateComponent;
+export default withNavigation(InvoiceCreateComponent);

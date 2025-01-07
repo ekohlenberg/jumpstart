@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import InvoiceItemService from '../services/invoice_item-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class InvoiceItemCreateComponent extends Component {
@@ -9,10 +9,8 @@ class InvoiceItemCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     invoice_id: '' ,
                 
                     description: '' ,
@@ -75,16 +73,16 @@ class InvoiceItemCreateComponent extends Component {
         e.preventDefault();
         let invoiceitem = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     invoice_id: this.state.invoice_id , 
-                
+                            
                     description: this.state.description , 
-                
+                            
                     quantity: this.state.quantity , 
-                
+                            
                     unit_price: this.state.unit_price , 
-                
+                            
                     total_amount: this.state.total_amount  
                         };
         console.log('invoiceitem => ' + JSON.stringify(invoiceitem));
@@ -92,11 +90,11 @@ class InvoiceItemCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             InvoiceItemService.createInvoiceItem(invoiceitem).then(res =>{
-                this.props.history.push('/invoiceitem');
+                this.props.navigate('/invoiceitem');
             });
         }else{
             InvoiceItemService.updateInvoiceItem(invoiceitem, this.state.id).then( res => {
-                this.props.history.push('/invoiceitem');
+                this.props.navigate('/invoiceitem');
             });
         }
     }
@@ -126,7 +124,7 @@ class InvoiceItemCreateComponent extends Component {
             this.setState({total_amount: event.target.value});
         }
             cancel(){
-        this.props.history.push('/invoiceitem');
+        this.props.navigate('/invoiceitem');
     }
 
     getTitle(){
@@ -204,4 +202,4 @@ class InvoiceItemCreateComponent extends Component {
     }
 }
 
-export default InvoiceItemCreateComponent;
+export default withNavigation(InvoiceItemCreateComponent);

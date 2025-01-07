@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import BillItemService from '../services/bill_item-service';
 
 class BillItemListComponent extends Component {
@@ -19,11 +21,11 @@ class BillItemListComponent extends Component {
         });
     }
     viewBillItem(id){
-        this.props.history.push(`/view-billitem/${id}`);
+        this.props.navigate(`/view-billitem/${id}`);
     }
     editBillItem(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-billitem/${id}`);
+        this.props.navigate(`/add-billitem/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class BillItemListComponent extends Component {
     }
 
     addBillItem(){
-        this.props.history.push('/add-billitem/_add');
+        this.props.navigate('/add-billitem/_add');
     }
 
     render() {
@@ -119,4 +121,4 @@ class BillItemListComponent extends Component {
     }
 }
 
-export default BillItemListComponent;
+export default withNavigation(BillItemListComponent);

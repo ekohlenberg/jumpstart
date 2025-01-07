@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import TransactionService from '../services/transaction-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class TransactionCreateComponent extends Component {
@@ -9,10 +9,8 @@ class TransactionCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     account_id: '' ,
                 
                     org_id: '' ,
@@ -87,20 +85,20 @@ class TransactionCreateComponent extends Component {
         e.preventDefault();
         let transaction = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     account_id: this.state.account_id , 
-                
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     transaction_date: this.state.transaction_date , 
-                
+                            
                     amount: this.state.amount , 
-                
+                            
                     transaction_type: this.state.transaction_type , 
-                
+                            
                     description: this.state.description , 
-                
+                            
                     created_date: this.state.created_date  
                         };
         console.log('transaction => ' + JSON.stringify(transaction));
@@ -108,11 +106,11 @@ class TransactionCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             TransactionService.createTransaction(transaction).then(res =>{
-                this.props.history.push('/transaction');
+                this.props.navigate('/transaction');
             });
         }else{
             TransactionService.updateTransaction(transaction, this.state.id).then( res => {
-                this.props.history.push('/transaction');
+                this.props.navigate('/transaction');
             });
         }
     }
@@ -150,7 +148,7 @@ class TransactionCreateComponent extends Component {
             this.setState({created_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/transaction');
+        this.props.navigate('/transaction');
     }
 
     getTitle(){
@@ -242,4 +240,4 @@ class TransactionCreateComponent extends Component {
     }
 }
 
-export default TransactionCreateComponent;
+export default withNavigation(TransactionCreateComponent);

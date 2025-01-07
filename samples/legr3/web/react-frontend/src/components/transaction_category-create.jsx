@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import TransactionCategoryService from '../services/transaction_category-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class TransactionCategoryCreateComponent extends Component {
@@ -9,10 +9,8 @@ class TransactionCategoryCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     transaction_id: '' ,
                 
                     category_id: '' 
@@ -57,10 +55,10 @@ class TransactionCategoryCreateComponent extends Component {
         e.preventDefault();
         let transactioncategory = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     transaction_id: this.state.transaction_id , 
-                
+                            
                     category_id: this.state.category_id  
                         };
         console.log('transactioncategory => ' + JSON.stringify(transactioncategory));
@@ -68,11 +66,11 @@ class TransactionCategoryCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             TransactionCategoryService.createTransactionCategory(transactioncategory).then(res =>{
-                this.props.history.push('/transactioncategory');
+                this.props.navigate('/transactioncategory');
             });
         }else{
             TransactionCategoryService.updateTransactionCategory(transactioncategory, this.state.id).then( res => {
-                this.props.history.push('/transactioncategory');
+                this.props.navigate('/transactioncategory');
             });
         }
     }
@@ -90,7 +88,7 @@ class TransactionCategoryCreateComponent extends Component {
             this.setState({category_id: event.target.value});
         }
             cancel(){
-        this.props.history.push('/transactioncategory');
+        this.props.navigate('/transactioncategory');
     }
 
     getTitle(){
@@ -147,4 +145,4 @@ class TransactionCategoryCreateComponent extends Component {
     }
 }
 
-export default TransactionCategoryCreateComponent;
+export default withNavigation(TransactionCategoryCreateComponent);

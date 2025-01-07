@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import TransactionCategoryService from '../services/transaction_category-service';
 
 class TransactionCategoryListComponent extends Component {
@@ -19,11 +21,11 @@ class TransactionCategoryListComponent extends Component {
         });
     }
     viewTransactionCategory(id){
-        this.props.history.push(`/view-transactioncategory/${id}`);
+        this.props.navigate(`/view-transactioncategory/${id}`);
     }
     editTransactionCategory(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-transactioncategory/${id}`);
+        this.props.navigate(`/add-transactioncategory/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class TransactionCategoryListComponent extends Component {
     }
 
     addTransactionCategory(){
-        this.props.history.push('/add-transactioncategory/_add');
+        this.props.navigate('/add-transactioncategory/_add');
     }
 
     render() {
@@ -107,4 +109,4 @@ class TransactionCategoryListComponent extends Component {
     }
 }
 
-export default TransactionCategoryListComponent;
+export default withNavigation(TransactionCategoryListComponent);

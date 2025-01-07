@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import AccountService from '../services/account-service';
-
+import { withNavigation } from './with-navigation';
 
 
 class AccountCreateComponent extends Component {
@@ -9,10 +9,8 @@ class AccountCreateComponent extends Component {
 
         this.state = {
             // step 2
-            id: this.props.match.params.id,
+            id: this.props.params?.id || '',
 
-                    id: '' ,
-                
                     org_id: '' ,
                 
                     account_name: '' ,
@@ -75,16 +73,16 @@ class AccountCreateComponent extends Component {
         e.preventDefault();
         let account = {
 
-                    id: this.state.id , 
-                
+                   id: this.state.id === '_add' ?  '0' : this.state.id ,
+                            
                     org_id: this.state.org_id , 
-                
+                            
                     account_name: this.state.account_name , 
-                
+                            
                     account_type: this.state.account_type , 
-                
+                            
                     balance: this.state.balance , 
-                
+                            
                     created_date: this.state.created_date  
                         };
         console.log('account => ' + JSON.stringify(account));
@@ -92,11 +90,11 @@ class AccountCreateComponent extends Component {
         // step 5
         if(this.state.id === '_add'){
             AccountService.createAccount(account).then(res =>{
-                this.props.history.push('/account');
+                this.props.navigate('/account');
             });
         }else{
             AccountService.updateAccount(account, this.state.id).then( res => {
-                this.props.history.push('/account');
+                this.props.navigate('/account');
             });
         }
     }
@@ -126,7 +124,7 @@ class AccountCreateComponent extends Component {
             this.setState({created_date: event.target.value});
         }
             cancel(){
-        this.props.history.push('/account');
+        this.props.navigate('/account');
     }
 
     getTitle(){
@@ -204,4 +202,4 @@ class AccountCreateComponent extends Component {
     }
 }
 
-export default AccountCreateComponent;
+export default withNavigation(AccountCreateComponent);

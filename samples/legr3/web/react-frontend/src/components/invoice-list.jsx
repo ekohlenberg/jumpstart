@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { withNavigation } from './with-navigation';
+
 import InvoiceService from '../services/invoice-service';
 
 class InvoiceListComponent extends Component {
@@ -19,11 +21,11 @@ class InvoiceListComponent extends Component {
         });
     }
     viewInvoice(id){
-        this.props.history.push(`/view-invoice/${id}`);
+        this.props.navigate(`/view-invoice/${id}`);
     }
     editInvoice(id){
         console.log("editing " + id)
-        this.props.history.push(`/add-invoice/${id}`);
+        this.props.navigate(`/add-invoice/${id}`);
     }
 
     componentDidMount(){
@@ -33,7 +35,7 @@ class InvoiceListComponent extends Component {
     }
 
     addInvoice(){
-        this.props.history.push('/add-invoice/_add');
+        this.props.navigate('/add-invoice/_add');
     }
 
     render() {
@@ -131,4 +133,4 @@ class InvoiceListComponent extends Component {
     }
 }
 
-export default InvoiceListComponent;
+export default withNavigation(InvoiceListComponent);
