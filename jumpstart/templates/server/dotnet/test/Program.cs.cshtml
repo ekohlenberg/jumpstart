@@ -15,6 +15,7 @@ namespace @Model.Namespace
             {
                 var domainObj = baseObject.DomainObj;
                 <text>
+                Logger.Info("Testing @(domainObj)");
                 @(domainObj)Test.testInsert();            
                 @(domainObj)Test.testUpdate();            
                 </text>
@@ -22,6 +23,7 @@ namespace @Model.Namespace
             }
             catch( Exception x)
             {
+                Logger.Error("Error executing test: ", x);
                 Console.WriteLine(x.Message);
                 Console.WriteLine(x.StackTrace);
 

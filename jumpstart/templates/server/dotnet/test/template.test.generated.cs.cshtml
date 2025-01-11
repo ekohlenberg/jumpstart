@@ -20,9 +20,9 @@ namespace @Model.Namespace
                 {
                     if (!string.IsNullOrEmpty(attr.FkObject))
                     {
-                        <text>
-                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
-                        </text>
+                    <text>
+                    @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                    </text>
                     }
                 }
                 else
@@ -33,7 +33,7 @@ namespace @Model.Namespace
                         testDataSet = attr.TestDataSet;
                     }
                     <text>
-                        @(Model.DomainVar).@attr.Name = Convert.@(attr.ConvertMethod)(BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet));
+                    @(Model.DomainVar).@attr.Name = Convert.@(attr.ConvertMethod)(BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet));
                     </text>
                 }
             }

@@ -73,6 +73,7 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Util.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseObject.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseLogic.generated.cs.cshtml", "./server/common", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Logger.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/common.csproj.cshtml", "./server/common", true));
               
                 /* persist */

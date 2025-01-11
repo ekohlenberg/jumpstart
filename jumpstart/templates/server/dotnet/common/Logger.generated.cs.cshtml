@@ -1,0 +1,156 @@
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using System.Diagnostics;
+
+namespace @Model.Name
+{
+
+    public interface ILogWriter
+    {
+        void Write(string level, string message);
+    }
+
+    public abstract class BaseLogWriter
+    {
+        protected readonly string ProgramName;
+        protected readonly object Lock = new();
+
+        protected BaseLogWriter()
+        {
+             ProgramName = Process.GetCurrentProcess().ProcessName ?? "UnknownProgram";
+        }
+
+        protected string FormatLogMessage(string level, string message)
+        {
+            string timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+            string currentUser = Environment.UserName;
+            return $"{timestamp} {level} {currentUser} {ProgramName} {message}";
+        }
+    }
+
+    internal class LogFileWriter : BaseLogWriter, ILogWriter
+    {
+        private readonly string _baseFileName;
+        private string _currentFileName;
+
+        public LogFileWriter()
+            : base()
+        {
+            _baseFileName = $"{ProgramName}.log";
+            _currentFileName = _baseFileName;
+        }
+
+        public void Write(string level, string message)
+        {
+            lock (Lock)
+            {
+                DateTime now = DateTime.UtcNow;
+
+                // Check if the file needs to be rolled over based on file's last write time
+                if (File.Exists(_currentFileName))
+                {
+                    DateTime lastWriteTime = File.GetLastWriteTimeUtc(_currentFileName);
+                    if (lastWriteTime.Date < now.Date)
+                    {
+                        RollOverLogFile(lastWriteTime);
+                    }
+                }
+
+                string logMessage = FormatLogMessage(level, message);
+                File.AppendAllText(_currentFileName, logMessage + Environment.NewLine);
+            }
+        }
+
+        private void RollOverLogFile(DateTime lastWriteTime)
+        {
+            lock (Lock)
+            {
+                if (File.Exists(_currentFileName))
+                {
+                    string newFileName = $"{ProgramName}-{lastWriteTime:yyyy-MM-dd}.log";
+                    File.Move(_currentFileName, newFileName);
+                }
+
+                _currentFileName = _baseFileName;
+            }
+        }
+    }
+
+    public class Logger
+    {	
+        public enum Level 
+        {
+            info,
+            debug
+        }
+
+        private static ILogWriter LogWriter = null;
+        private static Level level = Level.info;
+
+
+        protected static void Init()
+        {
+            if (LogWriter == null)
+            {
+                string logWriterName = Config.getString("logwriter");
+                if (logWriterName == "LogFileWriter")
+                {
+                        LogWriter = new LogFileWriter();
+                }	
+
+                
+                string logLevel = Config.getString("loglevel").ToLower();
+                if (logLevel == "debug")
+                {
+                        level = Level.debug;
+                }
+            }
+
+        }
+
+        public static void Error(string message)
+        {
+            Init();
+            LogWriter.Write("ERROR", message);
+        }
+        
+        public static void Error(string message, Exception x)
+        {
+            Init();
+            string m = string.Empty;
+            string s = string.Empty;
+
+            while (x != null)
+            {
+                m += x.Message;
+                m += "\n";
+                s += x.StackTrace;
+                s += "\n";				
+                x = x.InnerException;
+            }
+            
+            LogWriter.Write("ERROR", m + "\n" + s);
+        }
+
+        public static void Info( string message )
+        {
+                Init();
+                LogWriter.Write("INFO", message );
+        }
+
+
+        public static void Debug( string message )
+        {
+            Init();
+
+            if (level == Level.debug) 
+            {
+                LogWriter.Write("DEBUG", message );
+            }
+        }
+
+    }
+
+}
