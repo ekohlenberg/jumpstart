@@ -13,19 +13,19 @@ namespace legr3
             var transaction = new Transaction();
 
 
-                            transaction.account_id = BaseTest.getLastId("Account");
-                        
-                            transaction.org_id = BaseTest.getLastId("Org");
-                        
-                        transaction.transaction_date = Convert.ToDateTime(BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random));
+                    transaction.account_id = BaseTest.getLastId("Account");
                     
-                        transaction.amount = Convert.ToDouble(BaseTest.getTestData(transaction, "NUMERIC(18,4)", TestDataType.random));
+                    transaction.org_id = BaseTest.getLastId("Org");
                     
-                        transaction.transaction_type = Convert.ToString(BaseTest.getTestData(transaction, "VARCHAR", TestDataType.random));
+                    transaction.transaction_date = Convert.ToDateTime(BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random));
                     
-                        transaction.description = Convert.ToString(BaseTest.getTestData(transaction, "VARCHAR", TestDataType.random));
+                    transaction.amount = Convert.ToDouble(BaseTest.getTestData(transaction, "NUMERIC(18,4)", TestDataType.random));
                     
-                        transaction.created_date = Convert.ToDateTime(BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random));
+                    transaction.transaction_type = Convert.ToString(BaseTest.getTestData(transaction, "VARCHAR", TestDataType.random));
+                    
+                    transaction.description = Convert.ToString(BaseTest.getTestData(transaction, "VARCHAR", TestDataType.random));
+                    
+                    transaction.created_date = Convert.ToDateTime(BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing TransactionLogic insert: " + transaction.ToString());
                 TransactionLogic.insert(transaction);

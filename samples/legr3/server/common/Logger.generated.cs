@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Npgsql;
 
-namespace @Model.Name
+namespace legr3
 {
 
     public interface ILogWriter
@@ -198,14 +198,14 @@ namespace @Model.Name
 
                    
                     sql = "INSERT INTO audit.log (level, message, timestamp, username, program) " +
-                                "VALUES (@@level, @@message, @@timestamp, @@username, @@program);";
+                                "VALUES (@level, @message, @timestamp, @username, @program);";
 
                     using var command = new NpgsqlCommand(sql, connection);
-                    command.Parameters.AddWithValue("@@level", level);
-                    command.Parameters.AddWithValue("@@message", message);
-                    command.Parameters.AddWithValue("@@timestamp", DateTime.UtcNow);
-                    command.Parameters.AddWithValue("@@username", Environment.UserName);
-                    command.Parameters.AddWithValue("@@program", ProgramName);
+                    command.Parameters.AddWithValue("@level", level);
+                    command.Parameters.AddWithValue("@message", message);
+                    command.Parameters.AddWithValue("@timestamp", DateTime.UtcNow);
+                    command.Parameters.AddWithValue("@username", Environment.UserName);
+                    command.Parameters.AddWithValue("@program", ProgramName);
             
                     command.ExecuteNonQuery();
                         

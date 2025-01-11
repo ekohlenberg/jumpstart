@@ -13,10 +13,10 @@ namespace legr3
             var transactioncategory = new TransactionCategory();
 
 
-                            transactioncategory.transaction_id = BaseTest.getLastId("Transaction");
-                        
-                            transactioncategory.category_id = BaseTest.getLastId("Category");
-                        
+                    transactioncategory.transaction_id = BaseTest.getLastId("Transaction");
+                    
+                    transactioncategory.category_id = BaseTest.getLastId("Category");
+                    
                 Console.WriteLine("Testing TransactionCategoryLogic insert: " + transactioncategory.ToString());
                 TransactionCategoryLogic.insert(transactioncategory);
                 BaseTest.addLastId("TransactionCategory", transactioncategory.id);

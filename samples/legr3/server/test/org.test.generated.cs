@@ -13,7 +13,7 @@ namespace legr3
             var org = new Org();
 
 
-                        org.name = Convert.ToString(BaseTest.getTestData(org, "VARCHAR", TestDataType.companies));
+                    org.name = Convert.ToString(BaseTest.getTestData(org, "VARCHAR", TestDataType.companies));
                     
                 Console.WriteLine("Testing OrgLogic insert: " + org.ToString());
                 OrgLogic.insert(org);

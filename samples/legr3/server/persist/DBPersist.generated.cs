@@ -16,22 +16,9 @@ namespace legr3
         
         static public void select( SelectCallback selectCallback, string sql)
         {
-            // Retrieve all rows
-            /*
-            
-
-                await using var conn = new NpgsqlConnection(connString);
-                await conn.OpenAsync();
-
-                await using (var cmd = new NpgsqlCommand("SELECT some_field FROM data", conn))
-                await using (var reader = await cmd.ExecuteReaderAsync())
-                {
-                while (await reader.ReadAsync())
-                    Console.WriteLine(reader.GetString(0));
-                }
-                */
-                try
-                {
+        
+            try
+            {
                 string connectionStr = Config.getString("db.connection");
 
                 using (NpgsqlConnection connection = new NpgsqlConnection(connectionStr))
@@ -52,7 +39,10 @@ namespace legr3
             }
             catch (Exception ex)
             {
-                throw new Exception("Error executing sql " + sql, ex);
+                string m = $"Error executing select: {sql}";
+
+                Logger.Error( m, ex);
+                throw new Exception(m, ex);
             }
         }
 
@@ -128,13 +118,13 @@ namespace legr3
                     using (DbCommand command = (DbCommand) new NpgsqlCommand(sql, connection))
                     {
                         command.ExecuteNonQuery();
-                        Console.WriteLine(sql);
+                        Logger.Debug(sql);
                     }
                 }
             }
             catch(Exception x)
             {
-                Console.WriteLine(x.Message + ": " + sql);
+                Logger.Error(x.Message + ": " + sql);
             }
         }
 

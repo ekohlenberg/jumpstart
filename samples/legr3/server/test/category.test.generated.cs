@@ -13,11 +13,11 @@ namespace legr3
             var category = new Category();
 
 
-                            category.org_id = BaseTest.getLastId("Org");
-                        
-                        category.category_name = Convert.ToString(BaseTest.getTestData(category, "VARCHAR", TestDataType.random));
+                    category.org_id = BaseTest.getLastId("Org");
                     
-                        category.category_type = Convert.ToString(BaseTest.getTestData(category, "VARCHAR", TestDataType.random));
+                    category.category_name = Convert.ToString(BaseTest.getTestData(category, "VARCHAR", TestDataType.random));
+                    
+                    category.category_type = Convert.ToString(BaseTest.getTestData(category, "VARCHAR", TestDataType.random));
                     
                 Console.WriteLine("Testing CategoryLogic insert: " + category.ToString());
                 CategoryLogic.insert(category);

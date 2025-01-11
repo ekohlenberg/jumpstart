@@ -13,19 +13,19 @@ namespace legr3
             var user = new User();
 
 
-                        user.password_hash = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.random));
+                    user.password_hash = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.random));
                     
-                        user.first_name = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.firstnames));
+                    user.first_name = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.firstnames));
                     
-                        user.last_name = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.lastnames));
+                    user.last_name = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.lastnames));
                     
-                        user.username = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.usernames));
+                    user.username = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.usernames));
                     
-                        user.email = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.emailAddresses));
+                    user.email = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.emailAddresses));
                     
-                        user.created_date = Convert.ToDateTime(BaseTest.getTestData(user, "TIMESTAMP", TestDataType.random));
+                    user.created_date = Convert.ToDateTime(BaseTest.getTestData(user, "TIMESTAMP", TestDataType.random));
                     
-                        user.last_login_date = Convert.ToDateTime(BaseTest.getTestData(user, "TIMESTAMP", TestDataType.random));
+                    user.last_login_date = Convert.ToDateTime(BaseTest.getTestData(user, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing UserLogic insert: " + user.ToString());
                 UserLogic.insert(user);

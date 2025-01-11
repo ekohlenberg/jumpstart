@@ -13,21 +13,21 @@ namespace legr3
             var vendor = new Vendor();
 
 
-                            vendor.org_id = BaseTest.getLastId("Org");
-                        
-                        vendor.vendor_name = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.companies));
+                    vendor.org_id = BaseTest.getLastId("Org");
                     
-                        vendor.first_name = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.firstnames));
+                    vendor.vendor_name = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.companies));
                     
-                        vendor.last_name = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.lastnames));
+                    vendor.first_name = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.firstnames));
                     
-                        vendor.email = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.emailAddresses));
+                    vendor.last_name = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.lastnames));
                     
-                        vendor.phone = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.phoneNumbers));
+                    vendor.email = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.emailAddresses));
                     
-                        vendor.billing_address = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.addresses));
+                    vendor.phone = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.phoneNumbers));
                     
-                        vendor.created_date = Convert.ToDateTime(BaseTest.getTestData(vendor, "TIMESTAMP", TestDataType.random));
+                    vendor.billing_address = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.addresses));
+                    
+                    vendor.created_date = Convert.ToDateTime(BaseTest.getTestData(vendor, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing VendorLogic insert: " + vendor.ToString());
                 VendorLogic.insert(vendor);

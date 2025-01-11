@@ -13,15 +13,15 @@ namespace legr3
             var billitem = new BillItem();
 
 
-                            billitem.bill_id = BaseTest.getLastId("Bill");
-                        
-                        billitem.description = Convert.ToString(BaseTest.getTestData(billitem, "VARCHAR", TestDataType.random));
+                    billitem.bill_id = BaseTest.getLastId("Bill");
                     
-                        billitem.quantity = Convert.ToInt32(BaseTest.getTestData(billitem, "INTEGER", TestDataType.random));
+                    billitem.description = Convert.ToString(BaseTest.getTestData(billitem, "VARCHAR", TestDataType.random));
                     
-                        billitem.unit_price = Convert.ToDouble(BaseTest.getTestData(billitem, "NUMERIC(18,4)", TestDataType.random));
+                    billitem.quantity = Convert.ToInt32(BaseTest.getTestData(billitem, "INTEGER", TestDataType.random));
                     
-                        billitem.total_amount = Convert.ToDouble(BaseTest.getTestData(billitem, "NUMERIC(18,4)", TestDataType.random));
+                    billitem.unit_price = Convert.ToDouble(BaseTest.getTestData(billitem, "NUMERIC(18,4)", TestDataType.random));
+                    
+                    billitem.total_amount = Convert.ToDouble(BaseTest.getTestData(billitem, "NUMERIC(18,4)", TestDataType.random));
                     
                 Console.WriteLine("Testing BillItemLogic insert: " + billitem.ToString());
                 BillItemLogic.insert(billitem);

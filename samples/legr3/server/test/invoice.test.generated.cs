@@ -13,21 +13,21 @@ namespace legr3
             var invoice = new Invoice();
 
 
-                            invoice.customer_id = BaseTest.getLastId("Customer");
-                        
-                            invoice.org_id = BaseTest.getLastId("Org");
-                        
-                        invoice.invoice_number = Convert.ToInt64(BaseTest.getTestData(invoice, "BIGINT", TestDataType.random));
+                    invoice.customer_id = BaseTest.getLastId("Customer");
                     
-                        invoice.invoice_date = Convert.ToDateTime(BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random));
+                    invoice.org_id = BaseTest.getLastId("Org");
                     
-                        invoice.due_date = Convert.ToDateTime(BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random));
+                    invoice.invoice_number = Convert.ToInt64(BaseTest.getTestData(invoice, "BIGINT", TestDataType.random));
                     
-                        invoice.total_amount = Convert.ToDouble(BaseTest.getTestData(invoice, "NUMERIC(18,4)", TestDataType.random));
+                    invoice.invoice_date = Convert.ToDateTime(BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random));
                     
-                        invoice.status = Convert.ToString(BaseTest.getTestData(invoice, "VARCHAR", TestDataType.random));
+                    invoice.due_date = Convert.ToDateTime(BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random));
                     
-                        invoice.created_date = Convert.ToDateTime(BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random));
+                    invoice.total_amount = Convert.ToDouble(BaseTest.getTestData(invoice, "NUMERIC(18,4)", TestDataType.random));
+                    
+                    invoice.status = Convert.ToString(BaseTest.getTestData(invoice, "VARCHAR", TestDataType.random));
+                    
+                    invoice.created_date = Convert.ToDateTime(BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing InvoiceLogic insert: " + invoice.ToString());
                 InvoiceLogic.insert(invoice);

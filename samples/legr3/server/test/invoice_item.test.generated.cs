@@ -13,15 +13,15 @@ namespace legr3
             var invoiceitem = new InvoiceItem();
 
 
-                            invoiceitem.invoice_id = BaseTest.getLastId("Invoice");
-                        
-                        invoiceitem.description = Convert.ToString(BaseTest.getTestData(invoiceitem, "VARCHAR", TestDataType.random));
+                    invoiceitem.invoice_id = BaseTest.getLastId("Invoice");
                     
-                        invoiceitem.quantity = Convert.ToInt32(BaseTest.getTestData(invoiceitem, "INTEGER", TestDataType.random));
+                    invoiceitem.description = Convert.ToString(BaseTest.getTestData(invoiceitem, "VARCHAR", TestDataType.random));
                     
-                        invoiceitem.unit_price = Convert.ToDouble(BaseTest.getTestData(invoiceitem, "NUMERIC(18,4)", TestDataType.random));
+                    invoiceitem.quantity = Convert.ToInt32(BaseTest.getTestData(invoiceitem, "INTEGER", TestDataType.random));
                     
-                        invoiceitem.total_amount = Convert.ToDouble(BaseTest.getTestData(invoiceitem, "NUMERIC(18,4)", TestDataType.random));
+                    invoiceitem.unit_price = Convert.ToDouble(BaseTest.getTestData(invoiceitem, "NUMERIC(18,4)", TestDataType.random));
+                    
+                    invoiceitem.total_amount = Convert.ToDouble(BaseTest.getTestData(invoiceitem, "NUMERIC(18,4)", TestDataType.random));
                     
                 Console.WriteLine("Testing InvoiceItemLogic insert: " + invoiceitem.ToString());
                 InvoiceItemLogic.insert(invoiceitem);

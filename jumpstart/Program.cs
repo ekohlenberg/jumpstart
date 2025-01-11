@@ -96,6 +96,7 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.json.cshtml", "./server/api", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.Development.json.cshtml", "./server/api", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/Properties/launchSettings.json.cshtml", "./server/api/Properties", false));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/makefile.cshtml", "./server/api", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/api.csproj.cshtml", "./server/api", true));
 
                 
@@ -104,6 +105,8 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/test/template.test.generated.cs.cshtml", "./server/test", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/test/template.test.user.cs.cshtml", "./server/test", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/Program.cs.cshtml", "./server/test", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/makefile.cshtml", "./server/test", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/appsettings.json.cshtml", "./server/test", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/test.csproj.cshtml", "./server/test", true));
                
                /* server solution */

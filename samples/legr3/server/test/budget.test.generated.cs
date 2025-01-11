@@ -13,15 +13,15 @@ namespace legr3
             var budget = new Budget();
 
 
-                            budget.org_id = BaseTest.getLastId("Org");
-                        
-                            budget.category_id = BaseTest.getLastId("Category");
-                        
-                        budget.amount = Convert.ToDouble(BaseTest.getTestData(budget, "NUMERIC(18,4)", TestDataType.random));
+                    budget.org_id = BaseTest.getLastId("Org");
                     
-                        budget.start_date = Convert.ToDateTime(BaseTest.getTestData(budget, "DATE", TestDataType.random));
+                    budget.category_id = BaseTest.getLastId("Category");
                     
-                        budget.end_date = Convert.ToDateTime(BaseTest.getTestData(budget, "DATE", TestDataType.random));
+                    budget.amount = Convert.ToDouble(BaseTest.getTestData(budget, "NUMERIC(18,4)", TestDataType.random));
+                    
+                    budget.start_date = Convert.ToDateTime(BaseTest.getTestData(budget, "DATE", TestDataType.random));
+                    
+                    budget.end_date = Convert.ToDateTime(BaseTest.getTestData(budget, "DATE", TestDataType.random));
                     
                 Console.WriteLine("Testing BudgetLogic insert: " + budget.ToString());
                 BudgetLogic.insert(budget);

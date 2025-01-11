@@ -13,23 +13,23 @@ namespace legr3
             var customer = new Customer();
 
 
-                            customer.org_id = BaseTest.getLastId("Org");
-                        
-                        customer.customer_name = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.companies));
+                    customer.org_id = BaseTest.getLastId("Org");
                     
-                        customer.first_name = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.firstnames));
+                    customer.customer_name = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.companies));
                     
-                        customer.last_name = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.lastnames));
+                    customer.first_name = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.firstnames));
                     
-                        customer.email = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.emailAddresses));
+                    customer.last_name = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.lastnames));
                     
-                        customer.phone = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.phoneNumbers));
+                    customer.email = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.emailAddresses));
                     
-                        customer.billing_address = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.addresses));
+                    customer.phone = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.phoneNumbers));
                     
-                        customer.shipping_address = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.addresses));
+                    customer.billing_address = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.addresses));
                     
-                        customer.created_date = Convert.ToDateTime(BaseTest.getTestData(customer, "TIMESTAMP", TestDataType.random));
+                    customer.shipping_address = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.addresses));
+                    
+                    customer.created_date = Convert.ToDateTime(BaseTest.getTestData(customer, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing CustomerLogic insert: " + customer.ToString());
                 CustomerLogic.insert(customer);

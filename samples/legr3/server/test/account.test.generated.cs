@@ -13,15 +13,15 @@ namespace legr3
             var account = new Account();
 
 
-                            account.org_id = BaseTest.getLastId("Org");
-                        
-                        account.account_name = Convert.ToString(BaseTest.getTestData(account, "VARCHAR", TestDataType.random));
+                    account.org_id = BaseTest.getLastId("Org");
                     
-                        account.account_type = Convert.ToString(BaseTest.getTestData(account, "VARCHAR", TestDataType.random));
+                    account.account_name = Convert.ToString(BaseTest.getTestData(account, "VARCHAR", TestDataType.random));
                     
-                        account.balance = Convert.ToDouble(BaseTest.getTestData(account, "NUMERIC(18,4)", TestDataType.random));
+                    account.account_type = Convert.ToString(BaseTest.getTestData(account, "VARCHAR", TestDataType.random));
                     
-                        account.created_date = Convert.ToDateTime(BaseTest.getTestData(account, "TIMESTAMP", TestDataType.random));
+                    account.balance = Convert.ToDouble(BaseTest.getTestData(account, "NUMERIC(18,4)", TestDataType.random));
+                    
+                    account.created_date = Convert.ToDateTime(BaseTest.getTestData(account, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing AccountLogic insert: " + account.ToString());
                 AccountLogic.insert(account);

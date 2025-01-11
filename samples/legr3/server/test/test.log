@@ -1,0 +1,900 @@
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Org
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into sec.org (name,is_active,id,version,created_by,last_updated,last_updated_by) values ('Virtue Technologies',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.sec_org (name,is_active,id,version,created_by,last_updated,last_updated_by,org_id) values ('Virtue Technologies',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update sec.org set name='DataWorks', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.sec_org (id,name,is_active,created_by,last_updated,last_updated_by,version,org_id) values (3,'DataWorks',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing User
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into sec.user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by) values ('rnd28','Linda','Parker','lparker','linda.parker@example.com','01/11/2025 15:07:53','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.sec_user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by,user_id) values ('rnd28','Linda','Parker','lparker','linda.parker@example.com','01/11/2025 15:07:53','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update sec.user set password_hash='rnd29', first_name='Patrick', last_name='Hill', username='phill', email='patrick.hill@example.com', created_date='01/11/2025 15:07:53', last_login_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.sec_user (id,password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,created_by,last_updated,last_updated_by,version,user_id) values (3,'rnd29','Patrick','Hill','phill','patrick.hill@example.com','01/11/2025 15:07:53','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing UserOrg
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into sec.user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.sec_user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by,user_org_id) values (1,1,1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update sec.user_org set org_id=1, user_id=1, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.sec_user_org (id,org_id,user_id,is_active,created_by,last_updated,last_updated_by,version,user_org_id) values (3,1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Account
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd61','rnd68',158.3066512968523,'01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by,account_id) values (1,'rnd61','rnd68',158.3066512968523,'01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.account set org_id=1, account_name='rnd73', account_type='rnd22', balance=4624.842623107323, created_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_account (id,org_id,account_name,account_type,balance,created_date,is_active,created_by,last_updated,last_updated_by,version,account_id) values (3,1,'rnd73','rnd22',4624.842623107323,'01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Customer
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'Insight Global','Elizabeth','Scott','elizabeth.scott@example.com','555-202-0123','456 Oak St','4444 Cypressland St','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,customer_id) values (1,'Insight Global','Elizabeth','Scott','elizabeth.scott@example.com','555-202-0123','456 Oak St','4444 Cypressland St','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.customer set org_id=1, customer_name='Pinnacle Corporation', first_name='Paul', last_name='Hall', email='paul.hall@example.com', phone='555-292-9012', billing_address='4242 Lindenwood St', shipping_address='1818 Dogwood St', created_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_customer (id,org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,created_by,last_updated,last_updated_by,version,customer_id) values (3,1,'Pinnacle Corporation','Paul','Hall','paul.hall@example.com','555-292-9012','4242 Lindenwood St','1818 Dogwood St','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Vendor
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'Vanguard Systems','Laura','Campbell','laura.campbell@example.com','555-232-3456','3636 Cherrywood St','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,vendor_id) values (1,'Vanguard Systems','Laura','Campbell','laura.campbell@example.com','555-232-3456','3636 Cherrywood St','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.vendor set org_id=1, vendor_name='Radiant Innovations', first_name='Julia', last_name='Perez', email='julia.perez@example.com', phone='555-898-9898', billing_address='4545 Firtree St', created_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_vendor (id,org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,created_by,last_updated,last_updated_by,version,vendor_id) values (3,1,'Radiant Innovations','Julia','Perez','julia.perez@example.com','555-898-9898','4545 Firtree St','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Invoice
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,65,'01/11/2025 15:07:53','01/11/2025 15:07:53',9849.19354514682,'rnd64','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,invoice_id) values (1,1,65,'01/11/2025 15:07:53','01/11/2025 15:07:53',9849.19354514682,'rnd64','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.invoice set customer_id=1, org_id=1, invoice_number=11, invoice_date='01/11/2025 15:07:53', due_date='01/11/2025 15:07:53', total_amount=4988.579747406678, status='rnd53', created_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_invoice (id,customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,invoice_id) values (3,1,1,11,'01/11/2025 15:07:53','01/11/2025 15:07:53',4988.579747406678,'rnd53','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing InvoiceItem
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd65',78,4057.614408927067,2400.3999189167203,1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,invoice_item_id) values (1,'rnd65',78,4057.614408927067,2400.3999189167203,1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.invoice_item set invoice_id=1, description='rnd81', quantity=36, unit_price=6229.525919235399, total_amount=6639.697511940128, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_invoice_item (id,invoice_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,invoice_item_id) values (3,1,'rnd81',36,6229.525919235399,6639.697511940128,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Bill
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,92,'01/11/2025 15:07:53','01/11/2025 15:07:53',4263.9314056214225,'rnd27','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,bill_id) values (1,1,92,'01/11/2025 15:07:53','01/11/2025 15:07:53',4263.9314056214225,'rnd27','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.bill set vendor_id=1, org_id=1, bill_number=73, bill_date='01/11/2025 15:07:53', due_date='01/11/2025 15:07:53', total_amount=7484.216068310777, status='rnd39', created_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_bill (id,vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,bill_id) values (3,1,1,73,'01/11/2025 15:07:53','01/11/2025 15:07:53',7484.216068310777,'rnd39','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing BillItem
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd57',86,6523.131636424385,9822.374492026585,1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,bill_item_id) values (1,'rnd57',86,6523.131636424385,9822.374492026585,1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.bill_item set bill_id=1, description='rnd15', quantity=28, unit_price=2239.3426014671413, total_amount=2909.2259846809998, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_bill_item (id,bill_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,bill_item_id) values (3,1,'rnd15',28,2239.3426014671413,2909.2259846809998,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Payment
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,'01/11/2025 15:07:53',5548.157460418456,'rnd4','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by,payment_id) values (1,1,'01/11/2025 15:07:53',5548.157460418456,'rnd4','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.payment set invoice_id=1, org_id=1, payment_date='01/11/2025 15:07:53', amount=6679.682840174049, payment_method='rnd11', created_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_payment (id,invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,created_by,last_updated,last_updated_by,version,payment_id) values (3,1,1,'01/11/2025 15:07:53',6679.682840174049,'rnd11','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Transaction
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,'01/11/2025 15:07:53',956.9167119115041,'rnd40','rnd44','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by,transaction_id) values (1,1,'01/11/2025 15:07:53',956.9167119115041,'rnd40','rnd44','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.transaction set account_id=1, org_id=1, transaction_date='01/11/2025 15:07:53', amount=42.3835343868606, transaction_type='rnd23', description='rnd25', created_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_transaction (id,account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,created_by,last_updated,last_updated_by,version,transaction_id) values (3,1,1,'01/11/2025 15:07:53',42.3835343868606,'rnd23','rnd25','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Category
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd69','rnd77',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by,category_id) values (1,'rnd69','rnd77',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.category set org_id=1, category_name='rnd76', category_type='rnd17', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_category (id,org_id,category_name,category_type,is_active,created_by,last_updated,last_updated_by,version,category_id) values (3,1,'rnd76','rnd17',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing TransactionCategory
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by,transaction_category_id) values (1,1,1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.transaction_category set transaction_id=1, category_id=1, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_transaction_category (id,transaction_id,category_id,is_active,created_by,last_updated,last_updated_by,version,transaction_category_id) values (3,1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:07:53 INFO erickohlenberg test Testing Budget
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into app.budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,9789.626671284093,'01/11/2025 15:07:53','01/11/2025 15:07:53',1,1,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg');
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by,budget_id) values (1,1,9789.626671284093,'01/11/2025 15:07:53','01/11/2025 15:07:53',1,2,1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',1);
+2025-01-11 21:07:53 DEBUG erickohlenberg test update app.budget set org_id=1, category_id=1, amount=8198.30878781022, start_date='01/11/2025 15:07:53', end_date='01/11/2025 15:07:53', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:07:53', last_updated_by='erickohlenberg', version=2 where id=1;
+2025-01-11 21:07:53 DEBUG erickohlenberg test insert into audit.app_budget (id,org_id,category_id,amount,start_date,end_date,is_active,created_by,last_updated,last_updated_by,version,budget_id) values (3,1,1,8198.30878781022,'01/11/2025 15:07:53','01/11/2025 15:07:53',1,'erickohlenberg','01/11/2025 15:07:53','erickohlenberg',2,1);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Org
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into sec.org (name,is_active,id,version,created_by,last_updated,last_updated_by) values ('AstroTech',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.sec_org (name,is_active,id,version,created_by,last_updated,last_updated_by,org_id) values ('AstroTech',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update sec.org set name='Centurion Systems', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.sec_org (id,name,is_active,created_by,last_updated,last_updated_by,version,org_id) values (6,'Centurion Systems',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing User
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into sec.user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by) values ('rnd39','Amanda','Thomas','athomas','amanda.thomas@example.com','01/11/2025 15:08:06','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.sec_user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by,user_id) values ('rnd39','Amanda','Thomas','athomas','amanda.thomas@example.com','01/11/2025 15:08:06','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update sec.user set password_hash='rnd50', first_name='Tyler', last_name='Jackson', username='tjackson', email='tyler.jackson@example.com', created_date='01/11/2025 15:08:06', last_login_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.sec_user (id,password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,created_by,last_updated,last_updated_by,version,user_id) values (6,'rnd50','Tyler','Jackson','tjackson','tyler.jackson@example.com','01/11/2025 15:08:06','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing UserOrg
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into sec.user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.sec_user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by,user_org_id) values (4,4,1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update sec.user_org set org_id=4, user_id=4, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.sec_user_org (id,org_id,user_id,is_active,created_by,last_updated,last_updated_by,version,user_org_id) values (6,4,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Account
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd3','rnd63',4689.820316856648,'01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by,account_id) values (4,'rnd3','rnd63',4689.820316856648,'01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.account set org_id=4, account_name='rnd71', account_type='rnd42', balance=5925.077085398285, created_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_account (id,org_id,account_name,account_type,balance,created_date,is_active,created_by,last_updated,last_updated_by,version,account_id) values (6,4,'rnd71','rnd42',5925.077085398285,'01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Customer
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'Innovate Solutions','Michael','Anderson','michael.anderson@example.com','555-272-7890','3939 Sycamorewood St','4343 Magnolialand St','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,customer_id) values (4,'Innovate Solutions','Michael','Anderson','michael.anderson@example.com','555-272-7890','3939 Sycamorewood St','4343 Magnolialand St','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.customer set org_id=4, customer_name='Infinite Solutions', first_name='Patrick', last_name='Flores', email='patrick.flores@example.com', phone='555-202-0123', billing_address='2323 Palm St', shipping_address='4545 Firtree St', created_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_customer (id,org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,created_by,last_updated,last_updated_by,version,customer_id) values (6,4,'Infinite Solutions','Patrick','Flores','patrick.flores@example.com','555-202-0123','2323 Palm St','4545 Firtree St','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Vendor
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'Sunrise Technologies','Grace','King','grace.king@example.com','555-151-5678','1616 Redwood St','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,vendor_id) values (4,'Sunrise Technologies','Grace','King','grace.king@example.com','555-151-5678','1616 Redwood St','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.vendor set org_id=4, vendor_name='BrightPath Technologies', first_name='Matthew', last_name='Walker', email='matthew.walker@example.com', phone='555-111-1234', billing_address='1515 Fir St', created_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_vendor (id,org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,created_by,last_updated,last_updated_by,version,vendor_id) values (6,4,'BrightPath Technologies','Matthew','Walker','matthew.walker@example.com','555-111-1234','1515 Fir St','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Invoice
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,52,'01/11/2025 15:08:06','01/11/2025 15:08:06',888.576902008078,'rnd75','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,invoice_id) values (4,4,52,'01/11/2025 15:08:06','01/11/2025 15:08:06',888.576902008078,'rnd75','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.invoice set customer_id=4, org_id=4, invoice_number=79, invoice_date='01/11/2025 15:08:06', due_date='01/11/2025 15:08:06', total_amount=1738.4077176209, status='rnd85', created_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_invoice (id,customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,invoice_id) values (6,4,4,79,'01/11/2025 15:08:06','01/11/2025 15:08:06',1738.4077176209,'rnd85','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing InvoiceItem
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd61',1,2772.95972533539,6830.081689475163,1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,invoice_item_id) values (4,'rnd61',1,2772.95972533539,6830.081689475163,1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.invoice_item set invoice_id=4, description='rnd38', quantity=72, unit_price=2830.6544752806108, total_amount=9789.523319652228, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_invoice_item (id,invoice_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,invoice_item_id) values (6,4,'rnd38',72,2830.6544752806108,9789.523319652228,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Bill
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,31,'01/11/2025 15:08:06','01/11/2025 15:08:06',4796.494515869086,'rnd56','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,bill_id) values (4,4,31,'01/11/2025 15:08:06','01/11/2025 15:08:06',4796.494515869086,'rnd56','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.bill set vendor_id=4, org_id=4, bill_number=32, bill_date='01/11/2025 15:08:06', due_date='01/11/2025 15:08:06', total_amount=7121.328230574398, status='rnd84', created_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_bill (id,vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,bill_id) values (6,4,4,32,'01/11/2025 15:08:06','01/11/2025 15:08:06',7121.328230574398,'rnd84','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing BillItem
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd2',71,2866.7371560622078,8989.538553621835,1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,bill_item_id) values (4,'rnd2',71,2866.7371560622078,8989.538553621835,1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.bill_item set bill_id=4, description='rnd38', quantity=46, unit_price=4352.988459660613, total_amount=5319.508028978987, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_bill_item (id,bill_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,bill_item_id) values (6,4,'rnd38',46,4352.988459660613,5319.508028978987,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Payment
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,'01/11/2025 15:08:06',3948.4719742040065,'rnd93','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by,payment_id) values (4,4,'01/11/2025 15:08:06',3948.4719742040065,'rnd93','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.payment set invoice_id=4, org_id=4, payment_date='01/11/2025 15:08:06', amount=9914.018863450157, payment_method='rnd94', created_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_payment (id,invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,created_by,last_updated,last_updated_by,version,payment_id) values (6,4,4,'01/11/2025 15:08:06',9914.018863450157,'rnd94','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Transaction
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,'01/11/2025 15:08:06',6536.714603655169,'rnd63','rnd1','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by,transaction_id) values (4,4,'01/11/2025 15:08:06',6536.714603655169,'rnd63','rnd1','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.transaction set account_id=4, org_id=4, transaction_date='01/11/2025 15:08:06', amount=6491.758736506854, transaction_type='rnd13', description='rnd27', created_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_transaction (id,account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,created_by,last_updated,last_updated_by,version,transaction_id) values (6,4,4,'01/11/2025 15:08:06',6491.758736506854,'rnd13','rnd27','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Category
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd82','rnd46',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by,category_id) values (4,'rnd82','rnd46',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.category set org_id=4, category_name='rnd61', category_type='rnd88', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_category (id,org_id,category_name,category_type,is_active,created_by,last_updated,last_updated_by,version,category_id) values (6,4,'rnd61','rnd88',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing TransactionCategory
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by,transaction_category_id) values (4,4,1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.transaction_category set transaction_id=4, category_id=4, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_transaction_category (id,transaction_id,category_id,is_active,created_by,last_updated,last_updated_by,version,transaction_category_id) values (6,4,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:08:06 INFO erickohlenberg test Testing Budget
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into app.budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,9403.467286798466,'01/11/2025 15:08:06','01/11/2025 15:08:06',1,4,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg');
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by,budget_id) values (4,4,9403.467286798466,'01/11/2025 15:08:06','01/11/2025 15:08:06',1,5,1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',4);
+2025-01-11 21:08:06 DEBUG erickohlenberg test update app.budget set org_id=4, category_id=4, amount=1590.546793761679, start_date='01/11/2025 15:08:06', end_date='01/11/2025 15:08:06', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:08:06', last_updated_by='erickohlenberg', version=2 where id=4;
+2025-01-11 21:08:06 DEBUG erickohlenberg test insert into audit.app_budget (id,org_id,category_id,amount,start_date,end_date,is_active,created_by,last_updated,last_updated_by,version,budget_id) values (6,4,4,1590.546793761679,'01/11/2025 15:08:06','01/11/2025 15:08:06',1,'erickohlenberg','01/11/2025 15:08:06','erickohlenberg',2,4);
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Org
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into sec.org (name,is_active,id,version,created_by,last_updated,last_updated_by) values ('Lunar Solutions',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.sec_org (name,is_active,id,version,created_by,last_updated,last_updated_by,org_id) values ('Lunar Solutions',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update sec.org set name='Harmony Tech', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.sec_org (id,name,is_active,created_by,last_updated,last_updated_by,version,org_id) values (9,'Harmony Tech',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing User
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into sec.user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by) values ('rnd54','Linda','Flores','lflores','linda.flores@example.com','01/11/2025 15:09:26','01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.sec_user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by,user_id) values ('rnd54','Linda','Flores','lflores','linda.flores@example.com','01/11/2025 15:09:26','01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update sec.user set password_hash='rnd55', first_name='Anna', last_name='Edwards', username='aedwards', email='anna.edwards@example.com', created_date='01/11/2025 15:09:26', last_login_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.sec_user (id,password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,created_by,last_updated,last_updated_by,version,user_id) values (9,'rnd55','Anna','Edwards','aedwards','anna.edwards@example.com','01/11/2025 15:09:26','01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing UserOrg
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into sec.user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.sec_user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by,user_org_id) values (7,7,1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update sec.user_org set org_id=7, user_id=7, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.sec_user_org (id,org_id,user_id,is_active,created_by,last_updated,last_updated_by,version,user_org_id) values (9,7,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Account
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd39','rnd65',7106.645202885492,'01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by,account_id) values (7,'rnd39','rnd65',7106.645202885492,'01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.account set org_id=7, account_name='rnd28', account_type='rnd52', balance=7719.089751117769, created_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_account (id,org_id,account_name,account_type,balance,created_date,is_active,created_by,last_updated,last_updated_by,version,account_id) values (9,7,'rnd28','rnd52',7719.089751117769,'01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Customer
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'Quantum Systems','Steven','Lopez','steven.lopez@example.com','555-454-5454','909 Sycamore St','3434 Birchwood St','01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,customer_id) values (7,'Quantum Systems','Steven','Lopez','steven.lopez@example.com','555-454-5454','909 Sycamore St','3434 Birchwood St','01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.customer set org_id=7, customer_name='OmniTech', first_name='Grace', last_name='Davis', email='grace.davis@example.com', phone='555-345-6789', billing_address='3535 Walnutwood St', shipping_address='4444 Cypressland St', created_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_customer (id,org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,created_by,last_updated,last_updated_by,version,customer_id) values (9,7,'OmniTech','Grace','Davis','grace.davis@example.com','555-345-6789','3535 Walnutwood St','4444 Cypressland St','01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Vendor
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'Global Dynamics','Brian','Flores','brian.flores@example.com','555-787-8787','606 Cherry Ln','01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,vendor_id) values (7,'Global Dynamics','Brian','Flores','brian.flores@example.com','555-787-8787','606 Cherry Ln','01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.vendor set org_id=7, vendor_name='Phoenix Enterprises', first_name='Sophia', last_name='Lopez', email='sophia.lopez@example.com', phone='555-555-6666', billing_address='1010 Aspen St', created_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_vendor (id,org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,created_by,last_updated,last_updated_by,version,vendor_id) values (9,7,'Phoenix Enterprises','Sophia','Lopez','sophia.lopez@example.com','555-555-6666','1010 Aspen St','01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Invoice
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,8,'01/11/2025 15:09:26','01/11/2025 15:09:26',2450.823068437562,'rnd86','01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,invoice_id) values (7,7,8,'01/11/2025 15:09:26','01/11/2025 15:09:26',2450.823068437562,'rnd86','01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.invoice set customer_id=7, org_id=7, invoice_number=45, invoice_date='01/11/2025 15:09:26', due_date='01/11/2025 15:09:26', total_amount=4605.493546023193, status='rnd30', created_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_invoice (id,customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,invoice_id) values (9,7,7,45,'01/11/2025 15:09:26','01/11/2025 15:09:26',4605.493546023193,'rnd30','01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing InvoiceItem
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd72',18,4266.019705120174,7836.503071590613,1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,invoice_item_id) values (7,'rnd72',18,4266.019705120174,7836.503071590613,1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.invoice_item set invoice_id=7, description='rnd75', quantity=32, unit_price=9938.907873638303, total_amount=1626.726350576272, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_invoice_item (id,invoice_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,invoice_item_id) values (9,7,'rnd75',32,9938.907873638303,1626.726350576272,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Bill
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,71,'01/11/2025 15:09:26','01/11/2025 15:09:26',76.72178017950726,'rnd43','01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,bill_id) values (7,7,71,'01/11/2025 15:09:26','01/11/2025 15:09:26',76.72178017950726,'rnd43','01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.bill set vendor_id=7, org_id=7, bill_number=98, bill_date='01/11/2025 15:09:26', due_date='01/11/2025 15:09:26', total_amount=6500.169971460717, status='rnd60', created_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_bill (id,vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,bill_id) values (9,7,7,98,'01/11/2025 15:09:26','01/11/2025 15:09:26',6500.169971460717,'rnd60','01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing BillItem
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd27',26,7064.718853141146,5717.946621651409,1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,bill_item_id) values (7,'rnd27',26,7064.718853141146,5717.946621651409,1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.bill_item set bill_id=7, description='rnd85', quantity=15, unit_price=703.746643187464, total_amount=3022.791004922496, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_bill_item (id,bill_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,bill_item_id) values (9,7,'rnd85',15,703.746643187464,3022.791004922496,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Payment
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,'01/11/2025 15:09:26',4181.619118934128,'rnd39','01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by,payment_id) values (7,7,'01/11/2025 15:09:26',4181.619118934128,'rnd39','01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.payment set invoice_id=7, org_id=7, payment_date='01/11/2025 15:09:26', amount=1538.3784718159254, payment_method='rnd49', created_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_payment (id,invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,created_by,last_updated,last_updated_by,version,payment_id) values (9,7,7,'01/11/2025 15:09:26',1538.3784718159254,'rnd49','01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Transaction
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into app.transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,'01/11/2025 15:09:26',9454.287030176416,'rnd33','rnd34','01/11/2025 15:09:26',1,7,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg');
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by,transaction_id) values (7,7,'01/11/2025 15:09:26',9454.287030176416,'rnd33','rnd34','01/11/2025 15:09:26',1,8,1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',7);
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test update app.transaction set account_id=7, org_id=7, transaction_date='01/11/2025 15:09:26', amount=3810.2228133833273, transaction_type='rnd57', description='rnd60', created_date='01/11/2025 15:09:26', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:26', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:26 DEBUG erickohlenberg test insert into audit.app_transaction (id,account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,created_by,last_updated,last_updated_by,version,transaction_id) values (9,7,7,'01/11/2025 15:09:26',3810.2228133833273,'rnd57','rnd60','01/11/2025 15:09:26',1,'erickohlenberg','01/11/2025 15:09:26','erickohlenberg',2,7);
+
+2025-01-11 21:09:26 INFO erickohlenberg test Testing Category
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into app.category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd49','rnd11',1,7,1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg');
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into audit.app_category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by,category_id) values (7,'rnd49','rnd11',1,8,1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg',7);
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test update app.category set org_id=7, category_name='rnd68', category_type='rnd45', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:27', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into audit.app_category (id,org_id,category_name,category_type,is_active,created_by,last_updated,last_updated_by,version,category_id) values (9,7,'rnd68','rnd45',1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg',2,7);
+
+2025-01-11 21:09:27 INFO erickohlenberg test Testing TransactionCategory
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into app.transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,1,7,1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg');
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into audit.app_transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by,transaction_category_id) values (7,7,1,8,1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg',7);
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test update app.transaction_category set transaction_id=7, category_id=7, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:27', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into audit.app_transaction_category (id,transaction_id,category_id,is_active,created_by,last_updated,last_updated_by,version,transaction_category_id) values (9,7,7,1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg',2,7);
+
+2025-01-11 21:09:27 INFO erickohlenberg test Testing Budget
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into app.budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,9275.196714575197,'01/11/2025 15:09:27','01/11/2025 15:09:27',1,7,1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg');
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into audit.app_budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by,budget_id) values (7,7,9275.196714575197,'01/11/2025 15:09:27','01/11/2025 15:09:27',1,8,1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg',7);
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test update app.budget set org_id=7, category_id=7, amount=5937.1052998942705, start_date='01/11/2025 15:09:27', end_date='01/11/2025 15:09:27', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:09:27', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:09:27 DEBUG erickohlenberg test insert into audit.app_budget (id,org_id,category_id,amount,start_date,end_date,is_active,created_by,last_updated,last_updated_by,version,budget_id) values (9,7,7,5937.1052998942705,'01/11/2025 15:09:27','01/11/2025 15:09:27',1,'erickohlenberg','01/11/2025 15:09:27','erickohlenberg',2,7);
+
+2025-01-11 21:14:08 INFO erickohlenberg test Testing Org
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into sec.org (name,is_active,id,version,created_by,last_updated,last_updated_by) values ('Synergy Group',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.sec_org (name,is_active,id,version,created_by,last_updated,last_updated_by,org_id) values ('Synergy Group',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update sec.org set name='AstroTech', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.sec_org (id,name,is_active,created_by,last_updated,last_updated_by,version,org_id) values (3,'AstroTech',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing User
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into sec.user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by) values ('rnd99','Michael','Miller','mmiller','michael.miller@example.com','01/11/2025 15:14:09','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.sec_user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by,user_id) values ('rnd99','Michael','Miller','mmiller','michael.miller@example.com','01/11/2025 15:14:09','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update sec.user set password_hash='rnd78', first_name='Chris', last_name='Scott', username='cscott', email='chris.scott@example.com', created_date='01/11/2025 15:14:09', last_login_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.sec_user (id,password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,created_by,last_updated,last_updated_by,version,user_id) values (3,'rnd78','Chris','Scott','cscott','chris.scott@example.com','01/11/2025 15:14:09','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing UserOrg
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into sec.user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.sec_user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by,user_org_id) values (1,1,1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update sec.user_org set org_id=1, user_id=1, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.sec_user_org (id,org_id,user_id,is_active,created_by,last_updated,last_updated_by,version,user_org_id) values (3,1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Account
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd32','rnd7',1861.0016301913934,'01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by,account_id) values (1,'rnd32','rnd7',1861.0016301913934,'01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.account set org_id=1, account_name='rnd98', account_type='rnd81', balance=9779.921273755195, created_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_account (id,org_id,account_name,account_type,balance,created_date,is_active,created_by,last_updated,last_updated_by,version,account_id) values (3,1,'rnd98','rnd81',9779.921273755195,'01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Customer
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'Orion Technologies','Natalie','Allen','natalie.allen@example.com','555-121-2121','2727 Hazel St','3737 Sprucewood St','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,customer_id) values (1,'Orion Technologies','Natalie','Allen','natalie.allen@example.com','555-121-2121','2727 Hazel St','3737 Sprucewood St','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.customer set org_id=1, customer_name='BrightPath Technologies', first_name='Anthony', last_name='White', email='anthony.white@example.com', phone='555-777-8888', billing_address='202 Elm St', shipping_address='4040 Aspenwood St', created_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_customer (id,org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,created_by,last_updated,last_updated_by,version,customer_id) values (3,1,'BrightPath Technologies','Anthony','White','anthony.white@example.com','555-777-8888','202 Elm St','4040 Aspenwood St','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Vendor
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'Orion Technologies','Anthony','Garcia','anthony.garcia@example.com','555-454-5454','456 Oak St','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,vendor_id) values (1,'Orion Technologies','Anthony','Garcia','anthony.garcia@example.com','555-454-5454','456 Oak St','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.vendor set org_id=1, vendor_name='Stellar Systems', first_name='Jane', last_name='Hall', email='jane.hall@example.com', phone='555-898-9898', billing_address='2121 Juniper St', created_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_vendor (id,org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,created_by,last_updated,last_updated_by,version,vendor_id) values (3,1,'Stellar Systems','Jane','Hall','jane.hall@example.com','555-898-9898','2121 Juniper St','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Invoice
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,41,'01/11/2025 15:14:09','01/11/2025 15:14:09',7853.618202811889,'rnd47','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,invoice_id) values (1,1,41,'01/11/2025 15:14:09','01/11/2025 15:14:09',7853.618202811889,'rnd47','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.invoice set customer_id=1, org_id=1, invoice_number=97, invoice_date='01/11/2025 15:14:09', due_date='01/11/2025 15:14:09', total_amount=3430.1416061789037, status='rnd66', created_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_invoice (id,customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,invoice_id) values (3,1,1,97,'01/11/2025 15:14:09','01/11/2025 15:14:09',3430.1416061789037,'rnd66','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing InvoiceItem
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd27',37,9940.68207880537,5442.647513846118,1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,invoice_item_id) values (1,'rnd27',37,9940.68207880537,5442.647513846118,1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.invoice_item set invoice_id=1, description='rnd98', quantity=51, unit_price=5569.9663640030385, total_amount=8491.578665149387, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_invoice_item (id,invoice_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,invoice_item_id) values (3,1,'rnd98',51,5569.9663640030385,8491.578665149387,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Bill
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,54,'01/11/2025 15:14:09','01/11/2025 15:14:09',3061.5964357153202,'rnd20','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,bill_id) values (1,1,54,'01/11/2025 15:14:09','01/11/2025 15:14:09',3061.5964357153202,'rnd20','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.bill set vendor_id=1, org_id=1, bill_number=99, bill_date='01/11/2025 15:14:09', due_date='01/11/2025 15:14:09', total_amount=2248.5500519643974, status='rnd71', created_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_bill (id,vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,bill_id) values (3,1,1,99,'01/11/2025 15:14:09','01/11/2025 15:14:09',2248.5500519643974,'rnd71','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing BillItem
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd11',90,3923.5871584135007,3321.8806798637447,1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,bill_item_id) values (1,'rnd11',90,3923.5871584135007,3321.8806798637447,1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.bill_item set bill_id=1, description='rnd50', quantity=76, unit_price=681.4734330352479, total_amount=249.34402145079025, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_bill_item (id,bill_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,bill_item_id) values (3,1,'rnd50',76,681.4734330352479,249.34402145079025,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Payment
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,'01/11/2025 15:14:09',4681.19842705625,'rnd76','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by,payment_id) values (1,1,'01/11/2025 15:14:09',4681.19842705625,'rnd76','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.payment set invoice_id=1, org_id=1, payment_date='01/11/2025 15:14:09', amount=2736.2867651296574, payment_method='rnd46', created_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_payment (id,invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,created_by,last_updated,last_updated_by,version,payment_id) values (3,1,1,'01/11/2025 15:14:09',2736.2867651296574,'rnd46','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Transaction
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,'01/11/2025 15:14:09',727.2490199190506,'rnd26','rnd23','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by,transaction_id) values (1,1,'01/11/2025 15:14:09',727.2490199190506,'rnd26','rnd23','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.transaction set account_id=1, org_id=1, transaction_date='01/11/2025 15:14:09', amount=8285.18681253719, transaction_type='rnd55', description='rnd62', created_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_transaction (id,account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,created_by,last_updated,last_updated_by,version,transaction_id) values (3,1,1,'01/11/2025 15:14:09',8285.18681253719,'rnd55','rnd62','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Category
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by) values (1,'rnd13','rnd47',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by,category_id) values (1,'rnd13','rnd47',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.category set org_id=1, category_name='rnd29', category_type='rnd15', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_category (id,org_id,category_name,category_type,is_active,created_by,last_updated,last_updated_by,version,category_id) values (3,1,'rnd29','rnd15',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing TransactionCategory
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by,transaction_category_id) values (1,1,1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.transaction_category set transaction_id=1, category_id=1, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_transaction_category (id,transaction_id,category_id,is_active,created_by,last_updated,last_updated_by,version,transaction_category_id) values (3,1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:09 INFO erickohlenberg test Testing Budget
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into app.budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by) values (1,1,1612.577459769774,'01/11/2025 15:14:09','01/11/2025 15:14:09',1,1,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg');
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by,budget_id) values (1,1,1612.577459769774,'01/11/2025 15:14:09','01/11/2025 15:14:09',1,2,1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',1);
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test update app.budget set org_id=1, category_id=1, amount=9502.8642097308, start_date='01/11/2025 15:14:09', end_date='01/11/2025 15:14:09', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:09', last_updated_by='erickohlenberg', version=2 where id=1;
+
+2025-01-11 21:14:09 DEBUG erickohlenberg test insert into audit.app_budget (id,org_id,category_id,amount,start_date,end_date,is_active,created_by,last_updated,last_updated_by,version,budget_id) values (3,1,1,9502.8642097308,'01/11/2025 15:14:09','01/11/2025 15:14:09',1,'erickohlenberg','01/11/2025 15:14:09','erickohlenberg',2,1);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing Org
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into sec.org (name,is_active,id,version,created_by,last_updated,last_updated_by) values ('Silverline Innovations',1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.sec_org (name,is_active,id,version,created_by,last_updated,last_updated_by,org_id) values ('Silverline Innovations',1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update sec.org set name='Sunrise Technologies', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.sec_org (id,name,is_active,created_by,last_updated,last_updated_by,version,org_id) values (6,'Sunrise Technologies',1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing User
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into sec.user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by) values ('rnd85','Katie','Jackson','kjackson','katie.jackson@example.com','01/11/2025 15:14:12','01/11/2025 15:14:12',1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.sec_user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by,user_id) values ('rnd85','Katie','Jackson','kjackson','katie.jackson@example.com','01/11/2025 15:14:12','01/11/2025 15:14:12',1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update sec.user set password_hash='rnd9', first_name='James', last_name='Harris', username='jharris', email='james.harris@example.com', created_date='01/11/2025 15:14:12', last_login_date='01/11/2025 15:14:12', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.sec_user (id,password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,created_by,last_updated,last_updated_by,version,user_id) values (6,'rnd9','James','Harris','jharris','james.harris@example.com','01/11/2025 15:14:12','01/11/2025 15:14:12',1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing UserOrg
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into sec.user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.sec_user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by,user_org_id) values (4,4,1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update sec.user_org set org_id=4, user_id=4, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.sec_user_org (id,org_id,user_id,is_active,created_by,last_updated,last_updated_by,version,user_org_id) values (6,4,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing Account
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into app.account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd61','rnd99',7705.187128318849,'01/11/2025 15:14:12',1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by,account_id) values (4,'rnd61','rnd99',7705.187128318849,'01/11/2025 15:14:12',1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update app.account set org_id=4, account_name='rnd93', account_type='rnd38', balance=7317.272858233196, created_date='01/11/2025 15:14:12', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_account (id,org_id,account_name,account_type,balance,created_date,is_active,created_by,last_updated,last_updated_by,version,account_id) values (6,4,'rnd93','rnd38',7317.272858233196,'01/11/2025 15:14:12',1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing Customer
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into app.customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'Dynamic Systems','Joshua','Nelson','joshua.nelson@example.com','555-898-9898','4242 Lindenwood St','1010 Aspen St','01/11/2025 15:14:12',1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,customer_id) values (4,'Dynamic Systems','Joshua','Nelson','joshua.nelson@example.com','555-898-9898','4242 Lindenwood St','1010 Aspen St','01/11/2025 15:14:12',1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update app.customer set org_id=4, customer_name='SkyHigh Networks', first_name='Olivia', last_name='Harris', email='olivia.harris@example.com', phone='555-222-3333', billing_address='101 Maple Ave', shipping_address='808 Poplar St', created_date='01/11/2025 15:14:12', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_customer (id,org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,created_by,last_updated,last_updated_by,version,customer_id) values (6,4,'SkyHigh Networks','Olivia','Harris','olivia.harris@example.com','555-222-3333','101 Maple Ave','808 Poplar St','01/11/2025 15:14:12',1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing Vendor
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into app.vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'NovaTech','Anthony','Martin','anthony.martin@example.com','555-313-1234','303 Cedar St','01/11/2025 15:14:12',1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,vendor_id) values (4,'NovaTech','Anthony','Martin','anthony.martin@example.com','555-313-1234','303 Cedar St','01/11/2025 15:14:12',1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update app.vendor set org_id=4, vendor_name='Nimbus Technologies', first_name='Andrew', last_name='Lee', email='andrew.lee@example.com', phone='555-456-7890', billing_address='4040 Aspenwood St', created_date='01/11/2025 15:14:12', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_vendor (id,org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,created_by,last_updated,last_updated_by,version,vendor_id) values (6,4,'Nimbus Technologies','Andrew','Lee','andrew.lee@example.com','555-456-7890','4040 Aspenwood St','01/11/2025 15:14:12',1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing Invoice
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into app.invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,13,'01/11/2025 15:14:12','01/11/2025 15:14:12',986.2666575824519,'rnd93','01/11/2025 15:14:12',1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,invoice_id) values (4,4,13,'01/11/2025 15:14:12','01/11/2025 15:14:12',986.2666575824519,'rnd93','01/11/2025 15:14:12',1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update app.invoice set customer_id=4, org_id=4, invoice_number=30, invoice_date='01/11/2025 15:14:12', due_date='01/11/2025 15:14:12', total_amount=9620.659048375343, status='rnd69', created_date='01/11/2025 15:14:12', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_invoice (id,customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,invoice_id) values (6,4,4,30,'01/11/2025 15:14:12','01/11/2025 15:14:12',9620.659048375343,'rnd69','01/11/2025 15:14:12',1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing InvoiceItem
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into app.invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd4',9,6878.84973197685,68.19367829123291,1,4,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg');
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,invoice_item_id) values (4,'rnd4',9,6878.84973197685,68.19367829123291,1,5,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',4);
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test update app.invoice_item set invoice_id=4, description='rnd18', quantity=76, unit_price=7998.328138143509, total_amount=5941.365152699194, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:12', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:12 DEBUG erickohlenberg test insert into audit.app_invoice_item (id,invoice_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,invoice_item_id) values (6,4,'rnd18',76,7998.328138143509,5941.365152699194,1,'erickohlenberg','01/11/2025 15:14:12','erickohlenberg',2,4);
+
+2025-01-11 21:14:12 INFO erickohlenberg test Testing Bill
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into app.bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,14,'01/11/2025 15:14:12','01/11/2025 15:14:12',8749.522770181196,'rnd98','01/11/2025 15:14:12',1,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg');
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,bill_id) values (4,4,14,'01/11/2025 15:14:12','01/11/2025 15:14:12',8749.522770181196,'rnd98','01/11/2025 15:14:12',1,5,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',4);
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test update app.bill set vendor_id=4, org_id=4, bill_number=26, bill_date='01/11/2025 15:14:13', due_date='01/11/2025 15:14:13', total_amount=857.9231206702565, status='rnd7', created_date='01/11/2025 15:14:13', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:13', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_bill (id,vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,bill_id) values (6,4,4,26,'01/11/2025 15:14:13','01/11/2025 15:14:13',857.9231206702565,'rnd7','01/11/2025 15:14:13',1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',2,4);
+
+2025-01-11 21:14:13 INFO erickohlenberg test Testing BillItem
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into app.bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd98',88,5156.483179329073,5636.764330777118,1,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg');
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,bill_item_id) values (4,'rnd98',88,5156.483179329073,5636.764330777118,1,5,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',4);
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test update app.bill_item set bill_id=4, description='rnd3', quantity=70, unit_price=621.1013099047092, total_amount=5964.297906604843, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:13', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_bill_item (id,bill_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,bill_item_id) values (6,4,'rnd3',70,621.1013099047092,5964.297906604843,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',2,4);
+
+2025-01-11 21:14:13 INFO erickohlenberg test Testing Payment
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into app.payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,'01/11/2025 15:14:13',5577.7712063482295,'rnd40','01/11/2025 15:14:13',1,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg');
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by,payment_id) values (4,4,'01/11/2025 15:14:13',5577.7712063482295,'rnd40','01/11/2025 15:14:13',1,5,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',4);
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test update app.payment set invoice_id=4, org_id=4, payment_date='01/11/2025 15:14:13', amount=6544.394496627902, payment_method='rnd3', created_date='01/11/2025 15:14:13', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:13', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_payment (id,invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,created_by,last_updated,last_updated_by,version,payment_id) values (6,4,4,'01/11/2025 15:14:13',6544.394496627902,'rnd3','01/11/2025 15:14:13',1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',2,4);
+
+2025-01-11 21:14:13 INFO erickohlenberg test Testing Transaction
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into app.transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,'01/11/2025 15:14:13',4566.715943557312,'rnd77','rnd67','01/11/2025 15:14:13',1,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg');
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by,transaction_id) values (4,4,'01/11/2025 15:14:13',4566.715943557312,'rnd77','rnd67','01/11/2025 15:14:13',1,5,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',4);
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test update app.transaction set account_id=4, org_id=4, transaction_date='01/11/2025 15:14:13', amount=7564.217573411192, transaction_type='rnd23', description='rnd38', created_date='01/11/2025 15:14:13', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:13', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_transaction (id,account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,created_by,last_updated,last_updated_by,version,transaction_id) values (6,4,4,'01/11/2025 15:14:13',7564.217573411192,'rnd23','rnd38','01/11/2025 15:14:13',1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',2,4);
+
+2025-01-11 21:14:13 INFO erickohlenberg test Testing Category
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into app.category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by) values (4,'rnd66','rnd97',1,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg');
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by,category_id) values (4,'rnd66','rnd97',1,5,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',4);
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test update app.category set org_id=4, category_name='rnd59', category_type='rnd16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:13', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_category (id,org_id,category_name,category_type,is_active,created_by,last_updated,last_updated_by,version,category_id) values (6,4,'rnd59','rnd16',1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',2,4);
+
+2025-01-11 21:14:13 INFO erickohlenberg test Testing TransactionCategory
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into app.transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,1,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg');
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by,transaction_category_id) values (4,4,1,5,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',4);
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test update app.transaction_category set transaction_id=4, category_id=4, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:13', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_transaction_category (id,transaction_id,category_id,is_active,created_by,last_updated,last_updated_by,version,transaction_category_id) values (6,4,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',2,4);
+
+2025-01-11 21:14:13 INFO erickohlenberg test Testing Budget
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into app.budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by) values (4,4,5871.09715019769,'01/11/2025 15:14:13','01/11/2025 15:14:13',1,4,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg');
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by,budget_id) values (4,4,5871.09715019769,'01/11/2025 15:14:13','01/11/2025 15:14:13',1,5,1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',4);
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test update app.budget set org_id=4, category_id=4, amount=2349.5869236051235, start_date='01/11/2025 15:14:13', end_date='01/11/2025 15:14:13', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:13', last_updated_by='erickohlenberg', version=2 where id=4;
+
+2025-01-11 21:14:13 DEBUG erickohlenberg test insert into audit.app_budget (id,org_id,category_id,amount,start_date,end_date,is_active,created_by,last_updated,last_updated_by,version,budget_id) values (6,4,4,2349.5869236051235,'01/11/2025 15:14:13','01/11/2025 15:14:13',1,'erickohlenberg','01/11/2025 15:14:13','erickohlenberg',2,4);
+
+2025-01-11 21:14:15 INFO erickohlenberg test Testing Org
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into sec.org (name,is_active,id,version,created_by,last_updated,last_updated_by) values ('Innovate Solutions',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.sec_org (name,is_active,id,version,created_by,last_updated,last_updated_by,org_id) values ('Innovate Solutions',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update sec.org set name='OmniTech', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.sec_org (id,name,is_active,created_by,last_updated,last_updated_by,version,org_id) values (9,'OmniTech',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing User
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into sec.user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by) values ('rnd73','Rachel','Hill','rhill','rachel.hill@example.com','01/11/2025 15:14:16','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.sec_user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by,user_id) values ('rnd73','Rachel','Hill','rhill','rachel.hill@example.com','01/11/2025 15:14:16','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update sec.user set password_hash='rnd59', first_name='Patrick', last_name='White', username='pwhite', email='patrick.white@example.com', created_date='01/11/2025 15:14:16', last_login_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.sec_user (id,password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,created_by,last_updated,last_updated_by,version,user_id) values (9,'rnd59','Patrick','White','pwhite','patrick.white@example.com','01/11/2025 15:14:16','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing UserOrg
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into sec.user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.sec_user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by,user_org_id) values (7,7,1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update sec.user_org set org_id=7, user_id=7, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.sec_user_org (id,org_id,user_id,is_active,created_by,last_updated,last_updated_by,version,user_org_id) values (9,7,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Account
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd93','rnd40',6278.396617999277,'01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by,account_id) values (7,'rnd93','rnd40',6278.396617999277,'01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.account set org_id=7, account_name='rnd79', account_type='rnd34', balance=1875.5333297066522, created_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_account (id,org_id,account_name,account_type,balance,created_date,is_active,created_by,last_updated,last_updated_by,version,account_id) values (9,7,'rnd79','rnd34',1875.5333297066522,'01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Customer
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'Dynamic Systems','Isabella','Williams','isabella.williams@example.com','555-131-3456','3838 Poplarwood St','1818 Dogwood St','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,customer_id) values (7,'Dynamic Systems','Isabella','Williams','isabella.williams@example.com','555-131-3456','3838 Poplarwood St','1818 Dogwood St','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.customer set org_id=7, customer_name='Fusion Enterprises', first_name='Linda', last_name='Campbell', email='linda.campbell@example.com', phone='555-292-9012', billing_address='2020 Beech St', shipping_address='1313 Magnolia St', created_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_customer (id,org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,created_by,last_updated,last_updated_by,version,customer_id) values (9,7,'Fusion Enterprises','Linda','Campbell','linda.campbell@example.com','555-292-9012','2020 Beech St','1313 Magnolia St','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Vendor
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'Velocity Tech','Laura','Martin','laura.martin@example.com','555-234-5678','1717 Sequoia St','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,vendor_id) values (7,'Velocity Tech','Laura','Martin','laura.martin@example.com','555-234-5678','1717 Sequoia St','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.vendor set org_id=7, vendor_name='TechCorp', first_name='Zachary', last_name='Smith', email='zachary.smith@example.com', phone='555-121-2345', billing_address='1818 Dogwood St', created_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_vendor (id,org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,created_by,last_updated,last_updated_by,version,vendor_id) values (9,7,'TechCorp','Zachary','Smith','zachary.smith@example.com','555-121-2345','1818 Dogwood St','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Invoice
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,33,'01/11/2025 15:14:16','01/11/2025 15:14:16',2076.7691044913827,'rnd71','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,invoice_id) values (7,7,33,'01/11/2025 15:14:16','01/11/2025 15:14:16',2076.7691044913827,'rnd71','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.invoice set customer_id=7, org_id=7, invoice_number=49, invoice_date='01/11/2025 15:14:16', due_date='01/11/2025 15:14:16', total_amount=6569.879143839089, status='rnd74', created_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_invoice (id,customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,invoice_id) values (9,7,7,49,'01/11/2025 15:14:16','01/11/2025 15:14:16',6569.879143839089,'rnd74','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing InvoiceItem
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd72',13,3396.691181372685,555.2441789653839,1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,invoice_item_id) values (7,'rnd72',13,3396.691181372685,555.2441789653839,1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.invoice_item set invoice_id=7, description='rnd16', quantity=92, unit_price=2144.36865034898, total_amount=2904.5758962143873, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_invoice_item (id,invoice_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,invoice_item_id) values (9,7,'rnd16',92,2144.36865034898,2904.5758962143873,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Bill
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,8,'01/11/2025 15:14:16','01/11/2025 15:14:16',1094.0079349096843,'rnd13','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,bill_id) values (7,7,8,'01/11/2025 15:14:16','01/11/2025 15:14:16',1094.0079349096843,'rnd13','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.bill set vendor_id=7, org_id=7, bill_number=50, bill_date='01/11/2025 15:14:16', due_date='01/11/2025 15:14:16', total_amount=8855.108720916367, status='rnd41', created_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_bill (id,vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,bill_id) values (9,7,7,50,'01/11/2025 15:14:16','01/11/2025 15:14:16',8855.108720916367,'rnd41','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing BillItem
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd15',4,9544.187908507593,81.29847550373826,1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,bill_item_id) values (7,'rnd15',4,9544.187908507593,81.29847550373826,1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.bill_item set bill_id=7, description='rnd2', quantity=64, unit_price=406.26050118211856, total_amount=1894.2683173725504, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_bill_item (id,bill_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,bill_item_id) values (9,7,'rnd2',64,406.26050118211856,1894.2683173725504,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Payment
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,'01/11/2025 15:14:16',2973.9697687698817,'rnd5','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by,payment_id) values (7,7,'01/11/2025 15:14:16',2973.9697687698817,'rnd5','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.payment set invoice_id=7, org_id=7, payment_date='01/11/2025 15:14:16', amount=6905.376680230196, payment_method='rnd14', created_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_payment (id,invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,created_by,last_updated,last_updated_by,version,payment_id) values (9,7,7,'01/11/2025 15:14:16',6905.376680230196,'rnd14','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Transaction
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,'01/11/2025 15:14:16',2920.501300651387,'rnd80','rnd89','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by,transaction_id) values (7,7,'01/11/2025 15:14:16',2920.501300651387,'rnd80','rnd89','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.transaction set account_id=7, org_id=7, transaction_date='01/11/2025 15:14:16', amount=5141.227487579091, transaction_type='rnd18', description='rnd31', created_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_transaction (id,account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,created_by,last_updated,last_updated_by,version,transaction_id) values (9,7,7,'01/11/2025 15:14:16',5141.227487579091,'rnd18','rnd31','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Category
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by) values (7,'rnd81','rnd29',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by,category_id) values (7,'rnd81','rnd29',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.category set org_id=7, category_name='rnd33', category_type='rnd89', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_category (id,org_id,category_name,category_type,is_active,created_by,last_updated,last_updated_by,version,category_id) values (9,7,'rnd33','rnd89',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing TransactionCategory
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by,transaction_category_id) values (7,7,1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.transaction_category set transaction_id=7, category_id=7, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_transaction_category (id,transaction_id,category_id,is_active,created_by,last_updated,last_updated_by,version,transaction_category_id) values (9,7,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:16 INFO erickohlenberg test Testing Budget
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into app.budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by) values (7,7,2304.780610475219,'01/11/2025 15:14:16','01/11/2025 15:14:16',1,7,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg');
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by,budget_id) values (7,7,2304.780610475219,'01/11/2025 15:14:16','01/11/2025 15:14:16',1,8,1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',7);
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test update app.budget set org_id=7, category_id=7, amount=557.4405578525888, start_date='01/11/2025 15:14:16', end_date='01/11/2025 15:14:16', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:16', last_updated_by='erickohlenberg', version=2 where id=7;
+
+2025-01-11 21:14:16 DEBUG erickohlenberg test insert into audit.app_budget (id,org_id,category_id,amount,start_date,end_date,is_active,created_by,last_updated,last_updated_by,version,budget_id) values (9,7,7,557.4405578525888,'01/11/2025 15:14:16','01/11/2025 15:14:16',1,'erickohlenberg','01/11/2025 15:14:16','erickohlenberg',2,7);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Org
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into sec.org (name,is_active,id,version,created_by,last_updated,last_updated_by) values ('Innovate Solutions',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.sec_org (name,is_active,id,version,created_by,last_updated,last_updated_by,org_id) values ('Innovate Solutions',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update sec.org set name='NextGen Technologies', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.sec_org (id,name,is_active,created_by,last_updated,last_updated_by,version,org_id) values (12,'NextGen Technologies',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing User
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into sec.user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by) values ('rnd16','James','Wright','jwright','james.wright@example.com','01/11/2025 15:14:34','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.sec_user (password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,id,version,created_by,last_updated,last_updated_by,user_id) values ('rnd16','James','Wright','jwright','james.wright@example.com','01/11/2025 15:14:34','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update sec.user set password_hash='rnd16', first_name='Brittany', last_name='Wright', username='bwright', email='brittany.wright@example.com', created_date='01/11/2025 15:14:34', last_login_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.sec_user (id,password_hash,first_name,last_name,username,email,created_date,last_login_date,is_active,created_by,last_updated,last_updated_by,version,user_id) values (12,'rnd16','Brittany','Wright','bwright','brittany.wright@example.com','01/11/2025 15:14:34','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing UserOrg
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into sec.user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by) values (10,10,1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.sec_user_org (org_id,user_id,is_active,id,version,created_by,last_updated,last_updated_by,user_org_id) values (10,10,1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update sec.user_org set org_id=10, user_id=10, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.sec_user_org (id,org_id,user_id,is_active,created_by,last_updated,last_updated_by,version,user_org_id) values (12,10,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Account
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,'rnd77','rnd24',8485.241257496433,'01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_account (org_id,account_name,account_type,balance,created_date,is_active,id,version,created_by,last_updated,last_updated_by,account_id) values (10,'rnd77','rnd24',8485.241257496433,'01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.account set org_id=10, account_name='rnd90', account_type='rnd39', balance=8084.407211296469, created_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_account (id,org_id,account_name,account_type,balance,created_date,is_active,created_by,last_updated,last_updated_by,version,account_id) values (12,10,'rnd90','rnd39',8084.407211296469,'01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Customer
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,'Sunrise Technologies','Emily','Green','emily.green@example.com','555-202-0123','606 Cherry Ln','4444 Cypressland St','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_customer (org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,customer_id) values (10,'Sunrise Technologies','Emily','Green','emily.green@example.com','555-202-0123','606 Cherry Ln','4444 Cypressland St','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.customer set org_id=10, customer_name='Insight Global', first_name='Paul', last_name='Parker', email='paul.parker@example.com', phone='555-000-1111', billing_address='2222 Hickory St', shipping_address='808 Poplar St', created_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_customer (id,org_id,customer_name,first_name,last_name,email,phone,billing_address,shipping_address,created_date,is_active,created_by,last_updated,last_updated_by,version,customer_id) values (12,10,'Insight Global','Paul','Parker','paul.parker@example.com','555-000-1111','2222 Hickory St','808 Poplar St','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Vendor
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,'Sapphire Solutions','Kaitlyn','Garcia','kaitlyn.garcia@example.com','555-555-6666','3232 Elmwood St','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_vendor (org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,id,version,created_by,last_updated,last_updated_by,vendor_id) values (10,'Sapphire Solutions','Kaitlyn','Garcia','kaitlyn.garcia@example.com','555-555-6666','3232 Elmwood St','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.vendor set org_id=10, vendor_name='Dynamic Systems', first_name='Kevin', last_name='Turner', email='kevin.turner@example.com', phone='555-222-2345', billing_address='3737 Sprucewood St', created_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_vendor (id,org_id,vendor_name,first_name,last_name,email,phone,billing_address,created_date,is_active,created_by,last_updated,last_updated_by,version,vendor_id) values (12,10,'Dynamic Systems','Kevin','Turner','kevin.turner@example.com','555-222-2345','3737 Sprucewood St','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Invoice
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,10,15,'01/11/2025 15:14:34','01/11/2025 15:14:34',2148.4847800344564,'rnd33','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_invoice (customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,invoice_id) values (10,10,15,'01/11/2025 15:14:34','01/11/2025 15:14:34',2148.4847800344564,'rnd33','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.invoice set customer_id=10, org_id=10, invoice_number=24, invoice_date='01/11/2025 15:14:34', due_date='01/11/2025 15:14:34', total_amount=3595.4001540385193, status='rnd9', created_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_invoice (id,customer_id,org_id,invoice_number,invoice_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,invoice_id) values (12,10,10,24,'01/11/2025 15:14:34','01/11/2025 15:14:34',3595.4001540385193,'rnd9','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing InvoiceItem
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (10,'rnd15',30,7829.532138229669,6637.919260305406,1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_invoice_item (invoice_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,invoice_item_id) values (10,'rnd15',30,7829.532138229669,6637.919260305406,1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.invoice_item set invoice_id=10, description='rnd91', quantity=72, unit_price=7482.369421484272, total_amount=6349.898320991918, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_invoice_item (id,invoice_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,invoice_item_id) values (12,10,'rnd91',72,7482.369421484272,6349.898320991918,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Bill
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,10,90,'01/11/2025 15:14:34','01/11/2025 15:14:34',6895.3306266909985,'rnd12','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_bill (vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,id,version,created_by,last_updated,last_updated_by,bill_id) values (10,10,90,'01/11/2025 15:14:34','01/11/2025 15:14:34',6895.3306266909985,'rnd12','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.bill set vendor_id=10, org_id=10, bill_number=17, bill_date='01/11/2025 15:14:34', due_date='01/11/2025 15:14:34', total_amount=6187.550891129537, status='rnd5', created_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_bill (id,vendor_id,org_id,bill_number,bill_date,due_date,total_amount,status,created_date,is_active,created_by,last_updated,last_updated_by,version,bill_id) values (12,10,10,17,'01/11/2025 15:14:34','01/11/2025 15:14:34',6187.550891129537,'rnd5','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing BillItem
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by) values (10,'rnd72',93,1966.687759176341,4879.220525854332,1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_bill_item (bill_id,description,quantity,unit_price,total_amount,is_active,id,version,created_by,last_updated,last_updated_by,bill_item_id) values (10,'rnd72',93,1966.687759176341,4879.220525854332,1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.bill_item set bill_id=10, description='rnd70', quantity=83, unit_price=8794.283612356527, total_amount=1403.9005418561424, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_bill_item (id,bill_id,description,quantity,unit_price,total_amount,is_active,created_by,last_updated,last_updated_by,version,bill_item_id) values (12,10,'rnd70',83,8794.283612356527,1403.9005418561424,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Payment
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,10,'01/11/2025 15:14:34',6410.162304286278,'rnd54','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_payment (invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,id,version,created_by,last_updated,last_updated_by,payment_id) values (10,10,'01/11/2025 15:14:34',6410.162304286278,'rnd54','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.payment set invoice_id=10, org_id=10, payment_date='01/11/2025 15:14:34', amount=8447.882214741738, payment_method='rnd32', created_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_payment (id,invoice_id,org_id,payment_date,amount,payment_method,created_date,is_active,created_by,last_updated,last_updated_by,version,payment_id) values (12,10,10,'01/11/2025 15:14:34',8447.882214741738,'rnd32','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Transaction
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,10,'01/11/2025 15:14:34',1032.966664106675,'rnd34','rnd80','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_transaction (account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,id,version,created_by,last_updated,last_updated_by,transaction_id) values (10,10,'01/11/2025 15:14:34',1032.966664106675,'rnd34','rnd80','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.transaction set account_id=10, org_id=10, transaction_date='01/11/2025 15:14:34', amount=818.546387149165, transaction_type='rnd50', description='rnd81', created_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_transaction (id,account_id,org_id,transaction_date,amount,transaction_type,description,created_date,is_active,created_by,last_updated,last_updated_by,version,transaction_id) values (12,10,10,'01/11/2025 15:14:34',818.546387149165,'rnd50','rnd81','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Category
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by) values (10,'rnd36','rnd25',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_category (org_id,category_name,category_type,is_active,id,version,created_by,last_updated,last_updated_by,category_id) values (10,'rnd36','rnd25',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.category set org_id=10, category_name='rnd60', category_type='rnd20', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_category (id,org_id,category_name,category_type,is_active,created_by,last_updated,last_updated_by,version,category_id) values (12,10,'rnd60','rnd20',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing TransactionCategory
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by) values (10,10,1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_transaction_category (transaction_id,category_id,is_active,id,version,created_by,last_updated,last_updated_by,transaction_category_id) values (10,10,1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.transaction_category set transaction_id=10, category_id=10, is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_transaction_category (id,transaction_id,category_id,is_active,created_by,last_updated,last_updated_by,version,transaction_category_id) values (12,10,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
+2025-01-11 21:14:34 INFO erickohlenberg test Testing Budget
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into app.budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by) values (10,10,9966.349356230214,'01/11/2025 15:14:34','01/11/2025 15:14:34',1,10,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg');
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_budget (org_id,category_id,amount,start_date,end_date,is_active,id,version,created_by,last_updated,last_updated_by,budget_id) values (10,10,9966.349356230214,'01/11/2025 15:14:34','01/11/2025 15:14:34',1,11,1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',10);
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test update app.budget set org_id=10, category_id=10, amount=9101.654231593473, start_date='01/11/2025 15:14:34', end_date='01/11/2025 15:14:34', is_active=1, created_by='erickohlenberg', last_updated='01/11/2025 15:14:34', last_updated_by='erickohlenberg', version=2 where id=10;
+
+2025-01-11 21:14:34 DEBUG erickohlenberg test insert into audit.app_budget (id,org_id,category_id,amount,start_date,end_date,is_active,created_by,last_updated,last_updated_by,version,budget_id) values (12,10,10,9101.654231593473,'01/11/2025 15:14:34','01/11/2025 15:14:34',1,'erickohlenberg','01/11/2025 15:14:34','erickohlenberg',2,10);
+
