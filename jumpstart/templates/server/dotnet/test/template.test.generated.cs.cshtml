@@ -40,7 +40,7 @@ namespace @Model.Namespace
             @{
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj)Logic insert: " + @(Model.DomainVar).ToString());
-                @(Model.DomainObj)Logic.insert(@(Model.DomainVar));
+                @(Model.DomainObj)Logic.Create().insert(@(Model.DomainVar));
                 BaseTest.addLastId("@(Model.DomainObj)", @(Model.DomainVar).id);
             </text>
             }
@@ -49,7 +49,7 @@ namespace @Model.Namespace
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("@(Model.DomainObj)");
-            var @(Model.DomainVar) = @(Model.DomainObj)Logic.get(lastId);
+            var @(Model.DomainVar) = @(Model.DomainObj)Logic.Create().get(lastId);
 
             @foreach (var attr in Model.Attributes)
             {
@@ -79,7 +79,7 @@ namespace @Model.Namespace
             @{
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj)Logic update: " + @(Model.DomainVar).ToString());
-                @(Model.DomainObj)Logic.update(lastId, @(Model.DomainVar));
+                @(Model.DomainObj)Logic.Create().update(lastId, @(Model.DomainVar));
             </text>
             }
         }

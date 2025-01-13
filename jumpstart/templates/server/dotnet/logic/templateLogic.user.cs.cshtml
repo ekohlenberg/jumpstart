@@ -1,9 +1,26 @@
 
+@{
+    string namespaceName = @Model.Namespace; 
+    string domainObj = @Model.DomainObj;      
+    string domainVar = @Model.DomainVar;    
+    string schemaName = @Model.SchemaName;  
+    string tableName = @Model.TableName;    
+}
 using System;
 
 
 namespace @Model.Namespace
 {
+    public interface I@(Model.DomainObj)Logic
+    {
+        List<@(domainObj)> select();
+        @(domainObj) get(long id);
+        void insert(@(domainObj) @(domainVar));
+        void update(long id, @(domainObj) @(domainVar));
+        void delete( long id );
+    }
+
+
     public partial class @(Model.DomainObj)Logic
     {
         public @(Model.DomainObj)Logic()

@@ -23,6 +23,9 @@ namespace @(namespaceName).Controllers
         {
             Console.WriteLine("Processing GET List");
 
+
+            @(domainObj)Logic @(domainVar)Logic = RepositoryFactory.Create<@(domainObj)Logic>();
+
             List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.select();
 
             return @(domainVar)s;

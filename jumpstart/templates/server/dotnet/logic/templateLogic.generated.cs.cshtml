@@ -10,13 +10,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using @namespaceName;
 
 namespace @namespaceName
 {
-    public partial class @(domainObj)Logic : BaseLogic
+
+
+    public partial class @(domainObj)Logic : BaseLogic, I@(domainObj)Logic
     {
-        public static List<@(domainObj)> select()
+
+
+        public static I@(domainObj)Logic Create()
+        {
+
+            var @(domainVar) = new @(domainObj)Logic();
+            var proxy = DispatchProxy.Create<I@(domainObj)Logic, Proxy<I@(domainObj)Logic>>();
+            ((Proxy<I@(domainObj)Logic>)proxy).Target = @(domainVar);
+            ((Proxy<I@(domainObj)Logic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<I@(domainObj)Logic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<@(domainObj)> select()
         {
             Console.WriteLine("Processing @(domainObj)Logic select List");
 
@@ -36,7 +54,7 @@ namespace @namespaceName
             return @(domainVar)s;
         }
 
-        public static @(domainObj) get(long id)
+        public  @(domainObj) get(long id)
         {
             Console.WriteLine($"Processing @(domainObj)Logic get ID={id}");
 
@@ -48,7 +66,7 @@ namespace @namespaceName
             return @(domainVar);
         }
 
-        public static void insert(@(domainObj) @(domainVar))
+        public  void insert(@(domainObj) @(domainVar))
         {
             Console.WriteLine($"Processing @(domainObj)Logic insert: {@(domainVar)}");
 
@@ -57,7 +75,7 @@ namespace @namespaceName
             DBPersist.insert(@(domainVar));
         }
 
-        public static void update(long id, @(domainObj) @(domainVar))
+        public  void update(long id, @(domainObj) @(domainVar))
         {
             Console.WriteLine($"Processing @(domainObj)Logic update: ID = {id}\n{@(domainVar)}");
 
@@ -65,7 +83,7 @@ namespace @namespaceName
             DBPersist.update(@(domainVar));
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             @(domainObj) @(domainVar) = get(id);
             @(domainVar).is_active = 0;

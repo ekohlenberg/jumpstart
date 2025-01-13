@@ -314,6 +314,8 @@ namespace jumpstart {
                 }
             }
 
+            
+
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();

@@ -72,7 +72,6 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Config.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Util.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseObject.generated.cs.cshtml", "./server/common", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseLogic.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Logger.generated.cs.cshtml", "./server/common", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/common.csproj.cshtml", "./server/common", true));
               
@@ -87,6 +86,7 @@ namespace jumpstart {
 
                 /* logic */
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.generated.cs.cshtml", "./server/logic", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/BaseLogic.generated.cs.cshtml", "./server/logic", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.user.cs.cshtml", "./server/logic", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/logic.csproj.cshtml", "./server/logic", true));
             
