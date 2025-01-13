@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<BillItem> billitems = BillItemLogic.select();
+            List<BillItem> billitems = BillItemLogic.Create().select();
 
             return billitems;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing BillItem GET ID={id}");
 
-            BillItem billitem = BillItemLogic.get(id);
+            BillItem billitem = BillItemLogic.Create().get(id);
 
             return billitem;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] BillItem billitem)
         {
             Console.WriteLine($"Processing BillItem POST: {billitem}");
-            BillItemLogic.insert(billitem);
+            BillItemLogic.Create().insert(billitem);
         }
 
         // PUT api/<BillItemController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] BillItem billitem)
         {
             Console.WriteLine($"Processing BillItem PUT: ID = {id}\n{billitem}");
-            BillItemLogic.update(id, billitem);
+            BillItemLogic.Create().update(id, billitem);
         }
 
         // DELETE api/<BillItemController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            BillItemLogic.delete(id);
+            BillItemLogic.Create().delete(id);
         }
     }
 }

@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class TransactionLogic : BaseLogic
+
+
+    public partial class TransactionLogic : BaseLogic, ITransactionLogic
     {
-        public static List<Transaction> select()
+
+
+        public static ITransactionLogic Create()
+        {
+
+            var transaction = new TransactionLogic();
+            var proxy = DispatchProxy.Create<ITransactionLogic, Proxy<ITransactionLogic>>();
+            ((Proxy<ITransactionLogic>)proxy).Target = transaction;
+            ((Proxy<ITransactionLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<ITransactionLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Transaction> select()
         {
             Console.WriteLine("Processing TransactionLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return transactions;
         }
 
-        public static Transaction get(long id)
+        public  Transaction get(long id)
         {
             Console.WriteLine($"Processing TransactionLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return transaction;
         }
 
-        public static void insert(Transaction transaction)
+        public  void insert(Transaction transaction)
         {
             Console.WriteLine($"Processing TransactionLogic insert: {transaction}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(transaction);
         }
 
-        public static void update(long id, Transaction transaction)
+        public  void update(long id, Transaction transaction)
         {
             Console.WriteLine($"Processing TransactionLogic update: ID = {id}\n{transaction}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(transaction);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Transaction transaction = get(id);
             transaction.is_active = 0;

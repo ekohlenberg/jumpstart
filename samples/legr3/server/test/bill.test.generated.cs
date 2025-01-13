@@ -30,14 +30,14 @@ namespace legr3
                     bill.created_date = Convert.ToDateTime(BaseTest.getTestData(bill, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing BillLogic insert: " + bill.ToString());
-                BillLogic.insert(bill);
+                BillLogic.Create().insert(bill);
                 BaseTest.addLastId("Bill", bill.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Bill");
-            var bill = BillLogic.get(lastId);
+            var bill = BillLogic.Create().get(lastId);
 
 
                             bill.vendor_id = BaseTest.getLastId("Vendor");
@@ -57,7 +57,7 @@ namespace legr3
                         bill.created_date = (DateTime) BaseTest.getTestData(bill, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing BillLogic update: " + bill.ToString());
-                BillLogic.update(lastId, bill);
+                BillLogic.Create().update(lastId, bill);
                     }
     }
 }

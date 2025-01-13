@@ -32,14 +32,14 @@ namespace legr3
                     customer.created_date = Convert.ToDateTime(BaseTest.getTestData(customer, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing CustomerLogic insert: " + customer.ToString());
-                CustomerLogic.insert(customer);
+                CustomerLogic.Create().insert(customer);
                 BaseTest.addLastId("Customer", customer.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Customer");
-            var customer = CustomerLogic.get(lastId);
+            var customer = CustomerLogic.Create().get(lastId);
 
 
                             customer.org_id = BaseTest.getLastId("Org");
@@ -61,7 +61,7 @@ namespace legr3
                         customer.created_date = (DateTime) BaseTest.getTestData(customer, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing CustomerLogic update: " + customer.ToString());
-                CustomerLogic.update(lastId, customer);
+                CustomerLogic.Create().update(lastId, customer);
                     }
     }
 }

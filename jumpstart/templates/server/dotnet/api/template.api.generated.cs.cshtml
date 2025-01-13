@@ -1,4 +1,4 @@
-﻿@{
+@{
     string namespaceName = @Model.Namespace; 
     string domainObj = @Model.DomainObj; 
     string domainVar = @Model.DomainVar; 
@@ -23,10 +23,7 @@ namespace @(namespaceName).Controllers
         {
             Console.WriteLine("Processing GET List");
 
-
-            @(domainObj)Logic @(domainVar)Logic = RepositoryFactory.Create<@(domainObj)Logic>();
-
-            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.select();
+            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select();
 
             return @(domainVar)s;
         }
@@ -37,7 +34,7 @@ namespace @(namespaceName).Controllers
         {
             Console.WriteLine($"Processing @(domainObj) GET ID={id}");
 
-            @(domainObj) @(domainVar) = @(domainObj)Logic.get(id);
+            @(domainObj) @(domainVar) = @(domainObj)Logic.Create().get(id);
 
             return @(domainVar);
         }
@@ -47,7 +44,7 @@ namespace @(namespaceName).Controllers
         public void Post([FromBody] @(domainObj) @(domainVar))
         {
             Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
-            @(domainObj)Logic.insert(@(domainVar));
+            @(domainObj)Logic.Create().insert(@(domainVar));
         }
 
         // PUT api/<@(domainObj)Controller>/5
@@ -55,14 +52,14 @@ namespace @(namespaceName).Controllers
         public void Put(long id, [FromBody] @(domainObj) @(domainVar))
         {
             Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
-            @(domainObj)Logic.update(id, @(domainVar));
+            @(domainObj)Logic.Create().update(id, @(domainVar));
         }
 
         // DELETE api/<@(domainObj)Controller>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            @(domainObj)Logic.delete(id);
+            @(domainObj)Logic.Create().delete(id);
         }
     }
 }

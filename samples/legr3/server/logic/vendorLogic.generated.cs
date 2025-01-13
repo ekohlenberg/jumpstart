@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class VendorLogic : BaseLogic
+
+
+    public partial class VendorLogic : BaseLogic, IVendorLogic
     {
-        public static List<Vendor> select()
+
+
+        public static IVendorLogic Create()
+        {
+
+            var vendor = new VendorLogic();
+            var proxy = DispatchProxy.Create<IVendorLogic, Proxy<IVendorLogic>>();
+            ((Proxy<IVendorLogic>)proxy).Target = vendor;
+            ((Proxy<IVendorLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IVendorLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Vendor> select()
         {
             Console.WriteLine("Processing VendorLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return vendors;
         }
 
-        public static Vendor get(long id)
+        public  Vendor get(long id)
         {
             Console.WriteLine($"Processing VendorLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return vendor;
         }
 
-        public static void insert(Vendor vendor)
+        public  void insert(Vendor vendor)
         {
             Console.WriteLine($"Processing VendorLogic insert: {vendor}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(vendor);
         }
 
-        public static void update(long id, Vendor vendor)
+        public  void update(long id, Vendor vendor)
         {
             Console.WriteLine($"Processing VendorLogic update: ID = {id}\n{vendor}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(vendor);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Vendor vendor = get(id);
             vendor.is_active = 0;

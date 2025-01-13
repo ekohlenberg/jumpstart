@@ -24,14 +24,14 @@ namespace legr3
                     billitem.total_amount = Convert.ToDouble(BaseTest.getTestData(billitem, "NUMERIC(18,4)", TestDataType.random));
                     
                 Console.WriteLine("Testing BillItemLogic insert: " + billitem.ToString());
-                BillItemLogic.insert(billitem);
+                BillItemLogic.Create().insert(billitem);
                 BaseTest.addLastId("BillItem", billitem.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("BillItem");
-            var billitem = BillItemLogic.get(lastId);
+            var billitem = BillItemLogic.Create().get(lastId);
 
 
                             billitem.bill_id = BaseTest.getLastId("Bill");
@@ -45,7 +45,7 @@ namespace legr3
                         billitem.total_amount = (object) BaseTest.getTestData(billitem, "NUMERIC(18,4)", TestDataType.random);
                     
                 Console.WriteLine("Testing BillItemLogic update: " + billitem.ToString());
-                BillItemLogic.update(lastId, billitem);
+                BillItemLogic.Create().update(lastId, billitem);
                     }
     }
 }

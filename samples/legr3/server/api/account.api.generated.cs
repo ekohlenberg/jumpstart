@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<Account> accounts = AccountLogic.select();
+            List<Account> accounts = AccountLogic.Create().select();
 
             return accounts;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing Account GET ID={id}");
 
-            Account account = AccountLogic.get(id);
+            Account account = AccountLogic.Create().get(id);
 
             return account;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] Account account)
         {
             Console.WriteLine($"Processing Account POST: {account}");
-            AccountLogic.insert(account);
+            AccountLogic.Create().insert(account);
         }
 
         // PUT api/<AccountController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] Account account)
         {
             Console.WriteLine($"Processing Account PUT: ID = {id}\n{account}");
-            AccountLogic.update(id, account);
+            AccountLogic.Create().update(id, account);
         }
 
         // DELETE api/<AccountController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            AccountLogic.delete(id);
+            AccountLogic.Create().delete(id);
         }
     }
 }

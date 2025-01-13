@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<Vendor> vendors = VendorLogic.select();
+            List<Vendor> vendors = VendorLogic.Create().select();
 
             return vendors;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing Vendor GET ID={id}");
 
-            Vendor vendor = VendorLogic.get(id);
+            Vendor vendor = VendorLogic.Create().get(id);
 
             return vendor;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] Vendor vendor)
         {
             Console.WriteLine($"Processing Vendor POST: {vendor}");
-            VendorLogic.insert(vendor);
+            VendorLogic.Create().insert(vendor);
         }
 
         // PUT api/<VendorController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] Vendor vendor)
         {
             Console.WriteLine($"Processing Vendor PUT: ID = {id}\n{vendor}");
-            VendorLogic.update(id, vendor);
+            VendorLogic.Create().update(id, vendor);
         }
 
         // DELETE api/<VendorController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            VendorLogic.delete(id);
+            VendorLogic.Create().delete(id);
         }
     }
 }

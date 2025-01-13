@@ -24,14 +24,14 @@ namespace legr3
                     budget.end_date = Convert.ToDateTime(BaseTest.getTestData(budget, "DATE", TestDataType.random));
                     
                 Console.WriteLine("Testing BudgetLogic insert: " + budget.ToString());
-                BudgetLogic.insert(budget);
+                BudgetLogic.Create().insert(budget);
                 BaseTest.addLastId("Budget", budget.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Budget");
-            var budget = BudgetLogic.get(lastId);
+            var budget = BudgetLogic.Create().get(lastId);
 
 
                             budget.org_id = BaseTest.getLastId("Org");
@@ -45,7 +45,7 @@ namespace legr3
                         budget.end_date = (DateTime) BaseTest.getTestData(budget, "DATE", TestDataType.random);
                     
                 Console.WriteLine("Testing BudgetLogic update: " + budget.ToString());
-                BudgetLogic.update(lastId, budget);
+                BudgetLogic.Create().update(lastId, budget);
                     }
     }
 }

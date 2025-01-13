@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class PaymentLogic : BaseLogic
+
+
+    public partial class PaymentLogic : BaseLogic, IPaymentLogic
     {
-        public static List<Payment> select()
+
+
+        public static IPaymentLogic Create()
+        {
+
+            var payment = new PaymentLogic();
+            var proxy = DispatchProxy.Create<IPaymentLogic, Proxy<IPaymentLogic>>();
+            ((Proxy<IPaymentLogic>)proxy).Target = payment;
+            ((Proxy<IPaymentLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IPaymentLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Payment> select()
         {
             Console.WriteLine("Processing PaymentLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return payments;
         }
 
-        public static Payment get(long id)
+        public  Payment get(long id)
         {
             Console.WriteLine($"Processing PaymentLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return payment;
         }
 
-        public static void insert(Payment payment)
+        public  void insert(Payment payment)
         {
             Console.WriteLine($"Processing PaymentLogic insert: {payment}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(payment);
         }
 
-        public static void update(long id, Payment payment)
+        public  void update(long id, Payment payment)
         {
             Console.WriteLine($"Processing PaymentLogic update: ID = {id}\n{payment}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(payment);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Payment payment = get(id);
             payment.is_active = 0;

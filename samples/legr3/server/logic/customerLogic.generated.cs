@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class CustomerLogic : BaseLogic
+
+
+    public partial class CustomerLogic : BaseLogic, ICustomerLogic
     {
-        public static List<Customer> select()
+
+
+        public static ICustomerLogic Create()
+        {
+
+            var customer = new CustomerLogic();
+            var proxy = DispatchProxy.Create<ICustomerLogic, Proxy<ICustomerLogic>>();
+            ((Proxy<ICustomerLogic>)proxy).Target = customer;
+            ((Proxy<ICustomerLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<ICustomerLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Customer> select()
         {
             Console.WriteLine("Processing CustomerLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return customers;
         }
 
-        public static Customer get(long id)
+        public  Customer get(long id)
         {
             Console.WriteLine($"Processing CustomerLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return customer;
         }
 
-        public static void insert(Customer customer)
+        public  void insert(Customer customer)
         {
             Console.WriteLine($"Processing CustomerLogic insert: {customer}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(customer);
         }
 
-        public static void update(long id, Customer customer)
+        public  void update(long id, Customer customer)
         {
             Console.WriteLine($"Processing CustomerLogic update: ID = {id}\n{customer}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(customer);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Customer customer = get(id);
             customer.is_active = 0;

@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class AccountLogic : BaseLogic
+
+
+    public partial class AccountLogic : BaseLogic, IAccountLogic
     {
-        public static List<Account> select()
+
+
+        public static IAccountLogic Create()
+        {
+
+            var account = new AccountLogic();
+            var proxy = DispatchProxy.Create<IAccountLogic, Proxy<IAccountLogic>>();
+            ((Proxy<IAccountLogic>)proxy).Target = account;
+            ((Proxy<IAccountLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IAccountLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Account> select()
         {
             Console.WriteLine("Processing AccountLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return accounts;
         }
 
-        public static Account get(long id)
+        public  Account get(long id)
         {
             Console.WriteLine($"Processing AccountLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return account;
         }
 
-        public static void insert(Account account)
+        public  void insert(Account account)
         {
             Console.WriteLine($"Processing AccountLogic insert: {account}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(account);
         }
 
-        public static void update(long id, Account account)
+        public  void update(long id, Account account)
         {
             Console.WriteLine($"Processing AccountLogic update: ID = {id}\n{account}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(account);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Account account = get(id);
             account.is_active = 0;

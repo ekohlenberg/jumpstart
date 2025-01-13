@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class UserLogic : BaseLogic
+
+
+    public partial class UserLogic : BaseLogic, IUserLogic
     {
-        public static List<User> select()
+
+
+        public static IUserLogic Create()
+        {
+
+            var user = new UserLogic();
+            var proxy = DispatchProxy.Create<IUserLogic, Proxy<IUserLogic>>();
+            ((Proxy<IUserLogic>)proxy).Target = user;
+            ((Proxy<IUserLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IUserLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<User> select()
         {
             Console.WriteLine("Processing UserLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return users;
         }
 
-        public static User get(long id)
+        public  User get(long id)
         {
             Console.WriteLine($"Processing UserLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return user;
         }
 
-        public static void insert(User user)
+        public  void insert(User user)
         {
             Console.WriteLine($"Processing UserLogic insert: {user}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(user);
         }
 
-        public static void update(long id, User user)
+        public  void update(long id, User user)
         {
             Console.WriteLine($"Processing UserLogic update: ID = {id}\n{user}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(user);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             User user = get(id);
             user.is_active = 0;

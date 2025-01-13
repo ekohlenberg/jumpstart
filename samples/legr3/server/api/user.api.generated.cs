@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<User> users = UserLogic.select();
+            List<User> users = UserLogic.Create().select();
 
             return users;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing User GET ID={id}");
 
-            User user = UserLogic.get(id);
+            User user = UserLogic.Create().get(id);
 
             return user;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] User user)
         {
             Console.WriteLine($"Processing User POST: {user}");
-            UserLogic.insert(user);
+            UserLogic.Create().insert(user);
         }
 
         // PUT api/<UserController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] User user)
         {
             Console.WriteLine($"Processing User PUT: ID = {id}\n{user}");
-            UserLogic.update(id, user);
+            UserLogic.Create().update(id, user);
         }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            UserLogic.delete(id);
+            UserLogic.Create().delete(id);
         }
     }
 }

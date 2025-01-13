@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<Transaction> transactions = TransactionLogic.select();
+            List<Transaction> transactions = TransactionLogic.Create().select();
 
             return transactions;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing Transaction GET ID={id}");
 
-            Transaction transaction = TransactionLogic.get(id);
+            Transaction transaction = TransactionLogic.Create().get(id);
 
             return transaction;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] Transaction transaction)
         {
             Console.WriteLine($"Processing Transaction POST: {transaction}");
-            TransactionLogic.insert(transaction);
+            TransactionLogic.Create().insert(transaction);
         }
 
         // PUT api/<TransactionController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] Transaction transaction)
         {
             Console.WriteLine($"Processing Transaction PUT: ID = {id}\n{transaction}");
-            TransactionLogic.update(id, transaction);
+            TransactionLogic.Create().update(id, transaction);
         }
 
         // DELETE api/<TransactionController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            TransactionLogic.delete(id);
+            TransactionLogic.Create().delete(id);
         }
     }
 }

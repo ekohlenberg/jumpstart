@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<UserOrg> userorgs = UserOrgLogic.select();
+            List<UserOrg> userorgs = UserOrgLogic.Create().select();
 
             return userorgs;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing UserOrg GET ID={id}");
 
-            UserOrg userorg = UserOrgLogic.get(id);
+            UserOrg userorg = UserOrgLogic.Create().get(id);
 
             return userorg;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] UserOrg userorg)
         {
             Console.WriteLine($"Processing UserOrg POST: {userorg}");
-            UserOrgLogic.insert(userorg);
+            UserOrgLogic.Create().insert(userorg);
         }
 
         // PUT api/<UserOrgController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] UserOrg userorg)
         {
             Console.WriteLine($"Processing UserOrg PUT: ID = {id}\n{userorg}");
-            UserOrgLogic.update(id, userorg);
+            UserOrgLogic.Create().update(id, userorg);
         }
 
         // DELETE api/<UserOrgController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            UserOrgLogic.delete(id);
+            UserOrgLogic.Create().delete(id);
         }
     }
 }

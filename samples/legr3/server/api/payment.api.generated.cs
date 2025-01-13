@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<Payment> payments = PaymentLogic.select();
+            List<Payment> payments = PaymentLogic.Create().select();
 
             return payments;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing Payment GET ID={id}");
 
-            Payment payment = PaymentLogic.get(id);
+            Payment payment = PaymentLogic.Create().get(id);
 
             return payment;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] Payment payment)
         {
             Console.WriteLine($"Processing Payment POST: {payment}");
-            PaymentLogic.insert(payment);
+            PaymentLogic.Create().insert(payment);
         }
 
         // PUT api/<PaymentController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] Payment payment)
         {
             Console.WriteLine($"Processing Payment PUT: ID = {id}\n{payment}");
-            PaymentLogic.update(id, payment);
+            PaymentLogic.Create().update(id, payment);
         }
 
         // DELETE api/<PaymentController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            PaymentLogic.delete(id);
+            PaymentLogic.Create().delete(id);
         }
     }
 }

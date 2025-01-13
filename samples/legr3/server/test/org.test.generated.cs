@@ -16,20 +16,20 @@ namespace legr3
                     org.name = Convert.ToString(BaseTest.getTestData(org, "VARCHAR", TestDataType.companies));
                     
                 Console.WriteLine("Testing OrgLogic insert: " + org.ToString());
-                OrgLogic.insert(org);
+                OrgLogic.Create().insert(org);
                 BaseTest.addLastId("Org", org.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Org");
-            var org = OrgLogic.get(lastId);
+            var org = OrgLogic.Create().get(lastId);
 
 
                         org.name = (string) BaseTest.getTestData(org, "VARCHAR", TestDataType.companies);
                     
                 Console.WriteLine("Testing OrgLogic update: " + org.ToString());
-                OrgLogic.update(lastId, org);
+                OrgLogic.Create().update(lastId, org);
                     }
     }
 }

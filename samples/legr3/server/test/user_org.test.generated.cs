@@ -18,14 +18,14 @@ namespace legr3
                     userorg.user_id = BaseTest.getLastId("User");
                     
                 Console.WriteLine("Testing UserOrgLogic insert: " + userorg.ToString());
-                UserOrgLogic.insert(userorg);
+                UserOrgLogic.Create().insert(userorg);
                 BaseTest.addLastId("UserOrg", userorg.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("UserOrg");
-            var userorg = UserOrgLogic.get(lastId);
+            var userorg = UserOrgLogic.Create().get(lastId);
 
 
                             userorg.org_id = BaseTest.getLastId("Org");
@@ -33,7 +33,7 @@ namespace legr3
                             userorg.user_id = BaseTest.getLastId("User");
                         
                 Console.WriteLine("Testing UserOrgLogic update: " + userorg.ToString());
-                UserOrgLogic.update(lastId, userorg);
+                UserOrgLogic.Create().update(lastId, userorg);
                     }
     }
 }

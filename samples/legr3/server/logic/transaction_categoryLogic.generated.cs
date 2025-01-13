@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class TransactionCategoryLogic : BaseLogic
+
+
+    public partial class TransactionCategoryLogic : BaseLogic, ITransactionCategoryLogic
     {
-        public static List<TransactionCategory> select()
+
+
+        public static ITransactionCategoryLogic Create()
+        {
+
+            var transactioncategory = new TransactionCategoryLogic();
+            var proxy = DispatchProxy.Create<ITransactionCategoryLogic, Proxy<ITransactionCategoryLogic>>();
+            ((Proxy<ITransactionCategoryLogic>)proxy).Target = transactioncategory;
+            ((Proxy<ITransactionCategoryLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<ITransactionCategoryLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<TransactionCategory> select()
         {
             Console.WriteLine("Processing TransactionCategoryLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return transactioncategorys;
         }
 
-        public static TransactionCategory get(long id)
+        public  TransactionCategory get(long id)
         {
             Console.WriteLine($"Processing TransactionCategoryLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return transactioncategory;
         }
 
-        public static void insert(TransactionCategory transactioncategory)
+        public  void insert(TransactionCategory transactioncategory)
         {
             Console.WriteLine($"Processing TransactionCategoryLogic insert: {transactioncategory}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(transactioncategory);
         }
 
-        public static void update(long id, TransactionCategory transactioncategory)
+        public  void update(long id, TransactionCategory transactioncategory)
         {
             Console.WriteLine($"Processing TransactionCategoryLogic update: ID = {id}\n{transactioncategory}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(transactioncategory);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             TransactionCategory transactioncategory = get(id);
             transactioncategory.is_active = 0;

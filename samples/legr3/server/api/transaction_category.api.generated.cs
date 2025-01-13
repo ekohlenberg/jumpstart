@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<TransactionCategory> transactioncategorys = TransactionCategoryLogic.select();
+            List<TransactionCategory> transactioncategorys = TransactionCategoryLogic.Create().select();
 
             return transactioncategorys;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing TransactionCategory GET ID={id}");
 
-            TransactionCategory transactioncategory = TransactionCategoryLogic.get(id);
+            TransactionCategory transactioncategory = TransactionCategoryLogic.Create().get(id);
 
             return transactioncategory;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] TransactionCategory transactioncategory)
         {
             Console.WriteLine($"Processing TransactionCategory POST: {transactioncategory}");
-            TransactionCategoryLogic.insert(transactioncategory);
+            TransactionCategoryLogic.Create().insert(transactioncategory);
         }
 
         // PUT api/<TransactionCategoryController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] TransactionCategory transactioncategory)
         {
             Console.WriteLine($"Processing TransactionCategory PUT: ID = {id}\n{transactioncategory}");
-            TransactionCategoryLogic.update(id, transactioncategory);
+            TransactionCategoryLogic.Create().update(id, transactioncategory);
         }
 
         // DELETE api/<TransactionCategoryController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            TransactionCategoryLogic.delete(id);
+            TransactionCategoryLogic.Create().delete(id);
         }
     }
 }

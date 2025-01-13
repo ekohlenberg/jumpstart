@@ -30,14 +30,14 @@ namespace legr3
                     invoice.created_date = Convert.ToDateTime(BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing InvoiceLogic insert: " + invoice.ToString());
-                InvoiceLogic.insert(invoice);
+                InvoiceLogic.Create().insert(invoice);
                 BaseTest.addLastId("Invoice", invoice.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Invoice");
-            var invoice = InvoiceLogic.get(lastId);
+            var invoice = InvoiceLogic.Create().get(lastId);
 
 
                             invoice.customer_id = BaseTest.getLastId("Customer");
@@ -57,7 +57,7 @@ namespace legr3
                         invoice.created_date = (DateTime) BaseTest.getTestData(invoice, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing InvoiceLogic update: " + invoice.ToString());
-                InvoiceLogic.update(lastId, invoice);
+                InvoiceLogic.Create().update(lastId, invoice);
                     }
     }
 }

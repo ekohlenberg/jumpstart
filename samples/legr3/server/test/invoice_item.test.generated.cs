@@ -24,14 +24,14 @@ namespace legr3
                     invoiceitem.total_amount = Convert.ToDouble(BaseTest.getTestData(invoiceitem, "NUMERIC(18,4)", TestDataType.random));
                     
                 Console.WriteLine("Testing InvoiceItemLogic insert: " + invoiceitem.ToString());
-                InvoiceItemLogic.insert(invoiceitem);
+                InvoiceItemLogic.Create().insert(invoiceitem);
                 BaseTest.addLastId("InvoiceItem", invoiceitem.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("InvoiceItem");
-            var invoiceitem = InvoiceItemLogic.get(lastId);
+            var invoiceitem = InvoiceItemLogic.Create().get(lastId);
 
 
                             invoiceitem.invoice_id = BaseTest.getLastId("Invoice");
@@ -45,7 +45,7 @@ namespace legr3
                         invoiceitem.total_amount = (object) BaseTest.getTestData(invoiceitem, "NUMERIC(18,4)", TestDataType.random);
                     
                 Console.WriteLine("Testing InvoiceItemLogic update: " + invoiceitem.ToString());
-                InvoiceItemLogic.update(lastId, invoiceitem);
+                InvoiceItemLogic.Create().update(lastId, invoiceitem);
                     }
     }
 }

@@ -28,14 +28,14 @@ namespace legr3
                     transaction.created_date = Convert.ToDateTime(BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing TransactionLogic insert: " + transaction.ToString());
-                TransactionLogic.insert(transaction);
+                TransactionLogic.Create().insert(transaction);
                 BaseTest.addLastId("Transaction", transaction.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Transaction");
-            var transaction = TransactionLogic.get(lastId);
+            var transaction = TransactionLogic.Create().get(lastId);
 
 
                             transaction.account_id = BaseTest.getLastId("Account");
@@ -53,7 +53,7 @@ namespace legr3
                         transaction.created_date = (DateTime) BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing TransactionLogic update: " + transaction.ToString());
-                TransactionLogic.update(lastId, transaction);
+                TransactionLogic.Create().update(lastId, transaction);
                     }
     }
 }

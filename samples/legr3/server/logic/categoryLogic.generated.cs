@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class CategoryLogic : BaseLogic
+
+
+    public partial class CategoryLogic : BaseLogic, ICategoryLogic
     {
-        public static List<Category> select()
+
+
+        public static ICategoryLogic Create()
+        {
+
+            var category = new CategoryLogic();
+            var proxy = DispatchProxy.Create<ICategoryLogic, Proxy<ICategoryLogic>>();
+            ((Proxy<ICategoryLogic>)proxy).Target = category;
+            ((Proxy<ICategoryLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<ICategoryLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Category> select()
         {
             Console.WriteLine("Processing CategoryLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return categorys;
         }
 
-        public static Category get(long id)
+        public  Category get(long id)
         {
             Console.WriteLine($"Processing CategoryLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return category;
         }
 
-        public static void insert(Category category)
+        public  void insert(Category category)
         {
             Console.WriteLine($"Processing CategoryLogic insert: {category}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(category);
         }
 
-        public static void update(long id, Category category)
+        public  void update(long id, Category category)
         {
             Console.WriteLine($"Processing CategoryLogic update: ID = {id}\n{category}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(category);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Category category = get(id);
             category.is_active = 0;

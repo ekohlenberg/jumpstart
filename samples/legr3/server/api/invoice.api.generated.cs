@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<Invoice> invoices = InvoiceLogic.select();
+            List<Invoice> invoices = InvoiceLogic.Create().select();
 
             return invoices;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing Invoice GET ID={id}");
 
-            Invoice invoice = InvoiceLogic.get(id);
+            Invoice invoice = InvoiceLogic.Create().get(id);
 
             return invoice;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] Invoice invoice)
         {
             Console.WriteLine($"Processing Invoice POST: {invoice}");
-            InvoiceLogic.insert(invoice);
+            InvoiceLogic.Create().insert(invoice);
         }
 
         // PUT api/<InvoiceController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] Invoice invoice)
         {
             Console.WriteLine($"Processing Invoice PUT: ID = {id}\n{invoice}");
-            InvoiceLogic.update(id, invoice);
+            InvoiceLogic.Create().update(id, invoice);
         }
 
         // DELETE api/<InvoiceController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            InvoiceLogic.delete(id);
+            InvoiceLogic.Create().delete(id);
         }
     }
 }

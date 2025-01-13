@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class OrgLogic : BaseLogic
+
+
+    public partial class OrgLogic : BaseLogic, IOrgLogic
     {
-        public static List<Org> select()
+
+
+        public static IOrgLogic Create()
+        {
+
+            var org = new OrgLogic();
+            var proxy = DispatchProxy.Create<IOrgLogic, Proxy<IOrgLogic>>();
+            ((Proxy<IOrgLogic>)proxy).Target = org;
+            ((Proxy<IOrgLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IOrgLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Org> select()
         {
             Console.WriteLine("Processing OrgLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return orgs;
         }
 
-        public static Org get(long id)
+        public  Org get(long id)
         {
             Console.WriteLine($"Processing OrgLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return org;
         }
 
-        public static void insert(Org org)
+        public  void insert(Org org)
         {
             Console.WriteLine($"Processing OrgLogic insert: {org}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(org);
         }
 
-        public static void update(long id, Org org)
+        public  void update(long id, Org org)
         {
             Console.WriteLine($"Processing OrgLogic update: ID = {id}\n{org}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(org);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Org org = get(id);
             org.is_active = 0;

@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class InvoiceLogic : BaseLogic
+
+
+    public partial class InvoiceLogic : BaseLogic, IInvoiceLogic
     {
-        public static List<Invoice> select()
+
+
+        public static IInvoiceLogic Create()
+        {
+
+            var invoice = new InvoiceLogic();
+            var proxy = DispatchProxy.Create<IInvoiceLogic, Proxy<IInvoiceLogic>>();
+            ((Proxy<IInvoiceLogic>)proxy).Target = invoice;
+            ((Proxy<IInvoiceLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IInvoiceLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Invoice> select()
         {
             Console.WriteLine("Processing InvoiceLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return invoices;
         }
 
-        public static Invoice get(long id)
+        public  Invoice get(long id)
         {
             Console.WriteLine($"Processing InvoiceLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return invoice;
         }
 
-        public static void insert(Invoice invoice)
+        public  void insert(Invoice invoice)
         {
             Console.WriteLine($"Processing InvoiceLogic insert: {invoice}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(invoice);
         }
 
-        public static void update(long id, Invoice invoice)
+        public  void update(long id, Invoice invoice)
         {
             Console.WriteLine($"Processing InvoiceLogic update: ID = {id}\n{invoice}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(invoice);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Invoice invoice = get(id);
             invoice.is_active = 0;

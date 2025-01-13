@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class BudgetLogic : BaseLogic
+
+
+    public partial class BudgetLogic : BaseLogic, IBudgetLogic
     {
-        public static List<Budget> select()
+
+
+        public static IBudgetLogic Create()
+        {
+
+            var budget = new BudgetLogic();
+            var proxy = DispatchProxy.Create<IBudgetLogic, Proxy<IBudgetLogic>>();
+            ((Proxy<IBudgetLogic>)proxy).Target = budget;
+            ((Proxy<IBudgetLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IBudgetLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Budget> select()
         {
             Console.WriteLine("Processing BudgetLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return budgets;
         }
 
-        public static Budget get(long id)
+        public  Budget get(long id)
         {
             Console.WriteLine($"Processing BudgetLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return budget;
         }
 
-        public static void insert(Budget budget)
+        public  void insert(Budget budget)
         {
             Console.WriteLine($"Processing BudgetLogic insert: {budget}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(budget);
         }
 
-        public static void update(long id, Budget budget)
+        public  void update(long id, Budget budget)
         {
             Console.WriteLine($"Processing BudgetLogic update: ID = {id}\n{budget}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(budget);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Budget budget = get(id);
             budget.is_active = 0;

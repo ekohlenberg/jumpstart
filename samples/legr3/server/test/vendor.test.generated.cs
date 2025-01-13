@@ -30,14 +30,14 @@ namespace legr3
                     vendor.created_date = Convert.ToDateTime(BaseTest.getTestData(vendor, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing VendorLogic insert: " + vendor.ToString());
-                VendorLogic.insert(vendor);
+                VendorLogic.Create().insert(vendor);
                 BaseTest.addLastId("Vendor", vendor.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Vendor");
-            var vendor = VendorLogic.get(lastId);
+            var vendor = VendorLogic.Create().get(lastId);
 
 
                             vendor.org_id = BaseTest.getLastId("Org");
@@ -57,7 +57,7 @@ namespace legr3
                         vendor.created_date = (DateTime) BaseTest.getTestData(vendor, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing VendorLogic update: " + vendor.ToString());
-                VendorLogic.update(lastId, vendor);
+                VendorLogic.Create().update(lastId, vendor);
                     }
     }
 }

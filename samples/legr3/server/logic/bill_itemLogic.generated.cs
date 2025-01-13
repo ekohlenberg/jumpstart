@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class BillItemLogic : BaseLogic
+
+
+    public partial class BillItemLogic : BaseLogic, IBillItemLogic
     {
-        public static List<BillItem> select()
+
+
+        public static IBillItemLogic Create()
+        {
+
+            var billitem = new BillItemLogic();
+            var proxy = DispatchProxy.Create<IBillItemLogic, Proxy<IBillItemLogic>>();
+            ((Proxy<IBillItemLogic>)proxy).Target = billitem;
+            ((Proxy<IBillItemLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IBillItemLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<BillItem> select()
         {
             Console.WriteLine("Processing BillItemLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return billitems;
         }
 
-        public static BillItem get(long id)
+        public  BillItem get(long id)
         {
             Console.WriteLine($"Processing BillItemLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return billitem;
         }
 
-        public static void insert(BillItem billitem)
+        public  void insert(BillItem billitem)
         {
             Console.WriteLine($"Processing BillItemLogic insert: {billitem}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(billitem);
         }
 
-        public static void update(long id, BillItem billitem)
+        public  void update(long id, BillItem billitem)
         {
             Console.WriteLine($"Processing BillItemLogic update: ID = {id}\n{billitem}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(billitem);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             BillItem billitem = get(id);
             billitem.is_active = 0;

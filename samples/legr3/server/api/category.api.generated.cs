@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<Category> categorys = CategoryLogic.select();
+            List<Category> categorys = CategoryLogic.Create().select();
 
             return categorys;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing Category GET ID={id}");
 
-            Category category = CategoryLogic.get(id);
+            Category category = CategoryLogic.Create().get(id);
 
             return category;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] Category category)
         {
             Console.WriteLine($"Processing Category POST: {category}");
-            CategoryLogic.insert(category);
+            CategoryLogic.Create().insert(category);
         }
 
         // PUT api/<CategoryController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] Category category)
         {
             Console.WriteLine($"Processing Category PUT: ID = {id}\n{category}");
-            CategoryLogic.update(id, category);
+            CategoryLogic.Create().update(id, category);
         }
 
         // DELETE api/<CategoryController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            CategoryLogic.delete(id);
+            CategoryLogic.Create().delete(id);
         }
     }
 }

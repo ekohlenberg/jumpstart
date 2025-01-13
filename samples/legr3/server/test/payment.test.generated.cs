@@ -26,14 +26,14 @@ namespace legr3
                     payment.created_date = Convert.ToDateTime(BaseTest.getTestData(payment, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing PaymentLogic insert: " + payment.ToString());
-                PaymentLogic.insert(payment);
+                PaymentLogic.Create().insert(payment);
                 BaseTest.addLastId("Payment", payment.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Payment");
-            var payment = PaymentLogic.get(lastId);
+            var payment = PaymentLogic.Create().get(lastId);
 
 
                             payment.invoice_id = BaseTest.getLastId("Invoice");
@@ -49,7 +49,7 @@ namespace legr3
                         payment.created_date = (DateTime) BaseTest.getTestData(payment, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing PaymentLogic update: " + payment.ToString());
-                PaymentLogic.update(lastId, payment);
+                PaymentLogic.Create().update(lastId, payment);
                     }
     }
 }

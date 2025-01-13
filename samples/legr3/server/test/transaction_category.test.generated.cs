@@ -18,14 +18,14 @@ namespace legr3
                     transactioncategory.category_id = BaseTest.getLastId("Category");
                     
                 Console.WriteLine("Testing TransactionCategoryLogic insert: " + transactioncategory.ToString());
-                TransactionCategoryLogic.insert(transactioncategory);
+                TransactionCategoryLogic.Create().insert(transactioncategory);
                 BaseTest.addLastId("TransactionCategory", transactioncategory.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("TransactionCategory");
-            var transactioncategory = TransactionCategoryLogic.get(lastId);
+            var transactioncategory = TransactionCategoryLogic.Create().get(lastId);
 
 
                             transactioncategory.transaction_id = BaseTest.getLastId("Transaction");
@@ -33,7 +33,7 @@ namespace legr3
                             transactioncategory.category_id = BaseTest.getLastId("Category");
                         
                 Console.WriteLine("Testing TransactionCategoryLogic update: " + transactioncategory.ToString());
-                TransactionCategoryLogic.update(lastId, transactioncategory);
+                TransactionCategoryLogic.Create().update(lastId, transactioncategory);
                     }
     }
 }

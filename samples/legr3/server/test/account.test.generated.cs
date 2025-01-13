@@ -24,14 +24,14 @@ namespace legr3
                     account.created_date = Convert.ToDateTime(BaseTest.getTestData(account, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing AccountLogic insert: " + account.ToString());
-                AccountLogic.insert(account);
+                AccountLogic.Create().insert(account);
                 BaseTest.addLastId("Account", account.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("Account");
-            var account = AccountLogic.get(lastId);
+            var account = AccountLogic.Create().get(lastId);
 
 
                             account.org_id = BaseTest.getLastId("Org");
@@ -45,7 +45,7 @@ namespace legr3
                         account.created_date = (DateTime) BaseTest.getTestData(account, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing AccountLogic update: " + account.ToString());
-                AccountLogic.update(lastId, account);
+                AccountLogic.Create().update(lastId, account);
                     }
     }
 }

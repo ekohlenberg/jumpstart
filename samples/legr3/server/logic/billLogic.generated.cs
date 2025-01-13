@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class BillLogic : BaseLogic
+
+
+    public partial class BillLogic : BaseLogic, IBillLogic
     {
-        public static List<Bill> select()
+
+
+        public static IBillLogic Create()
+        {
+
+            var bill = new BillLogic();
+            var proxy = DispatchProxy.Create<IBillLogic, Proxy<IBillLogic>>();
+            ((Proxy<IBillLogic>)proxy).Target = bill;
+            ((Proxy<IBillLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IBillLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<Bill> select()
         {
             Console.WriteLine("Processing BillLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return bills;
         }
 
-        public static Bill get(long id)
+        public  Bill get(long id)
         {
             Console.WriteLine($"Processing BillLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return bill;
         }
 
-        public static void insert(Bill bill)
+        public  void insert(Bill bill)
         {
             Console.WriteLine($"Processing BillLogic insert: {bill}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(bill);
         }
 
-        public static void update(long id, Bill bill)
+        public  void update(long id, Bill bill)
         {
             Console.WriteLine($"Processing BillLogic update: ID = {id}\n{bill}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(bill);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             Bill bill = get(id);
             bill.is_active = 0;

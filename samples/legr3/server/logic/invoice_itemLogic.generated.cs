@@ -3,13 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using legr3;
 
 namespace legr3
 {
-    public partial class InvoiceItemLogic : BaseLogic
+
+
+    public partial class InvoiceItemLogic : BaseLogic, IInvoiceItemLogic
     {
-        public static List<InvoiceItem> select()
+
+
+        public static IInvoiceItemLogic Create()
+        {
+
+            var invoiceitem = new InvoiceItemLogic();
+            var proxy = DispatchProxy.Create<IInvoiceItemLogic, Proxy<IInvoiceItemLogic>>();
+            ((Proxy<IInvoiceItemLogic>)proxy).Target = invoiceitem;
+            ((Proxy<IInvoiceItemLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+            ((Proxy<IInvoiceItemLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+
+            //proxy.PerformAction();
+            return proxy;
+        }
+
+        public  List<InvoiceItem> select()
         {
             Console.WriteLine("Processing InvoiceItemLogic select List");
 
@@ -29,7 +47,7 @@ namespace legr3
             return invoiceitems;
         }
 
-        public static InvoiceItem get(long id)
+        public  InvoiceItem get(long id)
         {
             Console.WriteLine($"Processing InvoiceItemLogic get ID={id}");
 
@@ -41,7 +59,7 @@ namespace legr3
             return invoiceitem;
         }
 
-        public static void insert(InvoiceItem invoiceitem)
+        public  void insert(InvoiceItem invoiceitem)
         {
             Console.WriteLine($"Processing InvoiceItemLogic insert: {invoiceitem}");
 
@@ -50,7 +68,7 @@ namespace legr3
             DBPersist.insert(invoiceitem);
         }
 
-        public static void update(long id, InvoiceItem invoiceitem)
+        public  void update(long id, InvoiceItem invoiceitem)
         {
             Console.WriteLine($"Processing InvoiceItemLogic update: ID = {id}\n{invoiceitem}");
 
@@ -58,7 +76,7 @@ namespace legr3
             DBPersist.update(invoiceitem);
         }
 
-        public static void delete(long id)
+        public  void delete(long id)
         {
             InvoiceItem invoiceitem = get(id);
             invoiceitem.is_active = 0;

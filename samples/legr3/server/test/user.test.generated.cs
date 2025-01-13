@@ -28,14 +28,14 @@ namespace legr3
                     user.last_login_date = Convert.ToDateTime(BaseTest.getTestData(user, "TIMESTAMP", TestDataType.random));
                     
                 Console.WriteLine("Testing UserLogic insert: " + user.ToString());
-                UserLogic.insert(user);
+                UserLogic.Create().insert(user);
                 BaseTest.addLastId("User", user.id);
                     }
 
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("User");
-            var user = UserLogic.get(lastId);
+            var user = UserLogic.Create().get(lastId);
 
 
                         user.password_hash = (string) BaseTest.getTestData(user, "VARCHAR", TestDataType.random);
@@ -53,7 +53,7 @@ namespace legr3
                         user.last_login_date = (DateTime) BaseTest.getTestData(user, "TIMESTAMP", TestDataType.random);
                     
                 Console.WriteLine("Testing UserLogic update: " + user.ToString());
-                UserLogic.update(lastId, user);
+                UserLogic.Create().update(lastId, user);
                     }
     }
 }

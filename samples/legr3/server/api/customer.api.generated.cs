@@ -18,7 +18,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine("Processing GET List");
 
-            List<Customer> customers = CustomerLogic.select();
+            List<Customer> customers = CustomerLogic.Create().select();
 
             return customers;
         }
@@ -29,7 +29,7 @@ namespace legr3.Controllers
         {
             Console.WriteLine($"Processing Customer GET ID={id}");
 
-            Customer customer = CustomerLogic.get(id);
+            Customer customer = CustomerLogic.Create().get(id);
 
             return customer;
         }
@@ -39,7 +39,7 @@ namespace legr3.Controllers
         public void Post([FromBody] Customer customer)
         {
             Console.WriteLine($"Processing Customer POST: {customer}");
-            CustomerLogic.insert(customer);
+            CustomerLogic.Create().insert(customer);
         }
 
         // PUT api/<CustomerController>/5
@@ -47,14 +47,14 @@ namespace legr3.Controllers
         public void Put(long id, [FromBody] Customer customer)
         {
             Console.WriteLine($"Processing Customer PUT: ID = {id}\n{customer}");
-            CustomerLogic.update(id, customer);
+            CustomerLogic.Create().update(id, customer);
         }
 
         // DELETE api/<CustomerController>/5
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            CustomerLogic.delete(id);
+            CustomerLogic.Create().delete(id);
         }
     }
 }
