@@ -208,6 +208,8 @@ namespace @Model.Name
                     command.Parameters.AddWithValue("@@program", ProgramName);
             
                     command.ExecuteNonQuery();
+
+                    connection.Close();
                         
                             
                     

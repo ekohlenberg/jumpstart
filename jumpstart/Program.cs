@@ -87,6 +87,7 @@ namespace jumpstart {
                 /* logic */
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.generated.cs.cshtml", "./server/logic", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/BaseLogic.generated.cs.cshtml", "./server/logic", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/Proxy.generated.cs.cshtml", "./server/logic", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.user.cs.cshtml", "./server/logic", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/logic.csproj.cshtml", "./server/logic", true));
             

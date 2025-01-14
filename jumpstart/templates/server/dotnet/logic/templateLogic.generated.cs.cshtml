@@ -25,14 +25,19 @@ namespace @namespaceName
         {
 
             var @(domainVar) = new @(domainObj)Logic();
+
+
             var proxy = DispatchProxy.Create<I@(domainObj)Logic, Proxy<I@(domainObj)Logic>>();
+            ((Proxy<I@(domainObj)Logic>)proxy).Initialize();
             ((Proxy<I@(domainObj)Logic>)proxy).Target = @(domainVar);
-            ((Proxy<I@(domainObj)Logic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-            ((Proxy<I@(domainObj)Logic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+           // ((Proxy<I@(domainObj)Logic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+           // ((Proxy<I@(domainObj)Logic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
             //proxy.PerformAction();
             return proxy;
         }
+
+
 
         public  List<@(domainObj)> select()
         {
