@@ -18,14 +18,19 @@ namespace legr3
         {
 
             var budget = new BudgetLogic();
+
+
             var proxy = DispatchProxy.Create<IBudgetLogic, Proxy<IBudgetLogic>>();
+            ((Proxy<IBudgetLogic>)proxy).Initialize();
             ((Proxy<IBudgetLogic>)proxy).Target = budget;
-            ((Proxy<IBudgetLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-            ((Proxy<IBudgetLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+           // ((Proxy<IBudgetLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+           // ((Proxy<IBudgetLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
             //proxy.PerformAction();
             return proxy;
         }
+
+
 
         public  List<Budget> select()
         {

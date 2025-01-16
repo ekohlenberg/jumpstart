@@ -18,14 +18,19 @@ namespace legr3
         {
 
             var billitem = new BillItemLogic();
+
+
             var proxy = DispatchProxy.Create<IBillItemLogic, Proxy<IBillItemLogic>>();
+            ((Proxy<IBillItemLogic>)proxy).Initialize();
             ((Proxy<IBillItemLogic>)proxy).Target = billitem;
-            ((Proxy<IBillItemLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-            ((Proxy<IBillItemLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+           // ((Proxy<IBillItemLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+           // ((Proxy<IBillItemLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
             //proxy.PerformAction();
             return proxy;
         }
+
+
 
         public  List<BillItem> select()
         {

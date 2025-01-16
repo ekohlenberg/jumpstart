@@ -18,14 +18,19 @@ namespace legr3
         {
 
             var customer = new CustomerLogic();
+
+
             var proxy = DispatchProxy.Create<ICustomerLogic, Proxy<ICustomerLogic>>();
+            ((Proxy<ICustomerLogic>)proxy).Initialize();
             ((Proxy<ICustomerLogic>)proxy).Target = customer;
-            ((Proxy<ICustomerLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-            ((Proxy<ICustomerLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+           // ((Proxy<ICustomerLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+           // ((Proxy<ICustomerLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
             //proxy.PerformAction();
             return proxy;
         }
+
+
 
         public  List<Customer> select()
         {

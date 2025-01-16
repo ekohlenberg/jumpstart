@@ -208,6 +208,8 @@ namespace legr3
                     command.Parameters.AddWithValue("@program", ProgramName);
             
                     command.ExecuteNonQuery();
+
+                    connection.Close();
                         
                             
                     

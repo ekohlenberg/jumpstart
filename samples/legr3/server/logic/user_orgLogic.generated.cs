@@ -18,14 +18,19 @@ namespace legr3
         {
 
             var userorg = new UserOrgLogic();
+
+
             var proxy = DispatchProxy.Create<IUserOrgLogic, Proxy<IUserOrgLogic>>();
+            ((Proxy<IUserOrgLogic>)proxy).Initialize();
             ((Proxy<IUserOrgLogic>)proxy).Target = userorg;
-            ((Proxy<IUserOrgLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-            ((Proxy<IUserOrgLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+           // ((Proxy<IUserOrgLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+           // ((Proxy<IUserOrgLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
             //proxy.PerformAction();
             return proxy;
         }
+
+
 
         public  List<UserOrg> select()
         {

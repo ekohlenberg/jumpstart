@@ -18,14 +18,19 @@ namespace legr3
         {
 
             var transactioncategory = new TransactionCategoryLogic();
+
+
             var proxy = DispatchProxy.Create<ITransactionCategoryLogic, Proxy<ITransactionCategoryLogic>>();
+            ((Proxy<ITransactionCategoryLogic>)proxy).Initialize();
             ((Proxy<ITransactionCategoryLogic>)proxy).Target = transactioncategory;
-            ((Proxy<ITransactionCategoryLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-            ((Proxy<ITransactionCategoryLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
+           // ((Proxy<ITransactionCategoryLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
+           // ((Proxy<ITransactionCategoryLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
             //proxy.PerformAction();
             return proxy;
         }
+
+
 
         public  List<TransactionCategory> select()
         {
