@@ -16,17 +16,12 @@ namespace legr3
 
         public static IBillItemLogic Create()
         {
-
             var billitem = new BillItemLogic();
-
 
             var proxy = DispatchProxy.Create<IBillItemLogic, Proxy<IBillItemLogic>>();
             ((Proxy<IBillItemLogic>)proxy).Initialize();
             ((Proxy<IBillItemLogic>)proxy).Target = billitem;
-           // ((Proxy<IBillItemLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<IBillItemLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

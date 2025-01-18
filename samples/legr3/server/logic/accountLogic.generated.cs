@@ -16,17 +16,12 @@ namespace legr3
 
         public static IAccountLogic Create()
         {
-
             var account = new AccountLogic();
-
 
             var proxy = DispatchProxy.Create<IAccountLogic, Proxy<IAccountLogic>>();
             ((Proxy<IAccountLogic>)proxy).Initialize();
             ((Proxy<IAccountLogic>)proxy).Target = account;
-           // ((Proxy<IAccountLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<IAccountLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

@@ -7,11 +7,15 @@ using System.Reflection;
 namespace @Model.Name 
 {
 
+  
+
     public class Proxy<T> : DispatchProxy
     {
         public T Target { get; set; }
         public List<Action<MethodInfo, object[]>> BeforeActions = new();
         public List<Action<MethodInfo, object, object[]>> AfterActions = new();
+
+       
         
         protected override object Invoke(MethodInfo targetMethod, object[] args)
         {
@@ -32,7 +36,7 @@ namespace @Model.Name
             return result;
         }
 
-        public void Initialize()
+        public virtual void Initialize()
         {
 
             AddBeforeAction((method, args) =>

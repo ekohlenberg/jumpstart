@@ -48,9 +48,7 @@ namespace jumpstart {
                 GlobalCSVLoader gloader = new GlobalCSVLoader();
                 gloader.Load( "global.csv", metaModel);
 
-                Generator g = new Generator();
-
-                g.OnFileWriteEvent += metaModel.build.AddToOutputFolderMap;
+                Generator g = new Generator(metaModel);
 
                 /* database templates */
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.database.create.generated.sql.cshtml", "./database", true));
@@ -132,10 +130,8 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/logo.svg.cshtml", "./web/react-frontend/src", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/components/with-navigation.jsx.cshtml", "./web/react-frontend/src/components", true));
 
-                await g.GenerateApp(metaModel);
-                await g.GenerateSchemas(metaModel);
-                await g.GenerateObjects(metaModel);
-                await g.GenerateBuild(metaModel);
+               
+                await g.Generate();
 
                 // Output the string representation of the metaModel
                 //Console.WriteLine(metaModel.ToString());

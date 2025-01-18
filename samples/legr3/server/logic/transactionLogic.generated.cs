@@ -16,17 +16,12 @@ namespace legr3
 
         public static ITransactionLogic Create()
         {
-
             var transaction = new TransactionLogic();
-
 
             var proxy = DispatchProxy.Create<ITransactionLogic, Proxy<ITransactionLogic>>();
             ((Proxy<ITransactionLogic>)proxy).Initialize();
             ((Proxy<ITransactionLogic>)proxy).Target = transaction;
-           // ((Proxy<ITransactionLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<ITransactionLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

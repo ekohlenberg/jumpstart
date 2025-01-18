@@ -16,17 +16,12 @@ namespace legr3
 
         public static ICategoryLogic Create()
         {
-
             var category = new CategoryLogic();
-
 
             var proxy = DispatchProxy.Create<ICategoryLogic, Proxy<ICategoryLogic>>();
             ((Proxy<ICategoryLogic>)proxy).Initialize();
             ((Proxy<ICategoryLogic>)proxy).Target = category;
-           // ((Proxy<ICategoryLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<ICategoryLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

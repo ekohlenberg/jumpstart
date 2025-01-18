@@ -16,17 +16,12 @@ namespace legr3
 
         public static IOrgLogic Create()
         {
-
             var org = new OrgLogic();
-
 
             var proxy = DispatchProxy.Create<IOrgLogic, Proxy<IOrgLogic>>();
             ((Proxy<IOrgLogic>)proxy).Initialize();
             ((Proxy<IOrgLogic>)proxy).Target = org;
-           // ((Proxy<IOrgLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<IOrgLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

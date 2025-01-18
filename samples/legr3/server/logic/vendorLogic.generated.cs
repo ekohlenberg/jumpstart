@@ -16,17 +16,12 @@ namespace legr3
 
         public static IVendorLogic Create()
         {
-
             var vendor = new VendorLogic();
-
 
             var proxy = DispatchProxy.Create<IVendorLogic, Proxy<IVendorLogic>>();
             ((Proxy<IVendorLogic>)proxy).Initialize();
             ((Proxy<IVendorLogic>)proxy).Target = vendor;
-           // ((Proxy<IVendorLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<IVendorLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

@@ -16,17 +16,12 @@ namespace legr3
 
         public static IUserLogic Create()
         {
-
             var user = new UserLogic();
-
 
             var proxy = DispatchProxy.Create<IUserLogic, Proxy<IUserLogic>>();
             ((Proxy<IUserLogic>)proxy).Initialize();
             ((Proxy<IUserLogic>)proxy).Target = user;
-           // ((Proxy<IUserLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<IUserLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

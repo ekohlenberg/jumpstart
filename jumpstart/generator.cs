@@ -35,13 +35,18 @@ namespace jumpstart {
         
         public event FileWrittenEventHandler OnFileWriteEvent;
 
+        protected MetaModel metaModel = null;
+
         protected virtual void FireFileWriteEvent(string outputFolder, string outputFile)
         {
             OnFileWriteEvent?.Invoke(outputFolder, outputFile);
         }
-        public Generator()
+        public Generator(MetaModel metaModel)
         {
             
+            this.metaModel = metaModel;
+            OnFileWriteEvent += metaModel.build.AddToOutputFolderMap;
+
             razorEngine = new RazorLightEngineBuilder()
                 .UseEmbeddedResourcesProject(typeof(MetaObject))
                 .SetOperatingAssembly(typeof(MetaObject).Assembly)
@@ -60,14 +65,22 @@ namespace jumpstart {
 
         
 
-       public async Task GenerateApp( MetaModel metaModel )
+        public async Task Generate()
+        {
+            await GenerateApp();
+            await GenerateSchemas();
+            await GenerateObjects();
+            await GenerateBuild();
+        }
+
+       public async Task GenerateApp()
         {
             await GenTemplates<MetaModel>(metaModel);
             
         }
 
 
-        public async Task  GenerateSchemas( MetaModel metaModel )
+        public async Task  GenerateSchemas()
         {
             foreach (MetaSchema metaSchema in metaModel.Schemas.Values)
             {
@@ -76,7 +89,7 @@ namespace jumpstart {
             
         }        
 
-        public async Task GenerateObjects( MetaModel metaModel )
+        public async Task GenerateObjects()
         {
             foreach (MetaObject metaObject in metaModel.Objects)
             {
@@ -86,7 +99,7 @@ namespace jumpstart {
         }
 
 
-        public async Task GenerateBuild( MetaModel metaModel )
+        public async Task GenerateBuild()
         {
             List<TemplateDef> templateList =  templates[metaModel.build.GetType()];
             foreach( TemplateDef td in templateList)

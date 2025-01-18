@@ -16,17 +16,12 @@ namespace legr3
 
         public static IPaymentLogic Create()
         {
-
             var payment = new PaymentLogic();
-
 
             var proxy = DispatchProxy.Create<IPaymentLogic, Proxy<IPaymentLogic>>();
             ((Proxy<IPaymentLogic>)proxy).Initialize();
             ((Proxy<IPaymentLogic>)proxy).Target = payment;
-           // ((Proxy<IPaymentLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<IPaymentLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 

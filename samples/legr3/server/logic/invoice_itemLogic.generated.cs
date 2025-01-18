@@ -16,17 +16,12 @@ namespace legr3
 
         public static IInvoiceItemLogic Create()
         {
-
             var invoiceitem = new InvoiceItemLogic();
-
 
             var proxy = DispatchProxy.Create<IInvoiceItemLogic, Proxy<IInvoiceItemLogic>>();
             ((Proxy<IInvoiceItemLogic>)proxy).Initialize();
             ((Proxy<IInvoiceItemLogic>)proxy).Target = invoiceitem;
-           // ((Proxy<IInvoiceItemLogic>)proxy).BeforeAction = () => Console.WriteLine("Before method call");
-           // ((Proxy<IInvoiceItemLogic>)proxy).AfterAction = () => Console.WriteLine("After method call");
 
-            //proxy.PerformAction();
             return proxy;
         }
 
