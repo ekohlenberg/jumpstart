@@ -45,6 +45,18 @@ namespace legr3
                 Logger.Info($"Before invoking {method.Name} with arguments: {string.Join(", ", args)}");
             });
 
+           AddBeforeAction((method, args) =>
+            {
+                // Log the method name and arguments
+                Logger.Info($"invoking script host with arguments: {string.Join(", ", args)}");
+
+                ScriptHost s = new ScriptHost();
+
+                s.Invoke();
+                
+            });
+
+
             AddAfterAction((method, result, args) =>
             {
                 // Log the method name and arguments
@@ -58,6 +70,8 @@ namespace legr3
             if (action == null) throw new ArgumentNullException(nameof(action));
             BeforeActions.Add(action);
         }
+
+
 
         public void AddAfterAction(Action<MethodInfo, object, object[]> action)
         {
