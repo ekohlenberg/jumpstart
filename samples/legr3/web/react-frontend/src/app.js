@@ -54,6 +54,24 @@ import HeaderComponent from './components/legr3-header';
   import BudgetListComponent from './components/budget-list';
   import BudgetCreateComponent from './components/budget-create';
   
+  import ScriptListComponent from './components/script-list';
+  import ScriptCreateComponent from './components/script-create';
+  
+  import ActionListComponent from './components/action-list';
+  import ActionCreateComponent from './components/action-create';
+  
+  import ActionGroupListComponent from './components/action_group-list';
+  import ActionGroupCreateComponent from './components/action_group-create';
+  
+  import EventListComponent from './components/event-list';
+  import EventCreateComponent from './components/event-create';
+  
+  import ActionGroupMapListComponent from './components/action_group_map-list';
+  import ActionGroupMapCreateComponent from './components/action_group_map-create';
+  
+  import UserActionGroupListComponent from './components/user_action_group-list';
+  import UserActionGroupCreateComponent from './components/user_action_group-create';
+  
 // footer
 import FooterComponent from './components/legr3-footer';
 
@@ -111,6 +129,24 @@ function App() {
                             
                             <Route path='/budget' element = { < BudgetListComponent /> } />
                             <Route path='/add-budget/:id' element = { < BudgetCreateComponent /> } />
+                            
+                            <Route path='/script' element = { < ScriptListComponent /> } />
+                            <Route path='/add-script/:id' element = { < ScriptCreateComponent /> } />
+                            
+                            <Route path='/action' element = { < ActionListComponent /> } />
+                            <Route path='/add-action/:id' element = { < ActionCreateComponent /> } />
+                            
+                            <Route path='/actiongroup' element = { < ActionGroupListComponent /> } />
+                            <Route path='/add-actiongroup/:id' element = { < ActionGroupCreateComponent /> } />
+                            
+                            <Route path='/event' element = { < EventListComponent /> } />
+                            <Route path='/add-event/:id' element = { < EventCreateComponent /> } />
+                            
+                            <Route path='/actiongroupmap' element = { < ActionGroupMapListComponent /> } />
+                            <Route path='/add-actiongroupmap/:id' element = { < ActionGroupMapCreateComponent /> } />
+                            
+                            <Route path='/useractiongroup' element = { < UserActionGroupListComponent /> } />
+                            <Route path='/add-useractiongroup/:id' element = { < UserActionGroupCreateComponent /> } />
                             
                     </Routes>
                 </div>

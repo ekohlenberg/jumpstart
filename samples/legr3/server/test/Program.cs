@@ -71,6 +71,30 @@ namespace legr3
                 Logger.Info("Testing Budget");
                 BudgetTest.testInsert();            
                 BudgetTest.testUpdate();            
+                
+                Logger.Info("Testing Script");
+                ScriptTest.testInsert();            
+                ScriptTest.testUpdate();            
+                
+                Logger.Info("Testing Action");
+                ActionTest.testInsert();            
+                ActionTest.testUpdate();            
+                
+                Logger.Info("Testing ActionGroup");
+                ActionGroupTest.testInsert();            
+                ActionGroupTest.testUpdate();            
+                
+                Logger.Info("Testing Event");
+                EventTest.testInsert();            
+                EventTest.testUpdate();            
+                
+                Logger.Info("Testing ActionGroupMap");
+                ActionGroupMapTest.testInsert();            
+                ActionGroupMapTest.testUpdate();            
+                
+                Logger.Info("Testing UserActionGroup");
+                UserActionGroupTest.testInsert();            
+                UserActionGroupTest.testUpdate();            
                             }
             catch( Exception x)
             {

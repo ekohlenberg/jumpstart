@@ -37,6 +37,14 @@ class HeaderComponent extends Component {
                         
                         <div><a style={{marginLeft: "10px"}}className="navbar" href="/budget">Budget</a></div>
                         
+                        <div><a style={{marginLeft: "10px"}}className="navbar" href="/script">Scripts</a></div>
+                        
+                        <div><a style={{marginLeft: "10px"}}className="navbar" href="/action">Actions</a></div>
+                        
+                        <div><a style={{marginLeft: "10px"}}className="navbar" href="/actiongroup">Action Groups</a></div>
+                        
+                        <div><a style={{marginLeft: "10px"}}className="navbar" href="/event">Events</a></div>
+                        
                     </nav>
                 </header>
             </div>

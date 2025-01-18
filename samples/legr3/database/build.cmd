@@ -8,6 +8,8 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
         
             psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\app.schema.create.generated.sql
         
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\core.schema.create.generated.sql
+        
             psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\org.table.generated.sql
         
             psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\org.audit.generated.sql
@@ -127,4 +129,52 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
             psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\budget.sequence.generated.sql
         
             psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\budget.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\script.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\script.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\script.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\script.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group_map.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group_map.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group_map.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group_map.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\user_action_group.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\user_action_group.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\user_action_group.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\user_action_group.rwkindex.generated.sql
         

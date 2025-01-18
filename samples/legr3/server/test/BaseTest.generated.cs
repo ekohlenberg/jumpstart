@@ -327,6 +327,24 @@ private static Dictionary<string, long> _lastIdMap = null;
             
             protected static Stack<Budget> lastBudget = new Stack<Budget>();
             protected static Dictionary<long, Budget> mapBudget = new Dictionary<long, Budget>();
+            
+            protected static Stack<Script> lastScript = new Stack<Script>();
+            protected static Dictionary<long, Script> mapScript = new Dictionary<long, Script>();
+            
+            protected static Stack<Action> lastAction = new Stack<Action>();
+            protected static Dictionary<long, Action> mapAction = new Dictionary<long, Action>();
+            
+            protected static Stack<ActionGroup> lastActionGroup = new Stack<ActionGroup>();
+            protected static Dictionary<long, ActionGroup> mapActionGroup = new Dictionary<long, ActionGroup>();
+            
+            protected static Stack<Event> lastEvent = new Stack<Event>();
+            protected static Dictionary<long, Event> mapEvent = new Dictionary<long, Event>();
+            
+            protected static Stack<ActionGroupMap> lastActionGroupMap = new Stack<ActionGroupMap>();
+            protected static Dictionary<long, ActionGroupMap> mapActionGroupMap = new Dictionary<long, ActionGroupMap>();
+            
+            protected static Stack<UserActionGroup> lastUserActionGroup = new Stack<UserActionGroup>();
+            protected static Dictionary<long, UserActionGroup> mapUserActionGroup = new Dictionary<long, UserActionGroup>();
                 }
 }
 

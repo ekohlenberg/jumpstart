@@ -41,7 +41,8 @@ public class MetadataRecord {
 
 public class CSVLoader
 {
-    public void Load(string modelPath, MetaModel metaModel)
+
+    public virtual void Load(string modelPath, MetaModel metaModel)
     {
         
         using (var reader = new StreamReader(modelPath))
@@ -62,6 +63,8 @@ public class CSVLoader
         metaModel.SortMetaObjectsByReference();
         
     }
+
+  
 
     private void SetNamespace(MetaModel metaModel, string tableCatalog)
     {
