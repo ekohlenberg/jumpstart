@@ -45,9 +45,9 @@ namespace jumpstart {
                 // Load the model from the specified path
                 csvLoader.Load(modelPath, metaModel);
 
-                ModuleLoader moduleLoader = new ModuleLoader();
+                CoreLoader coreLoader = new CoreLoader();
 
-                moduleLoader.Load("modules.csv", metaModel );
+                coreLoader.Load("core.csv", metaModel );
 
                 GlobalCSVLoader gloader = new GlobalCSVLoader();
                 gloader.Load( "global.csv", metaModel);

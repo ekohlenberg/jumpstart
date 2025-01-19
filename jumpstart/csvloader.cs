@@ -60,13 +60,13 @@ public class CSVLoader
 
         }
 
-        metaModel.SortMetaObjectsByReference();
+        
         
     }
 
   
 
-    private void SetNamespace(MetaModel metaModel, string tableCatalog)
+    protected virtual void SetNamespace(MetaModel metaModel, string tableCatalog)
     {
         if (string.IsNullOrEmpty(metaModel.Namespace))
         {
@@ -80,7 +80,7 @@ public class CSVLoader
 
         if (!metaModel.Schemas.TryGetValue(mr.TABLE_SCHEMA, out schema))
         {
-            schema = new MetaSchema(mr.TABLE_SCHEMA, mr.TABLE_CATALOG);
+            schema = new MetaSchema(mr.TABLE_SCHEMA, metaModel.Namespace);
             metaModel.Schemas[mr.TABLE_SCHEMA] = schema;
         }
 
@@ -93,7 +93,7 @@ public class CSVLoader
 
         if (!schema.Objects.TryGetValue(mr.TABLE_NAME, out metaObject))
         {
-            metaObject = new MetaObject(mr.TABLE_CATALOG, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);
+            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);
             schema.Objects[mr.TABLE_NAME] = metaObject;
         }
 

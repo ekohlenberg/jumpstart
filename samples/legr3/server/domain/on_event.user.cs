@@ -1,11 +1,11 @@
 using System;
 
 
-namespace 
+namespace legr3
 {
-    public partial class Event 
+    public partial class OnEvent 
     {
-        public Event()
+        public OnEvent()
         {
             initialize();
         }

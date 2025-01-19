@@ -1,7 +1,7 @@
 using System;
 
 
-namespace 
+namespace legr3
 {
     public partial class ActionGroup 
     {

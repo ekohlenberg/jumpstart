@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace 
+namespace legr3
 {
     public partial class Action : BaseObject
     {
@@ -28,27 +28,27 @@ namespace
                 }
             }
             
-            public string object
+            public string objectname
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("object"));
+                    return Convert.ToString(getPropValue("objectname"));
                 }
                 set
                 {
-                    setPropValue("object", value);
+                    setPropValue("objectname", value);
                 }
             }
             
-            public string method
+            public string methodname
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("method"));
+                    return Convert.ToString(getPropValue("methodname"));
                 }
                 set
                 {
-                    setPropValue("method", value);
+                    setPropValue("methodname", value);
                 }
             }
             

@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace 
+namespace legr3
 {
     public partial class Script : BaseObject
     {

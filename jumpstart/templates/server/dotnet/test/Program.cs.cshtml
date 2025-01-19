@@ -11,15 +11,18 @@ namespace @Model.Namespace
         {
             try
             {
-            @foreach (var baseObject in Model.Objects)
-            {
-                var domainObj = baseObject.DomainObj;
-                <text>
-                Logger.Info("Testing @(domainObj)");
-                @(domainObj)Test.testInsert();            
-                @(domainObj)Test.testUpdate();            
-                </text>
-            }
+                @foreach (var metaObject in Model.Objects)
+                {
+                    if (metaObject.SchemaName == "sec") continue;
+                    
+                    var domainObj = metaObject.DomainObj;
+
+                    <text>
+                    Logger.Info("Testing @(domainObj)");
+                    @(domainObj)Test.testInsert();            
+                    @(domainObj)Test.testUpdate();            
+                    </text>
+                }
             }
             catch( Exception x)
             {

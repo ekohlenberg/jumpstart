@@ -154,13 +154,13 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
         
             psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group.rwkindex.generated.sql
         
-            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.table.generated.sql
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\on_event.table.generated.sql
         
-            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.audit.generated.sql
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\on_event.audit.generated.sql
         
-            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.sequence.generated.sql
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\on_event.sequence.generated.sql
         
-            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\event.rwkindex.generated.sql
+            psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\on_event.rwkindex.generated.sql
         
             psql --host=localhost --port=5433 --dbname=legr3 --username=postgres --file=.\action_group_map.table.generated.sql
         

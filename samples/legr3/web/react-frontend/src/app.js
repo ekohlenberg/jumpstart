@@ -63,8 +63,8 @@ import HeaderComponent from './components/legr3-header';
   import ActionGroupListComponent from './components/action_group-list';
   import ActionGroupCreateComponent from './components/action_group-create';
   
-  import EventListComponent from './components/event-list';
-  import EventCreateComponent from './components/event-create';
+  import OnEventListComponent from './components/on_event-list';
+  import OnEventCreateComponent from './components/on_event-create';
   
   import ActionGroupMapListComponent from './components/action_group_map-list';
   import ActionGroupMapCreateComponent from './components/action_group_map-create';
@@ -139,8 +139,8 @@ function App() {
                             <Route path='/actiongroup' element = { < ActionGroupListComponent /> } />
                             <Route path='/add-actiongroup/:id' element = { < ActionGroupCreateComponent /> } />
                             
-                            <Route path='/event' element = { < EventListComponent /> } />
-                            <Route path='/add-event/:id' element = { < EventCreateComponent /> } />
+                            <Route path='/onevent' element = { < OnEventListComponent /> } />
+                            <Route path='/add-onevent/:id' element = { < OnEventCreateComponent /> } />
                             
                             <Route path='/actiongroupmap' element = { < ActionGroupMapListComponent /> } />
                             <Route path='/add-actiongroupmap/:id' element = { < ActionGroupMapCreateComponent /> } />

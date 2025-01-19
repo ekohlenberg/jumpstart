@@ -46,6 +46,7 @@ namespace jumpstart {
             
             this.metaModel = metaModel;
             OnFileWriteEvent += metaModel.build.AddToOutputFolderMap;
+            metaModel.SortMetaObjectsByReference();
 
             razorEngine = new RazorLightEngineBuilder()
                 .UseEmbeddedResourcesProject(typeof(MetaObject))

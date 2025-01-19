@@ -2,18 +2,18 @@
 using System;
 using System.Reflection;
 
-namespace 
+namespace legr3
 {
-    public partial class Event : BaseObject
+    public partial class OnEvent : BaseObject
     {
         protected void initialize()
         {
             // Default initializer
-            tableName = "core.event";
-            tableBaseName = "event";
-            auditTableName = "audit.core_event";
+            tableName = "core.on_event";
+            tableBaseName = "on_event";
+            auditTableName = "audit.core_on_event";
 
-rwk.Add("object");rwk.Add("method");rwk.Add("script_id");        }
+rwk.Add("objectname");rwk.Add("methodname");rwk.Add("script_id");        }
 
 
             public long id
@@ -28,27 +28,27 @@ rwk.Add("object");rwk.Add("method");rwk.Add("script_id");        }
                 }
             }
             
-            public string object
+            public string objectname
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("object"));
+                    return Convert.ToString(getPropValue("objectname"));
                 }
                 set
                 {
-                    setPropValue("object", value);
+                    setPropValue("objectname", value);
                 }
             }
             
-            public string method
+            public string methodname
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("method"));
+                    return Convert.ToString(getPropValue("methodname"));
                 }
                 set
                 {
-                    setPropValue("method", value);
+                    setPropValue("methodname", value);
                 }
             }
             

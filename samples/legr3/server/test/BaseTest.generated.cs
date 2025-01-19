@@ -337,8 +337,8 @@ private static Dictionary<string, long> _lastIdMap = null;
             protected static Stack<ActionGroup> lastActionGroup = new Stack<ActionGroup>();
             protected static Dictionary<long, ActionGroup> mapActionGroup = new Dictionary<long, ActionGroup>();
             
-            protected static Stack<Event> lastEvent = new Stack<Event>();
-            protected static Dictionary<long, Event> mapEvent = new Dictionary<long, Event>();
+            protected static Stack<OnEvent> lastOnEvent = new Stack<OnEvent>();
+            protected static Dictionary<long, OnEvent> mapOnEvent = new Dictionary<long, OnEvent>();
             
             protected static Stack<ActionGroupMap> lastActionGroupMap = new Stack<ActionGroupMap>();
             protected static Dictionary<long, ActionGroupMap> mapActionGroupMap = new Dictionary<long, ActionGroupMap>();

@@ -2,8 +2,8 @@
 create table audit.sec_action (
     id BIGINT PRIMARY KEY,
 		action_id BIGINT ,
-		object VARCHAR(50) ,
-		method VARCHAR(50) ,
+		objectname VARCHAR(50) ,
+		methodname VARCHAR(50) ,
 		is_active integer ,
 		created_by varchar(50) ,
 		last_updated timestamp ,

@@ -8,8 +8,8 @@ build:
 	@cp -r -f ./templates $(TARGETDIR)
 	@mkdir -p $(TARGETDIR)/global
 	@cp -r -f ./global $(TARGETDIR)
-	@mkdir -p $(TARGETDIR)/modules
-	@cp -r -f ./modules $(TARGETDIR)
+	@mkdir -p $(TARGETDIR)/core
+	@cp -r -f ./core $(TARGETDIR)
 
 clean:
 	@rm -rf ./bin

@@ -11,9 +11,9 @@ class EventCreateComponent extends Component {
             // step 2
             id: this.props.params?.id || '',
 
-                    object: '' ,
+                    objectname: '' ,
                 
-                    method: '' ,
+                    methodname: '' ,
                 
                     script_id: '' 
                             
@@ -21,9 +21,9 @@ class EventCreateComponent extends Component {
                     
                     this.changeIdHandler = this.changeIdHandler.bind(this);
                                     
-                    this.changeObjectHandler = this.changeObjectHandler.bind(this);
+                    this.changeObjectnameHandler = this.changeObjectnameHandler.bind(this);
                                     
-                    this.changeMethodHandler = this.changeMethodHandler.bind(this);
+                    this.changeMethodnameHandler = this.changeMethodnameHandler.bind(this);
                                     
                     this.changeScriptIdHandler = this.changeScriptIdHandler.bind(this);
                         this.saveOrUpdateEvent = this.saveOrUpdateEvent.bind(this);
@@ -45,9 +45,9 @@ class EventCreateComponent extends Component {
 
                             id: event.id ,
                         
-                            object: event.object ,
+                            objectname: event.objectname ,
                         
-                            method: event.method ,
+                            methodname: event.methodname ,
                         
                             script_id: event.script_id 
                         
@@ -63,9 +63,9 @@ class EventCreateComponent extends Component {
 
                    id: this.state.id === '_add' ?  '0' : this.state.id ,
                             
-                    object: this.state.object , 
+                    objectname: this.state.objectname , 
                             
-                    method: this.state.method , 
+                    methodname: this.state.methodname , 
                             
                     script_id: this.state.script_id  
                         };
@@ -88,12 +88,12 @@ class EventCreateComponent extends Component {
             this.setState({id: event.target.value});
         }
         
-        changeObjectHandler= (event) => {
-            this.setState({object: event.target.value});
+        changeObjectnameHandler= (event) => {
+            this.setState({objectname: event.target.value});
         }
         
-        changeMethodHandler= (event) => {
-            this.setState({method: event.target.value});
+        changeMethodnameHandler= (event) => {
+            this.setState({methodname: event.target.value});
         }
         
         changeScriptIdHandler= (event) => {
@@ -134,15 +134,15 @@ class EventCreateComponent extends Component {
                                             <div className = "form-group">
                                             <br/>
                                             <label> Object: </label>
-                                            <input placeholder="" name="object" className="form-control" 
-                                                value={this.state.object} onChange={this.changeObjectHandler}/>
+                                            <input placeholder="" name="objectname" className="form-control" 
+                                                value={this.state.objectname} onChange={this.changeObjectnameHandler}/>
                                             </div>
                                                                 
                                             <div className = "form-group">
                                             <br/>
                                             <label> Method: </label>
-                                            <input placeholder="" name="method" className="form-control" 
-                                                value={this.state.method} onChange={this.changeMethodHandler}/>
+                                            <input placeholder="" name="methodname" className="form-control" 
+                                                value={this.state.methodname} onChange={this.changeMethodnameHandler}/>
                                             </div>
                                                                 
                                             <div className = "form-group">

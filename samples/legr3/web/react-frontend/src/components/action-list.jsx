@@ -78,9 +78,9 @@ class ActionListComponent extends Component {
 
                                                 <td> { action.id } </td>  
                                                 
-                                                <td> { action.object } </td>  
+                                                <td> { action.objectname } </td>  
                                                 
-                                                <td> { action.method } </td>  
+                                                <td> { action.methodname } </td>  
                                                 
                                                 <td> { action.is_active } </td>  
                                                 

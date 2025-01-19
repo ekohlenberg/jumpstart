@@ -1,49 +1,49 @@
 import React, { Component } from 'react'
 import { withNavigation } from './with-navigation';
 
-import EventService from '../services/event-service';
+import OnEventService from '../services/on_event-service';
 
-class EventListComponent extends Component {
+class OnEventListComponent extends Component {
     constructor(props) {
         super(props)
 
         this.state = {
-                events: []
+                onevents: []
         }
-        this.addEvent = this.addEvent.bind(this);
-        this.editEvent = this.editEvent.bind(this);
-        this.deleteEvent = this.deleteEvent.bind(this);
+        this.addOnEvent = this.addOnEvent.bind(this);
+        this.editOnEvent = this.editOnEvent.bind(this);
+        this.deleteOnEvent = this.deleteOnEvent.bind(this);
     }
 
-    deleteEvent(id){
-        EventService.deleteEvent(id).then( res => {
-            this.setState({ events: this.state.events.filter(event => event.id !== id) });
+    deleteOnEvent(id){
+        OnEventService.deleteOnEvent(id).then( res => {
+            this.setState({ onevents: this.state.onevents.filter(onevent => onevent.id !== id) });
         });
     }
-    viewEvent(id){
-        this.props.navigate(`/view-event/${id}`);
+    viewOnEvent(id){
+        this.props.navigate(`/view-onevent/${id}`);
     }
-    editEvent(id){
+    editOnEvent(id){
         console.log("editing " + id)
-        this.props.navigate(`/add-event/${id}`);
+        this.props.navigate(`/add-onevent/${id}`);
     }
 
     componentDidMount(){
-        EventService.getEvents().then((res) => {
-            this.setState({ events: res.data});
+        OnEventService.getOnEvents().then((res) => {
+            this.setState({ onevents: res.data});
         });
     }
 
-    addEvent(){
-        this.props.navigate('/add-event/_add');
+    addOnEvent(){
+        this.props.navigate('/add-onevent/_add');
     }
 
     render() {
         return (
             <div>
-                 <h2 className="text-center">Event List</h2>
+                 <h2 className="text-center">OnEvent List</h2>
                  <div className = "row">
-                    <button className="btn btn-primary" onClick={this.addEvent}> Add Event</button>
+                    <button className="btn btn-primary" onClick={this.addOnEvent}> Add OnEvent</button>
                  </div>
                  <br></br>
                  <div className = "row">
@@ -74,30 +74,30 @@ class EventListComponent extends Component {
                             </thead>
                             <tbody>
                                 {
-                                    this.state.events.map(
-                                        event => 
-                                        <tr key = { event.id }>
+                                    this.state.onevents.map(
+                                        onevent => 
+                                        <tr key = { onevent.id }>
 
-                                                <td> { event.id } </td>  
+                                                <td> { onevent.id } </td>  
                                                 
-                                                <td> { event.objectname } </td>  
+                                                <td> { onevent.objectname } </td>  
                                                 
-                                                <td> { event.methodname } </td>  
+                                                <td> { onevent.methodname } </td>  
                                                 
-                                                <td> { event.script_id } </td>  
+                                                <td> { onevent.script_id } </td>  
                                                 
-                                                <td> { event.is_active } </td>  
+                                                <td> { onevent.is_active } </td>  
                                                 
-                                                <td> { event.created_by } </td>  
+                                                <td> { onevent.created_by } </td>  
                                                 
-                                                <td> { event.last_updated } </td>  
+                                                <td> { onevent.last_updated } </td>  
                                                 
-                                                <td> { event.last_updated_by } </td>  
+                                                <td> { onevent.last_updated_by } </td>  
                                                 
-                                                <td> { event.version } </td>  
+                                                <td> { onevent.version } </td>  
                                                                                              <td>
-                                                 <button onClick={ () => this.editEvent(event.id)} className="btn btn-info">Update </button>
-                                                 <button style={{marginLeft: "10px"}} onClick={ () => this.deleteEvent(event.id)} className="btn btn-danger">Delete </button>
+                                                 <button onClick={ () => this.editOnEvent(onevent.id)} className="btn btn-info">Update </button>
+                                                 <button style={{marginLeft: "10px"}} onClick={ () => this.deleteOnEvent(onevent.id)} className="btn btn-danger">Delete </button>
                                                 
                                              </td>
                                         </tr>
@@ -113,4 +113,4 @@ class EventListComponent extends Component {
     }
 }
 
-export default withNavigation(EventListComponent);
+export default withNavigation(OnEventListComponent);

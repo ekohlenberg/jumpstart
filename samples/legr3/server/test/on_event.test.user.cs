@@ -1,12 +1,12 @@
 using System;
 
 
-namespace 
+namespace legr3
 {
-    public partial class EventTest
+    public partial class OnEventTest
     {
         
-        public EventTest()
+        public OnEventTest()
         {
            
         }

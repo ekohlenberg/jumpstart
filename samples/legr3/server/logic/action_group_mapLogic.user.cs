@@ -2,7 +2,7 @@
 using System;
 
 
-namespace 
+namespace legr3
 {
     public interface IActionGroupMapLogic
     {

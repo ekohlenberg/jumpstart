@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import ActionService from '../services/action-service';
+import OnEventService from '../services/on_event-service';
 import { withNavigation } from './with-navigation';
 
 
-class ActionCreateComponent extends Component {
+class OnEventCreateComponent extends Component {
     constructor(props) {
         super(props)
 
@@ -13,7 +13,9 @@ class ActionCreateComponent extends Component {
 
                     objectname: '' ,
                 
-                    methodname: '' 
+                    methodname: '' ,
+                
+                    script_id: '' 
                             
         }
                     
@@ -22,7 +24,9 @@ class ActionCreateComponent extends Component {
                     this.changeObjectnameHandler = this.changeObjectnameHandler.bind(this);
                                     
                     this.changeMethodnameHandler = this.changeMethodnameHandler.bind(this);
-                        this.saveOrUpdateAction = this.saveOrUpdateAction.bind(this);
+                                    
+                    this.changeScriptIdHandler = this.changeScriptIdHandler.bind(this);
+                        this.saveOrUpdateOnEvent = this.saveOrUpdateOnEvent.bind(this);
     }
 
     // step 3
@@ -34,16 +38,18 @@ class ActionCreateComponent extends Component {
         if(this.state.id === '_add'){
             return
         }else{
-            console.log ("Action componentDidMount() ID= " + this.state.id )
-            ActionService.getActionById(this.state.id).then( (res) =>{
-                let action = res.data;
+            console.log ("OnEvent componentDidMount() ID= " + this.state.id )
+            OnEventService.getOnEventById(this.state.id).then( (res) =>{
+                let onevent = res.data;
                 this.setState({
 
-                            id: action.id ,
+                            id: onevent.id ,
                         
-                            objectname: action.objectname ,
+                            objectname: onevent.objectname ,
                         
-                            methodname: action.methodname 
+                            methodname: onevent.methodname ,
+                        
+                            script_id: onevent.script_id 
                         
                 });
             });
@@ -51,26 +57,28 @@ class ActionCreateComponent extends Component {
         
        ;
     }
-    saveOrUpdateAction = (e) => {
+    saveOrUpdateOnEvent = (e) => {
         e.preventDefault();
-        let action = {
+        let onevent = {
 
                    id: this.state.id === '_add' ?  '0' : this.state.id ,
                             
                     objectname: this.state.objectname , 
                             
-                    methodname: this.state.methodname  
+                    methodname: this.state.methodname , 
+                            
+                    script_id: this.state.script_id  
                         };
-        console.log('action => ' + JSON.stringify(action));
+        console.log('onevent => ' + JSON.stringify(onevent));
 
         // step 5
         if(this.state.id === '_add'){
-            ActionService.createAction(action).then(res =>{
-                this.props.navigate('/action');
+            OnEventService.createOnEvent(onevent).then(res =>{
+                this.props.navigate('/onevent');
             });
         }else{
-            ActionService.updateAction(action, this.state.id).then( res => {
-                this.props.navigate('/action');
+            OnEventService.updateOnEvent(onevent, this.state.id).then( res => {
+                this.props.navigate('/onevent');
             });
         }
     }
@@ -87,15 +95,19 @@ class ActionCreateComponent extends Component {
         changeMethodnameHandler= (event) => {
             this.setState({methodname: event.target.value});
         }
+        
+        changeScriptIdHandler= (event) => {
+            this.setState({script_id: event.target.value});
+        }
             cancel(){
-        this.props.navigate('/action');
+        this.props.navigate('/onevent');
     }
 
     getTitle(){
         if(this.state.id === '_add'){
-            return <h3 className="text-center">Add Action</h3>
+            return <h3 className="text-center">Add OnEvent</h3>
         }else{
-            return <h3 className="text-center">Update Action</h3>
+            return <h3 className="text-center">Update OnEvent</h3>
         }
     }
     render() {
@@ -114,7 +126,7 @@ class ActionCreateComponent extends Component {
                     
                                             <div className = "form-group">
                                             <br/>
-                                            <label> Action ID: </label>
+                                            <label> Event ID: </label>
                                             <input placeholder="" name="id" className="form-control" 
                                                 value={this.state.id} onChange={this.changeIdHandler}/>
                                             </div>
@@ -132,7 +144,14 @@ class ActionCreateComponent extends Component {
                                             <input placeholder="" name="methodname" className="form-control" 
                                                 value={this.state.methodname} onChange={this.changeMethodnameHandler}/>
                                             </div>
-                                                                                    <button className="btn btn-success" onClick={this.saveOrUpdateAction}>Save</button>
+                                                                
+                                            <div className = "form-group">
+                                            <br/>
+                                            <label> Script ID: </label>
+                                            <input placeholder="" name="script_id" className="form-control" 
+                                                value={this.state.script_id} onChange={this.changeScriptIdHandler}/>
+                                            </div>
+                                                                                    <button className="btn btn-success" onClick={this.saveOrUpdateOnEvent}>Save</button>
                                         <button className="btn btn-danger" onClick={this.cancel.bind(this)} style={{marginLeft: "10px"}}>Cancel</button>
                                     </form>
                                 </div>
@@ -145,4 +164,4 @@ class ActionCreateComponent extends Component {
     }
 }
 
-export default withNavigation(ActionCreateComponent);
+export default withNavigation(OnEventCreateComponent);
