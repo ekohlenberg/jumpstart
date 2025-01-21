@@ -6,7 +6,7 @@ namespace legr3
 {
     public partial class Script : BaseObject
     {
-        protected void initialize()
+        protected void Initialize()
         {
             // Default initializer
             tableName = "core.script";

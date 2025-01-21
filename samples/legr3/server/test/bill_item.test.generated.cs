@@ -13,7 +13,7 @@ namespace legr3
             var billitem = new BillItem();
 
 
-                    billitem.bill_id = BaseTest.getLastId("Bill");
+                    billitem.bill_id = BaseTest.getLastId("bill");
                     
                     billitem.description = Convert.ToString(BaseTest.getTestData(billitem, "VARCHAR", TestDataType.random));
                     
@@ -25,7 +25,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing BillItemLogic insert: " + billitem.ToString());
                 BillItemLogic.Create().insert(billitem);
-                BaseTest.addLastId("BillItem", billitem.id);
+                BaseTest.addLastId("bill_item", billitem.id);
                     }
 
         public static void testUpdate()
@@ -34,7 +34,7 @@ namespace legr3
             var billitem = BillItemLogic.Create().get(lastId);
 
 
-                            billitem.bill_id = BaseTest.getLastId("Bill");
+                            billitem.bill_id = BaseTest.getLastId("bill");
                         
                         billitem.description = (string) BaseTest.getTestData(billitem, "VARCHAR", TestDataType.random);
                     

@@ -13,9 +13,9 @@ namespace legr3
             var transaction = new Transaction();
 
 
-                    transaction.account_id = BaseTest.getLastId("Account");
+                    transaction.account_id = BaseTest.getLastId("account");
                     
-                    transaction.org_id = BaseTest.getLastId("Org");
+                    transaction.org_id = BaseTest.getLastId("org");
                     
                     transaction.transaction_date = Convert.ToDateTime(BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random));
                     
@@ -29,7 +29,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing TransactionLogic insert: " + transaction.ToString());
                 TransactionLogic.Create().insert(transaction);
-                BaseTest.addLastId("Transaction", transaction.id);
+                BaseTest.addLastId("transaction", transaction.id);
                     }
 
         public static void testUpdate()
@@ -38,9 +38,9 @@ namespace legr3
             var transaction = TransactionLogic.Create().get(lastId);
 
 
-                            transaction.account_id = BaseTest.getLastId("Account");
+                            transaction.account_id = BaseTest.getLastId("account");
                         
-                            transaction.org_id = BaseTest.getLastId("Org");
+                            transaction.org_id = BaseTest.getLastId("org");
                         
                         transaction.transaction_date = (DateTime) BaseTest.getTestData(transaction, "TIMESTAMP", TestDataType.random);
                     

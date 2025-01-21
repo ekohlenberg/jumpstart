@@ -14,14 +14,52 @@ namespace @Model.Namespace
                 @foreach (var metaObject in Model.Objects)
                 {
                     if (metaObject.SchemaName == "sec") continue;
+                    if (metaObject.SchemaName == "core") continue;
                     
                     var domainObj = metaObject.DomainObj;
 
+
+                    if (domainObj == "User")
+                    {
+                    <text>
+                        List<OpRole> opRoles = OpRoleLogic.Create().select();
+                        var adminRole = opRoles.Find(role => role.name == "Administrator");
+
+                        BaseTest.addLastId("op_role", adminRole.id);
+
+                        List<User> users = UserLogic.Create().select();
+                        var currentUser = users.Find(user => user.username == Environment.UserName);
+
+                        if (currentUser == null)
+                        {
+                            @(domainObj)Test.testInsert();  
+                            long userId = BaseTest.getLastId("@(domainObj)");
+                            OpRoleMemberTest.testInsert();
+                        }
+                        else
+                        {
+                            BaseTest.addLastId("user", currentUser.id);
+
+                            List<OpRoleMember> opRoleMembers = OpRoleMemberLogic.Create().select();
+                            var adminRoleMembership = opRoleMembers.Find(membership => membership.user_id == currentUser.id && membership.op_role_id == adminRole.id);
+
+                            if (adminRoleMembership == null)
+                            {
+                                OpRoleMemberTest.testInsert();
+                            }
+                        }
+
+
+                    </text>
+                    }
+                    else
+                    {
                     <text>
                     Logger.Info("Testing @(domainObj)");
                     @(domainObj)Test.testInsert();            
                     @(domainObj)Test.testUpdate();            
                     </text>
+                    }
                 }
             }
             catch( Exception x)

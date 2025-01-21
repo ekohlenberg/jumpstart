@@ -92,6 +92,7 @@ namespace @Model.Namespace
             emailAddresses,
             addresses,
             usernames,
+            os_user,
             cities,
             states,
             zipcodes,
@@ -202,6 +203,10 @@ namespace @Model.Namespace
                     else if (testDataType == TestDataType.zipcodes)
                     {
                         result = getRandomFiveDigitNumber();
+                    }
+                    else if (testDataType == TestDataType.os_user)
+                    {
+                        result = Environment.UserName;
                     }
                     else
                     {

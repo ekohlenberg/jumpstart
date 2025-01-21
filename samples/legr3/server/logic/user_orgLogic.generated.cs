@@ -42,7 +42,7 @@ namespace legr3
                 userorgs.Add(userorg);
             };
 
-            DBPersist.select(userorgCallback, $"select * from sec.user_org");
+            DBPersist.select(userorgCallback, $"select * from app.user_org");
 
             return userorgs;
         }

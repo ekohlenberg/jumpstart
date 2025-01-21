@@ -13,9 +13,9 @@ namespace legr3
             var invoice = new Invoice();
 
 
-                    invoice.customer_id = BaseTest.getLastId("Customer");
+                    invoice.customer_id = BaseTest.getLastId("customer");
                     
-                    invoice.org_id = BaseTest.getLastId("Org");
+                    invoice.org_id = BaseTest.getLastId("org");
                     
                     invoice.invoice_number = Convert.ToInt64(BaseTest.getTestData(invoice, "BIGINT", TestDataType.random));
                     
@@ -31,7 +31,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing InvoiceLogic insert: " + invoice.ToString());
                 InvoiceLogic.Create().insert(invoice);
-                BaseTest.addLastId("Invoice", invoice.id);
+                BaseTest.addLastId("invoice", invoice.id);
                     }
 
         public static void testUpdate()
@@ -40,9 +40,9 @@ namespace legr3
             var invoice = InvoiceLogic.Create().get(lastId);
 
 
-                            invoice.customer_id = BaseTest.getLastId("Customer");
+                            invoice.customer_id = BaseTest.getLastId("customer");
                         
-                            invoice.org_id = BaseTest.getLastId("Org");
+                            invoice.org_id = BaseTest.getLastId("org");
                         
                         invoice.invoice_number = (long) BaseTest.getTestData(invoice, "BIGINT", TestDataType.random);
                     

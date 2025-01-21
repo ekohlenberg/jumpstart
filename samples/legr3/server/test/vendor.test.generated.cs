@@ -13,7 +13,7 @@ namespace legr3
             var vendor = new Vendor();
 
 
-                    vendor.org_id = BaseTest.getLastId("Org");
+                    vendor.org_id = BaseTest.getLastId("org");
                     
                     vendor.vendor_name = Convert.ToString(BaseTest.getTestData(vendor, "VARCHAR", TestDataType.companies));
                     
@@ -31,7 +31,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing VendorLogic insert: " + vendor.ToString());
                 VendorLogic.Create().insert(vendor);
-                BaseTest.addLastId("Vendor", vendor.id);
+                BaseTest.addLastId("vendor", vendor.id);
                     }
 
         public static void testUpdate()
@@ -40,7 +40,7 @@ namespace legr3
             var vendor = VendorLogic.Create().get(lastId);
 
 
-                            vendor.org_id = BaseTest.getLastId("Org");
+                            vendor.org_id = BaseTest.getLastId("org");
                         
                         vendor.vendor_name = (string) BaseTest.getTestData(vendor, "VARCHAR", TestDataType.companies);
                     

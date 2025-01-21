@@ -13,9 +13,9 @@ namespace legr3
             var bill = new Bill();
 
 
-                    bill.vendor_id = BaseTest.getLastId("Vendor");
+                    bill.vendor_id = BaseTest.getLastId("vendor");
                     
-                    bill.org_id = BaseTest.getLastId("Org");
+                    bill.org_id = BaseTest.getLastId("org");
                     
                     bill.bill_number = Convert.ToInt64(BaseTest.getTestData(bill, "BIGINT", TestDataType.random));
                     
@@ -31,7 +31,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing BillLogic insert: " + bill.ToString());
                 BillLogic.Create().insert(bill);
-                BaseTest.addLastId("Bill", bill.id);
+                BaseTest.addLastId("bill", bill.id);
                     }
 
         public static void testUpdate()
@@ -40,9 +40,9 @@ namespace legr3
             var bill = BillLogic.Create().get(lastId);
 
 
-                            bill.vendor_id = BaseTest.getLastId("Vendor");
+                            bill.vendor_id = BaseTest.getLastId("vendor");
                         
-                            bill.org_id = BaseTest.getLastId("Org");
+                            bill.org_id = BaseTest.getLastId("org");
                         
                         bill.bill_number = (long) BaseTest.getTestData(bill, "BIGINT", TestDataType.random);
                     

@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<BillItem> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<BillItem> billitems = BillItemLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public BillItem Get(long id)
         {
-            Console.WriteLine($"Processing BillItem GET ID={id}");
+            //Console.WriteLine($"Processing BillItem GET ID={id}");
 
             BillItem billitem = BillItemLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] BillItem billitem)
         {
-            Console.WriteLine($"Processing BillItem POST: {billitem}");
+            //Console.WriteLine($"Processing BillItem POST: {billitem}");
             BillItemLogic.Create().insert(billitem);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] BillItem billitem)
         {
-            Console.WriteLine($"Processing BillItem PUT: ID = {id}\n{billitem}");
+            //Console.WriteLine($"Processing BillItem PUT: ID = {id}\n{billitem}");
             BillItemLogic.Create().update(id, billitem);
         }
 

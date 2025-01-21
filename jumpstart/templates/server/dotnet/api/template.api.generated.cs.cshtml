@@ -21,7 +21,7 @@ namespace @(namespaceName).Controllers
         [HttpGet]
         public IEnumerable<@(domainObj)> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select();
 
@@ -32,7 +32,7 @@ namespace @(namespaceName).Controllers
         [HttpGet("{id}")]
         public @(domainObj) Get(long id)
         {
-            Console.WriteLine($"Processing @(domainObj) GET ID={id}");
+            //Console.WriteLine($"Processing @(domainObj) GET ID={id}");
 
             @(domainObj) @(domainVar) = @(domainObj)Logic.Create().get(id);
 
@@ -43,7 +43,7 @@ namespace @(namespaceName).Controllers
         [HttpPost]
         public void Post([FromBody] @(domainObj) @(domainVar))
         {
-            Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
+            //Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
             @(domainObj)Logic.Create().insert(@(domainVar));
         }
 
@@ -51,7 +51,7 @@ namespace @(namespaceName).Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] @(domainObj) @(domainVar))
         {
-            Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
+            //Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
             @(domainObj)Logic.Create().update(id, @(domainVar));
         }
 

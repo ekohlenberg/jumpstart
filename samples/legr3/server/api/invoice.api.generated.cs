@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Invoice> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Invoice> invoices = InvoiceLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Invoice Get(long id)
         {
-            Console.WriteLine($"Processing Invoice GET ID={id}");
+            //Console.WriteLine($"Processing Invoice GET ID={id}");
 
             Invoice invoice = InvoiceLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Invoice invoice)
         {
-            Console.WriteLine($"Processing Invoice POST: {invoice}");
+            //Console.WriteLine($"Processing Invoice POST: {invoice}");
             InvoiceLogic.Create().insert(invoice);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Invoice invoice)
         {
-            Console.WriteLine($"Processing Invoice PUT: ID = {id}\n{invoice}");
+            //Console.WriteLine($"Processing Invoice PUT: ID = {id}\n{invoice}");
             InvoiceLogic.Create().update(id, invoice);
         }
 

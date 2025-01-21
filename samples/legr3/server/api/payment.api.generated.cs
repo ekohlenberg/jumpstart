@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Payment> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Payment> payments = PaymentLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Payment Get(long id)
         {
-            Console.WriteLine($"Processing Payment GET ID={id}");
+            //Console.WriteLine($"Processing Payment GET ID={id}");
 
             Payment payment = PaymentLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Payment payment)
         {
-            Console.WriteLine($"Processing Payment POST: {payment}");
+            //Console.WriteLine($"Processing Payment POST: {payment}");
             PaymentLogic.Create().insert(payment);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Payment payment)
         {
-            Console.WriteLine($"Processing Payment PUT: ID = {id}\n{payment}");
+            //Console.WriteLine($"Processing Payment PUT: ID = {id}\n{payment}");
             PaymentLogic.Create().update(id, payment);
         }
 

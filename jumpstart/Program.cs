@@ -55,18 +55,23 @@ namespace jumpstart {
                 Generator g = new Generator(metaModel);
 
                 /* database templates */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.database.create.generated.sql.cshtml", "./database", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/audit.schema.create.generated.sql.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.database.create.generated.sql.cshtml", "./database/ddl", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/audit.schema.create.generated.sql.cshtml", "./database/ddl", true));
 
-                g.AddTemplate( typeof(MetaSchema), new TemplateDef("database/pgsql/template.schema.create.generated.sql.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaSchema), new TemplateDef("database/pgsql/template.schema.create.generated.sql.cshtml", "./database/ddl", true));
 
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.audit.generated.sql.cshtml", "./database", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.sequence.generated.sql.cshtml", "./database", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.rwkindex.generated.sql.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database/ddl", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.audit.generated.sql.cshtml", "./database/ddl", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.sequence.generated.sql.cshtml", "./database/ddl", true));
+                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.rwkindex.generated.sql.cshtml", "./database/ddl", true));
 
-                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.sh.cshtml", "./database", true));
-                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.cmd.cshtml", "./database", true));
+                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.sh.cshtml", "./database/ddl", true));
+                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.cmd.cshtml", "./database/ddl", true));
+
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.static.generated.sql.cshtml", "./database/data", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.admin.generated.sql.cshtml", "./database/data", true));
+                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/load.sh.cshtml", "./database/data", true));
+
 
 
                 /* dotnet server templates */
@@ -91,6 +96,7 @@ namespace jumpstart {
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.generated.cs.cshtml", "./server/logic", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/BaseLogic.generated.cs.cshtml", "./server/logic", true));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/Proxy.generated.cs.cshtml", "./server/logic", true));
+                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/op_role_memberLogic.core.cs.cshtml", "./server/logic", true));
                 g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.user.cs.cshtml", "./server/logic", false));
                 g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/logic.csproj.cshtml", "./server/logic", true));
             

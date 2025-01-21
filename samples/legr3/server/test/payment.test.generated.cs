@@ -13,9 +13,9 @@ namespace legr3
             var payment = new Payment();
 
 
-                    payment.invoice_id = BaseTest.getLastId("Invoice");
+                    payment.invoice_id = BaseTest.getLastId("invoice");
                     
-                    payment.org_id = BaseTest.getLastId("Org");
+                    payment.org_id = BaseTest.getLastId("org");
                     
                     payment.payment_date = Convert.ToDateTime(BaseTest.getTestData(payment, "TIMESTAMP", TestDataType.random));
                     
@@ -27,7 +27,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing PaymentLogic insert: " + payment.ToString());
                 PaymentLogic.Create().insert(payment);
-                BaseTest.addLastId("Payment", payment.id);
+                BaseTest.addLastId("payment", payment.id);
                     }
 
         public static void testUpdate()
@@ -36,9 +36,9 @@ namespace legr3
             var payment = PaymentLogic.Create().get(lastId);
 
 
-                            payment.invoice_id = BaseTest.getLastId("Invoice");
+                            payment.invoice_id = BaseTest.getLastId("invoice");
                         
-                            payment.org_id = BaseTest.getLastId("Org");
+                            payment.org_id = BaseTest.getLastId("org");
                         
                         payment.payment_date = (DateTime) BaseTest.getTestData(payment, "TIMESTAMP", TestDataType.random);
                     

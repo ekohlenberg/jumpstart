@@ -92,6 +92,7 @@ namespace legr3
             emailAddresses,
             addresses,
             usernames,
+            os_user,
             cities,
             states,
             zipcodes,
@@ -203,6 +204,10 @@ namespace legr3
                     {
                         result = getRandomFiveDigitNumber();
                     }
+                    else if (testDataType == TestDataType.os_user)
+                    {
+                        result = Environment.UserName;
+                    }
                     else
                     {
                         switch (baseDataType.ToUpper())
@@ -289,8 +294,14 @@ private static Dictionary<string, long> _lastIdMap = null;
             protected static Stack<User> lastUser = new Stack<User>();
             protected static Dictionary<long, User> mapUser = new Dictionary<long, User>();
             
-            protected static Stack<UserOrg> lastUserOrg = new Stack<UserOrg>();
-            protected static Dictionary<long, UserOrg> mapUserOrg = new Dictionary<long, UserOrg>();
+            protected static Stack<Script> lastScript = new Stack<Script>();
+            protected static Dictionary<long, Script> mapScript = new Dictionary<long, Script>();
+            
+            protected static Stack<Operation> lastOperation = new Stack<Operation>();
+            protected static Dictionary<long, Operation> mapOperation = new Dictionary<long, Operation>();
+            
+            protected static Stack<OpRole> lastOpRole = new Stack<OpRole>();
+            protected static Dictionary<long, OpRole> mapOpRole = new Dictionary<long, OpRole>();
             
             protected static Stack<Account> lastAccount = new Stack<Account>();
             protected static Dictionary<long, Account> mapAccount = new Dictionary<long, Account>();
@@ -301,50 +312,47 @@ private static Dictionary<string, long> _lastIdMap = null;
             protected static Stack<Vendor> lastVendor = new Stack<Vendor>();
             protected static Dictionary<long, Vendor> mapVendor = new Dictionary<long, Vendor>();
             
-            protected static Stack<Invoice> lastInvoice = new Stack<Invoice>();
-            protected static Dictionary<long, Invoice> mapInvoice = new Dictionary<long, Invoice>();
+            protected static Stack<Category> lastCategory = new Stack<Category>();
+            protected static Dictionary<long, Category> mapCategory = new Dictionary<long, Category>();
             
-            protected static Stack<InvoiceItem> lastInvoiceItem = new Stack<InvoiceItem>();
-            protected static Dictionary<long, InvoiceItem> mapInvoiceItem = new Dictionary<long, InvoiceItem>();
+            protected static Stack<UserOrg> lastUserOrg = new Stack<UserOrg>();
+            protected static Dictionary<long, UserOrg> mapUserOrg = new Dictionary<long, UserOrg>();
             
-            protected static Stack<Bill> lastBill = new Stack<Bill>();
-            protected static Dictionary<long, Bill> mapBill = new Dictionary<long, Bill>();
+            protected static Stack<UserPassword> lastUserPassword = new Stack<UserPassword>();
+            protected static Dictionary<long, UserPassword> mapUserPassword = new Dictionary<long, UserPassword>();
             
-            protected static Stack<BillItem> lastBillItem = new Stack<BillItem>();
-            protected static Dictionary<long, BillItem> mapBillItem = new Dictionary<long, BillItem>();
+            protected static Stack<EventService> lastEventService = new Stack<EventService>();
+            protected static Dictionary<long, EventService> mapEventService = new Dictionary<long, EventService>();
             
-            protected static Stack<Payment> lastPayment = new Stack<Payment>();
-            protected static Dictionary<long, Payment> mapPayment = new Dictionary<long, Payment>();
+            protected static Stack<OpRoleMap> lastOpRoleMap = new Stack<OpRoleMap>();
+            protected static Dictionary<long, OpRoleMap> mapOpRoleMap = new Dictionary<long, OpRoleMap>();
+            
+            protected static Stack<OpRoleMember> lastOpRoleMember = new Stack<OpRoleMember>();
+            protected static Dictionary<long, OpRoleMember> mapOpRoleMember = new Dictionary<long, OpRoleMember>();
             
             protected static Stack<Transaction> lastTransaction = new Stack<Transaction>();
             protected static Dictionary<long, Transaction> mapTransaction = new Dictionary<long, Transaction>();
             
-            protected static Stack<Category> lastCategory = new Stack<Category>();
-            protected static Dictionary<long, Category> mapCategory = new Dictionary<long, Category>();
+            protected static Stack<Invoice> lastInvoice = new Stack<Invoice>();
+            protected static Dictionary<long, Invoice> mapInvoice = new Dictionary<long, Invoice>();
             
-            protected static Stack<TransactionCategory> lastTransactionCategory = new Stack<TransactionCategory>();
-            protected static Dictionary<long, TransactionCategory> mapTransactionCategory = new Dictionary<long, TransactionCategory>();
+            protected static Stack<Bill> lastBill = new Stack<Bill>();
+            protected static Dictionary<long, Bill> mapBill = new Dictionary<long, Bill>();
             
             protected static Stack<Budget> lastBudget = new Stack<Budget>();
             protected static Dictionary<long, Budget> mapBudget = new Dictionary<long, Budget>();
             
-            protected static Stack<Script> lastScript = new Stack<Script>();
-            protected static Dictionary<long, Script> mapScript = new Dictionary<long, Script>();
+            protected static Stack<TransactionCategory> lastTransactionCategory = new Stack<TransactionCategory>();
+            protected static Dictionary<long, TransactionCategory> mapTransactionCategory = new Dictionary<long, TransactionCategory>();
             
-            protected static Stack<Action> lastAction = new Stack<Action>();
-            protected static Dictionary<long, Action> mapAction = new Dictionary<long, Action>();
+            protected static Stack<InvoiceItem> lastInvoiceItem = new Stack<InvoiceItem>();
+            protected static Dictionary<long, InvoiceItem> mapInvoiceItem = new Dictionary<long, InvoiceItem>();
             
-            protected static Stack<ActionGroup> lastActionGroup = new Stack<ActionGroup>();
-            protected static Dictionary<long, ActionGroup> mapActionGroup = new Dictionary<long, ActionGroup>();
+            protected static Stack<Payment> lastPayment = new Stack<Payment>();
+            protected static Dictionary<long, Payment> mapPayment = new Dictionary<long, Payment>();
             
-            protected static Stack<OnEvent> lastOnEvent = new Stack<OnEvent>();
-            protected static Dictionary<long, OnEvent> mapOnEvent = new Dictionary<long, OnEvent>();
-            
-            protected static Stack<ActionGroupMap> lastActionGroupMap = new Stack<ActionGroupMap>();
-            protected static Dictionary<long, ActionGroupMap> mapActionGroupMap = new Dictionary<long, ActionGroupMap>();
-            
-            protected static Stack<UserActionGroup> lastUserActionGroup = new Stack<UserActionGroup>();
-            protected static Dictionary<long, UserActionGroup> mapUserActionGroup = new Dictionary<long, UserActionGroup>();
+            protected static Stack<BillItem> lastBillItem = new Stack<BillItem>();
+            protected static Dictionary<long, BillItem> mapBillItem = new Dictionary<long, BillItem>();
                 }
 }
 

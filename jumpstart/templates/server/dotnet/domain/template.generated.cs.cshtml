@@ -13,7 +13,7 @@ namespace @namespaceName
 {
     public partial class @className : BaseObject
     {
-        protected void initialize()
+        protected void Initialize()
         {
             // Default initializer
             tableName = "@schemaName.@tableName";
@@ -24,15 +24,13 @@ namespace @namespaceName
             {
                 if (attr.RWK == "1")
                 {
-                    <text>rwk.Add("@attr.Name");</text>
+            <text>rwk.Add("@attr.Name");</text>
                 }
             }
         }
 
         @foreach (var attr in Model.Attributes)
         {
-            
-            
             <text>
             public @attr.DotNetType @attr.Name
             {

@@ -13,9 +13,9 @@ namespace legr3
             var budget = new Budget();
 
 
-                    budget.org_id = BaseTest.getLastId("Org");
+                    budget.org_id = BaseTest.getLastId("org");
                     
-                    budget.category_id = BaseTest.getLastId("Category");
+                    budget.category_id = BaseTest.getLastId("category");
                     
                     budget.amount = Convert.ToDouble(BaseTest.getTestData(budget, "NUMERIC(18,4)", TestDataType.random));
                     
@@ -25,7 +25,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing BudgetLogic insert: " + budget.ToString());
                 BudgetLogic.Create().insert(budget);
-                BaseTest.addLastId("Budget", budget.id);
+                BaseTest.addLastId("budget", budget.id);
                     }
 
         public static void testUpdate()
@@ -34,9 +34,9 @@ namespace legr3
             var budget = BudgetLogic.Create().get(lastId);
 
 
-                            budget.org_id = BaseTest.getLastId("Org");
+                            budget.org_id = BaseTest.getLastId("org");
                         
-                            budget.category_id = BaseTest.getLastId("Category");
+                            budget.category_id = BaseTest.getLastId("category");
                         
                         budget.amount = (object) BaseTest.getTestData(budget, "NUMERIC(18,4)", TestDataType.random);
                     

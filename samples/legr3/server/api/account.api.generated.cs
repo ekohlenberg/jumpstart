@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Account> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Account> accounts = AccountLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Account Get(long id)
         {
-            Console.WriteLine($"Processing Account GET ID={id}");
+            //Console.WriteLine($"Processing Account GET ID={id}");
 
             Account account = AccountLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Account account)
         {
-            Console.WriteLine($"Processing Account POST: {account}");
+            //Console.WriteLine($"Processing Account POST: {account}");
             AccountLogic.Create().insert(account);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Account account)
         {
-            Console.WriteLine($"Processing Account PUT: ID = {id}\n{account}");
+            //Console.WriteLine($"Processing Account PUT: ID = {id}\n{account}");
             AccountLogic.Create().update(id, account);
         }
 

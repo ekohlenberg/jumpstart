@@ -17,6 +17,8 @@ namespace legr3
         static public void select( SelectCallback selectCallback, string sql)
         {
         
+            Logger.Debug($"Excuting sql {sql}.");
+            
             try
             {
                 string connectionStr = Config.getString("db.connection");

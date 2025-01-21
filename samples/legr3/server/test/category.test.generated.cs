@@ -13,7 +13,7 @@ namespace legr3
             var category = new Category();
 
 
-                    category.org_id = BaseTest.getLastId("Org");
+                    category.org_id = BaseTest.getLastId("org");
                     
                     category.category_name = Convert.ToString(BaseTest.getTestData(category, "VARCHAR", TestDataType.random));
                     
@@ -21,7 +21,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing CategoryLogic insert: " + category.ToString());
                 CategoryLogic.Create().insert(category);
-                BaseTest.addLastId("Category", category.id);
+                BaseTest.addLastId("category", category.id);
                     }
 
         public static void testUpdate()
@@ -30,7 +30,7 @@ namespace legr3
             var category = CategoryLogic.Create().get(lastId);
 
 
-                            category.org_id = BaseTest.getLastId("Org");
+                            category.org_id = BaseTest.getLastId("org");
                         
                         category.category_name = (string) BaseTest.getTestData(category, "VARCHAR", TestDataType.random);
                     

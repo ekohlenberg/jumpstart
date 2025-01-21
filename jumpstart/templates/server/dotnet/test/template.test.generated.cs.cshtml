@@ -41,7 +41,7 @@ namespace @Model.Namespace
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj)Logic insert: " + @(Model.DomainVar).ToString());
                 @(Model.DomainObj)Logic.Create().insert(@(Model.DomainVar));
-                BaseTest.addLastId("@(Model.DomainObj)", @(Model.DomainVar).id);
+                BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar).id);
             </text>
             }
         }

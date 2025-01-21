@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Category> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Category> categorys = CategoryLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Category Get(long id)
         {
-            Console.WriteLine($"Processing Category GET ID={id}");
+            //Console.WriteLine($"Processing Category GET ID={id}");
 
             Category category = CategoryLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Category category)
         {
-            Console.WriteLine($"Processing Category POST: {category}");
+            //Console.WriteLine($"Processing Category POST: {category}");
             CategoryLogic.Create().insert(category);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Category category)
         {
-            Console.WriteLine($"Processing Category PUT: ID = {id}\n{category}");
+            //Console.WriteLine($"Processing Category PUT: ID = {id}\n{category}");
             CategoryLogic.Create().update(id, category);
         }
 

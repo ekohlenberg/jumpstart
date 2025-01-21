@@ -6,7 +6,7 @@ namespace legr3
 {
     public partial class Account : BaseObject
     {
-        protected void initialize()
+        protected void Initialize()
         {
             // Default initializer
             tableName = "app.account";

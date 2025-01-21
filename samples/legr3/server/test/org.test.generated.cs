@@ -17,7 +17,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing OrgLogic insert: " + org.ToString());
                 OrgLogic.Create().insert(org);
-                BaseTest.addLastId("Org", org.id);
+                BaseTest.addLastId("org", org.id);
                     }
 
         public static void testUpdate()

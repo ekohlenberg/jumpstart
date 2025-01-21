@@ -54,8 +54,6 @@ class UserListComponent extends Component {
 
                                     <th>User ID</th>
                                     
-                                    <th>Password</th>
-                                    
                                     <th>First</th>
                                     
                                     <th>Last</th>
@@ -87,8 +85,6 @@ class UserListComponent extends Component {
                                         <tr key = { user.id }>
 
                                                 <td> { user.id } </td>  
-                                                
-                                                <td> { user.password_hash } </td>  
                                                 
                                                 <td> { user.first_name } </td>  
                                                 

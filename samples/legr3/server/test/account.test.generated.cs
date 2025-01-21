@@ -13,7 +13,7 @@ namespace legr3
             var account = new Account();
 
 
-                    account.org_id = BaseTest.getLastId("Org");
+                    account.org_id = BaseTest.getLastId("org");
                     
                     account.account_name = Convert.ToString(BaseTest.getTestData(account, "VARCHAR", TestDataType.random));
                     
@@ -25,7 +25,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing AccountLogic insert: " + account.ToString());
                 AccountLogic.Create().insert(account);
-                BaseTest.addLastId("Account", account.id);
+                BaseTest.addLastId("account", account.id);
                     }
 
         public static void testUpdate()
@@ -34,7 +34,7 @@ namespace legr3
             var account = AccountLogic.Create().get(lastId);
 
 
-                            account.org_id = BaseTest.getLastId("Org");
+                            account.org_id = BaseTest.getLastId("org");
                         
                         account.account_name = (string) BaseTest.getTestData(account, "VARCHAR", TestDataType.random);
                     

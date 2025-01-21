@@ -42,8 +42,31 @@ namespace legr3
             AddBeforeAction((method, args) =>
             {
                 // Log the method name and arguments
-                Logger.Info($"Before invoking {method.Name} with arguments: {string.Join(", ", args)}");
+                Logger.Info($"Invoking {method.DeclaringType.Name}.{method.Name} with arguments: {string.Join(", ", args)}");
             });
+
+            AddBeforeAction((method, args) =>
+            {
+                // Log the method name and arguments
+                string objectName = args[0].GetType().Name;
+
+                Logger.Debug($"Checking {Environment.UserName} authorization for {objectName}.{method.Name} with arguments: {string.Join(", ", args)}");
+
+                bool authorized = OpRoleMemberLogic.Authorized( objectName, method.Name );
+
+                if (authorized)
+                {
+                    Logger.Debug($"{Environment.UserName} is authorized for {objectName}.{method.Name} with arguments: {string.Join(", ", args)}");
+
+                } 
+                else
+                { 
+                    throw new Exception($"User {Environment.UserName} is not authorized for {objectName}.{method.Name}.");
+                }
+
+            });
+
+            
 
            AddBeforeAction((method, args) =>
             {

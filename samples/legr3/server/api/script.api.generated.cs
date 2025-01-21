@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Script> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Script> scripts = ScriptLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Script Get(long id)
         {
-            Console.WriteLine($"Processing Script GET ID={id}");
+            //Console.WriteLine($"Processing Script GET ID={id}");
 
             Script script = ScriptLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Script script)
         {
-            Console.WriteLine($"Processing Script POST: {script}");
+            //Console.WriteLine($"Processing Script POST: {script}");
             ScriptLogic.Create().insert(script);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Script script)
         {
-            Console.WriteLine($"Processing Script PUT: ID = {id}\n{script}");
+            //Console.WriteLine($"Processing Script PUT: ID = {id}\n{script}");
             ScriptLogic.Create().update(id, script);
         }
 

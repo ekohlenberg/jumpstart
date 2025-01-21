@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Transaction> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Transaction> transactions = TransactionLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Transaction Get(long id)
         {
-            Console.WriteLine($"Processing Transaction GET ID={id}");
+            //Console.WriteLine($"Processing Transaction GET ID={id}");
 
             Transaction transaction = TransactionLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Transaction transaction)
         {
-            Console.WriteLine($"Processing Transaction POST: {transaction}");
+            //Console.WriteLine($"Processing Transaction POST: {transaction}");
             TransactionLogic.Create().insert(transaction);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Transaction transaction)
         {
-            Console.WriteLine($"Processing Transaction PUT: ID = {id}\n{transaction}");
+            //Console.WriteLine($"Processing Transaction PUT: ID = {id}\n{transaction}");
             TransactionLogic.Create().update(id, transaction);
         }
 

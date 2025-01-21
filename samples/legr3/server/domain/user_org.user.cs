@@ -7,7 +7,7 @@ namespace legr3
     {
         public UserOrg()
         {
-            initialize();
+            Initialize();
         }
     }
 }

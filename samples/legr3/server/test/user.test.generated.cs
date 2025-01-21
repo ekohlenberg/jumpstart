@@ -13,13 +13,11 @@ namespace legr3
             var user = new User();
 
 
-                    user.password_hash = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.random));
-                    
                     user.first_name = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.firstnames));
                     
                     user.last_name = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.lastnames));
                     
-                    user.username = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.usernames));
+                    user.username = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.os_user));
                     
                     user.email = Convert.ToString(BaseTest.getTestData(user, "VARCHAR", TestDataType.emailAddresses));
                     
@@ -29,7 +27,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing UserLogic insert: " + user.ToString());
                 UserLogic.Create().insert(user);
-                BaseTest.addLastId("User", user.id);
+                BaseTest.addLastId("user", user.id);
                     }
 
         public static void testUpdate()
@@ -38,13 +36,11 @@ namespace legr3
             var user = UserLogic.Create().get(lastId);
 
 
-                        user.password_hash = (string) BaseTest.getTestData(user, "VARCHAR", TestDataType.random);
-                    
                         user.first_name = (string) BaseTest.getTestData(user, "VARCHAR", TestDataType.firstnames);
                     
                         user.last_name = (string) BaseTest.getTestData(user, "VARCHAR", TestDataType.lastnames);
                     
-                        user.username = (string) BaseTest.getTestData(user, "VARCHAR", TestDataType.usernames);
+                        user.username = (string) BaseTest.getTestData(user, "VARCHAR", TestDataType.os_user);
                     
                         user.email = (string) BaseTest.getTestData(user, "VARCHAR", TestDataType.emailAddresses);
                     

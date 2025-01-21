@@ -19,7 +19,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing ScriptLogic insert: " + script.ToString());
                 ScriptLogic.Create().insert(script);
-                BaseTest.addLastId("Script", script.id);
+                BaseTest.addLastId("script", script.id);
                     }
 
         public static void testUpdate()

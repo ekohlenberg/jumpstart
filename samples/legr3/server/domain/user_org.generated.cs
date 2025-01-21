@@ -6,12 +6,12 @@ namespace legr3
 {
     public partial class UserOrg : BaseObject
     {
-        protected void initialize()
+        protected void Initialize()
         {
             // Default initializer
-            tableName = "sec.user_org";
+            tableName = "app.user_org";
             tableBaseName = "user_org";
-            auditTableName = "audit.sec_user_org";
+            auditTableName = "audit.app_user_org";
 
 rwk.Add("org_id");rwk.Add("user_id");        }
 

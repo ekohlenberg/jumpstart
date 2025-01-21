@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Customer> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Customer> customers = CustomerLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Customer Get(long id)
         {
-            Console.WriteLine($"Processing Customer GET ID={id}");
+            //Console.WriteLine($"Processing Customer GET ID={id}");
 
             Customer customer = CustomerLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Customer customer)
         {
-            Console.WriteLine($"Processing Customer POST: {customer}");
+            //Console.WriteLine($"Processing Customer POST: {customer}");
             CustomerLogic.Create().insert(customer);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Customer customer)
         {
-            Console.WriteLine($"Processing Customer PUT: ID = {id}\n{customer}");
+            //Console.WriteLine($"Processing Customer PUT: ID = {id}\n{customer}");
             CustomerLogic.Create().update(id, customer);
         }
 

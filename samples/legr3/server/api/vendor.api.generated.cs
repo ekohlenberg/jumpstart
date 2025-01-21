@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Vendor> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Vendor> vendors = VendorLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Vendor Get(long id)
         {
-            Console.WriteLine($"Processing Vendor GET ID={id}");
+            //Console.WriteLine($"Processing Vendor GET ID={id}");
 
             Vendor vendor = VendorLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Vendor vendor)
         {
-            Console.WriteLine($"Processing Vendor POST: {vendor}");
+            //Console.WriteLine($"Processing Vendor POST: {vendor}");
             VendorLogic.Create().insert(vendor);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Vendor vendor)
         {
-            Console.WriteLine($"Processing Vendor PUT: ID = {id}\n{vendor}");
+            //Console.WriteLine($"Processing Vendor PUT: ID = {id}\n{vendor}");
             VendorLogic.Create().update(id, vendor);
         }
 

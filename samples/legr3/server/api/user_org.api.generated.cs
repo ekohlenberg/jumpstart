@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<UserOrg> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<UserOrg> userorgs = UserOrgLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public UserOrg Get(long id)
         {
-            Console.WriteLine($"Processing UserOrg GET ID={id}");
+            //Console.WriteLine($"Processing UserOrg GET ID={id}");
 
             UserOrg userorg = UserOrgLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] UserOrg userorg)
         {
-            Console.WriteLine($"Processing UserOrg POST: {userorg}");
+            //Console.WriteLine($"Processing UserOrg POST: {userorg}");
             UserOrgLogic.Create().insert(userorg);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] UserOrg userorg)
         {
-            Console.WriteLine($"Processing UserOrg PUT: ID = {id}\n{userorg}");
+            //Console.WriteLine($"Processing UserOrg PUT: ID = {id}\n{userorg}");
             UserOrgLogic.Create().update(id, userorg);
         }
 

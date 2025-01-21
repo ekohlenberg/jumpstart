@@ -7,7 +7,7 @@ namespace legr3
     {
         public Vendor()
         {
-            initialize();
+            Initialize();
         }
     }
 }

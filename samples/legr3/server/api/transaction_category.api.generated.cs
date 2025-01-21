@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<TransactionCategory> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<TransactionCategory> transactioncategorys = TransactionCategoryLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public TransactionCategory Get(long id)
         {
-            Console.WriteLine($"Processing TransactionCategory GET ID={id}");
+            //Console.WriteLine($"Processing TransactionCategory GET ID={id}");
 
             TransactionCategory transactioncategory = TransactionCategoryLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] TransactionCategory transactioncategory)
         {
-            Console.WriteLine($"Processing TransactionCategory POST: {transactioncategory}");
+            //Console.WriteLine($"Processing TransactionCategory POST: {transactioncategory}");
             TransactionCategoryLogic.Create().insert(transactioncategory);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] TransactionCategory transactioncategory)
         {
-            Console.WriteLine($"Processing TransactionCategory PUT: ID = {id}\n{transactioncategory}");
+            //Console.WriteLine($"Processing TransactionCategory PUT: ID = {id}\n{transactioncategory}");
             TransactionCategoryLogic.Create().update(id, transactioncategory);
         }
 

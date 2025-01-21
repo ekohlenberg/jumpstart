@@ -182,7 +182,9 @@ namespace jumpstart {
     public class MetaSchema : MetaBaseElement
     {
         
-        public SortedDictionary<string, MetaObject> Objects { get; private set; } = new();
+        public List<MetaObject> Objects { get;  set; } = new();
+        public Dictionary<string, MetaObject> ObjectMap { get;  set; } = new();
+        
         public string Namespace {get; set;}
         public MetaSchema(string name, string _namespace)
         {
@@ -193,7 +195,7 @@ namespace jumpstart {
         public override string ToString()
         {
             string result = $"Schema: {Name}\n";
-            foreach (var obj in Objects.Values)
+            foreach (var obj in Objects)
             {
                 result += obj.ToString();
             }
@@ -264,13 +266,19 @@ namespace jumpstart {
             {
                 result += schema.ToString();
             }
-            return result;
+            return result;  
         }
 
         public void SortMetaObjectsByReference()
         {
             this.Objects = SortMetaObjectsByReference( this.Objects );
+
+            foreach(var schema in this.Schemas.Values)
+            {
+                schema.Objects = SortMetaObjectsByReference( schema.Objects );
+            }
         }
+        
         protected  List<MetaObject> SortMetaObjectsByReference(List<MetaObject> metaObjects)
         {
             // Build a dependency graph

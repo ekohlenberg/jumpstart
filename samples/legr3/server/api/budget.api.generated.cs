@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<Budget> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<Budget> budgets = BudgetLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public Budget Get(long id)
         {
-            Console.WriteLine($"Processing Budget GET ID={id}");
+            //Console.WriteLine($"Processing Budget GET ID={id}");
 
             Budget budget = BudgetLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] Budget budget)
         {
-            Console.WriteLine($"Processing Budget POST: {budget}");
+            //Console.WriteLine($"Processing Budget POST: {budget}");
             BudgetLogic.Create().insert(budget);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] Budget budget)
         {
-            Console.WriteLine($"Processing Budget PUT: ID = {id}\n{budget}");
+            //Console.WriteLine($"Processing Budget PUT: ID = {id}\n{budget}");
             BudgetLogic.Create().update(id, budget);
         }
 

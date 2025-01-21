@@ -11,8 +11,6 @@ class UserCreateComponent extends Component {
             // step 2
             id: this.props.params?.id || '',
 
-                    password_hash: '' ,
-                
                     first_name: '' ,
                 
                     last_name: '' ,
@@ -28,8 +26,6 @@ class UserCreateComponent extends Component {
         }
                     
                     this.changeIdHandler = this.changeIdHandler.bind(this);
-                                    
-                    this.changePasswordHashHandler = this.changePasswordHashHandler.bind(this);
                                     
                     this.changeFirstNameHandler = this.changeFirstNameHandler.bind(this);
                                     
@@ -61,8 +57,6 @@ class UserCreateComponent extends Component {
 
                             id: user.id ,
                         
-                            password_hash: user.password_hash ,
-                        
                             first_name: user.first_name ,
                         
                             last_name: user.last_name ,
@@ -86,8 +80,6 @@ class UserCreateComponent extends Component {
         let user = {
 
                    id: this.state.id === '_add' ?  '0' : this.state.id ,
-                            
-                    password_hash: this.state.password_hash , 
                             
                     first_name: this.state.first_name , 
                             
@@ -118,10 +110,6 @@ class UserCreateComponent extends Component {
 
         changeIdHandler= (event) => {
             this.setState({id: event.target.value});
-        }
-        
-        changePasswordHashHandler= (event) => {
-            this.setState({password_hash: event.target.value});
         }
         
         changeFirstNameHandler= (event) => {
@@ -177,13 +165,6 @@ class UserCreateComponent extends Component {
                                             <label> User ID: </label>
                                             <input placeholder="" name="id" className="form-control" 
                                                 value={this.state.id} onChange={this.changeIdHandler}/>
-                                            </div>
-                                                                
-                                            <div className = "form-group">
-                                            <br/>
-                                            <label> Password: </label>
-                                            <input placeholder="" name="password_hash" className="form-control" 
-                                                value={this.state.password_hash} onChange={this.changePasswordHashHandler}/>
                                             </div>
                                                                 
                                             <div className = "form-group">

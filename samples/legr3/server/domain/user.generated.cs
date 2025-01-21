@@ -6,12 +6,12 @@ namespace legr3
 {
     public partial class User : BaseObject
     {
-        protected void initialize()
+        protected void Initialize()
         {
             // Default initializer
-            tableName = "sec.user";
+            tableName = "app.user";
             tableBaseName = "user";
-            auditTableName = "audit.sec_user";
+            auditTableName = "audit.app_user";
 
 rwk.Add("email");        }
 
@@ -25,18 +25,6 @@ rwk.Add("email");        }
                 set
                 {
                     setPropValue("id", value);
-                }
-            }
-            
-            public string password_hash
-            {
-                get
-                {
-                    return Convert.ToString(getPropValue("password_hash"));
-                }
-                set
-                {
-                    setPropValue("password_hash", value);
                 }
             }
             

@@ -13,7 +13,7 @@ namespace legr3
             var invoiceitem = new InvoiceItem();
 
 
-                    invoiceitem.invoice_id = BaseTest.getLastId("Invoice");
+                    invoiceitem.invoice_id = BaseTest.getLastId("invoice");
                     
                     invoiceitem.description = Convert.ToString(BaseTest.getTestData(invoiceitem, "VARCHAR", TestDataType.random));
                     
@@ -25,7 +25,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing InvoiceItemLogic insert: " + invoiceitem.ToString());
                 InvoiceItemLogic.Create().insert(invoiceitem);
-                BaseTest.addLastId("InvoiceItem", invoiceitem.id);
+                BaseTest.addLastId("invoice_item", invoiceitem.id);
                     }
 
         public static void testUpdate()
@@ -34,7 +34,7 @@ namespace legr3
             var invoiceitem = InvoiceItemLogic.Create().get(lastId);
 
 
-                            invoiceitem.invoice_id = BaseTest.getLastId("Invoice");
+                            invoiceitem.invoice_id = BaseTest.getLastId("invoice");
                         
                         invoiceitem.description = (string) BaseTest.getTestData(invoiceitem, "VARCHAR", TestDataType.random);
                     

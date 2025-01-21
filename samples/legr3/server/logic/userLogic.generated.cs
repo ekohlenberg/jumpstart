@@ -42,7 +42,7 @@ namespace legr3
                 users.Add(user);
             };
 
-            DBPersist.select(userCallback, $"select * from sec.user");
+            DBPersist.select(userCallback, $"select * from app.user");
 
             return users;
         }

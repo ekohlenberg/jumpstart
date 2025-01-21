@@ -91,13 +91,13 @@ public class CSVLoader
     {
         MetaObject metaObject = null;
 
-        if (!schema.Objects.TryGetValue(mr.TABLE_NAME, out metaObject))
+        if (!schema.ObjectMap.TryGetValue(mr.TABLE_NAME, out metaObject))      
         {
-            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);
-            schema.Objects[mr.TABLE_NAME] = metaObject;
+            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);;
+            schema.Objects.Add( metaObject );
+            schema.ObjectMap[mr.TABLE_NAME] = metaObject;
         }
 
- 
         if (!metaModel.Objects.Any(obj => obj.Name == mr.TABLE_NAME))
         {
             metaModel.Objects.Add(metaObject);
@@ -108,6 +108,11 @@ public class CSVLoader
 
     private void AddAttributes(MetaObject metaObject, MetadataRecord mr)
     {
+        if (metaObject == null) throw new Exception( "metaObject is null");
+        if (mr == null) throw new Exception( "metadata record (mr) is null");
+        if (metaObject.Attributes == null) throw new Exception("metaObject.Attributes is null");
+        if (mr.COLUMN_NAME == null) throw new Exception("metadata record (mr) COLUMN_NAME is null");
+        
         if (!metaObject.Attributes.Any(attr => attr.Name == mr.COLUMN_NAME))
         {
             var attribute = new MetaAttribute
@@ -119,7 +124,7 @@ public class CSVLoader
                 ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), ""),
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
-                FkObject= mr.FK_OBJECT,
+                FkObject= mr.FK_OBJECT.ToLower(),
                 FkType=mr.FK_TYPE,
                 TestDataSet=mr.TEST_DATA_SET
             };

@@ -16,7 +16,7 @@ namespace legr3.Controllers
         [HttpGet]
         public IEnumerable<User> Get()
         {
-            Console.WriteLine("Processing GET List");
+            //Console.WriteLine("Processing GET List");
 
             List<User> users = UserLogic.Create().select();
 
@@ -27,7 +27,7 @@ namespace legr3.Controllers
         [HttpGet("{id}")]
         public User Get(long id)
         {
-            Console.WriteLine($"Processing User GET ID={id}");
+            //Console.WriteLine($"Processing User GET ID={id}");
 
             User user = UserLogic.Create().get(id);
 
@@ -38,7 +38,7 @@ namespace legr3.Controllers
         [HttpPost]
         public void Post([FromBody] User user)
         {
-            Console.WriteLine($"Processing User POST: {user}");
+            //Console.WriteLine($"Processing User POST: {user}");
             UserLogic.Create().insert(user);
         }
 
@@ -46,7 +46,7 @@ namespace legr3.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody] User user)
         {
-            Console.WriteLine($"Processing User PUT: ID = {id}\n{user}");
+            //Console.WriteLine($"Processing User PUT: ID = {id}\n{user}");
             UserLogic.Create().update(id, user);
         }
 

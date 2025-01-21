@@ -13,7 +13,7 @@ namespace legr3
             var customer = new Customer();
 
 
-                    customer.org_id = BaseTest.getLastId("Org");
+                    customer.org_id = BaseTest.getLastId("org");
                     
                     customer.customer_name = Convert.ToString(BaseTest.getTestData(customer, "VARCHAR", TestDataType.companies));
                     
@@ -33,7 +33,7 @@ namespace legr3
                     
                 Console.WriteLine("Testing CustomerLogic insert: " + customer.ToString());
                 CustomerLogic.Create().insert(customer);
-                BaseTest.addLastId("Customer", customer.id);
+                BaseTest.addLastId("customer", customer.id);
                     }
 
         public static void testUpdate()
@@ -42,7 +42,7 @@ namespace legr3
             var customer = CustomerLogic.Create().get(lastId);
 
 
-                            customer.org_id = BaseTest.getLastId("Org");
+                            customer.org_id = BaseTest.getLastId("org");
                         
                         customer.customer_name = (string) BaseTest.getTestData(customer, "VARCHAR", TestDataType.companies);
                     
