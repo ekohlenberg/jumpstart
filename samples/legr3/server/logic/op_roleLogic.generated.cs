@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class OpRoleLogic : BaseLogic, IOpRoleLogic
+    public partial class OpRoleLogic : IOpRoleLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IOpRoleLogic, Proxy<IOpRoleLogic>>();
             ((Proxy<IOpRoleLogic>)proxy).Initialize();
             ((Proxy<IOpRoleLogic>)proxy).Target = oprole;
+            ((Proxy<IOpRoleLogic>)proxy).DomainObj = "OpRole";
 
             return proxy;
         }

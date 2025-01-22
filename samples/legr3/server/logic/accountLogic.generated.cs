@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class AccountLogic : BaseLogic, IAccountLogic
+    public partial class AccountLogic : IAccountLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IAccountLogic, Proxy<IAccountLogic>>();
             ((Proxy<IAccountLogic>)proxy).Initialize();
             ((Proxy<IAccountLogic>)proxy).Target = account;
+            ((Proxy<IAccountLogic>)proxy).DomainObj = "Account";
 
             return proxy;
         }

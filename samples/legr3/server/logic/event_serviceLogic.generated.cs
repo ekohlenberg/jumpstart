@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class EventServiceLogic : BaseLogic, IEventServiceLogic
+    public partial class EventServiceLogic : IEventServiceLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IEventServiceLogic, Proxy<IEventServiceLogic>>();
             ((Proxy<IEventServiceLogic>)proxy).Initialize();
             ((Proxy<IEventServiceLogic>)proxy).Target = eventservice;
+            ((Proxy<IEventServiceLogic>)proxy).DomainObj = "EventService";
 
             return proxy;
         }

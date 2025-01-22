@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class ScriptLogic : BaseLogic, IScriptLogic
+    public partial class ScriptLogic : IScriptLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IScriptLogic, Proxy<IScriptLogic>>();
             ((Proxy<IScriptLogic>)proxy).Initialize();
             ((Proxy<IScriptLogic>)proxy).Target = script;
+            ((Proxy<IScriptLogic>)proxy).DomainObj = "Script";
 
             return proxy;
         }

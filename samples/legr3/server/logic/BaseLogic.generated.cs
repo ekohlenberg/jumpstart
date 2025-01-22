@@ -5,18 +5,11 @@ using System.Reflection;
 
 namespace legr3
 {
-    public class BaseLogic
+    public class BaseLogic 
     {
         public BaseLogic()
         {
 
-        }
-    }
-
-
-
-   
-
-    
-   
+        }  
+    }  
 }

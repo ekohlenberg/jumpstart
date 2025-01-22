@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class TransactionCategoryLogic : BaseLogic, ITransactionCategoryLogic
+    public partial class TransactionCategoryLogic : ITransactionCategoryLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<ITransactionCategoryLogic, Proxy<ITransactionCategoryLogic>>();
             ((Proxy<ITransactionCategoryLogic>)proxy).Initialize();
             ((Proxy<ITransactionCategoryLogic>)proxy).Target = transactioncategory;
+            ((Proxy<ITransactionCategoryLogic>)proxy).DomainObj = "TransactionCategory";
 
             return proxy;
         }

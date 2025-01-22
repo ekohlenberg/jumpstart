@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class InvoiceItemLogic : BaseLogic, IInvoiceItemLogic
+    public partial class InvoiceItemLogic : IInvoiceItemLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IInvoiceItemLogic, Proxy<IInvoiceItemLogic>>();
             ((Proxy<IInvoiceItemLogic>)proxy).Initialize();
             ((Proxy<IInvoiceItemLogic>)proxy).Target = invoiceitem;
+            ((Proxy<IInvoiceItemLogic>)proxy).DomainObj = "InvoiceItem";
 
             return proxy;
         }

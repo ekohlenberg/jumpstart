@@ -9,6 +9,7 @@ namespace legr3
         protected void Initialize()
         {
             // Default initializer
+            domainName = "Script";
             tableName = "core.script";
             tableBaseName = "script";
             auditTableName = "audit.core_script";

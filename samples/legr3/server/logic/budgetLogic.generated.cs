@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class BudgetLogic : BaseLogic, IBudgetLogic
+    public partial class BudgetLogic : IBudgetLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IBudgetLogic, Proxy<IBudgetLogic>>();
             ((Proxy<IBudgetLogic>)proxy).Initialize();
             ((Proxy<IBudgetLogic>)proxy).Target = budget;
+            ((Proxy<IBudgetLogic>)proxy).DomainObj = "Budget";
 
             return proxy;
         }

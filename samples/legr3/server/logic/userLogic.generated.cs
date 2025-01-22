@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class UserLogic : BaseLogic, IUserLogic
+    public partial class UserLogic : IUserLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IUserLogic, Proxy<IUserLogic>>();
             ((Proxy<IUserLogic>)proxy).Initialize();
             ((Proxy<IUserLogic>)proxy).Target = user;
+            ((Proxy<IUserLogic>)proxy).DomainObj = "User";
 
             return proxy;
         }

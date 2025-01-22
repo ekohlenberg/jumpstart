@@ -39,9 +39,9 @@ inner join sec.op_role_member m on
 inner join app.""user"" u on 
     u.id=m.user_id
 where
-    op.objectname='^(objectname)' and
-    op.methodname='^(methodname)' and
-    u.username='^(username)'";
+    op.objectname = '^(objectname)' and
+    op.methodname = '^(methodname)' and
+    u.username = '^(username)'";
 
                     BaseObject filter = new();
                     filter["objectname"] = objectName;

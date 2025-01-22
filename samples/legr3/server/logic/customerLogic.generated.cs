@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class CustomerLogic : BaseLogic, ICustomerLogic
+    public partial class CustomerLogic : ICustomerLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<ICustomerLogic, Proxy<ICustomerLogic>>();
             ((Proxy<ICustomerLogic>)proxy).Initialize();
             ((Proxy<ICustomerLogic>)proxy).Target = customer;
+            ((Proxy<ICustomerLogic>)proxy).DomainObj = "Customer";
 
             return proxy;
         }

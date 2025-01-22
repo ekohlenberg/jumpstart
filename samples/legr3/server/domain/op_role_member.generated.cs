@@ -9,6 +9,7 @@ namespace legr3
         protected void Initialize()
         {
             // Default initializer
+            domainName = "OpRoleMember";
             tableName = "sec.op_role_member";
             tableBaseName = "op_role_member";
             auditTableName = "audit.sec_op_role_member";

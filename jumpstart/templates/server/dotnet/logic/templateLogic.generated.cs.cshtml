@@ -17,7 +17,7 @@ namespace @namespaceName
 {
 
 
-    public partial class @(domainObj)Logic : BaseLogic, I@(domainObj)Logic
+    public partial class @(domainObj)Logic : I@(domainObj)Logic
     {
 
 
@@ -28,6 +28,7 @@ namespace @namespaceName
             var proxy = DispatchProxy.Create<I@(domainObj)Logic, Proxy<I@(domainObj)Logic>>();
             ((Proxy<I@(domainObj)Logic>)proxy).Initialize();
             ((Proxy<I@(domainObj)Logic>)proxy).Target = @(domainVar);
+            ((Proxy<I@(domainObj)Logic>)proxy).DomainObj = "@(domainObj)";
 
             return proxy;
         }

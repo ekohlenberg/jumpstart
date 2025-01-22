@@ -9,6 +9,7 @@ namespace legr3
         protected void Initialize()
         {
             // Default initializer
+            domainName = "EventService";
             tableName = "core.event_service";
             tableBaseName = "event_service";
             auditTableName = "audit.core_event_service";

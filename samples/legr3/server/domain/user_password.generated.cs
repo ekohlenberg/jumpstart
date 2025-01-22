@@ -9,6 +9,7 @@ namespace legr3
         protected void Initialize()
         {
             // Default initializer
+            domainName = "UserPassword";
             tableName = "sec.user_password";
             tableBaseName = "user_password";
             auditTableName = "audit.sec_user_password";

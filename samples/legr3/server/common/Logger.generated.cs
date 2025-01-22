@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Npgsql;
 
 namespace legr3
@@ -11,7 +12,7 @@ namespace legr3
 
     public interface ILogWriter
     {
-        void Write(string level, string message);
+        void Write(string level, string message, string filePath, int lineNumber, string memberName);
     }
 
     public abstract class BaseLogWriter
@@ -24,11 +25,11 @@ namespace legr3
              ProgramName = Process.GetCurrentProcess().ProcessName ?? "UnknownProgram";
         }
 
-        protected string FormatLogMessage(string level, string message)
+        protected string FormatLogMessage(string level, string message, string filePath, int lineNumber, string memberName )
         {
             string timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
             string currentUser = Environment.UserName;
-            return $"{timestamp} {level} {currentUser} {ProgramName} {message}\n";
+            return $"{timestamp} {level} {currentUser} {ProgramName} {filePath}:{lineNumber}.{memberName} {message}\n";
         }
     }
 
@@ -44,7 +45,7 @@ namespace legr3
             _currentFileName = _baseFileName;
         }
 
-        public void Write(string level, string message)
+        public void Write(string level, string message, string filePath, int lineNumber, string memberName)
         {
             lock (Lock)
             {
@@ -60,7 +61,7 @@ namespace legr3
                     }
                 }
 
-                string logMessage = FormatLogMessage(level, message);
+                string logMessage = FormatLogMessage(level, message, filePath, lineNumber, memberName);
                 File.AppendAllText(_currentFileName, logMessage + Environment.NewLine);
             }
         }
@@ -132,13 +133,17 @@ namespace legr3
             return logWriters;
         }
 
-        public static void Error(string message)
+        public static void Error(string message, [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
         {
             Init();
-            Write("ERROR", message);
+            Write("ERROR", message, filePath, lineNumber, memberName);
         }
         
-        public static void Error(string message, Exception x)
+        public static void Error(string message, Exception x,  [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
         {
             Init();
             string m = string.Empty;
@@ -153,17 +158,21 @@ namespace legr3
                 x = x.InnerException;
             }
             
-            Write("ERROR", m + "\n" + s);
+            Write("ERROR", m + "\n" + s, filePath, lineNumber, memberName);
         }
 
-        public static void Info( string message )
+        public static void Info( string message,  [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "" )
         {
             Init();
-            Write("INFO", message );
+            Write("INFO", message, filePath, lineNumber, memberName );
         }
 
 
-        public static void Debug( string message )
+        public static void Debug( string message,  [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "" )
         {
             Init();
 
@@ -173,18 +182,19 @@ namespace legr3
             }
         }
 
-        private static void Write( string level, string message )
+        private static void Write( string level, string message, string filePath = "",
+         int lineNumber = 0, string memberName = "" )
         {
             foreach( var logWriter in LogWriters)
             {
-                logWriter.Write(level, message);
+                logWriter.Write(level, message, filePath, lineNumber, memberName);
             }
         }
     }
 
     public class LogTableWriter : BaseLogWriter, ILogWriter
     {
-        public void Write(string level, string message)
+        public void Write(string level, string message, string filePath, int lineNumber, string memberName )
         {
 
             lock (Lock)
@@ -197,15 +207,19 @@ namespace legr3
                     connection.Open();
 
                    
-                    sql = "INSERT INTO audit.log (level, message, timestamp, username, program) " +
-                                "VALUES (@level, @message, @timestamp, @username, @program);";
+                    sql = "INSERT INTO audit.log (level, timestamp,  username, program, filepath, linenumber, membername, message) " +
+                                "VALUES (@level,  @timestamp, @username, @program, @filepath, @linenumber, @membername, @message);";
 
                     using var command = new NpgsqlCommand(sql, connection);
                     command.Parameters.AddWithValue("@level", level);
-                    command.Parameters.AddWithValue("@message", message);
                     command.Parameters.AddWithValue("@timestamp", DateTime.UtcNow);
                     command.Parameters.AddWithValue("@username", Environment.UserName);
                     command.Parameters.AddWithValue("@program", ProgramName);
+                    command.Parameters.AddWithValue("@filepath", filePath);
+                    command.Parameters.AddWithValue("@linenumber", lineNumber);
+                    command.Parameters.AddWithValue("@membername", memberName);
+                    command.Parameters.AddWithValue("@message", message);
+                    
             
                     command.ExecuteNonQuery();
 
@@ -224,11 +238,11 @@ namespace legr3
 
     public class LogConsoleWriter : BaseLogWriter, ILogWriter
     {
-        public void Write(string level, string message)
+        public void Write(string level, string message, string filePath, int lineNumber, string memberName)
         {
             lock (Lock)
             {
-                string logMessage = FormatLogMessage(level, message);
+                string logMessage = FormatLogMessage(level, message, filePath, lineNumber, memberName);
 								
                 Console.WriteLine(logMessage);
             }

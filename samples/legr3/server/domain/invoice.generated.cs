@@ -9,6 +9,7 @@ namespace legr3
         protected void Initialize()
         {
             // Default initializer
+            domainName = "Invoice";
             tableName = "app.invoice";
             tableBaseName = "invoice";
             auditTableName = "audit.app_invoice";

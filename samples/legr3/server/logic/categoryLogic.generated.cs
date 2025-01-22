@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class CategoryLogic : BaseLogic, ICategoryLogic
+    public partial class CategoryLogic : ICategoryLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<ICategoryLogic, Proxy<ICategoryLogic>>();
             ((Proxy<ICategoryLogic>)proxy).Initialize();
             ((Proxy<ICategoryLogic>)proxy).Target = category;
+            ((Proxy<ICategoryLogic>)proxy).DomainObj = "Category";
 
             return proxy;
         }

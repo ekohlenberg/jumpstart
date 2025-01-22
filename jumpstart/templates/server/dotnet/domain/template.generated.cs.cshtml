@@ -16,6 +16,7 @@ namespace @namespaceName
         protected void Initialize()
         {
             // Default initializer
+            domainName = "@(className)";
             tableName = "@schemaName.@tableName";
             tableBaseName = "@tableName";
             auditTableName = "audit.@(schemaName)_@(tableName)";

@@ -15,9 +15,11 @@ namespace legr3
                 setPropValue(k, t[k]);
             }
         }
-        public string tableName { get; set; }
-        public string tableBaseName{ get; set; }
-        public string auditTableName { get; set;}
+
+        public string domainName {get;  set;}
+        public string tableName { get;  set; }
+        public string tableBaseName{ get;  set; }
+        public string auditTableName { get;  set;}
         protected List<string> rwk = new List<string>();
 
         public List<string> getRwk() { return rwk;  }

@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class PaymentLogic : BaseLogic, IPaymentLogic
+    public partial class PaymentLogic : IPaymentLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IPaymentLogic, Proxy<IPaymentLogic>>();
             ((Proxy<IPaymentLogic>)proxy).Initialize();
             ((Proxy<IPaymentLogic>)proxy).Target = payment;
+            ((Proxy<IPaymentLogic>)proxy).DomainObj = "Payment";
 
             return proxy;
         }

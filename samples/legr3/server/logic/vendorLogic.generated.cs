@@ -10,7 +10,7 @@ namespace legr3
 {
 
 
-    public partial class VendorLogic : BaseLogic, IVendorLogic
+    public partial class VendorLogic : IVendorLogic
     {
 
 
@@ -21,6 +21,7 @@ namespace legr3
             var proxy = DispatchProxy.Create<IVendorLogic, Proxy<IVendorLogic>>();
             ((Proxy<IVendorLogic>)proxy).Initialize();
             ((Proxy<IVendorLogic>)proxy).Target = vendor;
+            ((Proxy<IVendorLogic>)proxy).DomainObj = "Vendor";
 
             return proxy;
         }
