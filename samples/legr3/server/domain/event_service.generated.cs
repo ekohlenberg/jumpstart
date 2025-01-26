@@ -14,7 +14,7 @@ namespace legr3
             tableBaseName = "event_service";
             auditTableName = "audit.core_event_service";
 
-rwk.Add("op_id");rwk.Add("script_id");        }
+rwk.Add("event_type");rwk.Add("objectname_filter");rwk.Add("methodname_filter");rwk.Add("script_id");        }
 
 
             public long id
@@ -29,15 +29,39 @@ rwk.Add("op_id");rwk.Add("script_id");        }
                 }
             }
             
-            public long op_id
+            public string event_type
             {
                 get
                 {
-                    return Convert.ToInt64(getPropValue("op_id"));
+                    return Convert.ToString(getPropValue("event_type"));
                 }
                 set
                 {
-                    setPropValue("op_id", value);
+                    setPropValue("event_type", value);
+                }
+            }
+            
+            public string objectname_filter
+            {
+                get
+                {
+                    return Convert.ToString(getPropValue("objectname_filter"));
+                }
+                set
+                {
+                    setPropValue("objectname_filter", value);
+                }
+            }
+            
+            public string methodname_filter
+            {
+                get
+                {
+                    return Convert.ToString(getPropValue("methodname_filter"));
+                }
+                set
+                {
+                    setPropValue("methodname_filter", value);
                 }
             }
             

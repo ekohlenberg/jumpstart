@@ -1,0 +1,15 @@
+﻿COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
+postgresql database-create database,model,database/pgsql/ddl/template.database.create.generated.sql.cshtml,./database/ddl,true
+postgresql database-create audit schema,model,database/pgsql/ddl/audit.schema.create.generated.sql.cshtml,./database/ddl,true
+postgresql database-create app schemas,schema,database/pgsql/ddl/template.schema.create.generated.sql.cshtml,./database/ddl,true
+postgresql database-create app tables,object,database/pgsql/ddl/template.table.generated.sql.cshtml,./database/ddl,true
+postgresql database-create audit tables,object,database/pgsql/ddl/template.audit.generated.sql.cshtml,./database/ddl,true
+postgresql database-create sequences,object,database/pgsql/ddl/template.sequence.generated.sql.cshtml,./database/ddl,true
+postgresql database-create rwk indexes,object,database/pgsql/ddl/template.rwkindex.generated.sql.cshtml,./database/ddl,true
+postgresql database-bash build script,build, database/pgsql/ddl/build.sh.cshtml,./database/ddl,true
+postgresql database-cmd build script,build, database/pgsql/ddl/build.cmd.cshtml,./database/ddl,true
+postgresql database-static data,model,database/pgsql/data/template.static.generated.sql.cshtml,./database/data,true
+postgresql database-admin initial data,model,database/pgsql/data/template.admin.generated.sql.cshtml,./database/data,true
+postgresql database-current user initial data,model,database/pgsql/data/template.currentuser.generated.sql.cshtml,./database/data,true
+postgresql database-current user initial data,model,database/pgsql/data/template.event.test.sql.cshtml,./database/data,true
+postgresql database-bash load script,build, database/pgsql/data/load.sh.cshtml,./database/data,true

@@ -11,7 +11,11 @@ class EventServiceCreateComponent extends Component {
             // step 2
             id: this.props.params?.id || '',
 
-                    op_id: '' ,
+                    event_type: '' ,
+                
+                    objectname_filter: '' ,
+                
+                    methodname_filter: '' ,
                 
                     script_id: '' 
                             
@@ -19,7 +23,11 @@ class EventServiceCreateComponent extends Component {
                     
                     this.changeIdHandler = this.changeIdHandler.bind(this);
                                     
-                    this.changeOpIdHandler = this.changeOpIdHandler.bind(this);
+                    this.changeEventTypeHandler = this.changeEventTypeHandler.bind(this);
+                                    
+                    this.changeObjectnameFilterHandler = this.changeObjectnameFilterHandler.bind(this);
+                                    
+                    this.changeMethodnameFilterHandler = this.changeMethodnameFilterHandler.bind(this);
                                     
                     this.changeScriptIdHandler = this.changeScriptIdHandler.bind(this);
                         this.saveOrUpdateEventService = this.saveOrUpdateEventService.bind(this);
@@ -41,7 +49,11 @@ class EventServiceCreateComponent extends Component {
 
                             id: eventservice.id ,
                         
-                            op_id: eventservice.op_id ,
+                            event_type: eventservice.event_type ,
+                        
+                            objectname_filter: eventservice.objectname_filter ,
+                        
+                            methodname_filter: eventservice.methodname_filter ,
                         
                             script_id: eventservice.script_id 
                         
@@ -57,7 +69,11 @@ class EventServiceCreateComponent extends Component {
 
                    id: this.state.id === '_add' ?  '0' : this.state.id ,
                             
-                    op_id: this.state.op_id , 
+                    event_type: this.state.event_type , 
+                            
+                    objectname_filter: this.state.objectname_filter , 
+                            
+                    methodname_filter: this.state.methodname_filter , 
                             
                     script_id: this.state.script_id  
                         };
@@ -80,8 +96,16 @@ class EventServiceCreateComponent extends Component {
             this.setState({id: event.target.value});
         }
         
-        changeOpIdHandler= (event) => {
-            this.setState({op_id: event.target.value});
+        changeEventTypeHandler= (event) => {
+            this.setState({event_type: event.target.value});
+        }
+        
+        changeObjectnameFilterHandler= (event) => {
+            this.setState({objectname_filter: event.target.value});
+        }
+        
+        changeMethodnameFilterHandler= (event) => {
+            this.setState({methodname_filter: event.target.value});
         }
         
         changeScriptIdHandler= (event) => {
@@ -121,9 +145,23 @@ class EventServiceCreateComponent extends Component {
                                                                 
                                             <div className = "form-group">
                                             <br/>
-                                            <label> Operation ID: </label>
-                                            <input placeholder="" name="op_id" className="form-control" 
-                                                value={this.state.op_id} onChange={this.changeOpIdHandler}/>
+                                            <label> Event Type: </label>
+                                            <input placeholder="" name="event_type" className="form-control" 
+                                                value={this.state.event_type} onChange={this.changeEventTypeHandler}/>
+                                            </div>
+                                                                
+                                            <div className = "form-group">
+                                            <br/>
+                                            <label> Object Filter: </label>
+                                            <input placeholder="" name="objectname_filter" className="form-control" 
+                                                value={this.state.objectname_filter} onChange={this.changeObjectnameFilterHandler}/>
+                                            </div>
+                                                                
+                                            <div className = "form-group">
+                                            <br/>
+                                            <label> Method Filter: </label>
+                                            <input placeholder="" name="methodname_filter" className="form-control" 
+                                                value={this.state.methodname_filter} onChange={this.changeMethodnameFilterHandler}/>
                                             </div>
                                                                 
                                             <div className = "form-group">

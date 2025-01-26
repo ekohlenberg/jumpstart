@@ -10,143 +10,65 @@ namespace jumpstart {
     {
         static async Task Main(string[] args)
         {
-            /*
-            if (args.Length == 0)
-            {
-                Console.WriteLine("Usage: jumpstart <modelPath>");
-                return;
-            }
-            */
+
+            
             string modelPath = "./test.csv";
+            string templDefName = string.Empty;
 
-            if (args.Length > 0)
-            {
-                modelPath = args[0];
-
-                if (!File.Exists(modelPath))
-                {
-                Console.WriteLine($"Error: File not found at path {modelPath}");
-
-                return;
-                }
-
-            }
-
-            Console.WriteLine($"Using model path {modelPath}");
-           
             try
             {
-                // Create an instance of the CSVLoader
-                var csvLoader = new CSVLoader();
 
+                if (args.Length == 2)
+                {
+                    modelPath = args[0];
+
+                    if (!File.Exists(modelPath))
+                    {
+                    Console.WriteLine($"Error: File not found at path {modelPath}");
+
+                    return;
+                    }
+
+                    templDefName = args[1];
+
+
+                }
+                else 
+                {
+                    throw new Exception("Usage: jumpstart <model.csv> <template-definition>");
+                }
+
+
+                Console.WriteLine($"Using model path {modelPath} with template definition {templDefName}.");
+           
+                // infer the namespace based on the model filename
                 string _namespace = Path.GetFileNameWithoutExtension(modelPath);
                 var metaModel = new MetaModel(_namespace);
+
+                // Create an instance of the CSVLoader
+                var csvLoader = new CSVLoader();
 
                 // Load the model from the specified path
                 csvLoader.Load(modelPath, metaModel);
 
+                // Load the core functionality in common to all apps
                 CoreLoader coreLoader = new CoreLoader();
-
                 coreLoader.Load("core.csv", metaModel );
 
+                // Add the standard columns to each object
                 GlobalCSVLoader gloader = new GlobalCSVLoader();
                 gloader.Load( "global.csv", metaModel);
 
+                // Instantiate the code generator
                 Generator g = new Generator(metaModel);
 
-                /* database templates */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.database.create.generated.sql.cshtml", "./database/ddl", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/audit.schema.create.generated.sql.cshtml", "./database/ddl", true));
+                // Load the template definition
+                g.AddTemplates( TemplateDefLoader.Load( templDefName) ) ;
 
-                g.AddTemplate( typeof(MetaSchema), new TemplateDef("database/pgsql/template.schema.create.generated.sql.cshtml", "./database/ddl", true));
-
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.table.generated.sql.cshtml", "./database/ddl", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.audit.generated.sql.cshtml", "./database/ddl", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.sequence.generated.sql.cshtml", "./database/ddl", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("database/pgsql/template.rwkindex.generated.sql.cshtml", "./database/ddl", true));
-
-                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.sh.cshtml", "./database/ddl", true));
-                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/build.cmd.cshtml", "./database/ddl", true));
-
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.static.generated.sql.cshtml", "./database/data", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.admin.generated.sql.cshtml", "./database/data", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("database/pgsql/template.currentuser.generated.sql.cshtml", "./database/data", true));
-                g.AddTemplate( typeof(MetaBuild), new TemplateDef( "database/pgsql/load.sh.cshtml", "./database/data", true));
-
-
-
-                /* dotnet server templates */
-                /* common */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Config.generated.cs.cshtml", "./server/common", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Util.generated.cs.cshtml", "./server/common", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/BaseObject.generated.cs.cshtml", "./server/common", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/Logger.generated.cs.cshtml", "./server/common", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/ScriptHost.generated.cs.cshtml", "./server/common", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/common/common.csproj.cshtml", "./server/common", true));
-              
-                /* persist */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/persist/DBPersist.generated.cs.cshtml", "./server/persist", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/persist/persist.csproj.cshtml", "./server/persist", true));
-             
-                /* domain */
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/domain/template.generated.cs.cshtml", "./server/domain", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/domain/template.user.cs.cshtml", "./server/domain", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/domain/domain.csproj.cshtml", "./server/domain", true));
-
-                /* logic */
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.generated.cs.cshtml", "./server/logic", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/BaseLogic.generated.cs.cshtml", "./server/logic", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/Proxy.generated.cs.cshtml", "./server/logic", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/op_role_memberLogic.core.cs.cshtml", "./server/logic", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/logic/templateLogic.user.cs.cshtml", "./server/logic", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/logic/logic.csproj.cshtml", "./server/logic", true));
-            
-                /* api */
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/api/template.api.generated.cs.cshtml", "./server/api", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/Program.cs.cshtml", "./server/api", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.json.cshtml", "./server/api", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/appsettings.Development.json.cshtml", "./server/api", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/Properties/launchSettings.json.cshtml", "./server/api/Properties", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/makefile.cshtml", "./server/api", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/api/api.csproj.cshtml", "./server/api", true));
-
-                
-                /* test */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/BaseTest.generated.cs.cshtml", "./server/test", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/test/template.test.generated.cs.cshtml", "./server/test", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("server/dotnet/test/template.test.user.cs.cshtml", "./server/test", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/Program.cs.cshtml", "./server/test", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/makefile.cshtml", "./server/test", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/appsettings.json.cshtml", "./server/test", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/test/test.csproj.cshtml", "./server/test", true));
-               
-               /* server solution */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("server/dotnet/server.sln.cshtml", "./server", true));
-
-                /* react templates */
-                /* components */
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/components/template-create.jsx.cshtml", "./web/react-frontend/src/components", true));
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/components/template-list.jsx.cshtml", "./web/react-frontend/src/components", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/components/template-header.jsx.cshtml", "./web/react-frontend/src/components", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/components/template-footer.jsx.cshtml", "./web/react-frontend/src/components", true));
-
-                /* services */
-                g.AddTemplate( typeof(MetaObject), new TemplateDef("web/react-frontend/src/services/template-service.js.cshtml", "./web/react-frontend/src/services", true));
-
-                /* application */
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/App.js.cshtml", "./web/react-frontend/src", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/App.css.cshtml", "./web/react-frontend/src", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/index.js.cshtml", "./web/react-frontend/src", true));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/run-config.js.cshtml", "./web/react-frontend/src", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/index.css.cshtml", "./web/react-frontend/src", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/logo.svg.cshtml", "./web/react-frontend/src", false));
-                g.AddTemplate( typeof(MetaModel), new TemplateDef("web/react-frontend/src/components/with-navigation.jsx.cshtml", "./web/react-frontend/src/components", true));
-
-               
+                // go!
                 await g.Generate();
 
-                // Output the string representation of the metaModel
-                //Console.WriteLine(metaModel.ToString());
+                
             }
             catch (Exception ex)
             {

@@ -16,7 +16,20 @@ namespace legr3
         public List<Action<MethodInfo, object[]>> BeforeActions = new();
         public List<Action<MethodInfo, object, object[]>> AfterActions = new();
 
-       
+        public void AddBeforeAction(Action<MethodInfo, object[]> action)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            BeforeActions.Add(action);
+        }
+
+
+
+        public void AddAfterAction(Action<MethodInfo, object, object[]> action)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            AfterActions.Add(action);
+        }
+
         
         protected override object Invoke(MethodInfo targetMethod, object[] args)
         {
@@ -43,7 +56,7 @@ namespace legr3
             AddBeforeAction((method, args) =>
             {
                 // Log the method name and arguments
-                Logger.Info($"Invoking {DomainObj}.{method.Name} with arguments: {string.Join(", ", args)}");
+                Logger.Info($"Invoking {DomainObj}.{method.Name}."/* with arguments: {string.Join(", ", args)}"*/);
             });
 
             AddBeforeAction((method, args) =>
@@ -51,14 +64,13 @@ namespace legr3
                 // Log the method name and arguments
                 
 
-                Logger.Debug($"Checking {Environment.UserName} authorization for {DomainObj}.{method.Name} with arguments: {string.Join(", ", args)}");
+                Logger.Debug($"Checking {Environment.UserName} authorization for {DomainObj}.{method.Name}."/*" with arguments: {string.Join(", ", args)}"*/);
 
                 bool authorized = OpRoleMemberLogic.Authorized( DomainObj, method.Name );
 
                 if (authorized)
                 {
-                    Logger.Debug($"{Environment.UserName} is authorized for {DomainObj}.{method.Name} with arguments: {string.Join(", ", args)}");
-
+                    Logger.Debug($"{Environment.UserName} is authorized for {DomainObj}.{method.Name}."/* with arguments: {string.Join(", ", args)}"*/);
                 } 
                 else
                 { 
@@ -72,11 +84,13 @@ namespace legr3
            AddBeforeAction((method, args) =>
             {
                 // Log the method name and arguments
-                Logger.Info($"invoking script host with arguments: {string.Join(", ", args)}");
+                Logger.Info($"invoking pre event service for {DomainObj}.{method.Name}." /*with arguments: {string.Join(", ", args)}"*/);
 
-                ScriptHost s = new ScriptHost();
+                EventContext ctx = new EventContext("post", DomainObj, method.Name, args);
 
-                s.Invoke();
+                EventServiceLogic.Invoke( ctx ); 
+
+                if (ctx.EventException != null) throw ctx.EventException;
                 
             });
 
@@ -84,25 +98,24 @@ namespace legr3
             AddAfterAction((method, result, args) =>
             {
                 // Log the method name and arguments
-                Logger.Info($"After invoking {method.Name} with arguments: {string.Join(", ", args)}");
+                Logger.Info($"After invoking {method.Name}."/* with arguments: {string.Join(", ", args)}"*/);
+            });
+
+            AddAfterAction((method, result, args) =>
+            {
+                // Log the method name and arguments
+                Logger.Info($"invoking post event service for or {DomainObj}.{method.Name}." /* with arguments: {string.Join(", ", args)}"*/);
+
+                EventContext ctx = new EventContext("post", DomainObj, method.Name, args, result);
+
+                EventServiceLogic.Invoke( ctx ); 
+               
+               if (ctx.EventException != null) throw ctx.EventException;
             });
         }
 
 
-        public void AddBeforeAction(Action<MethodInfo, object[]> action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            BeforeActions.Add(action);
-        }
-
-
-
-        public void AddAfterAction(Action<MethodInfo, object, object[]> action)
-        {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            AfterActions.Add(action);
-        }
-
+       
 
     }
 

@@ -10,6 +10,8 @@ build:
 	@cp -r -f ./global $(TARGETDIR)
 	@mkdir -p $(TARGETDIR)/core
 	@cp -r -f ./core $(TARGETDIR)
+	@mkdir -p $(TARGETDIR)/templatedefs
+	@cp -r -f ./templatedefs $(TARGETDIR)
 
 clean:
 	@rm -rf ./bin

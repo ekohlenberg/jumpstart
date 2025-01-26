@@ -15,8 +15,10 @@
 ,core,script,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,script,,,source,Source Code,,,,3,NULL,0,NO,VARCHAR,nvarchar,4096,NULL,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,event_service,Events,1,id,Event ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,event_service,,,op_id,Operation ID,rwk,operation,,4,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,event_service,,,script_id,Script ID,rwk,script,,4,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,event_service,,,event_type,Event Type,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,event_service,,,objectname_filter,Object Filter,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,event_service,,,methodname_filter,Method Filter,,,,4,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,event_service,,,script_id,Script ID,rwk,script,,5,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,sec,user_password,Password,1,id,User ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,sec,user_password,,,user_id,User ID,map,User,,2,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,sec,user_password,,,password_hash,Password,,,,3,NULL,0,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL

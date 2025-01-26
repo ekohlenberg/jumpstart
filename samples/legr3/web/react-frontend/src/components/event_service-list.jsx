@@ -54,7 +54,11 @@ class EventServiceListComponent extends Component {
 
                                     <th>Event ID</th>
                                     
-                                    <th>Operation ID</th>
+                                    <th>Event Type</th>
+                                    
+                                    <th>Object Filter</th>
+                                    
+                                    <th>Method Filter</th>
                                     
                                     <th>Script ID</th>
                                     
@@ -78,7 +82,11 @@ class EventServiceListComponent extends Component {
 
                                                 <td> { eventservice.id } </td>  
                                                 
-                                                <td> { eventservice.op_id } </td>  
+                                                <td> { eventservice.event_type } </td>  
+                                                
+                                                <td> { eventservice.objectname_filter } </td>  
+                                                
+                                                <td> { eventservice.methodname_filter } </td>  
                                                 
                                                 <td> { eventservice.script_id } </td>  
                                                 

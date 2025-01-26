@@ -9,18 +9,7 @@ using System.Threading.Tasks;
 namespace jumpstart {
 
 
-    public class TemplateDef
-    {
-        public TemplateDef( string templateFile, string outputFolder, bool force)
-        {
-            this.templateFile = templateFile;
-            this.outputFolder = outputFolder;
-            this.force = force;
-        }
-        public string templateFile {get;set;}
-        public string outputFolder {get;set;}
-        public bool force {get;set;}
-    }
+   
 
 
     public class Generator
@@ -55,13 +44,17 @@ namespace jumpstart {
                 .Build();
         }
 
-        public void AddTemplate(Type templateType, TemplateDef templateDef)
+        public void AddTemplates( List<TemplateDef> templateDefs )
         {
-            if (!templates.ContainsKey(templateType))
+            foreach( TemplateDef td in templateDefs )
             {
-                templates[templateType] = new List<TemplateDef>();
+                if (!templates.ContainsKey(td.templateType))
+                {
+                    templates[td.templateType] = new List<TemplateDef>();
+                }
+
+                templates[td.templateType].Add(td);
             }
-            templates[templateType].Add(templateDef);
         }
 
         
@@ -83,6 +76,7 @@ namespace jumpstart {
 
         public async Task  GenerateSchemas()
         {
+
             foreach (MetaSchema metaSchema in metaModel.Schemas.Values)
             {
                 await GenTemplates<MetaSchema>( metaSchema);
@@ -102,21 +96,29 @@ namespace jumpstart {
 
         public async Task GenerateBuild()
         {
-            List<TemplateDef> templateList =  templates[metaModel.build.GetType()];
-            foreach( TemplateDef td in templateList)
+            if (templates.ContainsKey(metaModel.build.GetType()))
             {
-                metaModel.build.SetOutputFolder( td.outputFolder );
-                await GenCode<MetaBuild>( metaModel.build, td);
+                List<TemplateDef> templateList =  templates[metaModel.build.GetType()];
+                foreach( TemplateDef td in templateList)
+                {
+                    metaModel.build.SetOutputFolder( td.outputFolder );
+                    await GenCode<MetaBuild>( metaModel.build, td);
+                }
             }
         }
         
 
         protected async Task GenTemplates<T>( T model) where T : MetaBaseElement
         {
-            List<TemplateDef> templateList =  templates[model.GetType()];
-            foreach( TemplateDef td in templateList)
-            {
-                await GenCode<T>( model, td);
+            if (templates.ContainsKey(model.GetType()))
+                {
+                List<TemplateDef> templateList =  templates[model.GetType()];
+                
+
+                foreach( TemplateDef td in templateList)
+                {
+                    await GenCode<T>( model, td);
+                }
             }
         }
 

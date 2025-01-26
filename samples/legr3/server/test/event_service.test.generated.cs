@@ -13,7 +13,11 @@ namespace legr3
             var eventservice = new EventService();
 
 
-                    eventservice.op_id = BaseTest.getLastId("operation");
+                    eventservice.event_type = Convert.ToString(BaseTest.getTestData(eventservice, "VARCHAR", TestDataType.random));
+                    
+                    eventservice.objectname_filter = Convert.ToString(BaseTest.getTestData(eventservice, "VARCHAR", TestDataType.random));
+                    
+                    eventservice.methodname_filter = Convert.ToString(BaseTest.getTestData(eventservice, "VARCHAR", TestDataType.random));
                     
                     eventservice.script_id = BaseTest.getLastId("script");
                     
@@ -28,8 +32,12 @@ namespace legr3
             var eventservice = EventServiceLogic.Create().get(lastId);
 
 
-                            eventservice.op_id = BaseTest.getLastId("operation");
-                        
+                        eventservice.event_type = (string) BaseTest.getTestData(eventservice, "VARCHAR", TestDataType.random);
+                    
+                        eventservice.objectname_filter = (string) BaseTest.getTestData(eventservice, "VARCHAR", TestDataType.random);
+                    
+                        eventservice.methodname_filter = (string) BaseTest.getTestData(eventservice, "VARCHAR", TestDataType.random);
+                    
                             eventservice.script_id = BaseTest.getLastId("script");
                         
                 Console.WriteLine("Testing EventServiceLogic update: " + eventservice.ToString());

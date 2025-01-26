@@ -1,0 +1,58 @@
+﻿COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
+postgresql database-create database,model,database/pgsql/template.database.create.generated.sql.cshtml,./database/ddl,true
+postgresql database-create audit schema,model,database/pgsql/audit.schema.create.generated.sql.cshtml,./database/ddl,true
+postgresql database-create app schemas,schema,database/pgsql/template.schema.create.generated.sql.cshtml,./database/ddl,true
+postgresql database-create app tables,object,database/pgsql/template.table.generated.sql.cshtml,./database/ddl,true
+postgresql database-create audit tables,object,database/pgsql/template.audit.generated.sql.cshtml,./database/ddl,true
+postgresql database-create sequences,object,database/pgsql/template.sequence.generated.sql.cshtml,./database/ddl,true
+postgresql database-create rwk indexes,object,database/pgsql/template.rwkindex.generated.sql.cshtml,./database/ddl,true
+postgresql database-bash build script,build, database/pgsql/build.sh.cshtml,./database/ddl,true
+postgresql database-cmd build script,build, database/pgsql/build.cmd.cshtml,./database/ddl,true
+postgresql database-static data,model,database/pgsql/template.static.generated.sql.cshtml,./database/data,true
+postgresql database-admin initial data,model,database/pgsql/template.admin.generated.sql.cshtml,./database/data,true
+postgresql database-current user initial data,model,database/pgsql/template.currentuser.generated.sql.cshtml,./database/data,true
+postgresql database-bash load script,build, database/pgsql/load.sh.cshtml,./database/data,true
+dotnet server templates-common,model,server/dotnet/common/Config.generated.cs.cshtml,./server/common,true
+dotnet server templates-common,model,server/dotnet/common/Util.generated.cs.cshtml,./server/common,true
+dotnet server templates-common,model,server/dotnet/common/BaseObject.generated.cs.cshtml,./server/common,true
+dotnet server templates-common,model,server/dotnet/common/Logger.generated.cs.cshtml,./server/common,true
+dotnet server templates-common,model,server/dotnet/common/ScriptHost.generated.cs.cshtml,./server/common,true
+dotnet server templates-common,model,server/dotnet/common/common.csproj.cshtml,./server/common,true
+dotnet server templates-persist,model,server/dotnet/persist/DBPersist.generated.cs.cshtml,./server/persist,true
+dotnet server templates-persist,model,server/dotnet/persist/persist.csproj.cshtml,./server/persist,true
+dotnet server templates-domain,object,server/dotnet/domain/template.generated.cs.cshtml,./server/domain,true
+dotnet server templates-domain,object,server/dotnet/domain/template.user.cs.cshtml,./server/domain,false
+dotnet server templates-domain,model,server/dotnet/domain/domain.csproj.cshtml,./server/domain,true
+dotnet server templates-logic,object,server/dotnet/logic/templateLogic.generated.cs.cshtml,./server/logic,true
+dotnet server templates-logic,model,server/dotnet/logic/BaseLogic.generated.cs.cshtml,./server/logic,true
+dotnet server templates-logic,model,server/dotnet/logic/Proxy.generated.cs.cshtml,./server/logic,true
+dotnet server templates-logic,model,server/dotnet/logic/op_role_memberLogic.core.cs.cshtml,./server/logic,true
+dotnet server templates-logic,object,server/dotnet/logic/templateLogic.user.cs.cshtml,./server/logic,false
+dotnet server templates-logic,model,server/dotnet/logic/logic.csproj.cshtml,./server/logic,true
+dotnet server templates-api,object,server/dotnet/api/template.api.generated.cs.cshtml,./server/api,true
+dotnet server templates-api,model,server/dotnet/api/Program.cs.cshtml,./server/api,false
+dotnet server templates-api,model,server/dotnet/api/appsettings.json.cshtml,./server/api,false
+dotnet server templates-api,model,server/dotnet/api/appsettings.Development.json.cshtml,./server/api,false
+dotnet server templates-api,model,server/dotnet/api/Properties/launchSettings.json.cshtml,./server/api/Properties,false
+dotnet server templates-api,model,server/dotnet/api/makefile.cshtml,./server/api,true
+dotnet server templates-api,model,server/dotnet/api/api.csproj.cshtml,./server/api,true
+dotnet server templates-test,model,server/dotnet/test/BaseTest.generated.cs.cshtml,./server/test,true
+dotnet server templates-test,object,server/dotnet/test/template.test.generated.cs.cshtml,./server/test,true
+dotnet server templates-test,object,server/dotnet/test/template.test.user.cs.cshtml,./server/test,false
+dotnet server templates-test,model,server/dotnet/test/Program.cs.cshtml,./server/test,true
+dotnet server templates-test,model,server/dotnet/test/makefile.cshtml,./server/test,true
+dotnet server templates-test,model,server/dotnet/test/appsettings.json.cshtml,./server/test,true
+dotnet server templates-test,model,server/dotnet/test/test.csproj.cshtml,./server/test,true
+dotnet server templates-server solution,model,server/dotnet/server.sln.cshtml,./server,true
+react templates-components,object,web/react-frontend/src/components/template-create.jsx.cshtml,./web/react-frontend/src/components,true
+react templates-components,object,web/react-frontend/src/components/template-list.jsx.cshtml,./web/react-frontend/src/components,true
+react templates-components,model,web/react-frontend/src/components/template-header.jsx.cshtml,./web/react-frontend/src/components,true
+react templates-components,model,web/react-frontend/src/components/template-footer.jsx.cshtml,./web/react-frontend/src/components,true
+react templates-services,object,web/react-frontend/src/services/template-service.js.cshtml,./web/react-frontend/src/services,true
+react templates-application,model,web/react-frontend/src/App.js.cshtml,./web/react-frontend/src,true
+react templates-application,model,web/react-frontend/src/App.css.cshtml,./web/react-frontend/src,false
+react templates-application,model,web/react-frontend/src/index.js.cshtml,./web/react-frontend/src,true
+react templates-application,model,web/react-frontend/src/run-config.js.cshtml,./web/react-frontend/src,false
+react templates-application,model,web/react-frontend/src/index.css.cshtml,./web/react-frontend/src,false
+react templates-application,model,web/react-frontend/src/logo.svg.cshtml,./web/react-frontend/src,false
+react templates-application,model,web/react-frontend/src/components/with-navigation.jsx.cshtml,./web/react-frontend/src/components,true
