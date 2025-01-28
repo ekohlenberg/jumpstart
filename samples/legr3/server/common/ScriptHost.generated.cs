@@ -30,7 +30,7 @@ namespace legr3
 				string source = s["source"].ToString();
 				string name = s["name"].ToString();
 
-				await ExecCode<T>(model, name, source);
+				await ExecCode<T>(model, name, "@{ try {" + source + "} catch( Exception e) {Model.EventException = e;}}");
 			}
 
 		}
@@ -50,7 +50,7 @@ namespace legr3
             {
                 throw new Exception($"Script content cannot be null or empty.");
             }
-
+            Logger.Debug( "Executing the script >>" + script + "<<");
             string generatedCode = await razorEngine.CompileRenderStringAsync<T>(name, script, model );
 
         }
