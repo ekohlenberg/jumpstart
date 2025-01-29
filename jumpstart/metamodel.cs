@@ -69,6 +69,29 @@ namespace jumpstart {
     public class MetaBaseElement
     {
         public string Name{get;set;}
+        protected string _filename = string.Empty;
+
+        public string FileName 
+        {
+            get 
+            {
+                if (string.IsNullOrEmpty(_filename)) 
+                {
+                    return Name;
+
+                }
+                else
+                {
+                    return _filename;
+                }
+            }
+            set 
+            {
+                _filename = value;
+            
+            }
+        }
+
         public readonly string  CR = "\n";
         protected static string ConvertToPascalCase(string input)
         {
@@ -164,6 +187,7 @@ namespace jumpstart {
             Label = label;
             Primary = primary;
             SchemaName = schemaName;
+            FileName = DomainObj;
         }
 
         public override string ToString()
@@ -184,7 +208,7 @@ namespace jumpstart {
         
         public List<MetaObject> Objects { get;  set; } = new();
         public Dictionary<string, MetaObject> ObjectMap { get;  set; } = new();
-        
+
         public string Namespace {get; set;}
         public MetaSchema(string name, string _namespace)
         {

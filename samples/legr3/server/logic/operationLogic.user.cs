@@ -5,12 +5,15 @@ using System;
 namespace legr3
 {
     public interface IOperationLogic
-    {
+    {  
+        // Generated methods
         List<Operation> select();
         Operation get(long id);
         void insert(Operation operation);
         void update(long id, Operation operation);
         void delete( long id );
+        //string getDomainName();
+        // Add user-defined methods here
     }
 
 

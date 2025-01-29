@@ -166,7 +166,7 @@ namespace jumpstart {
               
                 MetaBaseElement metaType = (MetaBaseElement) model;
                 string templateFile = Path.GetFileName(td.templateFile);
-                string targetFile = templateFile.Replace("template", model.Name).Replace(".cshtml", "");
+                string targetFile = templateFile.Replace("template", model.FileName).Replace(".cshtml", "");
                 string outputPath = Path.Combine(td.outputFolder, targetFile);
 
                 if (!Directory.Exists(td.outputFolder))

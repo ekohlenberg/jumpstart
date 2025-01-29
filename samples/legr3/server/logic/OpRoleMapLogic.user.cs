@@ -5,12 +5,15 @@ using System;
 namespace legr3
 {
     public interface IOpRoleMapLogic
-    {
+    {  
+        // Generated methods
         List<OpRoleMap> select();
         OpRoleMap get(long id);
         void insert(OpRoleMap oprolemap);
         void update(long id, OpRoleMap oprolemap);
         void delete( long id );
+        //string getDomainName();
+        // Add user-defined methods here
     }
 
 
