@@ -31,7 +31,7 @@ namespace jumpstart
 	            var records = csv.GetRecords<TemplateDefRecord>();
 	            foreach (TemplateDefRecord tdr in records)
 	            {
-	            	TemplateDef td = new TemplateDef( tdr.TEMPLATE_TYPE.Trim(), tdr.TEMPLATE_PATH.Trim(), tdr.OUTPUT_DIR.Trim(), tdr.FORCE.Trim());
+	            	TemplateDef td = new TemplateDef( tdr.TEMPLATE_TYPE.Trim(), tdr.TEMPLATE_PATH.Trim(), tdr.OUTPUT_DIR.Trim().ToLower(), tdr.FORCE.Trim().ToLower());
 
 	            	templateDefs.Add(td);
 	            }

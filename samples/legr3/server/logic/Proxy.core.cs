@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
  
+#pragma warning disable CS8604 // Possible null reference argument
+#pragma warning disable CS8620 // Argument of type ... cannot be used for parameter of type ...
+#pragma warning disable CS8618 // Non-nullable field is uninitialized
 
 namespace legr3 
 {
 
-  
+
 
     public class Proxy<T> : DispatchProxy 
     {   
-        public T Target { get; set; }
+        public T? Target { get; set; }
         public string DomainObj { get; set; }
         public List<Action<MethodInfo, object[]>> BeforeActions = new();
         public List<Action<MethodInfo, object, object[]>> AfterActions = new();
@@ -31,19 +34,20 @@ namespace legr3
         }
 
         
-        protected override object Invoke(MethodInfo targetMethod, object[] args)
+        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
+            if (targetMethod == null) return null;
 
             foreach (var action in BeforeActions)
             {
-                action.Invoke(targetMethod, args);
+               if (action != null) action.Invoke(targetMethod, args);
             }
 
             var result = targetMethod.Invoke(Target, args);
 
              foreach (var action in AfterActions)
             {
-                action.Invoke(targetMethod, result, args);
+                if (action != null) action.Invoke(targetMethod, result, args);
             }
 
 
@@ -121,3 +125,6 @@ namespace legr3
 
 
 }
+#pragma warning restore CS8604 // Possible null reference argument
+#pragma warning restore CS8620 // Argument of type ... cannot be used for parameter of type ...
+#pragma warning restore CS8618 // Non-nullable field is uninitialized
