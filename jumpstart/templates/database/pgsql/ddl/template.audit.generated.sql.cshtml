@@ -11,7 +11,7 @@ create table audit.@(Model.SchemaName + "_" + Model.TableName) (
     }
 
     var len = "";
-    if ((column.Length) != "NULL") {
+    if ((column.Length.Length > 0) && (column.Length != "NULL")) {
         len = "(" + column.Length + ")";
     }
 

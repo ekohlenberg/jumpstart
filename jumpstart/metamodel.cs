@@ -303,7 +303,7 @@ namespace jumpstart {
             }
         }
         
-        protected  List<MetaObject> SortMetaObjectsByReference(List<MetaObject> metaObjects)
+        protected  List<MetaObject> SortMetaObjectsByReference_1(List<MetaObject> metaObjects)
         {
             // Build a dependency graph
             var graph = new Dictionary<MetaObject, List<MetaObject>>();
@@ -365,12 +365,230 @@ namespace jumpstart {
             }
 
             // Check for circular dependencies
+            
             if (sorted.Count != metaObjects.Count)
             {
                 throw new InvalidOperationException("Circular dependency detected among MetaObjects.");
             }
+            
 
             return sorted;
+        }
+
+        protected List<MetaObject> SortMetaObjectsByReference(List<MetaObject> metaObjects)
+        {
+            // 1. Build the adjacency list: for each MetaObject, which MetaObjects depend on it?
+            //    Because if B has an FK to A, then A should come before B.
+            var adjacency = new Dictionary<MetaObject, List<MetaObject>>();
+            foreach (var metaObject in metaObjects)
+            {
+                adjacency[metaObject] = new List<MetaObject>();
+            }
+
+            foreach (var metaObject in metaObjects)
+            {
+                foreach (var attribute in metaObject.Attributes)
+                {
+                    if (!string.IsNullOrEmpty(attribute.FkObject))
+                    {
+                        var fkObject = metaObjects.FirstOrDefault(mo => mo.Name == attribute.FkObject);
+                        if (fkObject != null)
+                        {
+                            // fkObject -> metaObject
+                            adjacency[fkObject].Add(metaObject);
+                        }
+                    }
+                }
+            }
+
+            // 2. Find Strongly Connected Components (SCCs) in this directed graph
+            var sccs = TarjanScc(metaObjects, adjacency);
+
+            // 3. Build a graph of SCC "super-nodes" and topologically sort the super-nodes
+            //    Each SCC is treated as a single node in the "condensed" graph.
+            var sortedSccs = TopologicalSortSccs(sccs, adjacency);
+
+            // 4. Flatten the SCCs in topological order into a single list of MetaObject
+            var result = new List<MetaObject>();
+            foreach (var scc in sortedSccs)
+            {
+                // You can order objects within an SCC however you like.
+                // Usually the input or alphabetical order is fine.
+                result.AddRange(scc);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Uses Tarjan's algorithm to find strongly connected components in the given graph.
+        /// Returns a List of SCCs, where each SCC is a list of MetaObjects.
+        /// </summary>
+        private List<List<MetaObject>> TarjanScc(
+            List<MetaObject> nodes, 
+            Dictionary<MetaObject, List<MetaObject>> adjacency)
+        {
+            var sccResult = new List<List<MetaObject>>();
+
+            var indexMap   = new Dictionary<MetaObject, int>();   // Map: Node -> Tarjan index
+            var lowLinkMap = new Dictionary<MetaObject, int>();   // Map: Node -> low-link value
+            var onStack    = new HashSet<MetaObject>();
+            var stack      = new Stack<MetaObject>();
+
+            int currentIndex = 0;
+
+            // StrongConnect function (recursive DFS)
+            void StrongConnect(MetaObject v)
+            {
+                // Set the depth index for v to the smallest unused index
+                indexMap[v] = currentIndex;
+                lowLinkMap[v] = currentIndex;
+                currentIndex++;
+                stack.Push(v);
+                onStack.Add(v);
+
+                // Consider successors of v
+                foreach (var w in adjacency[v])
+                {
+                    if (!indexMap.ContainsKey(w))
+                    {
+                        // Successor w has not yet been visited; recurse on it
+                        StrongConnect(w);
+                        lowLinkMap[v] = Math.Min(lowLinkMap[v], lowLinkMap[w]);
+                    }
+                    else if (onStack.Contains(w))
+                    {
+                        // Successor w is in the stack and hence in the current SCC
+                        lowLinkMap[v] = Math.Min(lowLinkMap[v], indexMap[w]);
+                    }
+                }
+
+                // If v is a root node, pop the stack and generate an SCC
+                if (lowLinkMap[v] == indexMap[v])
+                {
+                    var scc = new List<MetaObject>();
+                    MetaObject nodeInScc;
+                    do
+                    {
+                        nodeInScc = stack.Pop();
+                        onStack.Remove(nodeInScc);
+                        scc.Add(nodeInScc);
+                    }
+                    while (!nodeInScc.Equals(v));
+
+                    sccResult.Add(scc);
+                }
+            }
+
+            // Run StrongConnect for all nodes that haven't been visited
+            foreach (var node in nodes)
+            {
+                if (!indexMap.ContainsKey(node))
+                {
+                    StrongConnect(node);
+                }
+            }
+
+            return sccResult;
+        }
+
+        /// <summary>
+        /// Given the list of SCCs, build a "condensed" graph of SCC super-nodes
+        /// and perform a topological sort on it. Returns the list of SCCs in topological order.
+        /// </summary>
+        private List<List<MetaObject>> TopologicalSortSccs(
+            List<List<MetaObject>> sccs,
+            Dictionary<MetaObject, List<MetaObject>> adjacency)
+        {
+            // First, build an SCC lookup: which SCC does each node belong to?
+            var sccLookup = new Dictionary<MetaObject, int>();
+            for (int i = 0; i < sccs.Count; i++)
+            {
+                foreach (var mo in sccs[i])
+                {
+                    sccLookup[mo] = i;
+                }
+            }
+
+            // Build adjacency among the SCCs (condensed graph)
+            var sccGraph = new Dictionary<int, HashSet<int>>();
+            for (int i = 0; i < sccs.Count; i++)
+            {
+                sccGraph[i] = new HashSet<int>();
+            }
+
+            for (int i = 0; i < sccs.Count; i++)
+            {
+                foreach (var metaObject in sccs[i])
+                {
+                    // look at the adjacency from metaObject to other nodes
+                    foreach (var neighbor in adjacency[metaObject])
+                    {
+                        int neighborScc = sccLookup[neighbor];
+                        if (neighborScc != i)
+                        {
+                            sccGraph[i].Add(neighborScc);
+                        }
+                    }
+                }
+            }
+
+            // Now we topologically sort the condensed graph of SCC indices
+            // Kahn's Algorithm or DFS-based approach can be used here.
+            // We'll use a Kahn's algorithm style for SCC indices:
+            var inDegree = new Dictionary<int, int>();
+            for (int i = 0; i < sccs.Count; i++)
+            {
+                inDegree[i] = 0;
+            }
+
+            foreach (var kvp in sccGraph)
+            {
+                var fromScc = kvp.Key;
+                foreach (var toScc in kvp.Value)
+                {
+                    inDegree[toScc]++;
+                }
+            }
+
+            var queue = new Queue<int>();
+            for (int i = 0; i < sccs.Count; i++)
+            {
+                if (inDegree[i] == 0)
+                {
+                    queue.Enqueue(i);
+                }
+            }
+
+            var sortedSccIndices = new List<int>();
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                sortedSccIndices.Add(current);
+
+                foreach (var neighbor in sccGraph[current])
+                {
+                    inDegree[neighbor]--;
+                    if (inDegree[neighbor] == 0)
+                    {
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+
+            // If not all SCCs are sorted, there's a problem, but strictly speaking
+            // strongly connected components can still be sorted as a condensed graph.
+            // If there's somehow a cycle among the SCC "super-nodes" (which shouldn't happen),
+            // you'd detect it here. Typically, it won't happen since each SCC is collapsed.
+            if (sortedSccIndices.Count != sccs.Count)
+            {
+                // This would be unusual with correct Tarjan's usage,
+                // but you could handle or throw if you want.
+                throw new InvalidOperationException("Unable to topologically sort the SCCs.");
+            }
+
+            // Return the SCCs in topological order
+            return sortedSccIndices.Select(sccIndex => sccs[sccIndex]).ToList();
         }
 
 

@@ -8,7 +8,7 @@ create table @Model.SchemaName.@Model.TableName (
     }
 
     var len = "";
-    if ((column.Length) != "NULL") {
+    if ((column.Length.Length > 0) && (column.Length != "NULL")) {
         len = "(" + column.Length + ")";
     }
 

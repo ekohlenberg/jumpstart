@@ -1,0 +1,16 @@
+CREATE SCHEMA audit; 
+GRANT USAGE ON SCHEMA audit TO defarge; 
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA audit TO defarge;
+
+CREATE TABLE IF NOT EXISTS audit.log (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL,
+    level TEXT NOT NULL,
+    username TEXT NOT NULL,
+    program TEXT NOT NULL,
+    filepath TEXT NOT NULL,
+    linenumber INTEGER NOT NULL,
+    membername TEXT NOT NULL,
+    message TEXT NOT NULL
+  
+);

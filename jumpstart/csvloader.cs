@@ -23,7 +23,7 @@ public class MetadataRecord {
     public string DATA_TYPE {get;set;}
     public string MSSQL_DATA_TYPE {get;set;}
     public string CHARACTER_MAXIMUM_LENGTH {get;set;}
-    public string CHARACTER_OCTET_LENGTH {get;set;}
+    /*public string CHARACTER_OCTET_LENGTH {get;set;}
     public string NUMERIC_PRECISION {get;set;}
     public string NUMERIC_PRECISION_RADIX {get;set;}
     public string NUMERIC_SCALE {get;set;}
@@ -36,7 +36,7 @@ public class MetadataRecord {
     public string COLLATION_NAME {get;set;}
     public string DOMAIN_CATALOG {get;set;}
     public string DOMAIN_SCHEMA {get;set;}
-    public string DOMAIN_NAME {get;set;}
+    public string DOMAIN_NAME {get;set;}*/
 }
 
 public class CSVLoader
@@ -119,15 +119,18 @@ public class CSVLoader
             {
                 Name = mr.COLUMN_NAME,
                 SqlDataType = mr.DATA_TYPE,
-                Length = mr.CHARACTER_MAXIMUM_LENGTH,
-                DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
-                ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), ""),
+                Length = mr.CHARACTER_MAXIMUM_LENGTH.Trim(),
+                DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), "object"),
+                ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), ""),
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
                 FkObject= mr.FK_OBJECT.ToLower(),
                 FkType=mr.FK_TYPE,
                 TestDataSet=mr.TEST_DATA_SET
             };
+            bool hasKey = TypeMapping.ConvertMap.ContainsKey(mr.DATA_TYPE.ToLower().Trim());
+
+            Console.WriteLine($"{mr.TABLE_NAME} {mr.COLUMN_NAME} >{mr.DATA_TYPE}< {hasKey}");
             metaObject.Attributes.Add( attribute );
         }
     }
