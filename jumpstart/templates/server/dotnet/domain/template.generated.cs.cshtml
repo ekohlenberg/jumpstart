@@ -35,15 +35,17 @@ namespace @namespaceName
         @foreach (var attr in Model.Attributes)
         {
             <text>
+            
             public @attr.DotNetType @attr.Name
             {
                 get
                 {
-                    return Convert.@(attr.ConvertMethod)(getPropValue("@attr.Name"));
+                    return Convert.@(attr.ConvertMethod)(this["@attr.Name"]);
                 }
                 set
                 {
-                    setPropValue("@attr.Name", value);
+                   
+                    this["@attr.Name"] = value;
                 }
             }
             </text>

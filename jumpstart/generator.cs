@@ -117,7 +117,14 @@ namespace jumpstart {
 
                 foreach( TemplateDef td in templateList)
                 {
-                    await GenCode<T>( model, td);
+                    if (td.templateFile.Contains(".cshtml"))
+                    {
+                        await GenCode<T>( model, td);
+                    }
+                    else
+                    {
+                        CopyFile(td);
+                    }
                 }
             }
         }
@@ -180,6 +187,40 @@ namespace jumpstart {
                 }
 
                 FireFileWriteEvent(td.outputFolder, outputPath);
+            }
+        }
+
+        protected void CopyFile(TemplateDef td)
+        {
+            string sourceFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
+            string destinationFilePath = Path.Combine(td.outputFolder, Path.GetFileName(td.templateFile));
+
+            try
+            {
+
+                if (!Directory.Exists(td.outputFolder))
+                {
+                    Directory.CreateDirectory(td.outputFolder);
+                }
+
+                if (!File.Exists(destinationFilePath) || td.force)
+                    {
+                        File.Copy(sourceFilePath, destinationFilePath, td.force);                        
+                        FireFileWriteEvent(td.outputFolder, destinationFilePath);
+                    }
+                
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"I/O error: {ex.Message}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine($"Permission error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
             }
         }
 

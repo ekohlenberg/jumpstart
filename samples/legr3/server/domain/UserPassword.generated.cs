@@ -14,126 +14,148 @@ namespace legr3
             tableBaseName = "user_password";
             auditTableName = "audit.sec_user_password";
 
-rwk.Add("user_id");        }
+
+            rwk.Add("user_id");
+                    }
 
 
+            
             public long id
             {
                 get
                 {
-                    return Convert.ToInt64(getPropValue("id"));
+                    return Convert.ToInt64(this["id"]);
                 }
                 set
                 {
-                    setPropValue("id", value);
+                   
+                    this["id"] = value;
                 }
             }
+            
             
             public long user_id
             {
                 get
                 {
-                    return Convert.ToInt64(getPropValue("user_id"));
+                    return Convert.ToInt64(this["user_id"]);
                 }
                 set
                 {
-                    setPropValue("user_id", value);
+                   
+                    this["user_id"] = value;
                 }
             }
+            
             
             public string password_hash
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("password_hash"));
+                    return Convert.ToString(this["password_hash"]);
                 }
                 set
                 {
-                    setPropValue("password_hash", value);
+                   
+                    this["password_hash"] = value;
                 }
             }
+            
             
             public DateTime expiry
             {
                 get
                 {
-                    return Convert.ToDateTime(getPropValue("expiry"));
+                    return Convert.ToDateTime(this["expiry"]);
                 }
                 set
                 {
-                    setPropValue("expiry", value);
+                   
+                    this["expiry"] = value;
                 }
             }
+            
             
             public int needs_reset
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("needs_reset"));
+                    return Convert.ToInt32(this["needs_reset"]);
                 }
                 set
                 {
-                    setPropValue("needs_reset", value);
+                   
+                    this["needs_reset"] = value;
                 }
             }
+            
             
             public int is_active
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("is_active"));
+                    return Convert.ToInt32(this["is_active"]);
                 }
                 set
                 {
-                    setPropValue("is_active", value);
+                   
+                    this["is_active"] = value;
                 }
             }
+            
             
             public string created_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("created_by"));
+                    return Convert.ToString(this["created_by"]);
                 }
                 set
                 {
-                    setPropValue("created_by", value);
+                   
+                    this["created_by"] = value;
                 }
             }
+            
             
             public DateTime last_updated
             {
                 get
                 {
-                    return Convert.ToDateTime(getPropValue("last_updated"));
+                    return Convert.ToDateTime(this["last_updated"]);
                 }
                 set
                 {
-                    setPropValue("last_updated", value);
+                   
+                    this["last_updated"] = value;
                 }
             }
+            
             
             public string last_updated_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("last_updated_by"));
+                    return Convert.ToString(this["last_updated_by"]);
                 }
                 set
                 {
-                    setPropValue("last_updated_by", value);
+                   
+                    this["last_updated_by"] = value;
                 }
             }
+            
             
             public int version
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("version"));
+                    return Convert.ToInt32(this["version"]);
                 }
                 set
                 {
-                    setPropValue("version", value);
+                   
+                    this["version"] = value;
                 }
             }
                 }

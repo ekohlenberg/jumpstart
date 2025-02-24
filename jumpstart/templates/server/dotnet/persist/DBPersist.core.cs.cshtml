@@ -61,11 +61,12 @@ namespace @Model.Name
             long id = identity(baseObject);
             int ver = version(baseObject);
 
-            baseObject.setPropValue("id", id);
-            baseObject.setPropValue("version", ver);
-            baseObject.setPropValue("created_by", Environment.UserName);
-            baseObject.setPropValue("last_updated", DateTime.Now);
-            baseObject.setPropValue("last_updated_by", Environment.UserName);
+            baseObject["id"] = id;
+            baseObject["version"] = ver;
+            baseObject["created_by"] = Environment.UserName;
+            baseObject["last_updated"] = DateTime.Now;
+            baseObject["last_updated_by"] = Environment.UserName;
+
             string sql = insertSql(baseObject, baseObject.tableName);
             execCmd(sql);
 
@@ -79,9 +80,9 @@ namespace @Model.Name
             BaseObject auditBaseObject = new BaseObject(baseObject);
 
             string auditFKCol = baseObject.tableBaseName + "_id";
-            auditBaseObject.setPropValue(auditFKCol, baseObject["id"]);
+            auditBaseObject[auditFKCol] = baseObject["id"];
             long id = identity(baseObject);
-            auditBaseObject.setPropValue("id", id);
+            auditBaseObject["id"] = id;
 
             Console.WriteLine("Audit: " + auditBaseObject.ToString());
 
@@ -92,9 +93,9 @@ namespace @Model.Name
         }
         static public void update(BaseObject baseObject)
         {
-            baseObject.setPropValue("version", version(baseObject));
-            baseObject.setPropValue("last_updated", DateTime.Now);
-            baseObject.setPropValue("last_updated_by", Environment.UserName);
+            baseObject["version"] = version(baseObject);
+            baseObject["last_updated"] = DateTime.Now;
+            baseObject["last_updated_by"] = Environment.UserName;
 
             string sql = updateSql(baseObject);
             execCmd(sql);

@@ -5,7 +5,7 @@ default: build
 build:
 	@jumpstart ./legr3.csv pgsql
 	@jumpstart ./legr3.csv dotnet
-	@jumpstart ./legr3.csv react
+	@jumpstart ./legr3.csv blazor
 
 database:
 	@jumpstart ./legr3.csv pgsql
@@ -14,7 +14,7 @@ server:
 	@jumpstart ./legr3.csv dotnet
 
 web:
-	@jumpstart ./legr3.csv react
+	@jumpstart ./legr3.csv blazor
 
 clean:
 	@rm -rf ./server

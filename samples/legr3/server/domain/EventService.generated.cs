@@ -14,126 +14,154 @@ namespace legr3
             tableBaseName = "event_service";
             auditTableName = "audit.core_event_service";
 
-rwk.Add("event_type");rwk.Add("objectname_filter");rwk.Add("methodname_filter");rwk.Add("script_id");        }
+
+            rwk.Add("event_type");
+            
+            rwk.Add("objectname_filter");
+            
+            rwk.Add("methodname_filter");
+            
+            rwk.Add("script_id");
+                    }
 
 
+            
             public long id
             {
                 get
                 {
-                    return Convert.ToInt64(getPropValue("id"));
+                    return Convert.ToInt64(this["id"]);
                 }
                 set
                 {
-                    setPropValue("id", value);
+                   
+                    this["id"] = value;
                 }
             }
+            
             
             public string event_type
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("event_type"));
+                    return Convert.ToString(this["event_type"]);
                 }
                 set
                 {
-                    setPropValue("event_type", value);
+                   
+                    this["event_type"] = value;
                 }
             }
+            
             
             public string objectname_filter
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("objectname_filter"));
+                    return Convert.ToString(this["objectname_filter"]);
                 }
                 set
                 {
-                    setPropValue("objectname_filter", value);
+                   
+                    this["objectname_filter"] = value;
                 }
             }
+            
             
             public string methodname_filter
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("methodname_filter"));
+                    return Convert.ToString(this["methodname_filter"]);
                 }
                 set
                 {
-                    setPropValue("methodname_filter", value);
+                   
+                    this["methodname_filter"] = value;
                 }
             }
+            
             
             public long script_id
             {
                 get
                 {
-                    return Convert.ToInt64(getPropValue("script_id"));
+                    return Convert.ToInt64(this["script_id"]);
                 }
                 set
                 {
-                    setPropValue("script_id", value);
+                   
+                    this["script_id"] = value;
                 }
             }
+            
             
             public int is_active
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("is_active"));
+                    return Convert.ToInt32(this["is_active"]);
                 }
                 set
                 {
-                    setPropValue("is_active", value);
+                   
+                    this["is_active"] = value;
                 }
             }
+            
             
             public string created_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("created_by"));
+                    return Convert.ToString(this["created_by"]);
                 }
                 set
                 {
-                    setPropValue("created_by", value);
+                   
+                    this["created_by"] = value;
                 }
             }
+            
             
             public DateTime last_updated
             {
                 get
                 {
-                    return Convert.ToDateTime(getPropValue("last_updated"));
+                    return Convert.ToDateTime(this["last_updated"]);
                 }
                 set
                 {
-                    setPropValue("last_updated", value);
+                   
+                    this["last_updated"] = value;
                 }
             }
+            
             
             public string last_updated_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("last_updated_by"));
+                    return Convert.ToString(this["last_updated_by"]);
                 }
                 set
                 {
-                    setPropValue("last_updated_by", value);
+                   
+                    this["last_updated_by"] = value;
                 }
             }
+            
             
             public int version
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("version"));
+                    return Convert.ToInt32(this["version"]);
                 }
                 set
                 {
-                    setPropValue("version", value);
+                   
+                    this["version"] = value;
                 }
             }
                 }

@@ -14,150 +14,176 @@ namespace legr3
             tableBaseName = "user";
             auditTableName = "audit.app_user";
 
-rwk.Add("email");        }
+
+            rwk.Add("email");
+                    }
 
 
+            
             public long id
             {
                 get
                 {
-                    return Convert.ToInt64(getPropValue("id"));
+                    return Convert.ToInt64(this["id"]);
                 }
                 set
                 {
-                    setPropValue("id", value);
+                   
+                    this["id"] = value;
                 }
             }
+            
             
             public string first_name
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("first_name"));
+                    return Convert.ToString(this["first_name"]);
                 }
                 set
                 {
-                    setPropValue("first_name", value);
+                   
+                    this["first_name"] = value;
                 }
             }
+            
             
             public string last_name
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("last_name"));
+                    return Convert.ToString(this["last_name"]);
                 }
                 set
                 {
-                    setPropValue("last_name", value);
+                   
+                    this["last_name"] = value;
                 }
             }
+            
             
             public string username
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("username"));
+                    return Convert.ToString(this["username"]);
                 }
                 set
                 {
-                    setPropValue("username", value);
+                   
+                    this["username"] = value;
                 }
             }
+            
             
             public string email
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("email"));
+                    return Convert.ToString(this["email"]);
                 }
                 set
                 {
-                    setPropValue("email", value);
+                   
+                    this["email"] = value;
                 }
             }
+            
             
             public DateTime created_date
             {
                 get
                 {
-                    return Convert.ToDateTime(getPropValue("created_date"));
+                    return Convert.ToDateTime(this["created_date"]);
                 }
                 set
                 {
-                    setPropValue("created_date", value);
+                   
+                    this["created_date"] = value;
                 }
             }
+            
             
             public DateTime last_login_date
             {
                 get
                 {
-                    return Convert.ToDateTime(getPropValue("last_login_date"));
+                    return Convert.ToDateTime(this["last_login_date"]);
                 }
                 set
                 {
-                    setPropValue("last_login_date", value);
+                   
+                    this["last_login_date"] = value;
                 }
             }
+            
             
             public int is_active
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("is_active"));
+                    return Convert.ToInt32(this["is_active"]);
                 }
                 set
                 {
-                    setPropValue("is_active", value);
+                   
+                    this["is_active"] = value;
                 }
             }
+            
             
             public string created_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("created_by"));
+                    return Convert.ToString(this["created_by"]);
                 }
                 set
                 {
-                    setPropValue("created_by", value);
+                   
+                    this["created_by"] = value;
                 }
             }
+            
             
             public DateTime last_updated
             {
                 get
                 {
-                    return Convert.ToDateTime(getPropValue("last_updated"));
+                    return Convert.ToDateTime(this["last_updated"]);
                 }
                 set
                 {
-                    setPropValue("last_updated", value);
+                   
+                    this["last_updated"] = value;
                 }
             }
+            
             
             public string last_updated_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("last_updated_by"));
+                    return Convert.ToString(this["last_updated_by"]);
                 }
                 set
                 {
-                    setPropValue("last_updated_by", value);
+                   
+                    this["last_updated_by"] = value;
                 }
             }
+            
             
             public int version
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("version"));
+                    return Convert.ToInt32(this["version"]);
                 }
                 set
                 {
-                    setPropValue("version", value);
+                   
+                    this["version"] = value;
                 }
             }
                 }

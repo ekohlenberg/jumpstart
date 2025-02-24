@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 
 namespace @Model.Name
 {
@@ -12,7 +13,7 @@ namespace @Model.Name
         {
             foreach( string k in t.Keys)
             {
-                setPropValue(k, t[k]);
+                this[k] = t[k];
             }
         }
 
@@ -24,33 +25,22 @@ namespace @Model.Name
 
         public List<string> getRwk() { return rwk;  }
 
-        
-        public object getPropValue(string propName)
+         // Override the indexer to keep dictionary & properties in sync
+        public new object this[string key]
         {
-            object result = DBNull.Value;
-            //propName = propName.Replace("get_", "").Replace("set_", "");
-            if (this.ContainsKey(propName))
+            get => base[key];
+            set
             {
-                result = this[propName];
+                // 1) Check if the new value is different to avoid recursive writes
+                if (!ContainsKey(key) || base[key] == null || !base[key].Equals(value))
+                {
+                    // 2) Update the dictionary
+                    base[key] = value;
+               
+                }
             }
-            return result;
         }
-
-        public void setPropValue(string propName, object value)
-        {
-            //propName = propName.Replace("get_", "").Replace("set_", "");
-            if (this.ContainsKey(propName))
-            {
-                this[propName] = value;
-            }
-            else
-            {
-                this.Add(propName, value);
-            }
-
-
-
-        }
+       
         public override string ToString()
         {
             string s = string.Empty;

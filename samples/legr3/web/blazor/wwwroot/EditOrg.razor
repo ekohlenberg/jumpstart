@@ -1,0 +1,89 @@
+@page "/edit-org"
+@page "/edit-org/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Org</h3>
+}
+else
+{
+	<h3>Edit @org.name</h3>
+}
+
+<EditForm Model="org" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+		<label for="name">Name</label>
+		<InputText id="name" @bind-Value="org.name" class="form-control" />
+		<table>
+			<tr>
+				<td>Active</td><td>@org.is_active</td>
+			</tr>
+			<tr>
+				<td>Created By</td><td>@org.created_by</td>
+			</tr>
+			<tr>
+				<td>Last Updated</td><td>@org.last_updated</td>
+			</tr>
+			<tr>
+				<td>Version</td><td>@org.version</td>
+			</tr>
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public Org org {get;set;} = new Org();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<Org>($"api/org/{id}");
+		if (result is not null)
+			org = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<Org>($"api/org/{id}", org);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Org>();
+					if (readResult is not null) 
+					{
+						org = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<Org>($"api/org/", org);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Org>();
+					if (readResult is not null)
+					{
+						org = readResult;
+					}
+				}
+		}
+
+	}
+}   

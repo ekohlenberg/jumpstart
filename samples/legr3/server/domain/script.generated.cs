@@ -14,102 +14,120 @@ namespace legr3
             tableBaseName = "script";
             auditTableName = "audit.core_script";
 
-rwk.Add("name");        }
+
+            rwk.Add("name");
+                    }
 
 
+            
             public long id
             {
                 get
                 {
-                    return Convert.ToInt64(getPropValue("id"));
+                    return Convert.ToInt64(this["id"]);
                 }
                 set
                 {
-                    setPropValue("id", value);
+                   
+                    this["id"] = value;
                 }
             }
+            
             
             public string name
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("name"));
+                    return Convert.ToString(this["name"]);
                 }
                 set
                 {
-                    setPropValue("name", value);
+                   
+                    this["name"] = value;
                 }
             }
+            
             
             public string source
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("source"));
+                    return Convert.ToString(this["source"]);
                 }
                 set
                 {
-                    setPropValue("source", value);
+                   
+                    this["source"] = value;
                 }
             }
+            
             
             public int is_active
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("is_active"));
+                    return Convert.ToInt32(this["is_active"]);
                 }
                 set
                 {
-                    setPropValue("is_active", value);
+                   
+                    this["is_active"] = value;
                 }
             }
+            
             
             public string created_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("created_by"));
+                    return Convert.ToString(this["created_by"]);
                 }
                 set
                 {
-                    setPropValue("created_by", value);
+                   
+                    this["created_by"] = value;
                 }
             }
+            
             
             public DateTime last_updated
             {
                 get
                 {
-                    return Convert.ToDateTime(getPropValue("last_updated"));
+                    return Convert.ToDateTime(this["last_updated"]);
                 }
                 set
                 {
-                    setPropValue("last_updated", value);
+                   
+                    this["last_updated"] = value;
                 }
             }
+            
             
             public string last_updated_by
             {
                 get
                 {
-                    return Convert.ToString(getPropValue("last_updated_by"));
+                    return Convert.ToString(this["last_updated_by"]);
                 }
                 set
                 {
-                    setPropValue("last_updated_by", value);
+                   
+                    this["last_updated_by"] = value;
                 }
             }
+            
             
             public int version
             {
                 get
                 {
-                    return Convert.ToInt32(getPropValue("version"));
+                    return Convert.ToInt32(this["version"]);
                 }
                 set
                 {
-                    setPropValue("version", value);
+                   
+                    this["version"] = value;
                 }
             }
                 }
