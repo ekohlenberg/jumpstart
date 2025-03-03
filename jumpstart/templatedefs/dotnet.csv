@@ -1,15 +1,15 @@
 ﻿COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
-dotnet server templates-common,model,server/dotnet/common/Config.core.cs.cshtml,./server/common,TRUE
-dotnet server templates-common,model,server/dotnet/common/Util.core.cs.cshtml,./server/common,TRUE
-dotnet server templates-common,model,server/dotnet/common/BaseObject.core.cs.cshtml,./server/common,TRUE
-dotnet server templates-common,model,server/dotnet/common/Logger.core.cs.cshtml,./server/common,TRUE
-dotnet server templates-common,model,server/dotnet/common/ScriptHost.core.cs.cshtml,./server/common,TRUE
-dotnet server templates-common,model,server/dotnet/common/common.csproj.cshtml,./server/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Config.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Util.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Logger.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/ScriptHost.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/common.csproj.cshtml,./shared/common,TRUE
+dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
+dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
+dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,./shared/domain,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/DBPersist.core.cs.cshtml,./server/persist,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/persist.csproj.cshtml,./server/persist,TRUE
-dotnet server templates-domain,object,server/dotnet/domain/template.generated.cs.cshtml,./server/domain,TRUE
-dotnet server templates-domain,object,server/dotnet/domain/template.user.cs.cshtml,./server/domain,FALSE
-dotnet server templates-domain,model,server/dotnet/domain/domain.csproj.cshtml,./server/domain,TRUE
 dotnet server templates-logic,object,server/dotnet/logic/templateLogic.generated.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/BaseLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/Proxy.core.cs.cshtml,./server/logic,TRUE

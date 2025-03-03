@@ -1,0 +1,29 @@
+
+public partial class List@(Model.DomainObj)
+{
+	public MarkupString GetTableHeader(@Model.DomainObj @Model.DomainVar)
+	{
+		StringBuilder sb = new StringBuilder();
+		@{
+		foreach(jumpstart.MetaAttribute a in Model.Attributes)
+		{
+		<text>
+		sb.Append("<th>@a.Label</th>\n");
+		</text>
+		}
+		}
+	}
+
+	public MarkupString GetTableDetail(@Model.DomainObj @Model.DomainVar)
+	{
+		StringBuilder sb = new StringBuilder();
+		@{
+		foreach(jumpstart.MetaAttribute a in Model.Attributes)
+		{
+		<text>
+		sb.Append("<td>@@@(Model.DomainVar).@a.Name</td>\n");
+		</text>
+		}
+		}
+	}
+}

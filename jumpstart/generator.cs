@@ -145,7 +145,6 @@ namespace jumpstart {
 
             string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", td.templateFile);
 
-            Console.WriteLine("Processing " + td.templateFile);
 
             if (!File.Exists(templatePath))
             {
@@ -155,6 +154,14 @@ namespace jumpstart {
             
 
             string template = File.ReadAllText(templatePath);
+
+            string templateFile = Path.GetFileName(td.templateFile);
+            string targetFile = templateFile.Replace("template", model.FileName).Replace(".cshtml", "");
+            string outputPath = Path.Combine(td.outputFolder, targetFile);
+
+            Console.WriteLine("Processing " + outputPath);
+
+
 
             if (string.IsNullOrEmpty(template))
             {
@@ -171,11 +178,7 @@ namespace jumpstart {
                 generatedCode = generatedCode.Replace("&lt;", "<");
                 generatedCode = generatedCode.Replace("&gt;", ">");
               
-                MetaBaseElement metaType = (MetaBaseElement) model;
-                string templateFile = Path.GetFileName(td.templateFile);
-                string targetFile = templateFile.Replace("template", model.FileName).Replace(".cshtml", "");
-                string outputPath = Path.Combine(td.outputFolder, targetFile);
-
+                
                 if (!Directory.Exists(td.outputFolder))
                 {
                     Directory.CreateDirectory(td.outputFolder);
