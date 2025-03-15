@@ -5,13 +5,13 @@
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
-<PageTitle>Organizations</PageTitle>
+<PageTitle>@(Model.Title)</PageTitle>
 
-<h1>Organization</h1>
+<h1>@(Model.Title)</h1>
 
 <p>This component demonstrates fetching org data from the server.</p>
 
-@@if (orgs == null)
+@@if (@(Model.DomainVar)List == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -20,53 +20,37 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th aria-label="Name">Name</th>
-                <th aria-label="Name">Active</th>
-                <th aria-label="Name">Created By</th>
-                <th aria-label="Name">Last Updated</th>
-                <th aria-label="Name">Version</th>
-                
+                @foreach( var a in @Model.Attributes)
+                {
+                <text>
+                <th>@a.Label</th>
+                </text>
+            
+                }
+
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @@foreach (var org in orgs)
+            @@foreach (var @(Model.DomainVar) in @(Model.DomainVar)List)
             {
                 <tr>
-                    <td>@@org.id.ToString()</td>
-                    <td>@@org.name</td>
-                    <td>@@org.is_active</td>
-                    <td>@@org.created_by</td>
-                    <td>@@org.last_updated</td>
-                    <td>@@org.version</td>
-                    <td><button class="btn btn-primary" @@onclick="@@(()=> EditOrg(@@org.id))">Edit</button></td>
+                    @foreach( var a in @Model.Attributes)
+                    {
+                    <text>
+                    <td>@@@(Model.DomainVar).@(a.Name).ToString()</td>
+                    </text>
+                    
+                    }
+                    <td><button class="btn btn-primary" @@onclick="@@(()=> Edit@(Model.DomainObj)(@@@(Model.DomainVar).id))">Edit</button></td>
                 </tr>
             }
         </tbody>
     </table>
-    <td><button class="btn btn-primary" @@onclick="@@(()=> AddOrg())">Add</button></td>
+    <td><button class="btn btn-primary" @@onclick="@@(()=> Add@(Model.DomainObj)())">Add</button></td>
 }
 
 @@code {
-    private Org[]? orgs;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-
-        orgs = await remoteClient.GetFromJsonAsync<Org[]>("api/org");
-    }
-
-    void AddOrg()
-    {
-        
-        Navigation.NavigateTo("edit-org");
-    }
-
-    void EditOrg(long id)
-    {
-        Navigation.NavigateTo($"edit-org/{id}");
-    }
+    
    
 }
