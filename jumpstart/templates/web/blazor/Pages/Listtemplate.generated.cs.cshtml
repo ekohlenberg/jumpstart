@@ -1,9 +1,11 @@
+using System;
+using @Model.Namespace;
 
 public partial class List@(Model.DomainObj)
 {
 	protected  @(Model.DomainObj)[]? @(Model.DomainVar)List;
 
-    protected override async Task OnInitializedAsync()
+    protected /* override */ async Task OnInitializedAsync()
     {
         var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 

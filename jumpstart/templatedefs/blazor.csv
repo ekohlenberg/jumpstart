@@ -1,13 +1,10 @@
 COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
-dotnet server templates-common,model,shared/dotnet/common/Config.core.cs.cshtml,shared/common,TRUE
-dotnet server templates-common,model,shared/dotnet/common/Util.core.cs.cshtml,shared/common,TRUE
-dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,shared/common,TRUE
-dotnet server templates-common,model,shared/dotnet/common/Logger.core.cs.cshtml,shared/common,TRUE
-dotnet server templates-common,model,shared/dotnet/common/ScriptHost.core.cs.cshtml,shared/common,TRUE
-dotnet server templates-common,model,shared/dotnet/common/common.csproj.cshtml,shared/common,TRUE
-dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,shared/domain,TRUE
-dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,shared/domain,FALSE
-dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,shared/domain,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Config.core.cs.cshtml,web/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Attributes.core.cs.cshtml,web/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Util.core.cs.cshtml,web/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,web/common,TRUE
+dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,web/domain,TRUE
+dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,web/domain,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/index.html,web/wwwroot,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/css/app.css,web/wwwroot/css,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/icon-192.png,web/wwwroot,FALSE
@@ -63,11 +60,10 @@ Blazor wasm content,model,web/blazor/Layout/NavMenu.razor.cshtml,web/Layout,TRUE
 Blazor wasm content,model,web/blazor/Layout/NavMenu.razor.css,web/Layout,FALSE
 Blazor wasm content,model,web/blazor/App.razor,web,TRUE
 Blazor wasm content,model,web/blazor/Properties/launchSettings.json,web/Properties,FALSE
-Blazor wasm content,model,web/blazor/_Imports.razor.cshtml,web/,FALSE
+Blazor wasm content,model,web/blazor/_Imports.razor.cshtml,web/,TRUE
 Blazor wasm content,model,web/blazor/template.csproj.cshtml,web/,FALSE
 Blazor wasm content,model,web/blazor/template.sln.cshtml,web/,FALSE
 Blazor wasm content,object,web/blazor/Pages/EditOrg.razor,web/Pages,FALSE
 Blazor wasm content,object,web/blazor/Pages/Listtemplate.razor.cshtml,web/Pages,TRUE
-Blazor wasm content,object,web/blazor/Pages/Listtemplate.generated.cs.cshtml,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Pages/Home.razor,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Program.cs.cshtml,web,FALSE

@@ -1,13 +1,13 @@
-﻿@@page "/org"
+﻿@@page "/@(Model.DomainVar)"
 @@using System.Net.Http;
 @@using Microsoft.Extensions.DependencyInjection;
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
-<PageTitle>@(Model.Title)</PageTitle>
+<PageTitle>@(Model.Label)</PageTitle>
 
-<h1>@(Model.Title)</h1>
+<h1>@(Model.Label)</h1>
 
 <p>This component demonstrates fetching org data from the server.</p>
 
@@ -51,6 +51,26 @@ else
 }
 
 @@code {
-    
+    protected  @(Model.DomainObj)[]? @(Model.DomainVar)List;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
+    }
+
+    void Add@(Model.DomainObj)()
+    {
+        
+        Navigation.NavigateTo("edit-@(Model.DomainVar)");
+    }
+
+    void Edit@(Model.DomainObj)(long id)
+    {
+        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
+    }
+
+
    
 }
