@@ -1,6 +1,7 @@
 using System;
+using System.Reflection;
 
-namespace @Model.Namespace
+namespace legr3
 {
 
 
@@ -9,9 +10,9 @@ namespace @Model.Namespace
 	{
 	    public string Label { get; }
 
-	    public LabelAttribute(string Label)
+	    public LabelAttribute(string label)
 	    {
-	        Label = Label;
+	        Label = label;
 	    }
 
 	    public static string GetClassLabel<T>()

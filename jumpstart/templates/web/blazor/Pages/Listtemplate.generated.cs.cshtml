@@ -1,29 +1,26 @@
 
 public partial class List@(Model.DomainObj)
 {
-	public MarkupString GetTableHeader(@Model.DomainObj @Model.DomainVar)
-	{
-		StringBuilder sb = new StringBuilder();
-		@{
-		foreach(jumpstart.MetaAttribute a in Model.Attributes)
-		{
-		<text>
-		sb.Append("<th>@a.Label</th>\n");
-		</text>
-		}
-		}
-	}
+	protected  @(Model.DomainObj)[]? @(Model.DomainVar)List;
 
-	public MarkupString GetTableDetail(@Model.DomainObj @Model.DomainVar)
-	{
-		StringBuilder sb = new StringBuilder();
-		@{
-		foreach(jumpstart.MetaAttribute a in Model.Attributes)
-		{
-		<text>
-		sb.Append("<td>@@@(Model.DomainVar).@a.Name</td>\n");
-		</text>
-		}
-		}
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
+    }
+
+    void Add@(Model.DomainObj)()
+    {
+        
+        Navigation.NavigateTo("edit-@(Model.DomainVar)");
+    }
+
+    void Edit@(Model.DomainObj)(long id)
+    {
+        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
+    }
+
+
+	
 }

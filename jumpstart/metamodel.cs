@@ -267,6 +267,7 @@ namespace jumpstart {
 
         public Dictionary<string, MetaSchema> Schemas { get; private set; } = new();
         public List<MetaObject> Objects { get; private set; } = new();
+        public List<MetaObject> PrimaryObjects { get; private set; } = new();
 
         public List<MetaAttribute> GlobalAttributes {get; private set;} = new();
 

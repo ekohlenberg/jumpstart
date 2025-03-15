@@ -4,6 +4,7 @@ dotnet server templates-common,model,shared/dotnet/common/Util.core.cs.cshtml,./
 dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/Logger.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/ScriptHost.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Attributes.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/common.csproj.cshtml,./shared/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE

@@ -1,41 +1,26 @@
 
 public partial class ListOpRole
 {
-	public MarkupString GetTableHeader(OpRole oprole)
-	{
-		StringBuilder sb = new StringBuilder();
+	protected  OpRole[]? oproleList;
 
-		sb.Append("<th>Role ID</th>\n");
-		
-		sb.Append("<th>Role Name</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-			}
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
-	public MarkupString GetTableDetail(OpRole oprole)
-	{
-		StringBuilder sb = new StringBuilder();
+        oproleList = await remoteClient.GetFromJsonAsync<OpRole[]>("api/oprole");
+    }
 
-		sb.Append("<td>@oprole.id</td>\n");
-		
-		sb.Append("<td>@oprole.name</td>\n");
-		
-		sb.Append("<td>@oprole.is_active</td>\n");
-		
-		sb.Append("<td>@oprole.created_by</td>\n");
-		
-		sb.Append("<td>@oprole.last_updated</td>\n");
-		
-		sb.Append("<td>@oprole.last_updated_by</td>\n");
-		
-		sb.Append("<td>@oprole.version</td>\n");
-			}
+    void AddOpRole()
+    {
+        
+        Navigation.NavigateTo("edit-oprole");
+    }
+
+    void EditOpRole(long id)
+    {
+        Navigation.NavigateTo($"edit-oprole/{id}");
+    }
+
+
+	
 }

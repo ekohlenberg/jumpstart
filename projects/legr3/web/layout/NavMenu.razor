@@ -1,4 +1,4 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">TestApp1</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -14,22 +14,97 @@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="account">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
             </NavLink>
         </div>
+        
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link" href="customer">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
             </NavLink>
         </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="vendor">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="invoice">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="bill">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="payment">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="category">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="budget">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="org">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Orgs
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
             </NavLink>
         </div>
-    </nav>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="user">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="script">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="eventservice">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="userpassword">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="operation">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="oprole">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+            </NavLink>
+        </div>
+            </nav>
 </div>
 
 @code {

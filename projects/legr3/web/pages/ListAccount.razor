@@ -1,72 +1,61 @@
-@page "/org"
-@using System.Net.Http;
-@using Microsoft.Extensions.DependencyInjection;
-@inject HttpClient Http
-@inject IHttpClientFactory ClientFactory
-@inject NavigationManager Navigation
-@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
-<PageTitle>Organizations</PageTitle>
+public partial class account
 
-<h1>Organization</h1>
+    public MarkupString GetTableHeader()
+	{
+		StringBuilder sb = new StringBuilder();
 
-<p>This component demonstrates fetching org data from the server.</p>
+		sb.Append("<th>Account ID</th>\n");
+		
+		sb.Append("<th>Organization</th>\n");
+		
+		sb.Append("<th>Name</th>\n");
+		
+		sb.Append("<th>Type</th>\n");
+		
+		sb.Append("<th>Balance</th>\n");
+		
+		sb.Append("<th>Created</th>\n");
+		
+		sb.Append("<th>Active</th>\n");
+		
+		sb.Append("<th>Created By</th>\n");
+		
+		sb.Append("<th>Last Updated</th>\n");
+		
+		sb.Append("<th>Last Updated By</th>\n");
+		
+		sb.Append("<th>Version</th>\n");
+		
+		return (MarkupString) sb.ToString();
+	}
 
-@if (orgs == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th aria-label="Name">Name</th>
-                <th aria-label="Name">Active</th>
-                <th aria-label="Name">Created By</th>
-                <th aria-label="Name">Last Updated</th>
-                <th aria-label="Name">Version</th>
-                
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var org in orgs)
-            {
-                <tr>
-                    <td>@org.id.ToString()</td>
-                    <td>@org.name</td>
-                    <td>@org.is_active</td>
-                    <td>@org.created_by</td>
-                    <td>@org.last_updated</td>
-                    <td>@org.version</td>
-                    <td><button class="btn btn-primary" @onclick="@(()=> EditOrg(@org.id))">Edit</button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <td><button class="btn btn-primary" @onclick="@(()=> AddOrg())">Add</button></td>
-}
+	public MarkupString GetTableDetail(Account account)
+	{
+		StringBuilder sb = new StringBuilder();
 
-@code {
-    private Org[]? orgs;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-
-        orgs = await remoteClient.GetFromJsonAsync<Org[]>("api/org");
-    }
-
-    void AddOrg()
-    {
-        
-        Navigation.NavigateTo("edit-org");
-    }
-
-    void EditOrg(long id)
-    {
-        Navigation.NavigateTo($"edit-org/{id}");
-    }
+		sb.Append($"<td>{account.id}</td>\n");
+		
+		sb.Append($"<td>{account.org_id}</td>\n");
+		
+		sb.Append($"<td>{account.account_name}</td>\n");
+		
+		sb.Append($"<td>{account.account_type}</td>\n");
+		
+		sb.Append($"<td>{account.balance}</td>\n");
+		
+		sb.Append($"<td>{account.created_date}</td>\n");
+		
+		sb.Append($"<td>{account.is_active}</td>\n");
+		
+		sb.Append($"<td>{account.created_by}</td>\n");
+		
+		sb.Append($"<td>{account.last_updated}</td>\n");
+		
+		sb.Append($"<td>{account.last_updated_by}</td>\n");
+		
+		sb.Append($"<td>{account.version}</td>\n");
+		
+		return (MarkupString) sb.ToString()
+	}
    
 }

@@ -103,6 +103,13 @@ public class CSVLoader
             metaModel.Objects.Add(metaObject);
         }
 
+        if (metaObject.Primary == "1")
+        {
+            if (!metaModel.PrimaryObjects.Any(obj => obj.Name == mr.TABLE_NAME))
+            {
+                metaModel.PrimaryObjects.Add(metaObject);
+            }   
+        }
         AddAttributes(metaObject, mr);
     }
 

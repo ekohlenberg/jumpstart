@@ -1,45 +1,26 @@
 
 public partial class ListTransactionCategory
 {
-	public MarkupString GetTableHeader(TransactionCategory transactioncategory)
-	{
-		StringBuilder sb = new StringBuilder();
+	protected  TransactionCategory[]? transactioncategoryList;
 
-		sb.Append("<th>Transaction-Category ID</th>\n");
-		
-		sb.Append("<th>Transaction ID</th>\n");
-		
-		sb.Append("<th>Category ID</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-			}
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
-	public MarkupString GetTableDetail(TransactionCategory transactioncategory)
-	{
-		StringBuilder sb = new StringBuilder();
+        transactioncategoryList = await remoteClient.GetFromJsonAsync<TransactionCategory[]>("api/transactioncategory");
+    }
 
-		sb.Append("<td>@transactioncategory.id</td>\n");
-		
-		sb.Append("<td>@transactioncategory.transaction_id</td>\n");
-		
-		sb.Append("<td>@transactioncategory.category_id</td>\n");
-		
-		sb.Append("<td>@transactioncategory.is_active</td>\n");
-		
-		sb.Append("<td>@transactioncategory.created_by</td>\n");
-		
-		sb.Append("<td>@transactioncategory.last_updated</td>\n");
-		
-		sb.Append("<td>@transactioncategory.last_updated_by</td>\n");
-		
-		sb.Append("<td>@transactioncategory.version</td>\n");
-			}
+    void AddTransactionCategory()
+    {
+        
+        Navigation.NavigateTo("edit-transactioncategory");
+    }
+
+    void EditTransactionCategory(long id)
+    {
+        Navigation.NavigateTo($"edit-transactioncategory/{id}");
+    }
+
+
+	
 }

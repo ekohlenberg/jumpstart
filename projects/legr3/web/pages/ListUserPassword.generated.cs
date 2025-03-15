@@ -1,53 +1,26 @@
 
 public partial class ListUserPassword
 {
-	public MarkupString GetTableHeader(UserPassword userpassword)
-	{
-		StringBuilder sb = new StringBuilder();
+	protected  UserPassword[]? userpasswordList;
 
-		sb.Append("<th>User ID</th>\n");
-		
-		sb.Append("<th>User ID</th>\n");
-		
-		sb.Append("<th>Password</th>\n");
-		
-		sb.Append("<th>Expiry</th>\n");
-		
-		sb.Append("<th>Needs Reset</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-			}
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
-	public MarkupString GetTableDetail(UserPassword userpassword)
-	{
-		StringBuilder sb = new StringBuilder();
+        userpasswordList = await remoteClient.GetFromJsonAsync<UserPassword[]>("api/userpassword");
+    }
 
-		sb.Append("<td>@userpassword.id</td>\n");
-		
-		sb.Append("<td>@userpassword.user_id</td>\n");
-		
-		sb.Append("<td>@userpassword.password_hash</td>\n");
-		
-		sb.Append("<td>@userpassword.expiry</td>\n");
-		
-		sb.Append("<td>@userpassword.needs_reset</td>\n");
-		
-		sb.Append("<td>@userpassword.is_active</td>\n");
-		
-		sb.Append("<td>@userpassword.created_by</td>\n");
-		
-		sb.Append("<td>@userpassword.last_updated</td>\n");
-		
-		sb.Append("<td>@userpassword.last_updated_by</td>\n");
-		
-		sb.Append("<td>@userpassword.version</td>\n");
-			}
+    void AddUserPassword()
+    {
+        
+        Navigation.NavigateTo("edit-userpassword");
+    }
+
+    void EditUserPassword(long id)
+    {
+        Navigation.NavigateTo($"edit-userpassword/{id}");
+    }
+
+
+	
 }

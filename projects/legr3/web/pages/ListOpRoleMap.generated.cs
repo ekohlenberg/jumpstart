@@ -1,45 +1,26 @@
 
 public partial class ListOpRoleMap
 {
-	public MarkupString GetTableHeader(OpRoleMap oprolemap)
-	{
-		StringBuilder sb = new StringBuilder();
+	protected  OpRoleMap[]? oprolemapList;
 
-		sb.Append("<th>Operation Role Map ID</th>\n");
-		
-		sb.Append("<th>Operation ID</th>\n");
-		
-		sb.Append("<th>Role ID</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-			}
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
-	public MarkupString GetTableDetail(OpRoleMap oprolemap)
-	{
-		StringBuilder sb = new StringBuilder();
+        oprolemapList = await remoteClient.GetFromJsonAsync<OpRoleMap[]>("api/oprolemap");
+    }
 
-		sb.Append("<td>@oprolemap.id</td>\n");
-		
-		sb.Append("<td>@oprolemap.op_id</td>\n");
-		
-		sb.Append("<td>@oprolemap.op_role_id</td>\n");
-		
-		sb.Append("<td>@oprolemap.is_active</td>\n");
-		
-		sb.Append("<td>@oprolemap.created_by</td>\n");
-		
-		sb.Append("<td>@oprolemap.last_updated</td>\n");
-		
-		sb.Append("<td>@oprolemap.last_updated_by</td>\n");
-		
-		sb.Append("<td>@oprolemap.version</td>\n");
-			}
+    void AddOpRoleMap()
+    {
+        
+        Navigation.NavigateTo("edit-oprolemap");
+    }
+
+    void EditOpRoleMap(long id)
+    {
+        Navigation.NavigateTo($"edit-oprolemap/{id}");
+    }
+
+
+	
 }

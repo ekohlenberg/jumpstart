@@ -1,72 +1,57 @@
-@page "/org"
-@using System.Net.Http;
-@using Microsoft.Extensions.DependencyInjection;
-@inject HttpClient Http
-@inject IHttpClientFactory ClientFactory
-@inject NavigationManager Navigation
-@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
-<PageTitle>Organizations</PageTitle>
+public partial class event_service
 
-<h1>Organization</h1>
+    public MarkupString GetTableHeader()
+	{
+		StringBuilder sb = new StringBuilder();
 
-<p>This component demonstrates fetching org data from the server.</p>
+		sb.Append("<th>Event ID</th>\n");
+		
+		sb.Append("<th>Event Type</th>\n");
+		
+		sb.Append("<th>Object Filter</th>\n");
+		
+		sb.Append("<th>Method Filter</th>\n");
+		
+		sb.Append("<th>Script ID</th>\n");
+		
+		sb.Append("<th>Active</th>\n");
+		
+		sb.Append("<th>Created By</th>\n");
+		
+		sb.Append("<th>Last Updated</th>\n");
+		
+		sb.Append("<th>Last Updated By</th>\n");
+		
+		sb.Append("<th>Version</th>\n");
+		
+		return (MarkupString) sb.ToString();
+	}
 
-@if (orgs == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th aria-label="Name">Name</th>
-                <th aria-label="Name">Active</th>
-                <th aria-label="Name">Created By</th>
-                <th aria-label="Name">Last Updated</th>
-                <th aria-label="Name">Version</th>
-                
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var org in orgs)
-            {
-                <tr>
-                    <td>@org.id.ToString()</td>
-                    <td>@org.name</td>
-                    <td>@org.is_active</td>
-                    <td>@org.created_by</td>
-                    <td>@org.last_updated</td>
-                    <td>@org.version</td>
-                    <td><button class="btn btn-primary" @onclick="@(()=> EditOrg(@org.id))">Edit</button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <td><button class="btn btn-primary" @onclick="@(()=> AddOrg())">Add</button></td>
-}
+	public MarkupString GetTableDetail(EventService eventservice)
+	{
+		StringBuilder sb = new StringBuilder();
 
-@code {
-    private Org[]? orgs;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-
-        orgs = await remoteClient.GetFromJsonAsync<Org[]>("api/org");
-    }
-
-    void AddOrg()
-    {
-        
-        Navigation.NavigateTo("edit-org");
-    }
-
-    void EditOrg(long id)
-    {
-        Navigation.NavigateTo($"edit-org/{id}");
-    }
+		sb.Append($"<td>{eventservice.id}</td>\n");
+		
+		sb.Append($"<td>{eventservice.event_type}</td>\n");
+		
+		sb.Append($"<td>{eventservice.objectname_filter}</td>\n");
+		
+		sb.Append($"<td>{eventservice.methodname_filter}</td>\n");
+		
+		sb.Append($"<td>{eventservice.script_id}</td>\n");
+		
+		sb.Append($"<td>{eventservice.is_active}</td>\n");
+		
+		sb.Append($"<td>{eventservice.created_by}</td>\n");
+		
+		sb.Append($"<td>{eventservice.last_updated}</td>\n");
+		
+		sb.Append($"<td>{eventservice.last_updated_by}</td>\n");
+		
+		sb.Append($"<td>{eventservice.version}</td>\n");
+		
+		return (MarkupString) sb.ToString()
+	}
    
 }

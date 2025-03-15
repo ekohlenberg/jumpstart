@@ -1,45 +1,26 @@
 
 public partial class ListOperation
 {
-	public MarkupString GetTableHeader(Operation operation)
-	{
-		StringBuilder sb = new StringBuilder();
+	protected  Operation[]? operationList;
 
-		sb.Append("<th>Action ID</th>\n");
-		
-		sb.Append("<th>Object</th>\n");
-		
-		sb.Append("<th>Method</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-			}
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
-	public MarkupString GetTableDetail(Operation operation)
-	{
-		StringBuilder sb = new StringBuilder();
+        operationList = await remoteClient.GetFromJsonAsync<Operation[]>("api/operation");
+    }
 
-		sb.Append("<td>@operation.id</td>\n");
-		
-		sb.Append("<td>@operation.objectname</td>\n");
-		
-		sb.Append("<td>@operation.methodname</td>\n");
-		
-		sb.Append("<td>@operation.is_active</td>\n");
-		
-		sb.Append("<td>@operation.created_by</td>\n");
-		
-		sb.Append("<td>@operation.last_updated</td>\n");
-		
-		sb.Append("<td>@operation.last_updated_by</td>\n");
-		
-		sb.Append("<td>@operation.version</td>\n");
-			}
+    void AddOperation()
+    {
+        
+        Navigation.NavigateTo("edit-operation");
+    }
+
+    void EditOperation(long id)
+    {
+        Navigation.NavigateTo($"edit-operation/{id}");
+    }
+
+
+	
 }
