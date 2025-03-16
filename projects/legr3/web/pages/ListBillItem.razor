@@ -1,61 +1,106 @@
-public partial class bill_item
+@page "/billitem"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Bill Items</PageTitle>
 
-    public MarkupString GetTableHeader()
-	{
-		StringBuilder sb = new StringBuilder();
+<h1>Bill Items</h1>
 
-		sb.Append("<th>Bill Item ID</th>\n");
-		
-		sb.Append("<th>Bill ID</th>\n");
-		
-		sb.Append("<th>Description</th>\n");
-		
-		sb.Append("<th>Quantity</th>\n");
-		
-		sb.Append("<th>Unit Price</th>\n");
-		
-		sb.Append("<th>Total Amount</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-		
-		return (MarkupString) sb.ToString();
-	}
+<p>This component demonstrates fetching org data from the server.</p>
 
-	public MarkupString GetTableDetail(BillItem billitem)
-	{
-		StringBuilder sb = new StringBuilder();
+@if (billitemList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
 
-		sb.Append($"<td>{billitem.id}</td>\n");
-		
-		sb.Append($"<td>{billitem.bill_id}</td>\n");
-		
-		sb.Append($"<td>{billitem.description}</td>\n");
-		
-		sb.Append($"<td>{billitem.quantity}</td>\n");
-		
-		sb.Append($"<td>{billitem.unit_price}</td>\n");
-		
-		sb.Append($"<td>{billitem.total_amount}</td>\n");
-		
-		sb.Append($"<td>{billitem.is_active}</td>\n");
-		
-		sb.Append($"<td>{billitem.created_by}</td>\n");
-		
-		sb.Append($"<td>{billitem.last_updated}</td>\n");
-		
-		sb.Append($"<td>{billitem.last_updated_by}</td>\n");
-		
-		sb.Append($"<td>{billitem.version}</td>\n");
-		
-		return (MarkupString) sb.ToString()
-	}
+                <th>Bill Item ID</th>
+                
+                <th>Bill ID</th>
+                
+                <th>Description</th>
+                
+                <th>Quantity</th>
+                
+                <th>Unit Price</th>
+                
+                <th>Total Amount</th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var billitem in billitemList)
+            {
+                <tr>
+
+                    <td>@billitem.id.ToString()</td>
+                    
+                    <td>@billitem.bill_id.ToString()</td>
+                    
+                    <td>@billitem.description.ToString()</td>
+                    
+                    <td>@billitem.quantity.ToString()</td>
+                    
+                    <td>@billitem.unit_price.ToString()</td>
+                    
+                    <td>@billitem.total_amount.ToString()</td>
+                    
+                    <td>@billitem.is_active.ToString()</td>
+                    
+                    <td>@billitem.created_by.ToString()</td>
+                    
+                    <td>@billitem.last_updated.ToString()</td>
+                    
+                    <td>@billitem.last_updated_by.ToString()</td>
+                    
+                    <td>@billitem.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditBillItem(@billitem.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddBillItem())">Add</button></td>
+}
+
+@code {
+    protected  BillItem[]? billitemList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        billitemList = await remoteClient.GetFromJsonAsync<BillItem[]>("api/billitem");
+    }
+
+    void AddBillItem()
+    {
+        
+        Navigation.NavigateTo("edit-billitem");
+    }
+
+    void EditBillItem(long id)
+    {
+        Navigation.NavigateTo($"edit-billitem/{id}");
+    }
+
+
    
 }

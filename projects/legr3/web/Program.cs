@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;*/
 using Microsoft.Extensions.DependencyInjection;
 
-using TestApp1;
+using legr3;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

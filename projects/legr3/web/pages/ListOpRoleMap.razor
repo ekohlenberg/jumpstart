@@ -1,49 +1,94 @@
-public partial class op_role_map
+@page "/oprolemap"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Operation Group Map</PageTitle>
 
-    public MarkupString GetTableHeader()
-	{
-		StringBuilder sb = new StringBuilder();
+<h1>Operation Group Map</h1>
 
-		sb.Append("<th>Operation Role Map ID</th>\n");
-		
-		sb.Append("<th>Operation ID</th>\n");
-		
-		sb.Append("<th>Role ID</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-		
-		return (MarkupString) sb.ToString();
-	}
+<p>This component demonstrates fetching org data from the server.</p>
 
-	public MarkupString GetTableDetail(OpRoleMap oprolemap)
-	{
-		StringBuilder sb = new StringBuilder();
+@if (oprolemapList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
 
-		sb.Append($"<td>{oprolemap.id}</td>\n");
-		
-		sb.Append($"<td>{oprolemap.op_id}</td>\n");
-		
-		sb.Append($"<td>{oprolemap.op_role_id}</td>\n");
-		
-		sb.Append($"<td>{oprolemap.is_active}</td>\n");
-		
-		sb.Append($"<td>{oprolemap.created_by}</td>\n");
-		
-		sb.Append($"<td>{oprolemap.last_updated}</td>\n");
-		
-		sb.Append($"<td>{oprolemap.last_updated_by}</td>\n");
-		
-		sb.Append($"<td>{oprolemap.version}</td>\n");
-		
-		return (MarkupString) sb.ToString()
-	}
+                <th>Operation Role Map ID</th>
+                
+                <th>Operation ID</th>
+                
+                <th>Role ID</th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var oprolemap in oprolemapList)
+            {
+                <tr>
+
+                    <td>@oprolemap.id.ToString()</td>
+                    
+                    <td>@oprolemap.op_id.ToString()</td>
+                    
+                    <td>@oprolemap.op_role_id.ToString()</td>
+                    
+                    <td>@oprolemap.is_active.ToString()</td>
+                    
+                    <td>@oprolemap.created_by.ToString()</td>
+                    
+                    <td>@oprolemap.last_updated.ToString()</td>
+                    
+                    <td>@oprolemap.last_updated_by.ToString()</td>
+                    
+                    <td>@oprolemap.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditOpRoleMap(@oprolemap.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddOpRoleMap())">Add</button></td>
+}
+
+@code {
+    protected  OpRoleMap[]? oprolemapList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        oprolemapList = await remoteClient.GetFromJsonAsync<OpRoleMap[]>("api/oprolemap");
+    }
+
+    void AddOpRoleMap()
+    {
+        
+        Navigation.NavigateTo("edit-oprolemap");
+    }
+
+    void EditOpRoleMap(long id)
+    {
+        Navigation.NavigateTo($"edit-oprolemap/{id}");
+    }
+
+
    
 }

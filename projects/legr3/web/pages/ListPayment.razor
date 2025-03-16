@@ -1,65 +1,110 @@
-public partial class payment
+@page "/payment"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Payment</PageTitle>
 
-    public MarkupString GetTableHeader()
-	{
-		StringBuilder sb = new StringBuilder();
+<h1>Payment</h1>
 
-		sb.Append("<th>Payment ID</th>\n");
-		
-		sb.Append("<th>Invoice ID</th>\n");
-		
-		sb.Append("<th>Organization ID</th>\n");
-		
-		sb.Append("<th>Payment Date</th>\n");
-		
-		sb.Append("<th>Amount</th>\n");
-		
-		sb.Append("<th>Payment Method</th>\n");
-		
-		sb.Append("<th>Created Date</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-		
-		return (MarkupString) sb.ToString();
-	}
+<p>This component demonstrates fetching org data from the server.</p>
 
-	public MarkupString GetTableDetail(Payment payment)
-	{
-		StringBuilder sb = new StringBuilder();
+@if (paymentList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
 
-		sb.Append($"<td>{payment.id}</td>\n");
-		
-		sb.Append($"<td>{payment.invoice_id}</td>\n");
-		
-		sb.Append($"<td>{payment.org_id}</td>\n");
-		
-		sb.Append($"<td>{payment.payment_date}</td>\n");
-		
-		sb.Append($"<td>{payment.amount}</td>\n");
-		
-		sb.Append($"<td>{payment.payment_method}</td>\n");
-		
-		sb.Append($"<td>{payment.created_date}</td>\n");
-		
-		sb.Append($"<td>{payment.is_active}</td>\n");
-		
-		sb.Append($"<td>{payment.created_by}</td>\n");
-		
-		sb.Append($"<td>{payment.last_updated}</td>\n");
-		
-		sb.Append($"<td>{payment.last_updated_by}</td>\n");
-		
-		sb.Append($"<td>{payment.version}</td>\n");
-		
-		return (MarkupString) sb.ToString()
-	}
+                <th>Payment ID</th>
+                
+                <th>Invoice ID</th>
+                
+                <th>Organization ID</th>
+                
+                <th>Payment Date</th>
+                
+                <th>Amount</th>
+                
+                <th>Payment Method</th>
+                
+                <th>Created Date</th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var payment in paymentList)
+            {
+                <tr>
+
+                    <td>@payment.id.ToString()</td>
+                    
+                    <td>@payment.invoice_id.ToString()</td>
+                    
+                    <td>@payment.org_id.ToString()</td>
+                    
+                    <td>@payment.payment_date.ToString()</td>
+                    
+                    <td>@payment.amount.ToString()</td>
+                    
+                    <td>@payment.payment_method.ToString()</td>
+                    
+                    <td>@payment.created_date.ToString()</td>
+                    
+                    <td>@payment.is_active.ToString()</td>
+                    
+                    <td>@payment.created_by.ToString()</td>
+                    
+                    <td>@payment.last_updated.ToString()</td>
+                    
+                    <td>@payment.last_updated_by.ToString()</td>
+                    
+                    <td>@payment.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditPayment(@payment.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddPayment())">Add</button></td>
+}
+
+@code {
+    protected  Payment[]? paymentList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        paymentList = await remoteClient.GetFromJsonAsync<Payment[]>("api/payment");
+    }
+
+    void AddPayment()
+    {
+        
+        Navigation.NavigateTo("edit-payment");
+    }
+
+    void EditPayment(long id)
+    {
+        Navigation.NavigateTo($"edit-payment/{id}");
+    }
+
+
    
 }

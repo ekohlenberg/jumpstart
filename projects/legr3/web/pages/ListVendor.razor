@@ -1,73 +1,118 @@
-public partial class vendor
+@page "/vendor"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Vendor</PageTitle>
 
-    public MarkupString GetTableHeader()
-	{
-		StringBuilder sb = new StringBuilder();
+<h1>Vendor</h1>
 
-		sb.Append("<th>Vendor </th>\n");
-		
-		sb.Append("<th>Organization</th>\n");
-		
-		sb.Append("<th>Name</th>\n");
-		
-		sb.Append("<th>First</th>\n");
-		
-		sb.Append("<th>Last</th>\n");
-		
-		sb.Append("<th>Email</th>\n");
-		
-		sb.Append("<th>Phone</th>\n");
-		
-		sb.Append("<th>Billing Address</th>\n");
-		
-		sb.Append("<th>Created</th>\n");
-		
-		sb.Append("<th>Active</th>\n");
-		
-		sb.Append("<th>Created By</th>\n");
-		
-		sb.Append("<th>Last Updated</th>\n");
-		
-		sb.Append("<th>Last Updated By</th>\n");
-		
-		sb.Append("<th>Version</th>\n");
-		
-		return (MarkupString) sb.ToString();
-	}
+<p>This component demonstrates fetching org data from the server.</p>
 
-	public MarkupString GetTableDetail(Vendor vendor)
-	{
-		StringBuilder sb = new StringBuilder();
+@if (vendorList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
 
-		sb.Append($"<td>{vendor.id}</td>\n");
-		
-		sb.Append($"<td>{vendor.org_id}</td>\n");
-		
-		sb.Append($"<td>{vendor.vendor_name}</td>\n");
-		
-		sb.Append($"<td>{vendor.first_name}</td>\n");
-		
-		sb.Append($"<td>{vendor.last_name}</td>\n");
-		
-		sb.Append($"<td>{vendor.email}</td>\n");
-		
-		sb.Append($"<td>{vendor.phone}</td>\n");
-		
-		sb.Append($"<td>{vendor.billing_address}</td>\n");
-		
-		sb.Append($"<td>{vendor.created_date}</td>\n");
-		
-		sb.Append($"<td>{vendor.is_active}</td>\n");
-		
-		sb.Append($"<td>{vendor.created_by}</td>\n");
-		
-		sb.Append($"<td>{vendor.last_updated}</td>\n");
-		
-		sb.Append($"<td>{vendor.last_updated_by}</td>\n");
-		
-		sb.Append($"<td>{vendor.version}</td>\n");
-		
-		return (MarkupString) sb.ToString()
-	}
+                <th>Vendor </th>
+                
+                <th>Organization</th>
+                
+                <th>Name</th>
+                
+                <th>First</th>
+                
+                <th>Last</th>
+                
+                <th>Email</th>
+                
+                <th>Phone</th>
+                
+                <th>Billing Address</th>
+                
+                <th>Created</th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vendor in vendorList)
+            {
+                <tr>
+
+                    <td>@vendor.id.ToString()</td>
+                    
+                    <td>@vendor.org_id.ToString()</td>
+                    
+                    <td>@vendor.vendor_name.ToString()</td>
+                    
+                    <td>@vendor.first_name.ToString()</td>
+                    
+                    <td>@vendor.last_name.ToString()</td>
+                    
+                    <td>@vendor.email.ToString()</td>
+                    
+                    <td>@vendor.phone.ToString()</td>
+                    
+                    <td>@vendor.billing_address.ToString()</td>
+                    
+                    <td>@vendor.created_date.ToString()</td>
+                    
+                    <td>@vendor.is_active.ToString()</td>
+                    
+                    <td>@vendor.created_by.ToString()</td>
+                    
+                    <td>@vendor.last_updated.ToString()</td>
+                    
+                    <td>@vendor.last_updated_by.ToString()</td>
+                    
+                    <td>@vendor.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditVendor(@vendor.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddVendor())">Add</button></td>
+}
+
+@code {
+    protected  Vendor[]? vendorList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        vendorList = await remoteClient.GetFromJsonAsync<Vendor[]>("api/vendor");
+    }
+
+    void AddVendor()
+    {
+        
+        Navigation.NavigateTo("edit-vendor");
+    }
+
+    void EditVendor(long id)
+    {
+        Navigation.NavigateTo($"edit-vendor/{id}");
+    }
+
+
    
 }
