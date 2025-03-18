@@ -2,7 +2,7 @@
 
 
 1. **Purpose**  
-    - Jumpstart is meant to help enterprise application developers create realistic prototypes that can be used as the foundation for real applications.
+    - Jumpstart is meant to help enterprise application developers create "scaffolds" that can be used as the foundation for production machine learning applications.
 
 2. **Problem Solved** 
    - This project generates a full stack application from metadata input.
@@ -14,7 +14,8 @@
 4. **Key Features**  
    - Accepts tabular metadata as input
    - Uses RazorLight templates to generate output.
-   - Output includes Postgres DDL scripts, dotnet REST API server, and React front-end.
+   - Output includes Postgres DDL scripts, dotnet REST API server, and Blazor (Web Assembly) front-end.
+	 - Distributed processing framework that will host Python, PowerShell, and C# agents
    - Future common modules will include:
      - OAuth authentication
      - Logging
