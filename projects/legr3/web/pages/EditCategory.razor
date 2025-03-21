@@ -1,0 +1,117 @@
+@page "/edit-category"
+@page "/edit-category/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Category</h3>
+}
+else
+{
+	<h3>Edit Category @category.getRwkString() </h3>
+}
+
+<EditForm Model="category" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">Category ID</label></td>
+		        <td><InputText id="id" @bind-Value="category.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="org_id">Organization ID</label></td>
+		        <td><InputText id="org_id" @bind-Value="category.org_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="category_name">Name</label></td>
+		        <td><InputText id="category_name" @bind-Value="category.category_name" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="category_type">Category Type</label></td>
+		        <td><InputText id="category_type" @bind-Value="category.category_type" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(category.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(category.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(category.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(category.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(category.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public Category category {get;set;} = new Category();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<Category>($"api/category/{id}");
+		if (result is not null)
+			category = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<Category>($"api/category/{id}", category);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Category>();
+					if (readResult is not null) 
+					{
+						category = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<Category>($"api/category", category);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Category>();
+					if (readResult is not null)
+					{
+						category = readResult;
+					}
+				}
+		}
+
+	}
+}   

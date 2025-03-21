@@ -134,6 +134,7 @@ namespace jumpstart {
     public class MetaObject : MetaBaseElement
     {
         private List<MetaAttribute> _userAttributes = null;
+        private List<MetaAttribute> _globalAttributes = null;
         public string Namespace {get; private set;}
         public string DomainObj { get; private set; }
 
@@ -175,6 +176,20 @@ namespace jumpstart {
                     }
                 }
                 return _userAttributes;
+            }
+        }
+        public List<MetaAttribute> GlobalAttributes {
+            get 
+            {
+                if (_globalAttributes == null)
+                {
+                    _globalAttributes = new List<MetaAttribute>();
+                    foreach(MetaAttribute a in Attributes)
+                    {
+                        if (a.IsGlobal()) _globalAttributes.Add(a);
+                    }
+                }
+                return _globalAttributes;
             }
         }
         public MetaObject(string _namespace, string tableName, string schemaName, string label, string primary)

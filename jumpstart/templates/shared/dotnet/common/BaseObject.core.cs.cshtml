@@ -24,6 +24,15 @@ namespace @Model.Name
         protected List<string> rwk = new List<string>();
 
         public List<string> getRwk() { return rwk;  }
+        public string getRwkString()
+        {
+            List<object> rwkValues = new();
+            foreach(string c in rwk)
+						{
+							rwkValues.Add( this[c] );
+						}
+            return String.Join( " ", rwkValues);
+        }
 
          // Override the indexer to keep dictionary & properties in sync
         public new object this[string key]

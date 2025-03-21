@@ -63,7 +63,7 @@ Blazor wasm content,model,web/blazor/Properties/launchSettings.json,web/Properti
 Blazor wasm content,model,web/blazor/_Imports.razor.cshtml,web/,TRUE
 Blazor wasm content,model,web/blazor/template.csproj.cshtml,web/,FALSE
 Blazor wasm content,model,web/blazor/template.sln.cshtml,web/,FALSE
-Blazor wasm content,object,web/blazor/Pages/EditOrg.razor,web/Pages,FALSE
+Blazor wasm content,object,web/blazor/Pages/Edittemplate.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,object,web/blazor/Pages/Listtemplate.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Pages/Home.razor,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Program.cs.cshtml,web,FALSE

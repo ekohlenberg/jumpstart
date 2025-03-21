@@ -1,0 +1,142 @@
+@page "/edit-invoice"
+@page "/edit-invoice/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Invoice</h3>
+}
+else
+{
+	<h3>Edit Invoice @invoice.getRwkString() </h3>
+}
+
+<EditForm Model="invoice" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">Invoice ID</label></td>
+		        <td><InputText id="id" @bind-Value="invoice.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="customer_id">Customer</label></td>
+		        <td><InputText id="customer_id" @bind-Value="invoice.customer_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="org_id">Organization</label></td>
+		        <td><InputText id="org_id" @bind-Value="invoice.org_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="invoice_number">Number</label></td>
+		        <td><InputText id="invoice_number" @bind-Value="invoice.invoice_number" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="invoice_date">Invoice Date</label></td>
+		        <td><InputText id="invoice_date" @bind-Value="invoice.invoice_date" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="due_date">Due Date</label></td>
+		        <td><InputText id="due_date" @bind-Value="invoice.due_date" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="total_amount">Total Amount</label></td>
+		        <td><InputText id="total_amount" @bind-Value="invoice.total_amount" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="status">Status</label></td>
+		        <td><InputText id="status" @bind-Value="invoice.status" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="created_date">Created</label></td>
+		        <td><InputText id="created_date" @bind-Value="invoice.created_date" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(invoice.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(invoice.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(invoice.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(invoice.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(invoice.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public Invoice invoice {get;set;} = new Invoice();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<Invoice>($"api/invoice/{id}");
+		if (result is not null)
+			invoice = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<Invoice>($"api/invoice/{id}", invoice);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Invoice>();
+					if (readResult is not null) 
+					{
+						invoice = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<Invoice>($"api/invoice", invoice);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Invoice>();
+					if (readResult is not null)
+					{
+						invoice = readResult;
+					}
+				}
+		}
+
+	}
+}   

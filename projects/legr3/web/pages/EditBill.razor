@@ -1,0 +1,142 @@
+@page "/edit-bill"
+@page "/edit-bill/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Bill</h3>
+}
+else
+{
+	<h3>Edit Bill @bill.getRwkString() </h3>
+}
+
+<EditForm Model="bill" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">Bill ID</label></td>
+		        <td><InputText id="id" @bind-Value="bill.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="vendor_id">Vendor </label></td>
+		        <td><InputText id="vendor_id" @bind-Value="bill.vendor_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="org_id">Organization</label></td>
+		        <td><InputText id="org_id" @bind-Value="bill.org_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="bill_number">Number</label></td>
+		        <td><InputText id="bill_number" @bind-Value="bill.bill_number" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="bill_date">Bill Date</label></td>
+		        <td><InputText id="bill_date" @bind-Value="bill.bill_date" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="due_date">Due Date</label></td>
+		        <td><InputText id="due_date" @bind-Value="bill.due_date" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="total_amount">Total Amount</label></td>
+		        <td><InputText id="total_amount" @bind-Value="bill.total_amount" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="status">Status</label></td>
+		        <td><InputText id="status" @bind-Value="bill.status" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="created_date">Created</label></td>
+		        <td><InputText id="created_date" @bind-Value="bill.created_date" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(bill.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(bill.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(bill.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(bill.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(bill.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public Bill bill {get;set;} = new Bill();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<Bill>($"api/bill/{id}");
+		if (result is not null)
+			bill = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<Bill>($"api/bill/{id}", bill);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Bill>();
+					if (readResult is not null) 
+					{
+						bill = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<Bill>($"api/bill", bill);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Bill>();
+					if (readResult is not null)
+					{
+						bill = readResult;
+					}
+				}
+		}
+
+	}
+}   

@@ -22,12 +22,12 @@ else
 
                 <tr>
                 <td><label for="id">Organization ID</label></td>
-		        <td><InputText id="id" @bind-Value="org.id" class="form-control" /></td>
+		        <td><InputText id="id" @bind-Value="@(org.id.ToString())" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="name">Name</label></td>
-		        <td><InputText id="name" @bind-Value="org.name" class="form-control" /></td>
+		        <td><InputText id="name" @bind-Value="@(org.name.ToString())" class="form-control" /></td>
                 </tr>
                 		
 
