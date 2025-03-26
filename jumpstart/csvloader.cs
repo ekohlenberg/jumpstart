@@ -1,6 +1,7 @@
 using System.IO;
 using System.Globalization;
 using CsvHelper;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace jumpstart {
 
@@ -129,6 +130,7 @@ public class CSVLoader
                 Length = mr.CHARACTER_MAXIMUM_LENGTH.Trim(),
                 DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), "object"),
                 ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), ""),
+                InputType = TypeMapping.InputMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), "Text"),
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
                 FkObject= mr.FK_OBJECT.ToLower(),

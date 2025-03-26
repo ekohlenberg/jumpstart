@@ -22,37 +22,37 @@ else
 
                 <tr>
                 <td><label for="id">Invoice ID</label></td>
-		        <td><InputText id="id" @bind-Value="invoice.id" class="form-control" /></td>
+		        <td><InputNumber id="id" @bind-Value="invoice.id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="customer_id">Customer</label></td>
-		        <td><InputText id="customer_id" @bind-Value="invoice.customer_id" class="form-control" /></td>
+		        <td><InputNumber id="customer_id" @bind-Value="invoice.customer_id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="org_id">Organization</label></td>
-		        <td><InputText id="org_id" @bind-Value="invoice.org_id" class="form-control" /></td>
+		        <td><InputNumber id="org_id" @bind-Value="invoice.org_id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="invoice_number">Number</label></td>
-		        <td><InputText id="invoice_number" @bind-Value="invoice.invoice_number" class="form-control" /></td>
+		        <td><InputNumber id="invoice_number" @bind-Value="invoice.invoice_number" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="invoice_date">Invoice Date</label></td>
-		        <td><InputText id="invoice_date" @bind-Value="invoice.invoice_date" class="form-control" /></td>
+		        <td><InputDate id="invoice_date" @bind-Value="invoice.invoice_date" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="due_date">Due Date</label></td>
-		        <td><InputText id="due_date" @bind-Value="invoice.due_date" class="form-control" /></td>
+		        <td><InputDate id="due_date" @bind-Value="invoice.due_date" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="total_amount">Total Amount</label></td>
-		        <td><InputText id="total_amount" @bind-Value="invoice.total_amount" class="form-control" /></td>
+		        <td><InputNumber id="total_amount" @bind-Value="invoice.total_amount" class="form-control" /></td>
                 </tr>
                 
                 <tr>
@@ -62,7 +62,7 @@ else
                 
                 <tr>
                 <td><label for="created_date">Created</label></td>
-		        <td><InputText id="created_date" @bind-Value="invoice.created_date" class="form-control" /></td>
+		        <td><InputDate id="created_date" @bind-Value="invoice.created_date" class="form-control" /></td>
                 </tr>
                 		
 

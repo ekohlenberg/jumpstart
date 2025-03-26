@@ -22,27 +22,27 @@ else
 
                 <tr>
                 <td><label for="id">Transaction ID</label></td>
-		        <td><InputText id="id" @bind-Value="transaction.id" class="form-control" /></td>
+		        <td><InputNumber id="id" @bind-Value="transaction.id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="account_id">Account ID</label></td>
-		        <td><InputText id="account_id" @bind-Value="transaction.account_id" class="form-control" /></td>
+		        <td><InputNumber id="account_id" @bind-Value="transaction.account_id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="org_id">Organization ID</label></td>
-		        <td><InputText id="org_id" @bind-Value="transaction.org_id" class="form-control" /></td>
+		        <td><InputNumber id="org_id" @bind-Value="transaction.org_id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="transaction_date">Transaction Date</label></td>
-		        <td><InputText id="transaction_date" @bind-Value="transaction.transaction_date" class="form-control" /></td>
+		        <td><InputDate id="transaction_date" @bind-Value="transaction.transaction_date" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="amount">Amount</label></td>
-		        <td><InputText id="amount" @bind-Value="transaction.amount" class="form-control" /></td>
+		        <td><InputNumber id="amount" @bind-Value="transaction.amount" class="form-control" /></td>
                 </tr>
                 
                 <tr>
@@ -57,7 +57,7 @@ else
                 
                 <tr>
                 <td><label for="created_date">Created Date</label></td>
-		        <td><InputText id="created_date" @bind-Value="transaction.created_date" class="form-control" /></td>
+		        <td><InputDate id="created_date" @bind-Value="transaction.created_date" class="form-control" /></td>
                 </tr>
                 		
 

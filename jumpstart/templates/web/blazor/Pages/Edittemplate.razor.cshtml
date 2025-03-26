@@ -24,7 +24,7 @@ else
                 <text>
                 <tr>
                 <td><label for="@(a.Name)">@a.Label</label></td>
-		        <td><InputText id="@(a.Name)" @@bind-Value="@(Model.DomainVar).@(a.Name)" class="form-control" /></td>
+		        <td><Input@(a.InputType) id="@(a.Name)" @@bind-Value="@(Model.DomainVar).@(a.Name)" class="form-control" /></td>
                 </tr>
                 </text>
             }

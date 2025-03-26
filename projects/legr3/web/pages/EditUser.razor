@@ -22,7 +22,7 @@ else
 
                 <tr>
                 <td><label for="id">User ID</label></td>
-		        <td><InputText id="id" @bind-Value="user.id" class="form-control" /></td>
+		        <td><InputNumber id="id" @bind-Value="user.id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
@@ -47,12 +47,12 @@ else
                 
                 <tr>
                 <td><label for="created_date">Created</label></td>
-		        <td><InputText id="created_date" @bind-Value="user.created_date" class="form-control" /></td>
+		        <td><InputDate id="created_date" @bind-Value="user.created_date" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="last_login_date">Last Login</label></td>
-		        <td><InputText id="last_login_date" @bind-Value="user.last_login_date" class="form-control" /></td>
+		        <td><InputDate id="last_login_date" @bind-Value="user.last_login_date" class="form-control" /></td>
                 </tr>
                 		
 

@@ -22,27 +22,27 @@ else
 
                 <tr>
                 <td><label for="id">Payment ID</label></td>
-		        <td><InputText id="id" @bind-Value="payment.id" class="form-control" /></td>
+		        <td><InputNumber id="id" @bind-Value="payment.id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="invoice_id">Invoice ID</label></td>
-		        <td><InputText id="invoice_id" @bind-Value="payment.invoice_id" class="form-control" /></td>
+		        <td><InputNumber id="invoice_id" @bind-Value="payment.invoice_id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="org_id">Organization ID</label></td>
-		        <td><InputText id="org_id" @bind-Value="payment.org_id" class="form-control" /></td>
+		        <td><InputNumber id="org_id" @bind-Value="payment.org_id" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="payment_date">Payment Date</label></td>
-		        <td><InputText id="payment_date" @bind-Value="payment.payment_date" class="form-control" /></td>
+		        <td><InputDate id="payment_date" @bind-Value="payment.payment_date" class="form-control" /></td>
                 </tr>
                 
                 <tr>
                 <td><label for="amount">Amount</label></td>
-		        <td><InputText id="amount" @bind-Value="payment.amount" class="form-control" /></td>
+		        <td><InputNumber id="amount" @bind-Value="payment.amount" class="form-control" /></td>
                 </tr>
                 
                 <tr>
@@ -52,7 +52,7 @@ else
                 
                 <tr>
                 <td><label for="created_date">Created Date</label></td>
-		        <td><InputText id="created_date" @bind-Value="payment.created_date" class="form-control" /></td>
+		        <td><InputDate id="created_date" @bind-Value="payment.created_date" class="form-control" /></td>
                 </tr>
                 		
 

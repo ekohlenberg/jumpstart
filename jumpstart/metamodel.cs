@@ -63,8 +63,30 @@ namespace jumpstart {
             {"cidr" , "ToString"},	
             {"macaddr" , "ToString"}	
         };
+        public static readonly Dictionary<string, string> InputMap = new()
+        {
+            {"integer", "Number"},
+            {"bigint", "Number"},
+            {"smallint", "Number"},
+            {"serial", "Number"},
+            {"bigserial", "Number"},
+            {"boolean", "Radio"},
+            {"char", "Text"},
+            {"varchar", "Text"},
+            {"text", "TextArea"},
+            {"date", "Date"},
+            {"timestamp", "Date"},
+            {"timestamptz", "Date"},
+            {"real", "Number"},
+            {"double precision", "Number"},
+            {"numeric", "Number"},
+            {"numeric(18,4)", "Number"},
+            {"json", "TextArea"},
+            {"uuid", "Text"},
+            {"bytea", "Text"},
+            {"xml", "Text"}
+        };
     }
-
 
     public class MetaBaseElement
     {
@@ -104,6 +126,8 @@ namespace jumpstart {
         private string _pascalName = null; 
         public string SqlDataType { get; set; }
         public string DotNetType {get;set;}
+
+        public string InputType {get;set;}
 
         public string PascalName {
             get {
