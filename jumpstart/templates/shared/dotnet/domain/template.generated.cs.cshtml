@@ -41,7 +41,27 @@ namespace @namespaceName
             {
                 get
                 {
-                    return Convert.@(attr.ConvertMethod)(this["@attr.Name"].ToString());
+                    @attr.DotNetType _@attr.Name;
+                    @{
+                        if (attr.DotNetType == "string")
+                        {
+                            <text>
+                            _@attr.Name = string.Empty;
+                            </text>
+                        } 
+                        else
+                        {
+                            <text>
+                             _@attr.Name = default(@attr.DotNetType);
+                             </text>
+                        }
+                    }
+                    
+                    if(this.ContainsKey("@attr.Name"))
+                    {
+                       _@attr.Name = Convert.@(attr.ConvertMethod)(this["@attr.Name"].ToString());
+                    }
+                    return _@attr.Name;
                 }
                 set
                 {

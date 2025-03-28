@@ -23,7 +23,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToInt64(this["id"].ToString());
+                    long _id;
+
+                             _id = default(long);
+                                                 
+                    if(this.ContainsKey("id"))
+                    {
+                       _id = Convert.ToInt64(this["id"].ToString());
+                    }
+                    return _id;
                 }
                 set
                 {
@@ -37,7 +45,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToInt64(this["customer_id"].ToString());
+                    long _customer_id;
+
+                             _customer_id = default(long);
+                                                 
+                    if(this.ContainsKey("customer_id"))
+                    {
+                       _customer_id = Convert.ToInt64(this["customer_id"].ToString());
+                    }
+                    return _customer_id;
                 }
                 set
                 {
@@ -51,7 +67,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToInt64(this["org_id"].ToString());
+                    long _org_id;
+
+                             _org_id = default(long);
+                                                 
+                    if(this.ContainsKey("org_id"))
+                    {
+                       _org_id = Convert.ToInt64(this["org_id"].ToString());
+                    }
+                    return _org_id;
                 }
                 set
                 {
@@ -65,7 +89,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToInt64(this["invoice_number"].ToString());
+                    long _invoice_number;
+
+                             _invoice_number = default(long);
+                                                 
+                    if(this.ContainsKey("invoice_number"))
+                    {
+                       _invoice_number = Convert.ToInt64(this["invoice_number"].ToString());
+                    }
+                    return _invoice_number;
                 }
                 set
                 {
@@ -79,7 +111,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToDateTime(this["invoice_date"].ToString());
+                    DateTime _invoice_date;
+
+                             _invoice_date = default(DateTime);
+                                                 
+                    if(this.ContainsKey("invoice_date"))
+                    {
+                       _invoice_date = Convert.ToDateTime(this["invoice_date"].ToString());
+                    }
+                    return _invoice_date;
                 }
                 set
                 {
@@ -93,7 +133,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToDateTime(this["due_date"].ToString());
+                    DateTime _due_date;
+
+                             _due_date = default(DateTime);
+                                                 
+                    if(this.ContainsKey("due_date"))
+                    {
+                       _due_date = Convert.ToDateTime(this["due_date"].ToString());
+                    }
+                    return _due_date;
                 }
                 set
                 {
@@ -107,7 +155,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToDouble(this["total_amount"].ToString());
+                    object _total_amount;
+
+                             _total_amount = default(object);
+                                                 
+                    if(this.ContainsKey("total_amount"))
+                    {
+                       _total_amount = Convert.ToDouble(this["total_amount"].ToString());
+                    }
+                    return _total_amount;
                 }
                 set
                 {
@@ -121,7 +177,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToString(this["status"].ToString());
+                    string _status;
+
+                            _status = string.Empty;
+                                                
+                    if(this.ContainsKey("status"))
+                    {
+                       _status = Convert.ToString(this["status"].ToString());
+                    }
+                    return _status;
                 }
                 set
                 {
@@ -135,7 +199,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToDateTime(this["created_date"].ToString());
+                    DateTime _created_date;
+
+                             _created_date = default(DateTime);
+                                                 
+                    if(this.ContainsKey("created_date"))
+                    {
+                       _created_date = Convert.ToDateTime(this["created_date"].ToString());
+                    }
+                    return _created_date;
                 }
                 set
                 {
@@ -149,7 +221,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToInt32(this["is_active"].ToString());
+                    int _is_active;
+
+                             _is_active = default(int);
+                                                 
+                    if(this.ContainsKey("is_active"))
+                    {
+                       _is_active = Convert.ToInt32(this["is_active"].ToString());
+                    }
+                    return _is_active;
                 }
                 set
                 {
@@ -163,7 +243,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToString(this["created_by"].ToString());
+                    string _created_by;
+
+                            _created_by = string.Empty;
+                                                
+                    if(this.ContainsKey("created_by"))
+                    {
+                       _created_by = Convert.ToString(this["created_by"].ToString());
+                    }
+                    return _created_by;
                 }
                 set
                 {
@@ -177,7 +265,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToDateTime(this["last_updated"].ToString());
+                    DateTime _last_updated;
+
+                             _last_updated = default(DateTime);
+                                                 
+                    if(this.ContainsKey("last_updated"))
+                    {
+                       _last_updated = Convert.ToDateTime(this["last_updated"].ToString());
+                    }
+                    return _last_updated;
                 }
                 set
                 {
@@ -191,7 +287,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToString(this["last_updated_by"].ToString());
+                    string _last_updated_by;
+
+                            _last_updated_by = string.Empty;
+                                                
+                    if(this.ContainsKey("last_updated_by"))
+                    {
+                       _last_updated_by = Convert.ToString(this["last_updated_by"].ToString());
+                    }
+                    return _last_updated_by;
                 }
                 set
                 {
@@ -205,7 +309,15 @@ namespace legr3
             {
                 get
                 {
-                    return Convert.ToInt32(this["version"].ToString());
+                    int _version;
+
+                             _version = default(int);
+                                                 
+                    if(this.ContainsKey("version"))
+                    {
+                       _version = Convert.ToInt32(this["version"].ToString());
+                    }
+                    return _version;
                 }
                 set
                 {
