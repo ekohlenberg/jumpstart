@@ -171,6 +171,12 @@ namespace @Model.Namespace
             double randomFloat = _random.NextDouble() * 10000;
             return randomFloat;
         }
+
+        public static decimal getRandomDecimal()
+        {
+            return Convert.ToDecimal( getRandomFloat() );
+        }
+
         public static object getTestData( BaseObject baseObject, string dataType, TestDataType testDataType)
         {
                 object result = string.Empty;
@@ -228,6 +234,8 @@ namespace @Model.Namespace
                                 result = DateTime.Now;
                                 break;
                             case "NUMERIC":
+                                result = getRandomDecimal();
+                                break;
                             case "DOUBLE PRECISION":
                             case "MONEY":
                             case "REAL":

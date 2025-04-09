@@ -12,6 +12,11 @@ create table @Model.SchemaName.@Model.TableName (
         len = "(" + column.Length + ")";
     }
 
+    if (column.SqlDataType == "numeric")
+    {
+        len = "(18,4)";
+    }
+
     var nullable = "";
     if (column.RWK == "1") {
         nullable = " not null";

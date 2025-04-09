@@ -50,9 +50,9 @@ namespace jumpstart {
             {"timetz" , "ToDateTime" },	//  Convert to DateTime, then use .TimeOfDay for TimeSpan
             {"real" , "ToSingle"},	
             {"double precision" , "ToDouble"},	
-            {"numeric" , "ToDouble"},	
-            {"numeric(18,4)" , "ToDouble"},	
-            {"decimal" , "ToDouble"},	
+            {"numeric" , "ToDecimal"},	
+            {"numeric(18,4)" , "ToDecimal"},	
+            {"decimal" , "ToDecimal"},	
             {"bytea" , "ToByte[]"},	
             {"uuid" , "Guid.Parse" },	// Guid.Parse is used instead of Convert for UUIDs
             {"json" , "ToString"},	

@@ -1,4 +1,4 @@
-TARGETDIR=./bin/Debug/net8.0
+TARGETDIR=./bin/Debug/net9.0
 
 default: build
 
