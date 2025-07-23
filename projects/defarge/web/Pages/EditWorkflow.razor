@@ -1,0 +1,117 @@
+@page "/edit-workflow"
+@page "/edit-workflow/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Workflow</h3>
+}
+else
+{
+	<h3>Edit Workflow @workflow.getRwkString() </h3>
+}
+
+<EditForm Model="workflow" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id"></label></td>
+		        <td><InputNumber id="id" @bind-Value="workflow.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="parent_workflow_id"></label></td>
+		        <td><InputNumber id="parent_workflow_id" @bind-Value="workflow.parent_workflow_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="name"></label></td>
+		        <td><InputText id="name" @bind-Value="workflow.name" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="description"></label></td>
+		        <td><InputText id="description" @bind-Value="workflow.description" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(workflow.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(workflow.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(workflow.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(workflow.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(workflow.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public Workflow workflow {get;set;} = new Workflow();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<Workflow>($"api/workflow/{id}");
+		if (result is not null)
+			workflow = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<Workflow>($"api/workflow/{id}", workflow);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Workflow>();
+					if (readResult is not null) 
+					{
+						workflow = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<Workflow>($"api/workflow", workflow);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Workflow>();
+					if (readResult is not null)
+					{
+						workflow = readResult;
+					}
+				}
+		}
+
+	}
+}   

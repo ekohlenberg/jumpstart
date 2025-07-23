@@ -1,0 +1,106 @@
+@page "/alert"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Alert</PageTitle>
+
+<h1>Alert</h1>
+
+<p>This component demonstrates fetching Alert data from the server.</p>
+
+@if (alertList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>ID</th>
+                
+                <th>Alert</th>
+                
+                <th>Metric</th>
+                
+                <th>Triggered</th>
+                
+                <th>Resolved</th>
+                
+                <th>Status</th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var alert in alertList)
+            {
+                <tr>
+
+                    <td>@alert.id.ToString()</td>
+                    
+                    <td>@alert.alert_rule_id.ToString()</td>
+                    
+                    <td>@alert.metric_event_id.ToString()</td>
+                    
+                    <td>@alert.triggered_at.ToString()</td>
+                    
+                    <td>@alert.resolved_at.ToString()</td>
+                    
+                    <td>@alert.status.ToString()</td>
+                    
+                    <td>@alert.is_active.ToString()</td>
+                    
+                    <td>@alert.created_by.ToString()</td>
+                    
+                    <td>@alert.last_updated.ToString()</td>
+                    
+                    <td>@alert.last_updated_by.ToString()</td>
+                    
+                    <td>@alert.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditAlert(@alert.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddAlert())">Add</button></td>
+}
+
+@code {
+    protected  Alert[]? alertList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        alertList = await remoteClient.GetFromJsonAsync<Alert[]>("api/alert");
+    }
+
+    void AddAlert()
+    {
+        
+        Navigation.NavigateTo("edit-alert");
+    }
+
+    void EditAlert(long id)
+    {
+        Navigation.NavigateTo($"edit-alert/{id}");
+    }
+
+
+   
+}

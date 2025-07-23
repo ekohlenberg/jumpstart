@@ -1,0 +1,112 @@
+@page "/edit-userorg"
+@page "/edit-userorg/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Users</h3>
+}
+else
+{
+	<h3>Edit Users @userorg.getRwkString() </h3>
+}
+
+<EditForm Model="userorg" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">User Org ID</label></td>
+		        <td><InputNumber id="id" @bind-Value="userorg.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="org_id">Organization ID</label></td>
+		        <td><InputNumber id="org_id" @bind-Value="userorg.org_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="user_id">User ID</label></td>
+		        <td><InputNumber id="user_id" @bind-Value="userorg.user_id" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(userorg.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(userorg.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(userorg.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(userorg.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(userorg.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public UserOrg userorg {get;set;} = new UserOrg();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<UserOrg>($"api/userorg/{id}");
+		if (result is not null)
+			userorg = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<UserOrg>($"api/userorg/{id}", userorg);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<UserOrg>();
+					if (readResult is not null) 
+					{
+						userorg = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<UserOrg>($"api/userorg", userorg);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<UserOrg>();
+					if (readResult is not null)
+					{
+						userorg = readResult;
+					}
+				}
+		}
+
+	}
+}   

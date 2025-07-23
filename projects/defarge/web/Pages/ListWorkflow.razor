@@ -1,0 +1,98 @@
+@page "/workflow"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Workflow</PageTitle>
+
+<h1>Workflow</h1>
+
+<p>This component demonstrates fetching Workflow data from the server.</p>
+
+@if (workflowList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th></th>
+                
+                <th></th>
+                
+                <th></th>
+                
+                <th></th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var workflow in workflowList)
+            {
+                <tr>
+
+                    <td>@workflow.id.ToString()</td>
+                    
+                    <td>@workflow.parent_workflow_id.ToString()</td>
+                    
+                    <td>@workflow.name.ToString()</td>
+                    
+                    <td>@workflow.description.ToString()</td>
+                    
+                    <td>@workflow.is_active.ToString()</td>
+                    
+                    <td>@workflow.created_by.ToString()</td>
+                    
+                    <td>@workflow.last_updated.ToString()</td>
+                    
+                    <td>@workflow.last_updated_by.ToString()</td>
+                    
+                    <td>@workflow.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditWorkflow(@workflow.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddWorkflow())">Add</button></td>
+}
+
+@code {
+    protected  Workflow[]? workflowList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        workflowList = await remoteClient.GetFromJsonAsync<Workflow[]>("api/workflow");
+    }
+
+    void AddWorkflow()
+    {
+        
+        Navigation.NavigateTo("edit-workflow");
+    }
+
+    void EditWorkflow(long id)
+    {
+        Navigation.NavigateTo($"edit-workflow/{id}");
+    }
+
+
+   
+}

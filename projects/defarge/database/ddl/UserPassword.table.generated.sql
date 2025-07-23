@@ -1,7 +1,7 @@
 
 create table sec.user_password (
 		id BIGINT PRIMARY KEY,
-		user_id BIGINT  not null,
+		user_id BIGINT ,
 		password_hash VARCHAR(255) ,
 		expiry TIMESTAMP ,
 		needs_reset INTEGER ,

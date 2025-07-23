@@ -28,7 +28,7 @@ defarge,app,alert,Alert,0,triggered_at,Triggered,,,,4,,,NO,TIMESTAMP,,
 defarge,app,alert,Alert,0,resolved_at,Resolved,,,,5,,,NO,TIMESTAMP,,
 defarge,app,alert,Alert,0,status,Status,,,,6,,,NO,VARCHAR,,
 defarge,app,category,Category,1,id,ID,,,,1,,,NO,BIGINT,,
-defarge,app,category,Category,1,parent_id,Parent,parent,Category,,2,,1,NO,BIGINT,,
+defarge,app,category,Category,1,parent_id,Parent,parent,Category,,2,,1,YES,BIGINT,,
 defarge,app,category,Category,1,name,Name,,,,3,,1,NO,VARCHAR,,255
 defarge,app,uom,Unit of Measure,1,id,ID,,,,1,,,NO,BIGINT,,
 defarge,app,uom,Unit of Measure,1,Name,Name,,,,2,,1,NO,VARCHAR,,255

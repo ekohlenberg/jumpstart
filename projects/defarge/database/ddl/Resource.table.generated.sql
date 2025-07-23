@@ -1,7 +1,7 @@
 
 create table app.resource (
 		id BIGINT PRIMARY KEY,
-		name VARCHAR(255)  not null,
+		name VARCHAR(255) ,
 		resource_type_id BIGINT ,
 		ip_address VARCHAR(255) ,
 		description VARCHAR(255) ,

@@ -17,7 +17,7 @@ namespace defarge
                     
                     metricevent.event_time = Convert.ToDateTime(BaseTest.getTestData(metricevent, "TIMESTAMP", TestDataType.random));
                     
-                    metricevent.value = Convert.ToDouble(BaseTest.getTestData(metricevent, "NUMERIC(18,4)", TestDataType.random));
+                    metricevent.value = Convert.ToDecimal(BaseTest.getTestData(metricevent, "NUMERIC(18,4)", TestDataType.random));
                     
                 Console.WriteLine("Testing MetricEventLogic insert: " + metricevent.ToString());
                 MetricEventLogic.Create().insert(metricevent);

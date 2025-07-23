@@ -4,7 +4,7 @@ create table app.user (
 		first_name VARCHAR(50) ,
 		last_name VARCHAR(50) ,
 		username VARCHAR(50) ,
-		email VARCHAR(100)  not null,
+		email VARCHAR(100) ,
 		created_date TIMESTAMP ,
 		last_login_date TIMESTAMP ,
 		is_active integer ,

@@ -19,7 +19,7 @@ namespace defarge
                     
                     alertrule.condition = Convert.ToString(BaseTest.getTestData(alertrule, "VARCHAR", TestDataType.random));
                     
-                    alertrule.threshold = Convert.ToDouble(BaseTest.getTestData(alertrule, "NUMERIC(18,4)", TestDataType.random));
+                    alertrule.threshold = Convert.ToDecimal(BaseTest.getTestData(alertrule, "NUMERIC(18,4)", TestDataType.random));
                     
                     alertrule.recipients = Convert.ToString(BaseTest.getTestData(alertrule, "VARCHAR", TestDataType.random));
                     

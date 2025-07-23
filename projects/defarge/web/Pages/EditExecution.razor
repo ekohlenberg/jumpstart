@@ -1,0 +1,127 @@
+@page "/edit-execution"
+@page "/edit-execution/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Execution Log</h3>
+}
+else
+{
+	<h3>Edit Execution Log @execution.getRwkString() </h3>
+}
+
+<EditForm Model="execution" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">Execution ID</label></td>
+		        <td><InputNumber id="id" @bind-Value="execution.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="process_id">Process</label></td>
+		        <td><InputNumber id="process_id" @bind-Value="execution.process_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="start_time">Start Time</label></td>
+		        <td><InputDate id="start_time" @bind-Value="execution.start_time" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="end_time">End Time</label></td>
+		        <td><InputDate id="end_time" @bind-Value="execution.end_time" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="status">Status</label></td>
+		        <td><InputText id="status" @bind-Value="execution.status" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="log_output">Log Output</label></td>
+		        <td><InputText id="log_output" @bind-Value="execution.log_output" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(execution.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(execution.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(execution.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(execution.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(execution.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public Execution execution {get;set;} = new Execution();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<Execution>($"api/execution/{id}");
+		if (result is not null)
+			execution = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<Execution>($"api/execution/{id}", execution);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Execution>();
+					if (readResult is not null) 
+					{
+						execution = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<Execution>($"api/execution", execution);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Execution>();
+					if (readResult is not null)
+					{
+						execution = readResult;
+					}
+				}
+		}
+
+	}
+}   

@@ -18,10 +18,10 @@ create table @Model.SchemaName.@Model.TableName (
     }
 
     var nullable = "";
-    if (column.RWK == "1") {
+/*    if (column.RWK == "1") {
         nullable = " not null";
     }
-
+*/
     var comma = "";
     if (i < Model.Attributes.Count - 1) {
         comma = ",";

@@ -1,0 +1,94 @@
+@page "/script"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Scripts</PageTitle>
+
+<h1>Scripts</h1>
+
+<p>This component demonstrates fetching Scripts data from the server.</p>
+
+@if (scriptList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>Script ID</th>
+                
+                <th>Name</th>
+                
+                <th>Source Code</th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var script in scriptList)
+            {
+                <tr>
+
+                    <td>@script.id.ToString()</td>
+                    
+                    <td>@script.name.ToString()</td>
+                    
+                    <td>@script.source.ToString()</td>
+                    
+                    <td>@script.is_active.ToString()</td>
+                    
+                    <td>@script.created_by.ToString()</td>
+                    
+                    <td>@script.last_updated.ToString()</td>
+                    
+                    <td>@script.last_updated_by.ToString()</td>
+                    
+                    <td>@script.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditScript(@script.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddScript())">Add</button></td>
+}
+
+@code {
+    protected  Script[]? scriptList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        scriptList = await remoteClient.GetFromJsonAsync<Script[]>("api/script");
+    }
+
+    void AddScript()
+    {
+        
+        Navigation.NavigateTo("edit-script");
+    }
+
+    void EditScript(long id)
+    {
+        Navigation.NavigateTo($"edit-script/{id}");
+    }
+
+
+   
+}

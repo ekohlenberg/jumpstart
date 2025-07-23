@@ -74,6 +74,30 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\OpRole.rwkindex.generated.sql
         
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Schedule.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Schedule.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Schedule.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Schedule.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Workflow.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Workflow.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Workflow.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Workflow.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Server.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Server.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Server.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Server.rwkindex.generated.sql
+        
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Metric.table.generated.sql
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Metric.audit.generated.sql
@@ -114,6 +138,14 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\EventService.rwkindex.generated.sql
         
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Process.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Process.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Process.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Process.rwkindex.generated.sql
+        
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\OpRoleMap.table.generated.sql
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\OpRoleMap.audit.generated.sql
@@ -129,6 +161,14 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\OpRoleMember.sequence.generated.sql
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\OpRoleMember.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\ScheduleWorkflow.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\ScheduleWorkflow.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\ScheduleWorkflow.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\ScheduleWorkflow.rwkindex.generated.sql
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\MetricEvent.table.generated.sql
         
@@ -153,6 +193,22 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\MetricResourceMap.sequence.generated.sql
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\MetricResourceMap.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Execution.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Execution.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Execution.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Execution.rwkindex.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\WorkflowProcess.table.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\WorkflowProcess.audit.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\WorkflowProcess.sequence.generated.sql
+        
+            psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\WorkflowProcess.rwkindex.generated.sql
         
             psql --host=localhost --port=5433 --dbname=defarge --username=postgres --file=.\Alert.table.generated.sql
         

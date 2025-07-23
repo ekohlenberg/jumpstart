@@ -1,0 +1,94 @@
+@page "/oprolemap"
+@using System.Net.Http;
+@using Microsoft.Extensions.DependencyInjection;
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<PageTitle>Operation Group Map</PageTitle>
+
+<h1>Operation Group Map</h1>
+
+<p>This component demonstrates fetching Operation Group Map data from the server.</p>
+
+@if (oprolemapList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>Operation Role Map ID</th>
+                
+                <th>Operation ID</th>
+                
+                <th>Role ID</th>
+                
+                <th>Active</th>
+                
+                <th>Created By</th>
+                
+                <th>Last Updated</th>
+                
+                <th>Last Updated By</th>
+                
+                <th>Version</th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var oprolemap in oprolemapList)
+            {
+                <tr>
+
+                    <td>@oprolemap.id.ToString()</td>
+                    
+                    <td>@oprolemap.op_id.ToString()</td>
+                    
+                    <td>@oprolemap.op_role_id.ToString()</td>
+                    
+                    <td>@oprolemap.is_active.ToString()</td>
+                    
+                    <td>@oprolemap.created_by.ToString()</td>
+                    
+                    <td>@oprolemap.last_updated.ToString()</td>
+                    
+                    <td>@oprolemap.last_updated_by.ToString()</td>
+                    
+                    <td>@oprolemap.version.ToString()</td>
+                                        <td><button class="btn btn-primary" @onclick="@(()=> EditOpRoleMap(@oprolemap.id))">Edit</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @onclick="@(()=> AddOpRoleMap())">Add</button></td>
+}
+
+@code {
+    protected  OpRoleMap[]? oprolemapList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        oprolemapList = await remoteClient.GetFromJsonAsync<OpRoleMap[]>("api/oprolemap");
+    }
+
+    void AddOpRoleMap()
+    {
+        
+        Navigation.NavigateTo("edit-oprolemap");
+    }
+
+    void EditOpRoleMap(long id)
+    {
+        Navigation.NavigateTo($"edit-oprolemap/{id}");
+    }
+
+
+   
+}

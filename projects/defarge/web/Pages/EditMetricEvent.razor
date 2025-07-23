@@ -1,0 +1,117 @@
+@page "/edit-metricevent"
+@page "/edit-metricevent/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Metric Event</h3>
+}
+else
+{
+	<h3>Edit Metric Event @metricevent.getRwkString() </h3>
+}
+
+<EditForm Model="metricevent" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">ID</label></td>
+		        <td><InputNumber id="id" @bind-Value="metricevent.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="metric_id">Metric</label></td>
+		        <td><InputNumber id="metric_id" @bind-Value="metricevent.metric_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="event_time">Event Time</label></td>
+		        <td><InputDate id="event_time" @bind-Value="metricevent.event_time" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="value">Value</label></td>
+		        <td><InputNumber id="value" @bind-Value="metricevent.value" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(metricevent.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(metricevent.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(metricevent.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(metricevent.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(metricevent.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public MetricEvent metricevent {get;set;} = new MetricEvent();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<MetricEvent>($"api/metricevent/{id}");
+		if (result is not null)
+			metricevent = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<MetricEvent>($"api/metricevent/{id}", metricevent);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<MetricEvent>();
+					if (readResult is not null) 
+					{
+						metricevent = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<MetricEvent>($"api/metricevent", metricevent);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<MetricEvent>();
+					if (readResult is not null)
+					{
+						metricevent = readResult;
+					}
+				}
+		}
+
+	}
+}   

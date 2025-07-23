@@ -1,7 +1,7 @@
 
 create table app.resource_type (
 		id BIGINT PRIMARY KEY,
-		name VARCHAR(255)  not null,
+		name VARCHAR(255) ,
 		is_active integer ,
 		created_by varchar(50) ,
 		last_updated timestamp ,

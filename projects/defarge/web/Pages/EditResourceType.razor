@@ -1,0 +1,107 @@
+@page "/edit-resourcetype"
+@page "/edit-resourcetype/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Resource Type</h3>
+}
+else
+{
+	<h3>Edit Resource Type @resourcetype.getRwkString() </h3>
+}
+
+<EditForm Model="resourcetype" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">ID</label></td>
+		        <td><InputNumber id="id" @bind-Value="resourcetype.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="name">Name</label></td>
+		        <td><InputText id="name" @bind-Value="resourcetype.name" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(resourcetype.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(resourcetype.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(resourcetype.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(resourcetype.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(resourcetype.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public ResourceType resourcetype {get;set;} = new ResourceType();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<ResourceType>($"api/resourcetype/{id}");
+		if (result is not null)
+			resourcetype = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<ResourceType>($"api/resourcetype/{id}", resourcetype);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<ResourceType>();
+					if (readResult is not null) 
+					{
+						resourcetype = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<ResourceType>($"api/resourcetype", resourcetype);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<ResourceType>();
+					if (readResult is not null)
+					{
+						resourcetype = readResult;
+					}
+				}
+		}
+
+	}
+}   

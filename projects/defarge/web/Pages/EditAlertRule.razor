@@ -1,0 +1,127 @@
+@page "/edit-alertrule"
+@page "/edit-alertrule/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Alert Rule</h3>
+}
+else
+{
+	<h3>Edit Alert Rule @alertrule.getRwkString() </h3>
+}
+
+<EditForm Model="alertrule" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">ID</label></td>
+		        <td><InputNumber id="id" @bind-Value="alertrule.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="metric_id">Metric</label></td>
+		        <td><InputNumber id="metric_id" @bind-Value="alertrule.metric_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="name">Name</label></td>
+		        <td><InputText id="name" @bind-Value="alertrule.name" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="condition">Condition</label></td>
+		        <td><InputText id="condition" @bind-Value="alertrule.condition" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="threshold">Threshold</label></td>
+		        <td><InputNumber id="threshold" @bind-Value="alertrule.threshold" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="recipients">Recipients</label></td>
+		        <td><InputText id="recipients" @bind-Value="alertrule.recipients" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(alertrule.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(alertrule.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(alertrule.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(alertrule.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(alertrule.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public AlertRule alertrule {get;set;} = new AlertRule();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<AlertRule>($"api/alertrule/{id}");
+		if (result is not null)
+			alertrule = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<AlertRule>($"api/alertrule/{id}", alertrule);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<AlertRule>();
+					if (readResult is not null) 
+					{
+						alertrule = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<AlertRule>($"api/alertrule", alertrule);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<AlertRule>();
+					if (readResult is not null)
+					{
+						alertrule = readResult;
+					}
+				}
+		}
+
+	}
+}   

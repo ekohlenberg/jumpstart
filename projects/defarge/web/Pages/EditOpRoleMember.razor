@@ -1,0 +1,112 @@
+@page "/edit-oprolemember"
+@page "/edit-oprolemember/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Operation Role Members</h3>
+}
+else
+{
+	<h3>Edit Operation Role Members @oprolemember.getRwkString() </h3>
+}
+
+<EditForm Model="oprolemember" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id">Member ID</label></td>
+		        <td><InputNumber id="id" @bind-Value="oprolemember.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="user_id">Username</label></td>
+		        <td><InputNumber id="user_id" @bind-Value="oprolemember.user_id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="op_role_id">Role</label></td>
+		        <td><InputNumber id="op_role_id" @bind-Value="oprolemember.op_role_id" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(oprolemember.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(oprolemember.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(oprolemember.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(oprolemember.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(oprolemember.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public OpRoleMember oprolemember {get;set;} = new OpRoleMember();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<OpRoleMember>($"api/oprolemember/{id}");
+		if (result is not null)
+			oprolemember = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<OpRoleMember>($"api/oprolemember/{id}", oprolemember);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<OpRoleMember>();
+					if (readResult is not null) 
+					{
+						oprolemember = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<OpRoleMember>($"api/oprolemember", oprolemember);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<OpRoleMember>();
+					if (readResult is not null)
+					{
+						oprolemember = readResult;
+					}
+				}
+		}
+
+	}
+}   

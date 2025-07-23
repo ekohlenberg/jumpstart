@@ -1,7 +1,7 @@
 
 create table core.script (
 		id BIGINT PRIMARY KEY,
-		name VARCHAR(255)  not null,
+		name VARCHAR(255) ,
 		source VARCHAR(4096) ,
 		is_active integer ,
 		created_by varchar(50) ,

@@ -1,0 +1,125 @@
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">defarge</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="resource">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Resource
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="metric">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Metric
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="alertrule">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Alert Rule
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="category">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Category
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="uom">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Unit of Measure
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="org">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Organization
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="user">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> User
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="script">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Scripts
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="eventservice">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Events
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="userpassword">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Password
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="operation">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Operations
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="oprole">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Operation Role
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="execution">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Execution Log
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="process">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Process
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="schedule">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Schedule
+            </NavLink>
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="workflow">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Workflow
+            </NavLink>
+        </div>
+            </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

@@ -1,0 +1,122 @@
+@page "/edit-schedule"
+@page "/edit-schedule/{id:long}"
+@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@if(id == null)
+{
+	<h3>Create Schedule</h3>
+}
+else
+{
+	<h3>Edit Schedule @schedule.getRwkString() </h3>
+}
+
+<EditForm Model="schedule" onsubmit="HandleSubmit">
+	@{
+		Console.WriteLine("rendering");
+	}
+	<div>
+        <table>
+
+                <tr>
+                <td><label for="id"></label></td>
+		        <td><InputNumber id="id" @bind-Value="schedule.id" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="cron_expression"></label></td>
+		        <td><InputText id="cron_expression" @bind-Value="schedule.cron_expression" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="next_run_time"></label></td>
+		        <td><InputDate id="next_run_time" @bind-Value="schedule.next_run_time" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="last_run_time"></label></td>
+		        <td><InputDate id="last_run_time" @bind-Value="schedule.last_run_time" class="form-control" /></td>
+                </tr>
+                
+                <tr>
+                <td><label for="status"></label></td>
+		        <td><InputText id="status" @bind-Value="schedule.status" class="form-control" /></td>
+                </tr>
+                		
+
+				<tr>
+					<td>Active</td><td>@(schedule.is_active.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Created By</td><td>@(schedule.created_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated</td><td>@(schedule.last_updated.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Last Updated By</td><td>@(schedule.last_updated_by.ToString())</td>
+				</tr>
+				
+				<tr>
+					<td>Version</td><td>@(schedule.version.ToString())</td>
+				</tr>
+							
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public long? id {get;set;}
+
+	public Schedule schedule {get;set;} = new Schedule();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Console.WriteLine("getting data");
+		if (id is not null) {
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		var result = await remoteClient.GetFromJsonAsync<Schedule>($"api/schedule/{id}");
+		if (result is not null)
+			schedule = result;
+		}
+	
+	}
+
+	async Task  HandleSubmit()
+	{
+		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+		if (id is not null) {
+			
+			var result = await remoteClient.PutAsJsonAsync<Schedule>($"api/schedule/{id}", schedule);
+				if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Schedule>();
+					if (readResult is not null) 
+					{
+						schedule = readResult;
+					}
+				}
+		}
+		else
+		{
+			var result = await remoteClient.PostAsJsonAsync<Schedule>($"api/schedule", schedule);	
+			if (result is not null)
+				{
+					var readResult = await result.Content.ReadFromJsonAsync<Schedule>();
+					if (readResult is not null)
+					{
+						schedule = readResult;
+					}
+				}
+		}
+
+	}
+}   

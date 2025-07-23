@@ -47,6 +47,24 @@
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRole', 'update', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRole', 'delete', 1, current_timestamp, current_user, current_user,1);
 		
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Schedule', 'select', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Schedule', 'get', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Schedule', 'insert', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Schedule', 'update', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Schedule', 'delete', 1, current_timestamp, current_user, current_user,1);
+		
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Workflow', 'select', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Workflow', 'get', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Workflow', 'insert', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Workflow', 'update', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Workflow', 'delete', 1, current_timestamp, current_user, current_user,1);
+		
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Server', 'select', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Server', 'get', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Server', 'insert', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Server', 'update', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Server', 'delete', 1, current_timestamp, current_user, current_user,1);
+		
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Metric', 'select', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Metric', 'get', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Metric', 'insert', 1, current_timestamp, current_user, current_user,1);
@@ -77,6 +95,12 @@
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'EventService', 'update', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'EventService', 'delete', 1, current_timestamp, current_user, current_user,1);
 		
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Process', 'select', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Process', 'get', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Process', 'insert', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Process', 'update', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Process', 'delete', 1, current_timestamp, current_user, current_user,1);
+		
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRoleMap', 'select', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRoleMap', 'get', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRoleMap', 'insert', 1, current_timestamp, current_user, current_user,1);
@@ -88,6 +112,12 @@
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRoleMember', 'insert', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRoleMember', 'update', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'OpRoleMember', 'delete', 1, current_timestamp, current_user, current_user,1);
+		
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'ScheduleWorkflow', 'select', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'ScheduleWorkflow', 'get', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'ScheduleWorkflow', 'insert', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'ScheduleWorkflow', 'update', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'ScheduleWorkflow', 'delete', 1, current_timestamp, current_user, current_user,1);
 		
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'MetricEvent', 'select', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'MetricEvent', 'get', 1, current_timestamp, current_user, current_user,1);
@@ -106,6 +136,18 @@
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'MetricResourceMap', 'insert', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'MetricResourceMap', 'update', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'MetricResourceMap', 'delete', 1, current_timestamp, current_user, current_user,1);
+		
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Execution', 'select', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Execution', 'get', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Execution', 'insert', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Execution', 'update', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Execution', 'delete', 1, current_timestamp, current_user, current_user,1);
+		
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'WorkflowProcess', 'select', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'WorkflowProcess', 'get', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'WorkflowProcess', 'insert', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'WorkflowProcess', 'update', 1, current_timestamp, current_user, current_user,1);
+		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'WorkflowProcess', 'delete', 1, current_timestamp, current_user, current_user,1);
 		
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Alert', 'select', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'Alert', 'get', 1, current_timestamp, current_user, current_user,1);

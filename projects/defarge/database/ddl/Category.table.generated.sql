@@ -1,8 +1,8 @@
 
 create table app.category (
 		id BIGINT PRIMARY KEY,
-		parent_id BIGINT  not null,
-		name VARCHAR(255)  not null,
+		parent_id BIGINT ,
+		name VARCHAR(255) ,
 		is_active integer ,
 		created_by varchar(50) ,
 		last_updated timestamp ,

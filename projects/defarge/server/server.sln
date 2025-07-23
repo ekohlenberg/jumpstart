@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "common\common.csproj", "49DC6B57-71CB-4EFC-9BF4-571E64FA3286"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "..\..\shared\dotnet\common\common.csproj", "49DC6B57-71CB-4EFC-9BF4-571E64FA3286"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domain", "domain\domain.csproj", "6F9A7088-24AF-442A-B5C8-810025B13DBB"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domain", "..\..\shared\dotnet\domain\domain.csproj", "6F9A7088-24AF-442A-B5C8-810025B13DBB"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "persist", "persist\persist.csproj", "EC5069A2-EC95-4680-8664-2A00356F3773"
 EndProject

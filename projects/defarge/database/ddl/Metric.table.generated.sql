@@ -2,7 +2,7 @@
 create table app.metric (
 		id BIGINT PRIMARY KEY,
 		name VARCHAR(255) ,
-		category_id BIGINT  not null,
+		category_id BIGINT ,
 		uom_id BIGINT ,
 		is_active integer ,
 		created_by varchar(50) ,

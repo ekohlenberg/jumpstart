@@ -171,6 +171,12 @@ namespace defarge
             double randomFloat = _random.NextDouble() * 10000;
             return randomFloat;
         }
+
+        public static decimal getRandomDecimal()
+        {
+            return Convert.ToDecimal( getRandomFloat() );
+        }
+
         public static object getTestData( BaseObject baseObject, string dataType, TestDataType testDataType)
         {
                 object result = string.Empty;
@@ -228,6 +234,8 @@ namespace defarge
                                 result = DateTime.Now;
                                 break;
                             case "NUMERIC":
+                                result = getRandomDecimal();
+                                break;
                             case "DOUBLE PRECISION":
                             case "MONEY":
                             case "REAL":
@@ -312,6 +320,15 @@ private static Dictionary<string, long> _lastIdMap = null;
             protected static Stack<OpRole> lastOpRole = new Stack<OpRole>();
             protected static Dictionary<long, OpRole> mapOpRole = new Dictionary<long, OpRole>();
             
+            protected static Stack<Schedule> lastSchedule = new Stack<Schedule>();
+            protected static Dictionary<long, Schedule> mapSchedule = new Dictionary<long, Schedule>();
+            
+            protected static Stack<Workflow> lastWorkflow = new Stack<Workflow>();
+            protected static Dictionary<long, Workflow> mapWorkflow = new Dictionary<long, Workflow>();
+            
+            protected static Stack<Server> lastServer = new Stack<Server>();
+            protected static Dictionary<long, Server> mapServer = new Dictionary<long, Server>();
+            
             protected static Stack<Metric> lastMetric = new Stack<Metric>();
             protected static Dictionary<long, Metric> mapMetric = new Dictionary<long, Metric>();
             
@@ -327,11 +344,17 @@ private static Dictionary<string, long> _lastIdMap = null;
             protected static Stack<EventService> lastEventService = new Stack<EventService>();
             protected static Dictionary<long, EventService> mapEventService = new Dictionary<long, EventService>();
             
+            protected static Stack<Process> lastProcess = new Stack<Process>();
+            protected static Dictionary<long, Process> mapProcess = new Dictionary<long, Process>();
+            
             protected static Stack<OpRoleMap> lastOpRoleMap = new Stack<OpRoleMap>();
             protected static Dictionary<long, OpRoleMap> mapOpRoleMap = new Dictionary<long, OpRoleMap>();
             
             protected static Stack<OpRoleMember> lastOpRoleMember = new Stack<OpRoleMember>();
             protected static Dictionary<long, OpRoleMember> mapOpRoleMember = new Dictionary<long, OpRoleMember>();
+            
+            protected static Stack<ScheduleWorkflow> lastScheduleWorkflow = new Stack<ScheduleWorkflow>();
+            protected static Dictionary<long, ScheduleWorkflow> mapScheduleWorkflow = new Dictionary<long, ScheduleWorkflow>();
             
             protected static Stack<MetricEvent> lastMetricEvent = new Stack<MetricEvent>();
             protected static Dictionary<long, MetricEvent> mapMetricEvent = new Dictionary<long, MetricEvent>();
@@ -341,6 +364,12 @@ private static Dictionary<string, long> _lastIdMap = null;
             
             protected static Stack<MetricResourceMap> lastMetricResourceMap = new Stack<MetricResourceMap>();
             protected static Dictionary<long, MetricResourceMap> mapMetricResourceMap = new Dictionary<long, MetricResourceMap>();
+            
+            protected static Stack<Execution> lastExecution = new Stack<Execution>();
+            protected static Dictionary<long, Execution> mapExecution = new Dictionary<long, Execution>();
+            
+            protected static Stack<WorkflowProcess> lastWorkflowProcess = new Stack<WorkflowProcess>();
+            protected static Dictionary<long, WorkflowProcess> mapWorkflowProcess = new Dictionary<long, WorkflowProcess>();
             
             protected static Stack<Alert> lastAlert = new Stack<Alert>();
             protected static Dictionary<long, Alert> mapAlert = new Dictionary<long, Alert>();

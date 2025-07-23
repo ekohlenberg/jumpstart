@@ -1,8 +1,8 @@
 
 create table app.user_org (
 		id BIGINT PRIMARY KEY,
-		org_id BIGINT  not null,
-		user_id BIGINT  not null,
+		org_id BIGINT ,
+		user_id BIGINT ,
 		is_active integer ,
 		created_by varchar(50) ,
 		last_updated timestamp ,
