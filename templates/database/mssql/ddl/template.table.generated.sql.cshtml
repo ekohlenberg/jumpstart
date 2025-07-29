@@ -1,0 +1,38 @@
+
+create table @Model.SchemaName.@Model.TableName (
+@for (int i = 0; i < Model.Attributes.Count; i++) {
+    var column = Model.Attributes[i];
+    var pk = "";
+    if (column.Name == "id"){
+        pk = "PRIMARY KEY";
+    }
+
+    var len = "";
+    if ((column.Length.Length > 0) && (column.Length != "NULL")) {
+        len = "(" + column.Length + ")";
+    }
+
+    if (column.MSSQLDataType == "DECIMAL")
+    {
+        len = "(18,4)";
+    }
+
+    var nullable = "";
+    if (column.IsNullable == false) {
+        nullable = " not null";
+    }
+
+    var comma = "";
+    if (i < Model.Attributes.Count - 1) {
+        comma = ",";
+    } 
+
+    @("\t\t" +
+column.Name + " " + column.MSSQLDataType + len + " " + pk + nullable + comma + @"
+"
+)
+    ;
+
+        
+    }
+);

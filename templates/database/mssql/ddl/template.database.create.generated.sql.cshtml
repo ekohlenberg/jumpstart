@@ -1,0 +1,26 @@
+
+
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'@Model.Name')
+BEGIN
+    -- Set the database to single-user mode to disconnect existing connections
+    ALTER DATABASE [@Model.Name] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+
+    -- Drop the database
+    DROP DATABASE [@Model.Name];
+END
+GO
+
+-- Create the database
+CREATE DATABASE [@Model.Name];
+
+-- Create a user in the database for the login
+USE [@Model.Name];
+IF NOT EXISTS (SELECT name FROM sys.database_principals WHERE name = '@Model.Name')
+BEGIN
+    CREATE USER [@Model.Name] FOR LOGIN [@Model.Name];
+END
+
+-- Grant db_owner role to the user
+ALTER ROLE db_owner ADD MEMBER [@Model.Name];
+
+

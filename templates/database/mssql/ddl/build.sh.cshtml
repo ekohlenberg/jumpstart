@@ -1,0 +1,13 @@
+export SQLCMD="sqlcmd"
+$SQLCMD config use-context sql_admin 
+$SQLCMD query "$(cat  ./@(Model.Name +".database.create.generated.sql"))"
+
+$SQLCMD config use-context @Model.Name
+
+
+    @foreach( string sourceFile in Model.sourceFiles) {
+    
+    if (sourceFile != Model.Name + ".database.create.generated.sql") {
+        @("$SQLCMD query \"$(cat  ./" + sourceFile + ")\"\n")
+        }
+    }
