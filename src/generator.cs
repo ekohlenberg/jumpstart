@@ -177,7 +177,23 @@ namespace jumpstart {
                 generatedCode = generatedCode.Replace("&#x9;", "\t");
                 generatedCode = generatedCode.Replace("&lt;", "<");
                 generatedCode = generatedCode.Replace("&gt;", ">");
-              
+                generatedCode = generatedCode.Replace("&quot;", "\"");
+                generatedCode = generatedCode.Replace("&apos;", "'");
+                generatedCode = generatedCode.Replace("&amp;", "&");
+                generatedCode = generatedCode.Replace("&copy;", "©");
+                generatedCode = generatedCode.Replace("&reg;", "®");
+                generatedCode = generatedCode.Replace("&trade;", "™");
+                generatedCode = generatedCode.Replace("&euro;", "€");
+                generatedCode = generatedCode.Replace("&pound;", "£");
+                generatedCode = generatedCode.Replace("&yen;", "¥");
+                generatedCode = generatedCode.Replace("&dollar;", "$"); 
+                generatedCode = generatedCode.Replace("&nbsp;", " ");
+                generatedCode = generatedCode.Replace("&mdash;", "—");
+                generatedCode = generatedCode.Replace("&ndash;", "–");
+                generatedCode = generatedCode.Replace("&hellip;", "…");
+                generatedCode = generatedCode.Replace("&copy;", "©");
+                generatedCode = generatedCode.Replace("&reg;", "®");    
+                generatedCode = generatedCode.Replace("&trade;", "™");
                 
                 if (!Directory.Exists(td.outputFolder))
                 {

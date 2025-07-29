@@ -23,7 +23,7 @@ namespace jumpstart
 	    {
 	    	List<TemplateDef> templateDefs = new();
 
-	        string templateDefPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templatedefs", templateDefName + ".csv");
+	        string templateDefPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates", templateDefName + ".csv");
 
 	        using (var reader = new StreamReader(templateDefPath))
 	        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))

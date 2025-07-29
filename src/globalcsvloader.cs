@@ -23,7 +23,7 @@ public class GlobalCSVLoader
     public void Load(string globalCsv, MetaModel metaModel)
     {
 
-        string modelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "global", globalCsv);
+        string modelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates/global", globalCsv);
 
         using (var reader = new StreamReader(modelPath))
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))

@@ -127,12 +127,14 @@ public class CSVLoader
             {
                 Name = mr.COLUMN_NAME,
                 SqlDataType = mr.DATA_TYPE,
+                MSSQLDataType = TypeMapping.PostgreSQLToMSSQLMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), mr.DATA_TYPE),
                 Length = mr.CHARACTER_MAXIMUM_LENGTH.Trim(),
                 DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), "object"),
                 ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), ""),
                 InputType = TypeMapping.InputMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), "Text"),
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
+								IsNullable =((mr.IS_NULLABLE.Trim() == "1" || mr.IS_NULLABLE.Trim().ToLower() == "yes") ? true : false),
                 FkObject= mr.FK_OBJECT.ToLower(),
                 FkType=mr.FK_TYPE,
                 TestDataSet=mr.TEST_DATA_SET

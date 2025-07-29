@@ -9,7 +9,7 @@ namespace jumpstart {
     {
         public override void Load(string moduleCsv, MetaModel metaModel)
         {
-            string modelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "core", moduleCsv);
+            string modelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "templates/core", moduleCsv);
 
             base.Load( modelPath, metaModel );
         

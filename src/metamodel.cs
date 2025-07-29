@@ -32,6 +32,9 @@ namespace jumpstart {
             { "xml", "string" }
         };
 
+        
+        
+
         public static readonly Dictionary<string, string> ConvertMap = new()
         {
             {"integer" , "ToInt32"},	
@@ -86,6 +89,81 @@ namespace jumpstart {
             {"bytea", "Text"},
             {"xml", "Text"}
         };
+
+        public static readonly Dictionary<string, string> PostgreSQLToMSSQLMap = new()
+        {
+            // Integer types
+            { "smallint", "SMALLINT" },
+            { "integer", "INT" },
+            { "bigint", "BIGINT" },
+            { "serial", "INT IDENTITY(1,1)" },
+            { "bigserial", "BIGINT IDENTITY(1,1)" },
+            
+            // Character types
+            { "character", "CHAR" },
+            { "character varying", "VARCHAR" },
+            { "varchar", "VARCHAR" },
+            { "char", "CHAR" },
+            { "text", "TEXT" },
+            { "nchar", "NCHAR" },
+            { "nvarchar", "NVARCHAR" },
+            { "ntext", "NTEXT" },
+            
+            // Numeric types
+            { "numeric", "DECIMAL" },
+            { "decimal", "DECIMAL" },
+            { "real", "REAL" },
+            { "double precision", "FLOAT" },
+            { "float", "FLOAT" },
+            { "money", "MONEY" },
+            { "smallmoney", "SMALLMONEY" },
+            
+            // Date/Time types
+            { "date", "DATE" },
+            { "time", "TIME" },
+            { "timestamp", "DATETIME2" },
+            { "timestamp without time zone", "DATETIME2" },
+            { "timestamp with time zone", "DATETIME2" },
+            { "timestamptz", "DATETIME2" },
+            { "time without time zone", "TIME" },
+            { "time with time zone", "TIME" },
+            { "timetz", "TIME" },
+            { "interval", "VARCHAR(50)" }, // SQL Server doesn't have direct interval type
+            
+            // Boolean type
+            { "boolean", "BIT" },
+            
+            // Binary types
+            { "bytea", "VARBINARY(MAX)" },
+            { "binary", "BINARY" },
+            { "varbinary", "VARBINARY" },
+            
+            // Other types
+            { "uuid", "UNIQUEIDENTIFIER" },
+            { "xml", "XML" },
+            { "json", "NVARCHAR(MAX)" },
+            { "jsonb", "NVARCHAR(MAX)" },
+            
+            // Network types (PostgreSQL specific - map to string equivalents)
+            { "inet", "VARCHAR(45)" },
+            { "cidr", "VARCHAR(43)" },
+            { "macaddr", "VARCHAR(17)" },
+            { "macaddr8", "VARCHAR(23)" },
+            
+            // Geometric types (PostgreSQL specific - map to string equivalents)
+            { "point", "VARCHAR(50)" },
+            { "line", "VARCHAR(100)" },
+            { "lseg", "VARCHAR(100)" },
+            { "box", "VARCHAR(100)" },
+            { "path", "VARCHAR(MAX)" },
+            { "polygon", "VARCHAR(MAX)" },
+            { "circle", "VARCHAR(100)" },
+            
+            // Array types (PostgreSQL specific - map to string equivalents)
+            { "integer[]", "NVARCHAR(MAX)" },
+            { "text[]", "NVARCHAR(MAX)" },
+            { "varchar[]", "NVARCHAR(MAX)" }
+        };
     }
 
     public class MetaBaseElement
@@ -125,6 +203,7 @@ namespace jumpstart {
     {
         private string _pascalName = null; 
         public string SqlDataType { get; set; }
+        public string MSSQLDataType { get; set; }
         public string DotNetType {get;set;}
 
         public string InputType {get;set;}
@@ -142,10 +221,11 @@ namespace jumpstart {
         public string FkType {get;set;}
         public string FkObject {get;set;}
 
+        public bool IsNullable{get;set;} = false;
+
         public string TestDataSet{get;set;}
 
-         bool _IsGlobal{get;set;} = false;
-
+        bool _IsGlobal{get;set;} = false;
         public bool IsGlobal() { return _IsGlobal;}
         public void SetGlobal() { _IsGlobal = true;}
 
