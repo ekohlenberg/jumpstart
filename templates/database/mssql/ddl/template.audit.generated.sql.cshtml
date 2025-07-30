@@ -1,4 +1,5 @@
-
+USE [@Model.Namespace];
+GO
 create table history.@(Model.SchemaName + "_" + Model.TableName) (
     id BIGINT PRIMARY KEY,
 @for (int i = 0; i < Model.Attributes.Count; i++) {
