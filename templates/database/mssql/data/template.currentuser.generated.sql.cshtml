@@ -1,8 +1,10 @@
 -- =====================================
 -- 1) Create Account for Current OS Principal
 -- =====================================
-DECLARE @os_user NVARCHAR(50) = SYSTEM_USER;
+DECLARE @@os_user NVARCHAR(50) = SYSTEM_USER;
+DECLARE @@principal_id BIGINT, @@password_id BIGINT, @@role_member_id BIGINT;
 
+SELECT @@principal_id = NEXT VALUE FOR app.principal_identity;
 INSERT INTO app.principal(
     id,
     first_name,
@@ -18,11 +20,11 @@ INSERT INTO app.principal(
     version
 )
 VALUES (
-    NEXT VALUE FOR app.principal_identity,          -- Use next value from principal_identity sequence
+    @@principal_id,          -- Use next value from principal_identity sequence
     'Current',
     'Principal',
-    @os_user,                               -- Unique username
-    @os_user + '@mydomain.com',
+    @@os_user,                               -- Unique username
+    @@os_user + '@mydomain.com',
     GETDATE(),
     null,
     1,
@@ -35,11 +37,12 @@ VALUES (
 WITH os_user_principal_id AS (
     SELECT id
     FROM app.principal
-    WHERE username = @os_user
+    WHERE username = @@os_user
 )
+SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity
 INSERT INTO sec.principal_password(
     id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by, version)
-SELECT  NEXT VALUE FOR sec.principal_password_identity,
+SELECT  @@password_id,
     os_user_principal_id.id,
      CAST(FLOOR(RAND(CHECKSUM(NEWID())) * 100000 + 1) AS NVARCHAR(10)),  
      GETDATE(),
@@ -62,13 +65,14 @@ FROM
 WITH os_user_principal_id AS (
     SELECT id
     FROM app.principal
-    WHERE username = @os_user
+    WHERE username = @@os_user
 ),
 os_user_role_id AS (
     SELECT id
     FROM sec.op_role
     WHERE name = 'Administrator'
 )
+SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity
 INSERT INTO sec.op_role_member(
     id,
     principal_id,
@@ -80,7 +84,7 @@ INSERT INTO sec.op_role_member(
     version
 )
 SELECT
-    NEXT VALUE FOR sec.op_role_member_identity,  -- PK for op_role_member
+    @@role_member_id,  -- PK for op_role_member
     os_user_principal_id.id,
     os_user_role_id.id,
     1,
