@@ -20,7 +20,7 @@ namespace @namespaceName
             domainName = "@(className)";
             tableName = "@schemaName.@tableName";
             tableBaseName = "@tableName";
-            auditTableName = "audit.@(schemaName)_@(tableName)";
+            auditTableName = "history.@(schemaName)_@(tableName)";
 
             @foreach (var attr in Model.Attributes)
             {
