@@ -6,6 +6,6 @@ if (sourceFile == Model.Name + ".database.create.generated.sql") continue;
 if (sourceFile == "load.cmd") continue;
 if (sourceFile == "load.sh") continue;
 
-    @("%SQLCMD% -i ./" + sourceFile + "\n")
+    @("%SQLCMD% -i .\\" + sourceFile + "\n")
 
 }
