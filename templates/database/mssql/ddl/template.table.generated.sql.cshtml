@@ -1,6 +1,13 @@
+-- silent_execution.sql
+SET NOCOUNT ON;
+SET ANSI_WARNINGS OFF;
+SET ANSI_PADDING OFF;
+SET QUOTED_IDENTIFIER OFF;
+
 USE [@Model.Namespace];
 GO
-create table @Model.SchemaName.@Model.TableName (
+create table @Model.Sch
+emaName.@Model.TableName (
 @for (int i = 0; i < Model.Attributes.Count; i++) {
     var column = Model.Attributes[i];
     var pk = "";

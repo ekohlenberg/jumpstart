@@ -78,7 +78,7 @@ namespace @Model.Name
                 } 
                 else
                 { 
-                    throw new Exception($"User {Environment.UserName} is not authorized for {DomainObj}.{method.Name}.");
+                    throw new Exception($"Principal {Environment.UserName} is not authorized for {DomainObj}.{method.Name}.");
                 }
 
             });

@@ -36,12 +36,12 @@ inner join sec.op_role r on
     r.id=orm.op_role_id
 inner join sec.op_role_member m on
     m.op_role_id=r.id
-inner join app.""user"" u on 
-    u.id=m.user_id
+inner join app.""principal"" p on 
+    p.id=m.principal_id
 where
     op.objectname = '^(objectname)' and
     op.methodname = '^(methodname)' and
-    u.username = '^(username)'";
+    p.username = '^(username)'";
 
                     BaseObject filter = new();
                     filter["objectname"] = objectName;

@@ -91,7 +91,7 @@ namespace @Model.Namespace
             phoneNumbers,
             emailAddresses,
             addresses,
-            usernames,
+            principalnames,
             os_user,
             cities,
             states,
@@ -200,7 +200,7 @@ namespace @Model.Namespace
                         string l = baseObject["last_name"].ToString();
                         result = f.ToLower() + "." + l.ToLower() + "@@example.com";
                     }
-                    else if (testDataType == TestDataType.usernames)
+                    else if (testDataType == TestDataType.principalnames)
                     {
                         string f = baseObject["first_name"].ToString();
                         string l = baseObject["last_name"].ToString();

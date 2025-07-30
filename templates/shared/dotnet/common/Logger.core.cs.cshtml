@@ -207,13 +207,13 @@ namespace @Model.Name
                     connection.Open();
 
                    
-                    sql = "INSERT INTO audit.log (level, timestamp,  username, program, filepath, linenumber, membername, message) " +
-                                "VALUES (@@level,  @@timestamp, @@username, @@program, @@filepath, @@linenumber, @@membername, @@message);";
+                    sql = "INSERT INTO audit.log (level, timestamp,  principalname, program, filepath, linenumber, membername, message) " +
+"VALUES (@@level,  @@timestamp, @@principalname, @@program, @@filepath, @@linenumber, @@membername, @@message);";
 
                     using var command = new NpgsqlCommand(sql, connection);
                     command.Parameters.AddWithValue("@@level", level);
                     command.Parameters.AddWithValue("@@timestamp", DateTime.UtcNow);
-                    command.Parameters.AddWithValue("@@username", Environment.UserName);
+                    command.Parameters.AddWithValue("@@principalname", Environment.UserName);
                     command.Parameters.AddWithValue("@@program", ProgramName);
                     command.Parameters.AddWithValue("@@filepath", filePath);
                     command.Parameters.AddWithValue("@@linenumber", lineNumber);

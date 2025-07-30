@@ -1,7 +1,7 @@
 -- =====================================
--- 1) Create Admin User
+-- 1) Create Admin Principal
 -- =====================================
-INSERT INTO app."user"(
+INSERT INTO app."principal"(
     id,
     first_name,
     last_name,
@@ -16,9 +16,9 @@ INSERT INTO app."user"(
     version
 )
 VALUES (
-    nextval('app.user_identity'),          -- Use next value from user_identity sequence
+    nextval('app.principal_identity'),          -- Use next value from principal_identity sequence
     'Admin',
-    'User',
+    'Principal',
     'admin',                               -- Unique username
     'admin@mydomain.com',
     now(),
@@ -35,10 +35,10 @@ WITH admin_user_id AS (
     FROM app."user"
     WHERE username = 'admin'
 )
-INSERT INTO sec.user_password(
-    id, user_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by, version)
-SELECT  nextval('sec.user_password_identity'),
-    admin_user_id.id,
+INSERT INTO sec.principal_password(
+    id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by, version)
+SELECT  nextval('sec.principal_password_identity'),
+    admin_principal_id.id,
      (floor(random() * 100000 + 1))::int::varchar,  
      current_timestamp,
      1,
@@ -48,7 +48,7 @@ SELECT  nextval('sec.user_password_identity'),
      current_user,
      1
 FROM
-    admin_user_id;
+    admin_principal_id;
 
 -- =====================================
 -- 2) Create Admin Role
@@ -105,13 +105,13 @@ FROM sec.operation op
 CROSS JOIN admin_role_id;
 
 -- =====================================
--- 4) Map Admin User to Admin Role
---    Using sub-selects on sec."user" (by username)
+-- 4) Map Admin Principal to Admin Role
+--    Using sub-selects on sec."principal" (by username)
 --    and sec.op_role (by name)
 -- =====================================
-WITH admin_user_id AS (
+WITH admin_principal_id AS (
     SELECT id
-    FROM app."user"
+    FROM app."principal"
     WHERE username = 'admin'
 ),
 admin_role_id AS (
@@ -121,7 +121,7 @@ admin_role_id AS (
 )
 INSERT INTO sec.op_role_member(
     id,
-    user_id,
+    principal_id,
     op_role_id,
     is_active,
     created_by,
@@ -131,14 +131,14 @@ INSERT INTO sec.op_role_member(
 )
 SELECT
     nextval('sec.op_role_member_identity'),  -- PK for op_role_member
-    admin_user_id.id,
+    admin_principal_id.id,
     admin_role_id.id,
     1,
     'system',
     now(),
     'system',
     1
-FROM admin_user_id
+FROM admin_principal_id
 CROSS JOIN admin_role_id;
 
 -- =====================================

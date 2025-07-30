@@ -17,21 +17,21 @@ namespace @Model.Namespace
 
                 BaseTest.addLastId("op_role", adminRole.id);
 
-                List<User> users = UserLogic.Create().select();
-                var currentUser = users.Find(user => user.username == Environment.UserName);
+                List<Principal> principals = PrincipalLogic.Create().select();
+var currentPrincipal = principals.Find(principal => principal.username == Environment.UserName);
 
-                if (currentUser == null)
+                if (currentPrincipal == null)
                 {
-                    UserTest.testInsert();  
-                    long userId = BaseTest.getLastId("User");
+                    PrincipalTest.testInsert();  
+                    long principalId = BaseTest.getLastId("Principal");
                     OpRoleMemberTest.testInsert();
                 }
                 else
                 {
-                    BaseTest.addLastId("user", currentUser.id);
+                    BaseTest.addLastId("principal", currentPrincipal.id);
 
                     List<OpRoleMember> opRoleMembers = OpRoleMemberLogic.Create().select();
-                    var adminRoleMembership = opRoleMembers.Find(membership => membership.user_id == currentUser.id && membership.op_role_id == adminRole.id);
+                    var adminRoleMembership = opRoleMembers.Find(membership => membership.principal_id == currentPrincipal.id && membership.op_role_id == adminRole.id);
 
                     if (adminRoleMembership == null)
                     {
@@ -44,7 +44,7 @@ namespace @Model.Namespace
                 {
                     if (metaObject.SchemaName == "sec") continue;
                     if (metaObject.SchemaName == "core") continue;
-                    if (metaObject.DomainObj == "User") continue;
+                    if (metaObject.DomainObj == "Principal") continue;
                     
                     var domainObj = metaObject.DomainObj;
                 <text>
