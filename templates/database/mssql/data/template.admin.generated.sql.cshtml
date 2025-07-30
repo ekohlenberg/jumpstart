@@ -1,7 +1,7 @@
 -- =====================================
 -- 1) Create Admin Principal
 -- =====================================
-INSERT INTO app."principal"(
+INSERT INTO app.principal(
     id,
     first_name,
     last_name,
@@ -16,36 +16,36 @@ INSERT INTO app."principal"(
     version
 )
 VALUES (
-    nextval('app.principal_identity'),          -- Use next value from principal_identity sequence
+    NEXT VALUE FOR app.principal_identity,          -- Use next value from principal_identity sequence
     'Admin',
     'Principal',
     'admin',                               -- Unique username
     'admin@mydomain.com',
-    now(),
+    GETDATE(),
     null,
     1,
     'system',
-    now(),
+    GETDATE(),
     'system',
     1
 );
 
-WITH admin_user_id AS (
+WITH admin_principal_id AS (
     SELECT id
-    FROM app."user"
+    FROM app.principal
     WHERE username = 'admin'
 )
 INSERT INTO sec.principal_password(
     id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by, version)
-SELECT  nextval('sec.principal_password_identity'),
+SELECT  NEXT VALUE FOR sec.principal_password_identity,
     admin_principal_id.id,
-     (floor(random() * 100000 + 1))::int::varchar,  
-     current_timestamp,
+     CAST(FLOOR(RAND(CHECKSUM(NEWID())) * 100000 + 1) AS NVARCHAR(10)),  
+     GETDATE(),
      1,
      1,
-     current_user,
-     current_timestamp,
-     current_user,
+     SYSTEM_USER,
+     GETDATE(),
+     SYSTEM_USER,
      1
 FROM
     admin_principal_id;
@@ -63,11 +63,11 @@ INSERT INTO sec.op_role(
     version
 )
 VALUES (
-    nextval('sec.op_role_identity'),       -- Use next value from op_role_identity sequence
+    NEXT VALUE FOR sec.op_role_identity,       -- Use next value from op_role_identity sequence
     'Administrator',                       -- Unique role name
     1,
     'system',
-    now(),
+    GETDATE(),
     'system',
     1
 );
@@ -93,12 +93,12 @@ INSERT INTO sec.op_role_map(
     version
 )
 SELECT
-    nextval('sec.op_role_map_identity'),  -- PK for op_role_map
+    NEXT VALUE FOR sec.op_role_map_identity,  -- PK for op_role_map
     op.id,
     admin_role_id.id,
     1,
     'system',
-    now(),
+    GETDATE(),
     'system',
     1
 FROM sec.operation op
@@ -106,12 +106,12 @@ CROSS JOIN admin_role_id;
 
 -- =====================================
 -- 4) Map Admin Principal to Admin Role
---    Using sub-selects on sec."principal" (by username)
+--    Using sub-selects on sec.principal (by username)
 --    and sec.op_role (by name)
 -- =====================================
 WITH admin_principal_id AS (
     SELECT id
-    FROM app."principal"
+    FROM app.principal
     WHERE username = 'admin'
 ),
 admin_role_id AS (
@@ -130,12 +130,12 @@ INSERT INTO sec.op_role_member(
     version
 )
 SELECT
-    nextval('sec.op_role_member_identity'),  -- PK for op_role_member
+    NEXT VALUE FOR sec.op_role_member_identity,  -- PK for op_role_member
     admin_principal_id.id,
     admin_role_id.id,
     1,
     'system',
-    now(),
+    GETDATE(),
     'system',
     1
 FROM admin_principal_id

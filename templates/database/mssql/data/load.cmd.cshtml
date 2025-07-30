@@ -1,4 +1,4 @@
-set SQLCMD="sqlcmd -S localhost -d @Model.Name -E"
+set SQLCMD=sqlcmd -S localhost -d @Model.Name -E
 
 @foreach( string sourceFile in Model.sourceFiles) {
 
