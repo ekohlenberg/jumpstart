@@ -1,5 +1,5 @@
 @@echo off
-psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.\@(Model.Name + ".database.create.generated.sql")
+sqlcmd -S localhost -i .\@(Model.Name + ".database.create.generated.sql")
 
     @foreach( string sourceFile in Model.sourceFiles) {
     
@@ -14,7 +14,7 @@ psql --host=localhost --port=5433 --dbname=postgres --username=postgres --file=.
     else
     {
         <text>
-            psql --host=localhost --port=5433 --dbname=@Model.Name --username=postgres --file=.\@sourceFile
+            sqlcmd -S localhost -i .\@sourceFile
         </text>
         }
     }
