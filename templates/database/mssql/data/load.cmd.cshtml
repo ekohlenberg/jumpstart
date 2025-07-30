@@ -1,8 +1,11 @@
-export SQLCMD="sqlcmd -S localhost -d @Model.Name -E"
+set SQLCMD="sqlcmd -S localhost -d @Model.Name -E"
 
 @foreach( string sourceFile in Model.sourceFiles) {
 
-if (sourceFile != Model.Name + ".database.create.generated.sql") {
-    @("$SQLCMD -i ./" + sourceFile + "\n")
-    }
+if (sourceFile == Model.Name + ".database.create.generated.sql") continue;
+if (sourceFile == "load.cmd") continue;
+if (sourceFile == "load.sh") continue;
+
+    @("%SQLCMD% -i ./" + sourceFile + "\n")
+
 }

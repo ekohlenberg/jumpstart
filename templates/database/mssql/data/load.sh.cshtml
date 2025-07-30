@@ -2,7 +2,10 @@ export PSQLCMD="psql --host=localhost --port=5432 --dbname=@Model.Name --usernam
 
 @foreach( string sourceFile in Model.sourceFiles) {
 
-if (sourceFile != Model.Name + ".database.create.generated.sql") {
+if (sourceFile == Model.Name + ".database.create.generated.sql") continue;
+if (sourceFile == "load.cmd") continue;
+if (sourceFile == "load.sh") continue;
+
     @("$PSQLCMD --file=./" + sourceFile + "\n")
-    }
+
 }
