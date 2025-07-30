@@ -10,7 +10,12 @@ dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
 dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,./shared/domain,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/DBPersist.core.cs.cshtml,./server/persist,TRUE
+dotnet server templates-persist,model,server/dotnet/persist/IDatabaseProvider.cs.cshtml,./server/persist,TRUE
+dotnet server templates-persist,model,server/dotnet/persist/PostgreSQLProvider.cs.cshtml,./server/persist,TRUE
+dotnet server templates-persist,model,server/dotnet/persist/SqlServerProvider.cs.cshtml,./server/persist,TRUE
+dotnet server templates-persist,model,server/dotnet/persist/DatabaseProviderFactory.cs.cshtml,./server/persist,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/persist.csproj.cshtml,./server/persist,TRUE
+dotnet server templates-persist,model,server/dotnet/persist/appsettings.json.cshtml,./server/persist,FALSE
 dotnet server templates-logic,object,server/dotnet/logic/templateLogic.generated.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/BaseLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/Proxy.core.cs.cshtml,./server/logic,TRUE
