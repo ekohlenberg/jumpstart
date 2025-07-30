@@ -36,6 +36,7 @@ public class GlobalCSVLoader
                         {
                             Name = mr.COLUMN_NAME,
                             SqlDataType = mr.DATA_TYPE,
+                            MSSQLDataType = TypeMapping.PostgreSQLToMSSQLMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), mr.DATA_TYPE),
                             Length = mr.CHARACTER_MAXIMUM_LENGTH,
                             DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), "object"),
                             ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower(), ""),
