@@ -1,0 +1,18 @@
+using System;
+using System.Data.Common;
+
+namespace @Model.Name
+{
+    public interface IDatabaseProvider
+    {
+        DbConnection CreateConnection(string connectionString);
+        DbCommand CreateCommand(string sql, DbConnection connection);
+        string GetNextIdentitySql(string tableName);
+        string GetVersionSql(string tableName, long id);
+        string FormatParameter(string parameterName);
+        string FormatTableName(string tableName);
+        string FormatColumnName(string columnName);
+        string FormatValue(object value);
+        string GetParameterPrefix();
+    }
+} 

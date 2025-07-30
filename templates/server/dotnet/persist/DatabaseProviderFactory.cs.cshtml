@@ -1,0 +1,22 @@
+using System;
+
+namespace @Model.Name
+{
+    public static class DatabaseProviderFactory
+    {
+        public static IDatabaseProvider CreateProvider(string databaseType = null)
+        {
+            if (string.IsNullOrEmpty(databaseType))
+            {
+                databaseType = Config.getString("db.type", "postgresql").ToLower();
+            }
+
+            return databaseType switch
+            {
+                "postgresql" or "pgsql" => new PostgreSQLProvider(),
+                "sqlserver" or "mssql" => new SqlServerProvider(),
+                _ => throw new ArgumentException($"Unsupported database type: {databaseType}")
+            };
+        }
+    }
+} 
