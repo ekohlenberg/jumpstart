@@ -14,6 +14,7 @@ sqlcmd -S localhost -i .\@(Model.Name + ".database.create.generated.sql")
     else
     {
         <text>
+            echo @sourceFile
             sqlcmd -S localhost -i .\@sourceFile
         </text>
         }
