@@ -1,0 +1,8 @@
+export SQLCMD="sqlcmd -S localhost -d @Model.Name -E"
+
+@foreach( string sourceFile in Model.sourceFiles) {
+
+if (sourceFile != Model.Name + ".database.create.generated.sql") {
+    @("$SQLCMD -i ./" + sourceFile + "\n")
+    }
+}

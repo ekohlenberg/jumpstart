@@ -13,3 +13,4 @@ sqlserver database-admin initial data,model,database/mssql/data/template.admin.g
 sqlserver database-current user initial data,model,database/mssql/data/template.currentuser.generated.sql.cshtml,./database/data,true
 sqlserver database-current user initial data,model,database/mssql/data/template.event.test.sql.cshtml,./database/data,true
 sqlserver database-bash load script,build, database/mssql/data/load.sh.cshtml,./database/data,true
+sqlserver database-bash load script,build, database/mssql/data/load.cmd.cshtml,./database/data,true
