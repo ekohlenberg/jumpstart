@@ -85,7 +85,7 @@ VALUES (
 --    Using a cursor to get unique sequence values for each operation
 -- =====================================
 DECLARE @@op_id BIGINT;
-DECLARE @@role_map_id BIGINT;
+
 
 -- Get the admin role ID
 DECLARE @@admin_role_id BIGINT;
@@ -98,7 +98,7 @@ DECLARE operation_cursor CURSOR FOR
 OPEN operation_cursor;
 FETCH NEXT FROM operation_cursor INTO @@op_id;
 
-WHILE @@FETCH_STATUS = 0
+WHILE @@@@FETCH_STATUS = 0
 BEGIN
     -- Get next sequence value for each operation
     SELECT @@role_map_id = NEXT VALUE FOR sec.op_role_map_identity;
