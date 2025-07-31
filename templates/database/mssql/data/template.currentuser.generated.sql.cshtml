@@ -34,12 +34,13 @@ VALUES (
     1
 );
 
+SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity
 WITH os_user_principal_id AS (
     SELECT id
     FROM app.principal
     WHERE username = @@os_user
 )
-SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity
+
 INSERT INTO sec.principal_password(
     id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by, version)
 SELECT  @@password_id,
@@ -62,6 +63,7 @@ FROM
 --    Using sub-selects on sec.principal (by username)
 --    and sec.op_role (by name)
 -- =====================================
+SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity
 WITH os_user_principal_id AS (
     SELECT id
     FROM app.principal
@@ -72,7 +74,7 @@ os_user_role_id AS (
     FROM sec.op_role
     WHERE name = 'Administrator'
 )
-SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity
+
 INSERT INTO sec.op_role_member(
     id,
     principal_id,
