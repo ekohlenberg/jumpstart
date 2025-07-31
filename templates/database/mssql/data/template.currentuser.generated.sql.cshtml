@@ -34,7 +34,8 @@ VALUES (
     1
 );
 
-SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity
+SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity;
+
 WITH os_user_principal_id AS (
     SELECT id
     FROM app.principal
@@ -63,7 +64,8 @@ FROM
 --    Using sub-selects on sec.principal (by username)
 --    and sec.op_role (by name)
 -- =====================================
-SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity
+SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity;
+
 WITH os_user_principal_id AS (
     SELECT id
     FROM app.principal

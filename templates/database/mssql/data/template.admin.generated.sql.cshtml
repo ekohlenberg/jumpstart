@@ -135,6 +135,8 @@ DEALLOCATE operation_cursor;
 --    Using sub-selects on sec.principal (by username)
 --    and sec.op_role (by name)
 -- =====================================
+SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity;
+
 WITH admin_principal_id AS (
     SELECT id
     FROM app.principal
@@ -145,7 +147,6 @@ admin_role_id AS (
     FROM sec.op_role
     WHERE name = 'Administrator'
 )
-SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity;
 
 INSERT INTO sec.op_role_member(
     id,
