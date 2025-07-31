@@ -33,7 +33,7 @@ VALUES (
     1
 );
 
-SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity
+SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity;
 
 WITH admin_principal_id AS (
     SELECT id
@@ -145,7 +145,8 @@ admin_role_id AS (
     FROM sec.op_role
     WHERE name = 'Administrator'
 )
-SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity
+SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity;
+
 INSERT INTO sec.op_role_member(
     id,
     principal_id,
