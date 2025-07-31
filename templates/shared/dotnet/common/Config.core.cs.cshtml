@@ -42,6 +42,12 @@ namespace @Model.Name
             return result;
         }
 
+        static public string getString(string param, string defaultValue)
+        {
+            string result = getString(param);
+            return string.IsNullOrEmpty(result) ? defaultValue : result;
+        }
+
         static public string getDbConnection()
         {
             // Path to the .namespace file in the user's home directory
