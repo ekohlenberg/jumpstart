@@ -207,7 +207,7 @@ namespace @Model.Name
                     connection.Open();
 
                    
-                    sql = "INSERT INTO audit.log (level, timestamp,  principalname, program, filepath, linenumber, membername, message) " +
+                    sql = "INSERT INTO history.log (level, timestamp,  principalname, program, filepath, linenumber, membername, message) " +
 "VALUES (@@level,  @@timestamp, @@principalname, @@program, @@filepath, @@linenumber, @@membername, @@message);";
 
                     using var command = new NpgsqlCommand(sql, connection);
