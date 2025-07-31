@@ -5,7 +5,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Npgsql;
+using System.Data.Common;
 
 namespace @Model.Name
 {
@@ -194,43 +194,38 @@ namespace @Model.Name
 
     public class LogTableWriter : BaseLogWriter, ILogWriter
     {
+        private static readonly IDatabaseProvider _provider = DatabaseProviderFactory.CreateProvider();
+        private static readonly string _connectionString = Config.getString("db.connection");
+        private static readonly string _tableName = _provider.FormatTableName("history.log");
+        private static readonly string _insertSql = $"INSERT INTO {_tableName} (level, timestamp, principalname, program, filepath, linenumber, membername, message) " +
+                                                   "VALUES (@level, @timestamp, @principalname, @program, @filepath, @linenumber, @membername, @message);";
+
         public void Write(string level, string message, string filePath, int lineNumber, string memberName )
         {
-
             lock (Lock)
             {
-                string sql = string.Empty;
                 try
                 {
-                    string connectionStr = Config.getString("db.connection");
-                    NpgsqlConnection connection = new NpgsqlConnection(connectionStr);
-                    connection.Open();
+                    using (DbConnection connection = _provider.CreateConnection(_connectionString))
+                    {
+                        connection.Open();
 
-                   
-                    sql = "INSERT INTO history.log (level, timestamp,  principalname, program, filepath, linenumber, membername, message) " +
-"VALUES (@@level,  @@timestamp, @@principalname, @@program, @@filepath, @@linenumber, @@membername, @@message);";
-
-                    using var command = new NpgsqlCommand(sql, connection);
-                    command.Parameters.AddWithValue("@@level", level);
-                    command.Parameters.AddWithValue("@@timestamp", DateTime.UtcNow);
-                    command.Parameters.AddWithValue("@@principalname", Environment.UserName);
-                    command.Parameters.AddWithValue("@@program", ProgramName);
-                    command.Parameters.AddWithValue("@@filepath", filePath);
-                    command.Parameters.AddWithValue("@@linenumber", lineNumber);
-                    command.Parameters.AddWithValue("@@membername", memberName);
-                    command.Parameters.AddWithValue("@@message", message);
-                    
-            
-                    command.ExecuteNonQuery();
-
-                    connection.Close();
+                        using var command = _provider.CreateCommand(_insertSql, connection);
+                        command.Parameters.AddWithValue("@level", level);
+                        command.Parameters.AddWithValue("@timestamp", DateTime.UtcNow);
+                        command.Parameters.AddWithValue("@principalname", Environment.UserName);
+                        command.Parameters.AddWithValue("@program", ProgramName);
+                        command.Parameters.AddWithValue("@filepath", filePath);
+                        command.Parameters.AddWithValue("@linenumber", lineNumber);
+                        command.Parameters.AddWithValue("@membername", memberName);
+                        command.Parameters.AddWithValue("@message", message);
                         
-                            
-                    
+                        command.ExecuteNonQuery();
+                    }
                 }
                 catch(Exception x)
                 {
-                    Console.Error.WriteLine(x.Message + ": " + sql);
+                    Console.Error.WriteLine(x.Message + ": " + _insertSql);
                 }
             }
         }
