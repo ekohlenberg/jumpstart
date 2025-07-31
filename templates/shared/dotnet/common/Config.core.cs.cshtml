@@ -76,28 +76,63 @@ namespace @Model.Name
             string username = parameters.Length >= 4 ? parameters[3] : string.Empty;
             string password = parameters.Length >= 5 ? parameters[4] : string.Empty;
 
-            // Create the connection string based on whether username/password are provided
+            // Get database type from config (default to postgresql)
+            string dbType = getString("db.type", "postgresql").ToLower();
+
+            // Create the connection string based on database type and whether username/password are provided
             string dbcon;
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
                 // Full connection string with username and password
-                dbcon = "Host=^server;Port=^port;Username=^username;Password=^password;Database=^database;";
-                dbcon = dbcon.Replace("^server", server)
-                            .Replace("^port", port)
-                            .Replace("^database", database)
-                            .Replace("^username", username)
-                            .Replace("^password", password);
+                dbcon = getConnectionStringTemplate(dbType, true);
             }
             else
             {
                 // Connection string without username and password (for trusted connections)
-                dbcon = "Host=^server;Port=^port;Database=^database;";
-                dbcon = dbcon.Replace("^server", server)
-                            .Replace("^port", port)
-                            .Replace("^database", database);
+                dbcon = getConnectionStringTemplate(dbType, false);
+            }
+
+            // Replace placeholders with actual values
+            dbcon = dbcon.Replace("^server", server)
+                        .Replace("^port", port)
+                        .Replace("^database", database);
+
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            {
+                dbcon = dbcon.Replace("^username", username)
+                            .Replace("^password", password);
             }
 
             return dbcon;
+        }
+
+        static private string getConnectionStringTemplate(string dbType, bool includeCredentials)
+        {
+            switch (dbType)
+            {
+                case "sqlserver":
+                case "mssql":
+                    if (includeCredentials)
+                    {
+                        return "Server=^server,^port;Database=^database;User Id=^username;Password=^password;TrustServerCertificate=true;";
+                    }
+                    else
+                    {
+                        return "Server=^server,^port;Database=^database;Trusted_Connection=true;TrustServerCertificate=true;";
+                    }
+
+                case "postgresql":
+                case "pgsql":
+                default:
+                    if (includeCredentials)
+                    {
+                        return "Host=^server;Port=^port;Database=^database;Username=^username;Password=^password;";
+                    }
+                    else
+                    {
+                        return "Host=^server;Port=^port;Database=^database;";
+                    }
+            }
         }
         
         static public int getInt(string param)
