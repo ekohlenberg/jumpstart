@@ -65,24 +65,37 @@ namespace @Model.Name
 
             // Split the content by colon (:) to extract parameters
             string[] parameters = fileContent.Split(':');
-            if (parameters.Length != 5)
+            if (parameters.Length != 3 && parameters.Length != 5)
             {
-                throw new FormatException("The .@(Model.Name) file must contain exactly five parameters separated by colons (:).\nserver:port:database:user:password");
+                throw new FormatException("The .@(Model.Name) file must contain either 3 or 5 parameters separated by colons (:).\nFormat: server:port:database[:username:password]");
             }
 
             string server = parameters[0];
             string port = parameters[1];
             string database = parameters[2];
-            string username = parameters[3];
-            string password = parameters[4];
+            string username = parameters.Length >= 4 ? parameters[3] : string.Empty;
+            string password = parameters.Length >= 5 ? parameters[4] : string.Empty;
 
-            // Create the connection string
-            string dbcon = "Host=^server;Port=^port;Username=^username;Password=^password;Database=^database;";
-            dbcon = dbcon.Replace("^server", server)
-                        .Replace("^port", port)
-                        .Replace("^database", database)
-                        .Replace("^username", username)
-                        .Replace("^password", password);
+            // Create the connection string based on whether username/password are provided
+            string dbcon;
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            {
+                // Full connection string with username and password
+                dbcon = "Host=^server;Port=^port;Username=^username;Password=^password;Database=^database;";
+                dbcon = dbcon.Replace("^server", server)
+                            .Replace("^port", port)
+                            .Replace("^database", database)
+                            .Replace("^username", username)
+                            .Replace("^password", password);
+            }
+            else
+            {
+                // Connection string without username and password (for trusted connections)
+                dbcon = "Host=^server;Port=^port;Database=^database;";
+                dbcon = dbcon.Replace("^server", server)
+                            .Replace("^port", port)
+                            .Replace("^database", database);
+            }
 
             return dbcon;
         }
