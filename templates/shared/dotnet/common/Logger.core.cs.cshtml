@@ -214,7 +214,7 @@ namespace @Model.Name
                             _connectionString = Config.getString("db.connection");
                             _tableName = _provider.FormatTableName("history.log");
                             _insertSql = $"INSERT INTO {_tableName} (level, timestamp, principalname, program, filepath, linenumber, membername, message) " +
-                                        "VALUES (@level, @timestamp, @principalname, @program, @filepath, @linenumber, @membername, @message);";
+                                        "VALUES (@@level, @@timestamp, @@principalname, @@program, @@filepath, @@linenumber, @@membername, @@message);";
                             _initialized = true;
                         }
                         catch (Exception ex)
