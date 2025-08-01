@@ -246,14 +246,14 @@ namespace @Model.Name
                         connection.Open();
 
                         using var command = _provider.CreateCommand(_insertSql, connection);
-                        command.Parameters.AddWithValue("@level", level);
-                        command.Parameters.AddWithValue("@timestamp", DateTime.UtcNow);
-                        command.Parameters.AddWithValue("@principalname", Environment.UserName);
-                        command.Parameters.AddWithValue("@program", ProgramName);
-                        command.Parameters.AddWithValue("@filepath", filePath);
-                        command.Parameters.AddWithValue("@linenumber", lineNumber);
-                        command.Parameters.AddWithValue("@membername", memberName);
-                        command.Parameters.AddWithValue("@message", message);
+                        command.Parameters.AddWithValue("@@level", level);
+                        command.Parameters.AddWithValue("@@timestamp", DateTime.UtcNow);
+                        command.Parameters.AddWithValue("@@principalname", Environment.UserName);
+                        command.Parameters.AddWithValue("@@program", ProgramName);
+                        command.Parameters.AddWithValue("@@filepath", filePath);
+                        command.Parameters.AddWithValue("@@linenumber", lineNumber);
+                        command.Parameters.AddWithValue("@@membername", memberName);
+                        command.Parameters.AddWithValue("@@message", message);
                         
                         command.ExecuteNonQuery();
                     }
