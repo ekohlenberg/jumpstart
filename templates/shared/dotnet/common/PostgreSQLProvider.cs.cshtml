@@ -16,6 +16,17 @@ namespace @Model.Name
             return new NpgsqlCommand(sql, (NpgsqlConnection)connection);
         }
 
+        public DbParameter CreateParameter()
+        {
+            return new NpgsqlParameter();
+        }
+
+        public void AddParameterWithValue(DbCommand command, string parameterName, object value)
+        {
+            var parameter = new NpgsqlParameter(parameterName, value);
+            command.Parameters.Add(parameter);
+        }
+
         public string GetNextIdentitySql(string tableName)
         {
             return $"SELECT nextval('{tableName}_identity');";

@@ -245,15 +245,38 @@ namespace @Model.Name
                     {
                         connection.Open();
 
-                        using var command = _provider.CreateCommand(_insertSql, connection);
-                        command.Parameters.AddWithValue("@@level", level);
-                        command.Parameters.AddWithValue("@@timestamp", DateTime.UtcNow);
-                        command.Parameters.AddWithValue("@@principalname", Environment.UserName);
-                        command.Parameters.AddWithValue("@@program", ProgramName);
-                        command.Parameters.AddWithValue("@@filepath", filePath);
-                        command.Parameters.AddWithValue("@@linenumber", lineNumber);
-                        command.Parameters.AddWithValue("@@membername", memberName);
-                        command.Parameters.AddWithValue("@@message", message);
+                        var command = _provider.CreateCommand(_insertSql, connection);
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[0].ParameterName = "@@level";
+                        command.Parameters[0].Value = level;
+                        
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[1].ParameterName = "@@timestamp";
+                        command.Parameters[1].Value = DateTime.UtcNow;
+                        
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[2].ParameterName = "@@principalname";
+                        command.Parameters[2].Value = Environment.UserName;
+                        
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[3].ParameterName = "@@program";
+                        command.Parameters[3].Value = ProgramName;
+                        
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[4].ParameterName = "@@filepath";
+                        command.Parameters[4].Value = filePath;
+                        
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[5].ParameterName = "@@linenumber";
+                        command.Parameters[5].Value = lineNumber;
+                        
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[6].ParameterName = "@@membername";
+                        command.Parameters[6].Value = memberName;
+                        
+                        command.Parameters.Add(_provider.CreateParameter());
+                        command.Parameters[7].ParameterName = "@@message";
+                        command.Parameters[7].Value = message;
                         
                         command.ExecuteNonQuery();
                     }

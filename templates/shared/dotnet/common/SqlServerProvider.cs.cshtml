@@ -27,6 +27,17 @@ namespace @Model.Name
             return new SqlCommand(sql, (SqlConnection)connection);
         }
 
+        public DbParameter CreateParameter()
+        {
+            return new SqlParameter();
+        }
+
+        public void AddParameterWithValue(DbCommand command, string parameterName, object value)
+        {
+            var parameter = new SqlParameter(parameterName, value);
+            command.Parameters.Add(parameter);
+        }
+
         public string GetNextIdentitySql(string tableName)
         {
             return $"SELECT NEXT VALUE FOR dbo.{tableName}_identity;";

@@ -7,6 +7,8 @@ namespace @Model.Name
     {
         DbConnection CreateConnection(string connectionString);
         DbCommand CreateCommand(string sql, DbConnection connection);
+        DbParameter CreateParameter();
+        void AddParameterWithValue(DbCommand command, string parameterName, object value);
         string GetNextIdentitySql(string tableName);
         string GetVersionSql(string tableName, long id);
         string FormatParameter(string parameterName);
