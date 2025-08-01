@@ -23,7 +23,7 @@ namespace @Model.Name
 
         public string GetVersionSql(string tableName, long id)
         {
-            return $@@"with ver_check as (
+            return $@"with ver_check as (
                 select max(version) as v from {tableName}
                 where id={id}
                 union all select 0 as v
