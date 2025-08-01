@@ -8,7 +8,18 @@ namespace @Model.Name
     {
         public DbConnection CreateConnection(string connectionString)
         {
-            return new SqlConnection(connectionString);
+            DbConnection connection;
+            try
+            {
+                connection = new SqlConnection(connectionString);
+                connection.Open();
+            } 
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Error opening connection: " + ex.Message);
+                throw;
+            }
+            return connection;
         }
 
         public DbCommand CreateCommand(string sql, DbConnection connection)

@@ -195,10 +195,37 @@ namespace @Model.Name
     public class LogTableWriter : BaseLogWriter, ILogWriter
     {
         private static readonly IDatabaseProvider _provider = DatabaseProviderFactory.CreateProvider();
-        private static readonly string _connectionString = Config.getString("db.connection");
-        private static readonly string _tableName = _provider.FormatTableName("history.log");
-        private static readonly string _insertSql = $"INSERT INTO {_tableName} (level, timestamp, principalname, program, filepath, linenumber, membername, message) " +
-                                                   "VALUES (@level, @timestamp, @principalname, @program, @filepath, @linenumber, @membername, @message);";
+        private static string _connectionString = null;
+        private static string _tableName = null;
+        private static string _insertSql = null;
+        private static bool _initialized = false;
+        private static readonly object _initLock = new object();
+
+        private static void InitializeIfNeeded()
+        {
+            if (!_initialized)
+            {
+                lock (_initLock)
+                {
+                    if (!_initialized)
+                    {
+                        try
+                        {
+                            _connectionString = Config.getString("db.connection");
+                            _tableName = _provider.FormatTableName("history.log");
+                            _insertSql = $"INSERT INTO {_tableName} (level, timestamp, principalname, program, filepath, linenumber, membername, message) " +
+                                        "VALUES (@level, @timestamp, @principalname, @program, @filepath, @linenumber, @membername, @message);";
+                            _initialized = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine($"Failed to initialize LogTableWriter: {ex.Message}");
+                            _initialized = true; // Prevent repeated attempts
+                        }
+                    }
+                }
+            }
+        }
 
         public void Write(string level, string message, string filePath, int lineNumber, string memberName )
         {
@@ -206,6 +233,14 @@ namespace @Model.Name
             {
                 try
                 {
+                    InitializeIfNeeded();
+                    
+                    if (_connectionString == null)
+                    {
+                        // Database logging not available, skip silently
+                        return;
+                    }
+
                     using (DbConnection connection = _provider.CreateConnection(_connectionString))
                     {
                         connection.Open();
@@ -225,7 +260,7 @@ namespace @Model.Name
                 }
                 catch(Exception x)
                 {
-                    Console.Error.WriteLine(x.Message + ": " + _insertSql);
+                    Console.Error.WriteLine($"LogTableWriter error: {x.Message}");
                 }
             }
         }

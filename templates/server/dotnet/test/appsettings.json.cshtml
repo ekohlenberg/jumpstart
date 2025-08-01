@@ -8,6 +8,7 @@
   "AllowedHosts": "*",
 	"appsettings": {
     "logwriters": "@(Model.Name).LogFileWriter,@(Model.Name).LogTableWriter,@(Model.Name).LogConsoleWriter",
-		"loglevel": "debug" 
+		"loglevel": "debug" ,
+		"db.type": "mssql" 
 	}
 }
