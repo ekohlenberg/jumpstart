@@ -1,7 +1,12 @@
 -- =====================================
 -- 1) Create Account for Current OS Principal
 -- =====================================
-DECLARE @@os_user NVARCHAR(50) = SYSTEM_USER;
+DECLARE @@os_user NVARCHAR(50) = 
+    CASE 
+        WHEN CHARINDEX('\', SYSTEM_USER) > 0 
+        THEN RIGHT(SYSTEM_USER, LEN(SYSTEM_USER) - CHARINDEX('\', SYSTEM_USER))
+        ELSE SYSTEM_USER 
+    END;
 DECLARE @@principal_id BIGINT, @@password_id BIGINT, @@role_member_id BIGINT;
 
 SELECT @@principal_id = NEXT VALUE FOR app.principal_identity;

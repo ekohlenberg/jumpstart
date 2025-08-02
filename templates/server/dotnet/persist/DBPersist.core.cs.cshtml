@@ -25,7 +25,6 @@ namespace @Model.Name
 
                 using (DbConnection connection = _provider.CreateConnection(connectionStr))
                 {
-                    connection.Open();
 
                     using (DbCommand command = _provider.CreateCommand(sql, connection))
                     {
@@ -116,7 +115,7 @@ namespace @Model.Name
 
                 using (DbConnection connection = _provider.CreateConnection(connectionStr))
                 {
-                    connection.Open();
+                    
 
                     using (DbCommand command = _provider.CreateCommand(sql, connection))
                     {
@@ -325,12 +324,12 @@ namespace @Model.Name
         
         static string getSql( BaseObject t)
         {
-            string sqlTemplate = "select * from " + _provider.FormatTableName("^(table)") + " where id=^(id)";
+            string sqlTemplate = "select * from ^(table) where id=^(id)";
 
             BaseObject p = new BaseObject();
 
             p["id"] = t["id"];
-            p["table"] = t.tableName;
+            p["table"] = _provider.FormatTableName(t.tableName);
 
             return substituteTemplate(p, sqlTemplate);
         }

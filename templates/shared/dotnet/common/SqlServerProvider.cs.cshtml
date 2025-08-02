@@ -40,7 +40,7 @@ namespace @Model.Name
 
         public string GetNextIdentitySql(string tableName)
         {
-            return $"SELECT NEXT VALUE FOR dbo.{tableName}_identity;";
+            return $"SELECT NEXT VALUE FOR {tableName}_identity;";
         }
 
         public string GetVersionSql(string tableName, long id)
@@ -60,7 +60,18 @@ namespace @Model.Name
 
         public string FormatTableName(string tableName)
         {
-            return $"[{tableName}]";
+            if (string.IsNullOrEmpty(tableName))
+                return tableName;
+
+            var parts = tableName.Split('.');
+            var formattedParts = new string[parts.Length];
+            
+            for (int i = 0; i < parts.Length; i++)
+            {
+                formattedParts[i] = $"[{parts[i]}]";
+            }
+            
+            return string.Join(".", formattedParts);
         }
 
         public string FormatColumnName(string columnName)
