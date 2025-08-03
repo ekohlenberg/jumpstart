@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-blue.svg)](https://www.microsoft.com/en-us/sql-server/sql-server-2022)
 
 > **Jumpstart** is an enterprise-grade code generation framework that creates full-stack applications from metadata specifications. It generates production-ready scaffolds for machine learning applications, business systems, and data-driven applications.
 
@@ -13,8 +14,8 @@ Jumpstart transforms tabular metadata into complete, production-ready applicatio
 - **Database Layer**: PostgreSQL DDL scripts with audit trails, sequences, and real-world keys
 - **Backend API**: .NET 9 REST API with authentication, authorization, and business logic
 - **Frontend**: Blazor WebAssembly with modern UI components
-- **Testing**: Comprehensive test suites for both API and persist layers
-- **Infrastructure**: Docker support, logging, and monitoring capabilities
+- **Testing**: Generated test suites for both API and persist layers
+- **Infrastructure**: Logging and monitoring capabilities
 
 ## ✨ Key Features
 
@@ -24,21 +25,20 @@ Jumpstart transforms tabular metadata into complete, production-ready applicatio
 - Supports complex relationships, constraints, and business rules
 
 ### 🏗️ **Full-Stack Architecture**
-- **Database**: PostgreSQL with audit trails and sequences
+- **Database**: PostgreSQL and MS SQL Server support with audit trails and sequences
 - **Backend**: .NET 9 REST API with dependency injection
 - **Frontend**: Blazor WebAssembly with responsive design
 - **Testing**: Dual test suites (API and persist layer testing)
 
 ### 🔐 **Enterprise Security**
 - Role-based access control (RBAC)
-- Object-level permissions (RWX authorization)
-- OAuth authentication support
+- Object-level permissions (RWX authorization) (future)
+- OAuth authentication support (future)
 - Audit logging and compliance features
 
 ### 🚀 **Developer Experience**
 - Hot reload during development
 - Comprehensive logging and debugging
-- Docker containerization
 - Automated testing and CI/CD ready
 
 ## 🛠️ Technology Stack
@@ -48,9 +48,8 @@ Jumpstart transforms tabular metadata into complete, production-ready applicatio
 | **Backend** | .NET 9, ASP.NET Core |
 | **Database** | PostgreSQL 15+ |
 | **Frontend** | Blazor WebAssembly |
-| **Testing** | xUnit, HTTP Client |
+| **Testing** | Generated Persist and HTTP Client |
 | **Templating** | RazorLight |
-| **Containerization** | Docker |
 
 ## 📋 Prerequisites
 
@@ -141,30 +140,38 @@ generated-app/
 
 ### Database Connection
 
+Jumpstart reads database connection parrameters from a file in your home directory:
+
+```bash
+# Model configuration file location
+~/.jumpstart-model
+```
+
+The appsettings.json file contains your application's runtime configuration in the *appsettings* section.
+
+### Application Settings
+
 Update `appsettings.json` in your generated application:
 
 ```json
 {
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=myapp;Username=postgres;Password=password"
-  }
-}
-```
-
-### Authentication
-
-Configure OAuth providers in your generated API:
-
-```json
-{
-  "Authentication": {
-    "Google": {
-      "ClientId": "your-client-id",
-      "ClientSecret": "your-client-secret"
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
     }
-  }
+  },
+  "AllowedHosts": "*",
+        "appsettings": {
+                "logwriters": "<your-model-name>.LogFileWriter,<your-model-name>.LogTableWriter,<your-model-name>.LogConsoleWriter",
+                "loglevel": "debug" ,
+                "db.type": "mssql"
+        }
 }
 ```
+
+
+
 
 ## 🧪 Testing
 
