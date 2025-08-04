@@ -1,0 +1,57 @@
+-- =====================================
+-- Generate SELECT queries for all objects
+-- =====================================
+
+@{
+    foreach( var metaObject in Model.Objects)
+    {
+        if (metaObject.SchemaName == "sec") continue;
+        if (metaObject.SchemaName == "core") continue;
+        
+        var domainObj = metaObject.DomainObj;
+        var tableName = metaObject.TableName;
+        var schemaName = metaObject.SchemaName;
+        
+        // Get all attributes for this object
+        var attributes = metaObject.Attributes;
+        
+        // Find foreign key relationships
+        var foreignKeys = attributes.Where(a => !string.IsNullOrEmpty(a.FkObject)).ToList();
+        
+        // Find rwk columns for this object
+        var rwkColumns = attributes.Where(a => a.Rwk == 1).ToList();
+        
+        <text>
+-- =====================================
+-- Query for @(domainObj) (@(schemaName).@(tableName))
+-- =====================================
+DECLARE @@query_id BIGINT = NEXT VALUE FOR core.query_identity;
+
+INSERT INTO core.query (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+    created_date, 
+    created_by
+) VALUES (
+    @@query_id,
+    'Select All @(domainObj)',
+    'SELECT 
+        @(tableName).id,
+        @(tableName).@(string.Join(",\n        " + tableName + ".", attributes.Where(a => !a.Name.EndsWith("id") && a.Name != "id").Select(a => a.Name)))@(foreignKeys.Count > 0 ? ",\n        " + string.Join(",\n        ", foreignKeys.Select(fk => {
+            var fkTable = fk.FkObject;
+            var fkRwkColumns = Model.Objects.FirstOrDefault(o => o.DomainObj == fk.FkObject)?.Attributes.Where(a => a.Rwk == 1).ToList() ?? new List<MetaAttribute>();
+            return string.Join(",\n        ", fkRwkColumns.Select(rwk => fkTable + "." + rwk.Name + " AS " + fkTable + "_" + rwk.Name));
+        })) : "")
+    FROM @(schemaName).@(tableName)@(foreignKeys.Count > 0 ? "\n    " + string.Join("\n    ", foreignKeys.Select(fk => "LEFT JOIN " + schemaName + "." + fk.FkObject + " ON " + tableName + "." + fk.Name + " = " + fk.FkObject + ".id")) : "")
+    ORDER BY @(tableName).id;',
+    'Select all @(domainObj) records with related @(string.Join(", ", foreignKeys.Select(fk => fk.FkObject))) information',
+    GETDATE(),
+    SYSTEM_USER
+);
+
+        </text>
+    }
+}
+		
