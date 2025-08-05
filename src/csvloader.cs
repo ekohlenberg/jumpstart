@@ -111,6 +111,7 @@ public class CSVLoader
                 metaModel.PrimaryObjects.Add(metaObject);
             }   
         }
+        metaObject.Model = metaModel;
         AddAttributes(metaObject, mr);
     }
 

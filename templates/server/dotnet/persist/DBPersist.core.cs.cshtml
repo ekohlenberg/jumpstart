@@ -12,6 +12,7 @@ namespace @Model.Name
     public class DBPersist
     {
         private static readonly IDatabaseProvider _provider = DatabaseProviderFactory.CreateProvider();
+        private static readonly Dictionary<string, BaseObject> _queryCache = new Dictionary<string, BaseObject>();
         
         public delegate void SelectCallback(DbDataReader rdr);
         
@@ -358,6 +359,105 @@ namespace @Model.Name
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Retrieves a query by name from the core.query table with caching
+        /// </summary>
+        /// <param name="queryName">The name of the query to retrieve</param>
+        /// <returns>A BaseObject containing the query information, or null if not found</returns>
+        public static BaseObject GetQueryByName(string queryName)
+        {
+            // Check cache first
+            if (_queryCache.ContainsKey(queryName))
+            {
+                Logger.Debug($"Query '{queryName}' found in cache");
+                return _queryCache[queryName];
+            }
+
+            BaseObject query = new BaseObject();
+            query["tableName"] = "core.query";
+            
+            string sql = "SELECT id, name, sql_text, description, created_by FROM " + 
+                        _provider.FormatTableName("core.query") + 
+                        " WHERE " + _provider.FormatColumnName("name") + " = " + 
+                        _provider.FormatValue(queryName);
+
+            bool found = false;
+            SelectCallback scb = (rdr) =>
+            {
+                found = true;
+                query["id"] = rdr["id"];
+                query["name"] = rdr["name"];
+                query["sql_text"] = rdr["sql_text"];
+                query["description"] = rdr["description"];
+                query["created_by"] = rdr["created_by"];
+            };
+
+            select(scb, sql);
+
+            // Cache the result (even if null to avoid repeated database calls for missing queries)
+            if (found)
+            {
+                _queryCache[queryName] = query;
+                Logger.Debug($"Query '{queryName}' cached");
+            }
+            else
+            {
+                _queryCache[queryName] = null;
+                Logger.Debug($"Query '{queryName}' not found, cached as null");
+            }
+
+            return found ? query : null;
+        }
+
+        /// <summary>
+        /// Executes a query by name and processes the results with a callback
+        /// </summary>
+        /// <param name="queryName">The name of the query to execute</param>
+        /// <param name="callback">Callback function to process each row of results</param>
+        public static void ExecuteQueryByName(string queryName, SelectCallback callback)
+        {
+            BaseObject query = GetQueryByName(queryName);
+            if (query == null)
+            {
+                throw new Exception($"Query '{queryName}' not found in core.query table");
+            }
+
+            string sql = query["sql_text"].ToString();
+            select(callback, sql);
+        }
+
+        /// <summary>
+        /// Clears the query cache
+        /// </summary>
+        public static void ClearQueryCache()
+        {
+            _queryCache.Clear();
+            Logger.Debug("Query cache cleared");
+        }
+
+        /// <summary>
+        /// Refreshes a specific query from the database, bypassing the cache
+        /// </summary>
+        /// <param name="queryName">The name of the query to refresh</param>
+        /// <returns>A BaseObject containing the query information, or null if not found</returns>
+        public static BaseObject RefreshQueryByName(string queryName)
+        {
+            // Remove from cache to force database lookup
+            _queryCache.Remove(queryName);
+            Logger.Debug($"Query '{queryName}' removed from cache for refresh");
+            
+            return GetQueryByName(queryName);
+        }
+
+        /// <summary>
+        /// Gets the number of cached queries
+        /// </summary>
+        /// <returns>The number of queries currently in the cache</returns>
+        public static int GetCacheSize()
+        {
+            return _queryCache.Count;
         }
     }
 }

@@ -50,7 +50,8 @@ namespace @namespaceName
                 @(domainVar)s.Add(@(domainVar));
             };
 
-            DBPersist.select(@(domainVar)Callback, $"select * from @schemaName.@tableName");
+            //DBPersist.select(@(domainVar)Callback, $"select * from @schemaName.@tableName");
+            DBPersist.ExecuteQueryByName("@(tableName)-select", @(domainVar)Callback);
 
             return @(domainVar)s;
         }

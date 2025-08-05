@@ -168,7 +168,15 @@ namespace jumpstart {
                 throw new Exception($"Template content is null or empty. Cannot read template {templatePath}");
             }
 
-            string generatedCode = await razorEngine.CompileRenderStringAsync<T>(td.templateFile, template, model );
+            string generatedCode;
+            try
+            {
+                generatedCode = await razorEngine.CompileRenderStringAsync<T>(td.templateFile, template, model);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error compiling template {td.templateFile}: {ex.Message}", ex);
+            }
 
             if (generatedCode.Length > 0)
             {

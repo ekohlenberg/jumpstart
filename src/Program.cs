@@ -8,7 +8,7 @@ namespace jumpstart {
 
     class Program
     {
-        static async Task Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
 
             
@@ -24,9 +24,8 @@ namespace jumpstart {
 
                     if (!File.Exists(modelPath))
                     {
-                    Console.WriteLine($"Error: File not found at path {modelPath}");
-
-                    return;
+                        Console.WriteLine($"Error: File not found at path {modelPath}");
+                        return 1; // File not found error
                     }
 
                     templDefName = args[1];
@@ -35,7 +34,8 @@ namespace jumpstart {
                 }
                 else 
                 {
-                    throw new Exception("Usage: jumpstart <model.csv> <template-definition>");
+                    Console.WriteLine("Usage: jumpstart <model.csv> <template-definition>");
+                    return 2; // Usage error
                 }
 
 
@@ -68,21 +68,33 @@ namespace jumpstart {
                 // go!
                 await g.Generate();
 
-                
+                Console.WriteLine("Code generation completed successfully.");
+                return 0; // Success
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine($"File not found error: {ex.Message}");
+                return 1; // File not found error
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Invalid argument error: {ex.Message}");
+                return 2; // Invalid argument error
             }
             catch (Exception ex)
             {
-                
                 Exception x = ex;
                 while(x != null)
                 {
-                    Console.WriteLine($"Error: {x.Message}\n{x.StackTrace}");
-
+                    Console.WriteLine($"Error: {x.Message}");
+                    if (x.StackTrace != null)
+                    {
+                        Console.WriteLine($"Stack trace: {x.StackTrace}");
+                    }
                     x = x.InnerException;
                 }
+                return 3; // General error
             }
-
-                return;
         }
     }
 }

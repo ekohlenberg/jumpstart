@@ -16,10 +16,60 @@
         var attributes = metaObject.Attributes;
         
         // Find foreign key relationships
-        var foreignKeys = attributes.Where(a => !string.IsNullOrEmpty(a.FkObject)).ToList();
+        var foreignKeys = new List<MetaAttribute>();
+        foreach(var attr in attributes)
+        {
+            if (!string.IsNullOrEmpty(attr.FkObject))
+            {
+                foreignKeys.Add(attr);
+            }
+        }
         
-        // Find rwk columns for this object
-        var rwkColumns = attributes.Where(a => a.Rwk == 1).ToList();
+        // Build the SELECT clause for main table attributes (excluding foreign key columns)
+        var selectColumns = new List<string>();
+        foreach(var attr in attributes)
+        {
+            if (!attr.Name.EndsWith("id") && attr.Name != "id" && string.IsNullOrEmpty(attr.FkObject))
+            {
+                selectColumns.Add(tableName + "." + attr.Name);
+            }
+        }
+        
+        // Build the SELECT clause for foreign key RWK columns
+        var fkSelectColumns = new List<string>();
+        var joinClauses = new List<string>();
+        var fkTableNames = new List<string>();
+        
+        foreach(var fk in foreignKeys)
+        {
+            var fkTable = fk.FkObject;
+            fkTableNames.Add(fkTable);
+            
+            // Find the foreign key object
+            var fkObject = (MetaObject)null;
+            foreach(var obj in Model.Objects)
+            {
+                if (obj.DomainObj == fk.FkObject)
+                {
+                    fkObject = obj;
+                    break;
+                }
+            }
+            if (fkObject != null)
+            {
+                // Get RWK columns from the foreign key table
+                foreach(var fkAttr in fkObject.Attributes)
+                {
+                    if (fkAttr.Rwk == 1)
+                    {
+                        fkSelectColumns.Add(fkTable + "." + fkAttr.Name + " AS " + fkTable + "_" + fkAttr.Name);
+                    }
+                }
+            }
+            
+            // Build JOIN clause
+            joinClauses.Add("LEFT JOIN " + schemaName + "." + fk.FkObject + " ON " + tableName + "." + fk.Name + " = " + fk.FkObject + ".id");
+        }
         
         <text>
 -- =====================================
@@ -36,23 +86,21 @@ BEGIN
         name, 
         sql_text, 
         description, 
-        created_date, 
-        created_by
+        last_updated, 
+        last_updated_by,
+        is_active,
+        version
     ) VALUES (
         query_id,
-        'Select All @(domainObj)',
+        '@(schemaName).@(tableName)-select',
         'SELECT 
-            @(tableName).id,
-            @(tableName).@(string.Join(",\n            " + tableName + ".", attributes.Where(a => !a.Name.EndsWith("id") && a.Name != "id").Select(a => a.Name)))@(foreignKeys.Count > 0 ? ",\n            " + string.Join(",\n            ", foreignKeys.Select(fk => {
-                var fkTable = fk.FkObject;
-                var fkRwkColumns = Model.Objects.FirstOrDefault(o => o.DomainObj == fk.FkObject)?.Attributes.Where(a => a.Rwk == 1).ToList() ?? new List<MetaAttribute>();
-                return string.Join(",\n            ", fkRwkColumns.Select(rwk => fkTable + "." + rwk.Name + " AS " + fkTable + "_" + rwk.Name));
-            })) : "")
-        FROM @(schemaName).@(tableName)@(foreignKeys.Count > 0 ? "\n        " + string.Join("\n        ", foreignKeys.Select(fk => "LEFT JOIN " + schemaName + "." + fk.FkObject + " ON " + tableName + "." + fk.Name + " = " + fk.FkObject + ".id")) : "")
-        ORDER BY @(tableName).id;',
-        'Select all @(domainObj) records with related @(string.Join(", ", foreignKeys.Select(fk => fk.FkObject))) information',
+            @(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
+        FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
+        ORDER BY @(schemaName).@(tableName).id;',
+        'Select all @(domainObj) records with related @(string.Join(", ", fkTableNames)) information',
         NOW(),
-        CURRENT_USER
+        CURRENT_USER,
+        1
     );
 END $$;
 

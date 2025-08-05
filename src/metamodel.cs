@@ -265,6 +265,8 @@ namespace jumpstart {
                 return result;
             }
         }
+
+        public MetaModel Model {get;set;}
         
         public List<MetaAttribute> Attributes { get; private set; } = new();
 
