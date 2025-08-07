@@ -1,0 +1,27 @@
+using System.Net.Http.Json;
+
+namespace @(Model.Namespace).Common
+{
+    public static class ApiHelper
+    {
+        public static async Task<T?> SafeReadFromJsonAsync<T>(this HttpResponseMessage response) where T : class
+        {
+            if (response == null || !response.IsSuccessStatusCode)
+                return null;
+
+            // Check if there's content to read
+            if (response.Content.Headers.ContentLength == 0 || response.Content.Headers.ContentLength == null)
+                return null;
+
+            try
+            {
+                return await response.Content.ReadFromJsonAsync<T>();
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                // Handle JSON parsing errors gracefully
+                return null;
+            }
+        }
+    }
+} 

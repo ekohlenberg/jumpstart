@@ -246,7 +246,7 @@ namespace @Model.Name
                         //Console.WriteLine("LogTableWriter: connection.Open()");
                         //connection.Open();
 
-                        Console.WriteLine("LogTableWriter: _insertSql: " + _insertSql);
+                        //Console.WriteLine("LogTableWriter: _insertSql: " + _insertSql);
 
                         var command = _provider.CreateCommand(_insertSql, connection);
                         command.Parameters.Add(_provider.CreateParameter());
