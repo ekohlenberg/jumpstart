@@ -1,10 +1,12 @@
 ﻿@@page "/@(Model.DomainVar)"
 @@using System.Net.Http;
 @@using Microsoft.Extensions.DependencyInjection;
+@@using Radzen;
+@@using Radzen.Blazor;
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
-@@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
+@@rendermode InteractiveWebAssembly
 <PageTitle>@(Model.Label)</PageTitle>
 
 <h1>@(Model.Label)</h1>
@@ -17,60 +19,62 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                @foreach( var a in @Model.Attributes)
-                {
-                <text>
-                <th>@a.Label</th>
-                </text>
-            
-                }
-
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @@foreach (var @(Model.DomainVar) in @(Model.DomainVar)List)
-            {
-                <tr>
-                    @foreach( var a in @Model.Attributes)
-                    {
-                    <text>
-                    <td>@@@(Model.DomainVar).@(a.Name).ToString()</td>
-                    </text>
-                    
-                    }
-                    <td><button class="btn btn-primary" @@onclick="@@(()=> Edit@(Model.DomainObj)(@@@(Model.DomainVar).id))">Edit</button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <td><button class="btn btn-primary" @@onclick="@@(()=> Add@(Model.DomainObj)())">Add</button></td>
+    <RadzenDataGrid Data="@(Model.DomainVar)List" 
+                    TItem="@(Model.DomainObj)"
+                    AllowPaging="true"
+                    PageSize="25"
+                    AllowSorting="true"
+                    AllowFiltering="true"
+                    FilterMode="FilterMode.Advanced"
+                    ShowColumnChooser="true"
+                    ShowGroupPanel="true"
+                    ShowSearchBox="true"
+                    ShowRefreshButton="true"
+                    RowClick="@@OnRowClick"
+                    Style="height: 600px;">
+        
+        @foreach( var a in @Model.Attributes)
+        {
+        <text>
+        <RadzenDataGridColumn TItem="@(Model.DomainObj)" Property="@(a.Name)" Title="@(a.Label)" Width="200px" />
+        </text>
+        }
+        
+        <RadzenDataGridColumn TItem="@(Model.DomainObj)" Title="Actions" TextAlign="TextAlign.Center" Width="100px">
+            <Template Context="data">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" 
+                             Click="@@(  () =>  Edit@(Model.DomainObj)(data.id))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </RadzenDataGrid>
+    
+    <div class="mt-3">
+        <RadzenButton Text="Add @(Model.Label)" Icon="add" ButtonStyle="ButtonStyle.Primary" 
+                      Click="@@( () =>  Add@(Model.DomainObj)())" />
+    </div>
 }
 
 @@code {
-    protected  @(Model.DomainObj)[]? @(Model.DomainVar)List;
+    protected @(Model.Namespace).@(Model.DomainObj)[]? @(Model.DomainVar)List;
 
     protected override async Task OnInitializedAsync()
     {
         var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-
-        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
+        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.Namespace).@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
     }
 
     void Add@(Model.DomainObj)()
     {
-        
-        Navigation.NavigateTo("edit-@(Model.DomainVar)");
+         Navigation.NavigateTo("edit-@(Model.DomainVar)");
     }
 
     void Edit@(Model.DomainObj)(long id)
     {
-        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
+         Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
     }
-
-
-   
+    
+    void  OnRowClick(DataGridRowMouseEventArgs<@(Model.Namespace).@(Model.DomainObj)> args)
+    {
+         Navigation.NavigateTo($"edit-@(Model.DomainVar)/{args.Data.id}");
+    }
 }

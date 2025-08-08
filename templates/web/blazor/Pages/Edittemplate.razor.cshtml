@@ -47,14 +47,14 @@ else
 	[Parameter]
 	public long? id {get;set;}
 
-	public @(Model.DomainObj) @(Model.DomainVar) {get;set;} = new @(Model.DomainObj)();
+	public @(Model.Namespace).@(Model.DomainObj) @(Model.DomainVar) {get;set;} = new @(Model.Namespace).@(Model.DomainObj)();
 
 	protected override async Task OnParametersSetAsync()
 	{
 		Console.WriteLine("getting data");
 		if (id is not null) {
 			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-		var result = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}");
+		var result = await remoteClient.GetFromJsonAsync<@(Model.Namespace).@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}");
 		if (result is not null)
 			@(Model.DomainVar) = result;
 		}
@@ -67,10 +67,10 @@ else
 
 		if (id is not null) {
 			
-			var result = await remoteClient.PutAsJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}", @(Model.DomainVar));
+			var result = await remoteClient.PutAsJsonAsync<@(Model.Namespace).@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}", @(Model.DomainVar));
 				if (result is not null)
 				{
-					var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
+					var readResult = await result.Content.ReadFromJsonAsync<@(Model.Namespace).@(Model.DomainObj)>();
 					if (readResult is not null) 
 					{
 						@(Model.DomainVar) = readResult;
@@ -79,10 +79,10 @@ else
 		}
 		else
 		{
-			var result = await remoteClient.PostAsJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)", @(Model.DomainVar));	
+			var result = await remoteClient.PostAsJsonAsync<@(Model.Namespace).@(Model.DomainObj)>($"api/@(Model.DomainVar)", @(Model.DomainVar));	
 			if (result is not null)
 				{
-					var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
+					var readResult = await result.Content.ReadFromJsonAsync<@(Model.Namespace).@(Model.DomainObj)>();
 					if (readResult is not null)
 					{
 						@(Model.DomainVar) = readResult;
