@@ -1,66 +1,85 @@
 ﻿@@page "/@(Model.DomainVar)"
 @@using System.Net.Http;
 @@using Microsoft.Extensions.DependencyInjection;
-@@using Radzen;
-@@using Radzen.Blazor;
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
 @@rendermode InteractiveWebAssembly
 <PageTitle>@(Model.Label)</PageTitle>
 
-<h1>@(Model.Label)</h1>
+<MudText Typo="Typo.h3" Class="mb-4">@(Model.Label)</MudText>
 
-<p>This component demonstrates fetching @(Model.Label) data from the server.</p>
+<MudText Typo="Typo.body1" Class="mb-4">This component demonstrates fetching @(Model.Label) data from the server.</MudText>
 
 @@if (@(Model.DomainVar)List == null)
 {
-    <p><em>Loading...</em></p>
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 else
 {
-    <RadzenDataGrid Data="@(Model.DomainVar)List" 
-                    TItem="@(Model.DomainObj)"
-                    AllowPaging="true"
-                    PageSize="25"
-                    AllowSorting="true"
-                    AllowFiltering="true"
-                    FilterMode="FilterMode.Advanced"
-                    ShowColumnChooser="true"
-                    ShowGroupPanel="true"
-                    ShowSearchBox="true"
-                    ShowRefreshButton="true"
-                    RowClick="@@OnRowClick"
-                    Style="height: 600px;">
+    <MudTable Items="@(Model.DomainVar)List" 
+              Dense="true" 
+              Hover="true" 
+              Striped="true"
+              Filter="new Func<@(Model.DomainObj),bool>(FilterFunc)"
+              @@bind-SelectedItem="selectedItem"
+              Loading="@@loading"
+              LoadingProgressColor="Color.Info"
+              Breakpoint="Breakpoint.Sm"
+              Class="mt-4">
         
-        @foreach( var a in @Model.Attributes)
-        {
-        <text>
-        <RadzenDataGridColumn TItem="@(Model.DomainObj)" Property="@(a.Name)" Title="@(a.Label)" Width="200px" />
-        </text>
-        }
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@(Model.Label)</MudText>
+            <MudSpacer />
+            <MudTextField @@bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
         
-        <RadzenDataGridColumn TItem="@(Model.DomainObj)" Title="Actions" TextAlign="TextAlign.Center" Width="100px">
-            <Template Context="data">
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" 
-                             Click="@@(  () =>  Edit@(Model.DomainObj)(data.id))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </RadzenDataGrid>
+        <HeaderContent>
+            @foreach( var a in Model.Attributes)
+            {
+            <MudTh><MudTableSortLabel SortBy="new Func<@(Model.DomainObj), object>(x=>x.@(a.Name))">@(a.Label)</MudTableSortLabel></MudTh>
+            }
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        
+        <RowTemplate>
+            @foreach( var a in Model.Attributes)
+            {
+            <MudTd DataLabel="@(a.Label)">@@context.@(a.Name)</MudTd>
+            }
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@@Icons.Material.Filled.Edit" 
+                              Color="Color.Primary" 
+                              Size="Size.Small"
+                              OnClick="@@( () => Edit@(Model.DomainObj)(context.id))" />
+            </MudTd>
+        </RowTemplate>
+        
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
     
-    <div class="mt-3">
-        <RadzenButton Text="Add @(Model.Label)" Icon="add" ButtonStyle="ButtonStyle.Primary" 
-                      Click="@@( () =>  Add@(Model.DomainObj)())" />
-    </div>
+    <MudButton Variant="Variant.Filled" 
+               Color="Color.Primary" 
+               StartIcon="@@Icons.Material.Filled.Add"
+               OnClick="@@( () => Add@(Model.DomainObj)())"
+               Class="mt-4">
+        Add @(Model.Label)
+    </MudButton>
 }
 
 @@code {
     protected @(Model.Namespace).@(Model.DomainObj)[]? @(Model.DomainVar)List;
+    protected @(Model.Namespace).@(Model.DomainObj)? selectedItem;
+    protected bool loading = true;
+    protected string searchString = "";
 
     protected override async Task OnInitializedAsync()
     {
         var remoteClient = ClientFactory.CreateClient("RemoteAPI");
         @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.Namespace).@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
+        loading = false;
     }
 
     void Add@(Model.DomainObj)()
@@ -73,8 +92,21 @@ else
          Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
     }
     
-    void  OnRowClick(DataGridRowMouseEventArgs<@(Model.Namespace).@(Model.DomainObj)> args)
+    private bool FilterFunc(@(Model.Namespace).@(Model.DomainObj) element)
     {
-         Navigation.NavigateTo($"edit-@(Model.DomainVar)/{args.Data.id}");
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+            
+        @foreach( var a in Model.Attributes)
+        {
+        <text>
+        if (element.@(a.Name).ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase) == true)
+        {
+            return true;
+        }
+        </text>
+        }
+        
+        return false;
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;*/
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor.Services;
 
 using @Model.Name;
 
@@ -24,6 +25,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
             client2.BaseAddress = new Uri("http://localhost:5209");
         });
         
+        // Add MudBlazor services
+        builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();
 
