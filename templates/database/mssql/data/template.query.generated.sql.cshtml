@@ -46,11 +46,9 @@
 	var joinClauses = new List<string>();
 	var fkTableNames = new List<string>();
 	
-	for(int fkIndex = 0; fkIndex < foreignKeys.Count; fkIndex++)
+	foreach(var fk in foreignKeys)
 	{
-		var fk = foreignKeys[fkIndex];
 		var fkTable = fk.FkObject;
-		var fkAlias = "fk" + fkIndex.ToString();
 		fkTableNames.Add(fkTable);
 		
 		// Find the foreign key object
@@ -70,13 +68,13 @@
 			{
 				if (fkAttr.RWK == "1")
 				{
-					fkSelectColumns.Add(fkAlias + "." + fkAttr.Name + " AS " + fkTable + "_" + fkAttr.Name);
+					fkSelectColumns.Add(fkTable + "." + fkAttr.Name + " AS " + fkTable + "_" + fkAttr.Name);
 				}
 			}
 		}
 		
-		// Build JOIN clause with unique alias
-		joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + fkAlias + " ON " + tableName + "." + fk.Name + " = " + fkAlias + ".id");
+		// Build JOIN clause
+		joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " ON " + tableName + "." + fk.Name + " = " + fkObject.TableName + ".id");
 	}
         <text>
 -- =====================================

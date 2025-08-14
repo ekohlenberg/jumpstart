@@ -41,22 +41,18 @@ namespace @(namespaceName).Controllers
 
         // POST api/<@(domainObj)Controller>
         [HttpPost]
-        public @(domainObj) Post([FromBody] @(domainObj) @(domainVar))
+        public void Post([FromBody] @(domainObj) @(domainVar))
         {
             //Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
             @(domainObj)Logic.Create().insert(@(domainVar));
-
-            return @(domainVar);
         }
 
         // PUT api/<@(domainObj)Controller>/5
         [HttpPut("{id}")]
-        public @(domainObj) Put(long id, [FromBody] @(domainObj) @(domainVar))
+        public void Put(long id, [FromBody] @(domainObj) @(domainVar))
         {
             //Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
             @(domainObj)Logic.Create().update(id, @(domainVar));
-
-            return @(domainVar);
         }
 
         // DELETE api/<@(domainObj)Controller>/5
