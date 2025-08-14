@@ -19,28 +19,13 @@ namespace @(namespaceName).Controllers
     {
         // GET: api/<@(domainObj)Controller>
         [HttpGet]
-        public IEnumerable<@(domainObj)> Get([FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+        public IEnumerable<@(domainObj)> Get()
         {
             //Console.WriteLine("Processing GET List");
 
             List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select();
 
-            // Add pagination support for AG Grid
-            if (page.HasValue && pageSize.HasValue)
-            {
-                int skip = (page.Value - 1) * pageSize.Value;
-                @(domainVar)s = @(domainVar)s.Skip(skip).Take(pageSize.Value).ToList();
-            }
-
             return @(domainVar)s;
-        }
-
-        // GET: api/<@(domainObj)Controller>/count
-        [HttpGet("count")]
-        public int GetCount()
-        {
-            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select();
-            return @(domainVar)s.Count;
         }
 
         // GET api/<@(domainObj)Controller>/5

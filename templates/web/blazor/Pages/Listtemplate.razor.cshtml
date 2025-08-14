@@ -4,7 +4,7 @@
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
-@@rendermode InteractiveWebAssembly
+@@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
 <PageTitle>@(Model.Label)</PageTitle>
 
 <MudText Typo="Typo.h3" Class="mb-4">@(Model.Label)</MudText>
@@ -17,78 +17,58 @@
 }
 else
 {
-    <MudTable Items="@(Model.DomainVar)List" 
-              Dense="true" 
-              Hover="true" 
-              Striped="true"
-              Filter="new Func<@(Model.DomainObj),bool>(FilterFunc)"
-              @@bind-SelectedItem="selectedItem"
-              Loading="@@loading"
-              LoadingProgressColor="Color.Info"
-              Breakpoint="Breakpoint.Sm"
-              Class="mt-4">
-        
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">@(Model.Label)</MudText>
-            <MudSpacer />
-            <MudTextField @@bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-        
-        <HeaderContent>
-            @foreach( var a in Model.Attributes)
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach( var a in @Model.Attributes)
+                {
+                <text>
+                <th>@a.Label</th>
+                </text>
+            
+                }
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @@foreach (var @(Model.DomainVar) in @(Model.DomainVar)List)
             {
-            <MudTh><MudTableSortLabel SortBy="new Func<@(Model.DomainObj), object>(x=>x.@(a.Name))">@(a.Label)</MudTableSortLabel></MudTh>
+                <tr>
+                    @foreach( var a in @Model.Attributes)
+                    {
+                    <text>
+                    <td>@@@(Model.DomainVar).@(a.Name).ToString()</td>
+                    </text>
+                    
+                    }
+                    <td><button class="btn btn-primary" @@onclick="@@(()=> Edit@(Model.DomainObj)(@@@(Model.DomainVar).id))">Edit</button></td>
+                </tr>
             }
-            <MudTh>Actions</MudTh>
-        </HeaderContent>
-        
-        <RowTemplate>
-            @foreach( var a in Model.Attributes)
-            {
-            <MudTd DataLabel="@(a.Label)">@@context.@(a.Name)</MudTd>
-            }
-            <MudTd DataLabel="Actions">
-                <MudIconButton Icon="@@Icons.Material.Filled.Edit" 
-                              Color="Color.Primary" 
-                              Size="Size.Small"
-                              OnClick="@@( () => Edit@(Model.DomainObj)(context.id))" />
-            </MudTd>
-        </RowTemplate>
-        
-        <PagerContent>
-            <MudTablePager />
-        </PagerContent>
-    </MudTable>
-    
-    <MudButton Variant="Variant.Filled" 
-               Color="Color.Primary" 
-               StartIcon="@@Icons.Material.Filled.Add"
-               OnClick="@@( () => Add@(Model.DomainObj)())"
-               Class="mt-4">
-        Add @(Model.Label)
-    </MudButton>
+        </tbody>
+    </table>
+    <td><button class="btn btn-primary" @@onclick="@@(()=> Add@(Model.DomainObj)())">Add</button></td>
 }
 
 @@code {
-    protected @(Model.Namespace).@(Model.DomainObj)[]? @(Model.DomainVar)List;
-    protected @(Model.Namespace).@(Model.DomainObj)? selectedItem;
-    protected bool loading = true;
-    protected string searchString = "";
+    protected  @(Model.DomainObj)[]? @(Model.DomainVar)List;
 
     protected override async Task OnInitializedAsync()
     {
         var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.Namespace).@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
-        loading = false;
+
+        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
     }
 
     void Add@(Model.DomainObj)()
     {
-         Navigation.NavigateTo("edit-@(Model.DomainVar)");
+        
+        Navigation.NavigateTo("edit-@(Model.DomainVar)");
     }
 
     void Edit@(Model.DomainObj)(long id)
     {
+<<<<<<< HEAD
          Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
     }
     
@@ -108,5 +88,11 @@ else
         }
         
         return false;
+=======
+        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
+>>>>>>> parent of e1796b66 (building - adding stored query and grid support)
     }
+
+
+   
 }

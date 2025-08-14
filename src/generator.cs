@@ -202,9 +202,7 @@ namespace jumpstart {
                 generatedCode = generatedCode.Replace("&copy;", "©");
                 generatedCode = generatedCode.Replace("&reg;", "®");    
                 generatedCode = generatedCode.Replace("&trade;", "™");
-                generatedCode = generatedCode.Replace("@@", "@");
-                generatedCode = generatedCode.Replace("2@", "@@");
-
+                
                 if (!Directory.Exists(td.outputFolder))
                 {
                     Directory.CreateDirectory(td.outputFolder);

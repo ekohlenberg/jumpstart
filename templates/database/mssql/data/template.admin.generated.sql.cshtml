@@ -98,7 +98,7 @@ DECLARE operation_cursor CURSOR FOR
 OPEN operation_cursor;
 FETCH NEXT FROM operation_cursor INTO @@op_id;
 
-WHILE 2@@FETCH_STATUS = 0
+WHILE @@@@FETCH_STATUS = 0
 BEGIN
     -- Get next sequence value for each operation
     SELECT @@role_map_id = NEXT VALUE FOR sec.op_role_map_identity;

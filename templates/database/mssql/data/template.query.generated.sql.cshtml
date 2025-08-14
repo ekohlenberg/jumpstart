@@ -82,9 +82,9 @@
 -- =====================================
 -- Query for @(domainObj) (@(schemaName).@(tableName))
 -- =====================================
-DECLARE @@query_id BIGINT = NEXT VALUE FOR core.sql_identity;
+DECLARE @@query_id BIGINT = NEXT VALUE FOR core.query_identity;
 
-INSERT INTO core.sql (
+INSERT INTO core.query (
     id, 
     name, 
     sql_text, 

@@ -1,0 +1,106 @@
+# @(Model.Name) - Blazor WebAssembly Application
+
+This is a generated Blazor WebAssembly application using plain HTML and Bootstrap for the UI components.
+
+## Prerequisites
+
+- **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download)
+- **Node.js** (optional, for development tools)
+
+## Quick Start
+
+### 1. Restore Dependencies
+
+```bash
+# On Windows
+build.cmd
+
+# On Unix/Linux/macOS
+chmod +x build.sh
+./build.sh
+
+# Or manually
+dotnet restore
+```
+
+### 2. Build the Application
+
+```bash
+# Using the build script
+make build
+
+# Or manually
+dotnet build
+```
+
+### 3. Run the Application
+
+```bash
+# Using the build script
+make run
+
+# Or manually
+dotnet run
+```
+
+The application will be available at `https://localhost:5001` or `http://localhost:5000`.
+
+## Project Structure
+
+- **Pages/** - Blazor pages and components
+- **Layout/** - Application layout components
+- **wwwroot/** - Static web assets
+- **common/** - Shared utilities and helpers
+- **domain/** - Domain models and objects
+
+## UI Components
+
+This application uses standard HTML and Bootstrap for UI components. Key features include:
+
+- **HTML Tables** - Data display with Bootstrap styling
+- **Bootstrap Forms** - Input forms with validation
+- **Bootstrap Buttons** - Action buttons and navigation
+- **Bootstrap Cards** - Content containers
+- **Bootstrap Navigation** - Responsive navigation bar
+
+## Development
+
+### Hot Reload
+
+The application supports hot reload during development. Simply save your changes and the browser will automatically refresh.
+
+### Adding New Pages
+
+1. Create a new `.razor` file in the `Pages/` directory
+2. Add the page to the navigation in `Layout/NavMenu.razor.cshtml`
+3. The page will be automatically available
+
+### Styling
+
+- **Bootstrap 5** - CSS framework for responsive design
+- **Bootstrap Icons** - Icon library
+- **Custom CSS** - Located in `wwwroot/css/app.css`
+
+## Troubleshooting
+
+### Build Errors
+
+1. Clean the project: `make clean`
+2. Restore dependencies: `dotnet restore`
+3. Rebuild: `dotnet build`
+
+### Styling Issues
+
+1. Ensure Bootstrap CSS is loaded in `wwwroot/index.html`
+2. Check that Bootstrap JavaScript is included for interactive components
+3. Verify custom CSS in `wwwroot/css/app.css`
+
+## Deployment
+
+To create a production build:
+
+```bash
+dotnet publish -c Release
+```
+
+The published files will be in `bin/Release/net9.0/publish/`.

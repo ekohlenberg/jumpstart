@@ -376,10 +376,10 @@ namespace @Model.Name
             }
 
             BaseObject query = new BaseObject();
-            query["tableName"] = "core.sql";
+            query["tableName"] = "core.query";
             
             string sql = "SELECT id, name, sql_text, description, created_by FROM " + 
-                        _provider.FormatTableName("core.sql") + 
+                        _provider.FormatTableName("core.query") + 
                         " WHERE " + _provider.FormatColumnName("name") + " = " + 
                         _provider.FormatValue(queryName);
 
