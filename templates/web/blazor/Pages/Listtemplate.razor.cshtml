@@ -7,18 +7,18 @@
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
 <PageTitle>@(Model.Label)</PageTitle>
 
-<MudText Typo="Typo.h3" Class="mb-4">@(Model.Label)</MudText>
+<h1>@(Model.Label)</h1>
 
-<MudText Typo="Typo.body1" Class="mb-4">This component demonstrates fetching @(Model.Label) data from the server.</MudText>
+<p>This component demonstrates fetching @(Model.Label) data from the server.</p>
 
 @@if (@(Model.DomainVar)List == null)
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="table-dark">
             <tr>
                 @foreach( var a in @Model.Attributes)
                 {
@@ -68,29 +68,7 @@ else
 
     void Edit@(Model.DomainObj)(long id)
     {
-<<<<<<< HEAD
-         Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
-    }
-    
-    private bool FilterFunc(@(Model.Namespace).@(Model.DomainObj) element)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-            
-        @foreach( var a in Model.Attributes)
-        {
-        <text>
-        if (element.@(a.Name).ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase) == true)
-        {
-            return true;
-        }
-        </text>
-        }
-        
-        return false;
-=======
         Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
->>>>>>> parent of e1796b66 (building - adding stored query and grid support)
     }
 
 

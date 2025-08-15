@@ -6,54 +6,41 @@
 
 @@if(id == null)
 {
-	<MudText Typo="Typo.h4" Class="mb-4">Create @(Model.Label)</MudText>
+	<h3>Create @(Model.Label)</h3>
 }
 else
 {
-	<MudText Typo="Typo.h4" Class="mb-4">Edit @(Model.Label) @@@(Model.DomainVar).getRwkString() </MudText>
+	<h3>Edit @(Model.Label) @@@(Model.DomainVar).getRwkString() </h3>
 }
 
 <EditForm Model="@(Model.DomainVar)" onsubmit="HandleSubmit">
 	@@{
 		Console.WriteLine("rendering");
 	}
-	<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
-        <MudPaper Class="pa-4" Elevation="3">
-            <MudGrid>
-                @foreach(var a in Model.UserAttributes)
-                {
-                    <MudItem xs="12" sm="6">
-                        <MudTextField @@bind-Value="@(Model.DomainVar).@(a.Name)" 
-                                     Label="@(a.Label)" 
-                                     Variant="Variant.Outlined" 
-                                     FullWidth="true" />
-                    </MudItem>
-                }
-            </MudGrid>
-            
-            <MudDivider Class="my-4" />
-            
-            <MudText Typo="Typo.h6" Class="mb-3">System Information</MudText>
-            <MudGrid>
-                @foreach(var g in Model.GlobalAttributes)
-                {
-                    <MudItem xs="12" sm="6">
-                        <MudField Label="@(g.Label)" Variant="Variant.Text">
-                            @@(@(Model.DomainVar).@(g.Name).ToString())
-                        </MudField>
-                    </MudItem>
-                }
-            </MudGrid>
-            
-            <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
-                <MudButton Variant="Variant.Filled" 
-                           Color="Color.Primary" 
-                           ButtonType="ButtonType.Submit">
-                    Save
-                </MudButton>
-            </MudStack>
-        </MudPaper>
-	</MudContainer>
+	<div>
+        <table>
+            @foreach(var a in Model.UserAttributes)
+            {
+                <text>
+                <tr>
+                <td><label for="@(a.Name)">@a.Label</label></td>
+		        <td><Input@(a.InputType) id="@(a.Name)" @@bind-Value="@(Model.DomainVar).@(a.Name)" class="form-control" /></td>
+                </tr>
+                </text>
+            }
+		
+			@foreach(var g in Model.GlobalAttributes)
+			{
+				<text>
+				<tr>
+					<td>@(g.Label)</td><td>@@(@(Model.DomainVar).@(g.Name).ToString())</td>
+				</tr>
+				</text>
+			}
+			
+		</table>
+	</div>
+	<button type="submit" class="btn btn-primary">Save</button>
 </EditForm>
 
 @@code {
