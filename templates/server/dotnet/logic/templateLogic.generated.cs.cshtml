@@ -51,7 +51,7 @@ namespace @namespaceName
             };
 
             //DBPersist.select(@(domainVar)Callback, $"select * from @schemaName.@tableName");
-            DBPersist.ExecuteQueryByName("@(tableName)-select", @(domainVar)Callback);
+            DBPersist.ExecuteQueryByName("@(schemaName).@(tableName)-select", @(domainVar)Callback);
 
             return @(domainVar)s;
         }

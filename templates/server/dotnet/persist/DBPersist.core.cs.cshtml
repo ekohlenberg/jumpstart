@@ -376,10 +376,10 @@ namespace @Model.Name
             }
 
             BaseObject query = new BaseObject();
-            query["tableName"] = "core.query";
+            query["tableName"] = "core.sql";
             
             string sql = "SELECT id, name, sql_text, description, created_by FROM " + 
-                        _provider.FormatTableName("core.query") + 
+                        _provider.FormatTableName("core.sql") + 
                         " WHERE " + _provider.FormatColumnName("name") + " = " + 
                         _provider.FormatValue(queryName);
 
@@ -421,7 +421,7 @@ namespace @Model.Name
             BaseObject query = GetQueryByName(queryName);
             if (query == null)
             {
-                throw new Exception($"Query '{queryName}' not found in core.query table");
+                throw new Exception($"Query '{queryName}' not found in core.sql table");
             }
 
             string sql = query["sql_text"].ToString();

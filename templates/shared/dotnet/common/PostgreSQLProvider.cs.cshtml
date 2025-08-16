@@ -8,7 +8,9 @@ namespace @Model.Name
     {
         public DbConnection CreateConnection(string connectionString)
         {
-            return new NpgsqlConnection(connectionString);
+            NpgsqlConnection connection =  new NpgsqlConnection(connectionString);
+            connection.Open();
+            return connection;
         }
 
         public DbCommand CreateCommand(string sql, DbConnection connection)
@@ -49,7 +51,18 @@ namespace @Model.Name
 
         public string FormatTableName(string tableName)
         {
-            return $"\"{tableName}\"";
+            if (string.IsNullOrEmpty(tableName))
+                return tableName;
+
+            var parts = tableName.Split('.');
+            var formattedParts = new string[parts.Length];
+            
+            for (int i = 0; i < parts.Length; i++)
+            {
+                formattedParts[i] = $"\"{parts[i]}\"";
+            }
+            
+            return string.Join(".", formattedParts);
         }
 
         public string FormatColumnName(string columnName)

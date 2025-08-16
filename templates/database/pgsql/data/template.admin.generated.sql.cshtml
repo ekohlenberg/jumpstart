@@ -19,7 +19,7 @@ VALUES (
     nextval('app.principal_identity'),          -- Use next value from principal_identity sequence
     'Admin',
     'Principal',
-    'admin',                               -- Unique username
+    'admin',                               -- Unique principalname
     'admin@mydomain.com',
     now(),
     null,
@@ -29,10 +29,9 @@ VALUES (
     'system',
     1
 );
-
-WITH admin_user_id AS (
+WITH admin_principal_id AS (
     SELECT id
-    FROM app."user"
+    FROM app."principal"
     WHERE username = 'admin'
 )
 INSERT INTO sec.principal_password(

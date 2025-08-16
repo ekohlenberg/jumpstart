@@ -80,9 +80,9 @@
 -- =====================================
 -- Query for @(domainObj) (@(schemaName).@(tableName))
 -- =====================================
-DECLARE @@query_id BIGINT = NEXT VALUE FOR core.query_identity;
+DECLARE @@sql_id BIGINT = NEXT VALUE FOR core.sql_identity;
 
-INSERT INTO core.query (
+INSERT INTO core.sql (
     id, 
     name, 
     sql_text, 
@@ -93,8 +93,8 @@ INSERT INTO core.query (
 	is_active,
 	version
 ) VALUES (
-    @@query_id,
-    '@(tableName)-select',
+    @@sql_id,
+    '@(schemaName).@(tableName)-select',
     'SELECT 
         @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
     FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
