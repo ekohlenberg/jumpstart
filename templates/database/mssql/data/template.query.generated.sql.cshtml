@@ -41,10 +41,13 @@
 		}
 	}
 	
-	// Build the SELECT clause for foreign key RWK columns
+	// Build the SELECT clause for foreign key RWK columns with improved aliasing
 	var fkSelectColumns = new List<string>();
 	var joinClauses = new List<string>();
 	var fkTableNames = new List<string>();
+	
+	// Track used aliases to avoid conflicts
+	var usedAliases = new HashSet<string>();
 	
 	foreach(var fk in foreignKeys)
 	{
@@ -63,18 +66,37 @@
 		}
 		if (fkObject != null)
 		{
-			// Get RWK columns from the foreign key table
+			// Create unique alias based on foreign key column name
+			// Remove "_id" suffix and use the remaining part as the alias base
+			var aliasBase = fk.Name;
+			if (aliasBase.EndsWith("_id"))
+			{
+				aliasBase = aliasBase.Substring(0, aliasBase.Length - 3);
+			}
+			
+			// Ensure alias is unique
+			var alias = aliasBase;
+			var counter = 1;
+			while (usedAliases.Contains(alias))
+			{
+				alias = aliasBase + "_" + counter;
+				counter++;
+			}
+			usedAliases.Add(alias);
+			
+			// Get RWK columns from the foreign key table with improved aliasing
 			foreach(var fkAttr in fkObject.Attributes)
 			{
 				if (fkAttr.RWK == "1")
 				{
-					fkSelectColumns.Add(fkTable + "." + fkAttr.Name + " AS " + fkTable + "_" + fkAttr.Name);
+					// Use the unique alias for the column reference
+					fkSelectColumns.Add(alias + "." + fkAttr.Name + " AS " + alias + "_" + fkAttr.Name);
 				}
 			}
+			
+			// Build JOIN clause with unique alias
+			joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + tableName + "." + fk.Name + " = " + alias + ".id");
 		}
-		
-		// Build JOIN clause
-		joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " ON " + tableName + "." + fk.Name + " = " + fkObject.TableName + ".id");
 	}
         <text>
 -- =====================================
