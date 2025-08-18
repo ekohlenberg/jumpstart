@@ -14,7 +14,7 @@ namespace @namespaceName
     [Label("@classLabel")]
     public partial class @className : BaseObject
     {
-        protected void Initialize()
+        protected override void Initialize()
         {
             // Default initializer
             domainName = "@(className)";
@@ -30,6 +30,17 @@ namespace @namespaceName
             rwk.Add("@attr.Name");
             </text>
                 }
+    
+                
+            }
+
+            @foreach (var attr in Model.Attributes)
+            {
+                
+            <text>
+            _defaults["@attr.Name"] = default(@attr.DotNetType);
+            </text>
+                
             }
         }
 
