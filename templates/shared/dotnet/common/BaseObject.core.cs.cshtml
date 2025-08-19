@@ -9,6 +9,7 @@ namespace @Model.Name
     {
         public BaseObject() { }
 
+
         public BaseObject( BaseObject t)
         {
             foreach( string k in t.Keys)
@@ -16,6 +17,7 @@ namespace @Model.Name
                 this[k] = t[k];
             }
         }
+        protected Dictionary<string, object> _defaults = new Dictionary<string, object>();
 
         public string domainName {get;  set;}
         public string tableName { get;  set; }
@@ -37,7 +39,12 @@ namespace @Model.Name
          // Override the indexer to keep dictionary & properties in sync
         public new object this[string key]
         {
-            get => base[key];
+            get
+            {
+                object v = this.ContainsKey(key) ? base[key] : _defaults[key];
+
+                return v;
+            }
             set
             {
                 // 1) Check if the new value is different to avoid recursive writes
@@ -61,5 +68,8 @@ namespace @Model.Name
 
             return this.GetType().Name + "{\n" + s + "\n}";
         }
+
+        protected virtual void Initialize()
+        {}
     }
 }
