@@ -50,7 +50,10 @@ var currentPrincipal = principals.Find(principal => principal.username == Enviro
                 <text>
                 Logger.Info("Testing @(domainObj)");
                 @(domainObj)Test.testInsert();            
+                @(domainObj)Test.testUpdate(); 
+                @(domainObj)Test.testInsert();            
                 @(domainObj)Test.testUpdate();            
+                @(domainObj)Test.testSelect();            
                 </text>
                     
                 }

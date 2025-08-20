@@ -49,7 +49,10 @@ namespace @Model.Namespace
                 <text>
                 Logger.Info("Testing @(domainObj)");
                 await @(domainObj)Test.testInsert();            
-                await @(domainObj)Test.testUpdate();            
+                await @(domainObj)Test.testUpdate();    
+                 await @(domainObj)Test.testInsert();            
+                await @(domainObj)Test.testUpdate();     
+                await @(domainObj)Test.testSelect();            
                 </text>
                     
                 }
