@@ -46,6 +46,48 @@ namespace @Model.Namespace
             }
         }
 
+        public static async Task testInsertRwkOnly()
+        {
+            var @(Model.DomainVar) = new @(Model.DomainObj)();
+
+            @foreach (var attr in Model.Attributes)
+            {
+                if (attr.IsGlobal()) continue;
+                
+                // Only assign values to RWK fields
+                if (attr.RWK == "1")
+                {
+                    if (attr.Name.EndsWith("id"))
+                    {
+                        if (!string.IsNullOrEmpty(attr.FkObject))
+                        {
+                        <text>
+                        @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                        </text>
+                        }
+                    }
+                    else
+                    {
+                        var testDataSet = "random";
+                        if (!string.IsNullOrEmpty(attr.TestDataSet))
+                        {
+                            testDataSet = attr.TestDataSet;
+                        }
+                        <text>
+                        @(Model.DomainVar).@attr.Name = Convert.@(attr.ConvertMethod)(BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet));
+                        </text>
+                    }
+                }
+            }
+            @{
+            <text>
+                Console.WriteLine("Testing @(Model.DomainObj) API insert (RWK only): " + @(Model.DomainVar).ToString());
+                await PostAsync("@(Model.DomainObj)", @(Model.DomainVar));
+                BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar).id);
+            </text>
+            }
+        }
+
         public static async Task testUpdate()
         {
             long lastId = BaseTest.getLastId("@(Model.DomainObj)");
@@ -81,6 +123,56 @@ namespace @Model.Namespace
                 Console.WriteLine("Testing @(Model.DomainObj) API update: " + @(Model.DomainVar).ToString());
                 await PutAsync("@(Model.DomainObj)", lastId, @(Model.DomainVar));
             </text>
+            }
+        }
+
+        public static async Task testSelect()
+        {
+            Console.WriteLine("Testing @(Model.DomainObj) API select (list):");
+            
+            try
+            {
+                var @(Model.DomainVar)List = await BaseTest.GetListAsync<@(Model.DomainObj)>("@(Model.DomainObj)");
+                
+                Console.WriteLine($"Retrieved {@(Model.DomainVar)List.Count} @(Model.DomainObj) records");
+                
+                if (@(Model.DomainVar)List.Count > 0)
+                {
+                    Console.WriteLine("First record: " + @(Model.DomainVar)List[0].ToString());
+                    
+                    // Output all fields for each object, one per row
+                    Console.WriteLine("\nDetailed @(Model.DomainObj) records:");
+                    Console.WriteLine("=" + new string('=', 50));
+                    
+                    for (int i = 0; i < @(Model.DomainVar)List.Count; i++)
+                    {
+                        var @(Model.DomainVar) = @(Model.DomainVar)List[i];
+                        Console.WriteLine($"Record {i + 1}:");
+                        Console.WriteLine($"  ID: {@(Model.DomainVar).id}");
+                        @foreach (var attr in Model.Attributes)
+                        {
+                            if (attr.Name != "id")
+                            {
+                                <text>
+                        Console.WriteLine($"  @attr.Name: {@(Model.DomainVar).@attr.Name}");
+                                </text>
+                            }
+                        }
+                        Console.WriteLine();
+                    }
+                    
+                    // Store the first record for potential use in other tests
+                    BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar)List[0].id);
+                }
+                else
+                {
+                    Console.WriteLine("No @(Model.DomainObj) records found in database");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error testing @(Model.DomainObj) select: {ex.Message}");
+                throw;
             }
         }
     }

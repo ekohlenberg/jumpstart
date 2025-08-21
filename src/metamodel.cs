@@ -9,6 +9,29 @@ namespace jumpstart {
 
     public static class TypeMapping
     {
+        /// <summary>
+        /// Extracts the base data type by splitting on punctuation (particularly parentheses)
+        /// and returns the left portion as the key for dictionary lookups
+        /// </summary>
+        /// <param name="dataType">The full data type string (e.g., "numeric(18,4)", "varchar(255)")</param>
+        /// <returns>The base data type without parameters (e.g., "numeric", "varchar")</returns>
+        public static string GetBaseDataType(string dataType)
+        {
+            if (string.IsNullOrEmpty(dataType))
+                return dataType;
+
+            // Split by common punctuation that indicates parameters
+            var punctuationChars = new[] { '(', '[', '<', ' ' };
+            int index = dataType.IndexOfAny(punctuationChars);
+            
+            if (index > 0)
+            {
+                return dataType.Substring(0, index).ToLower().Trim();
+            }
+            
+            return dataType.ToLower().Trim();
+        }
+
         public static readonly Dictionary<string, string> DataTypeMap = new()
         {
             { "integer", "int" },

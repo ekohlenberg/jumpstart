@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 
 namespace @Model.Name
 {
@@ -137,21 +138,27 @@ namespace @Model.Name
             StringBuilder cols = new StringBuilder("");
             StringBuilder vals = new StringBuilder("");
 
-            foreach (string k in baseObject.Keys)
+            // Use reflection to get all properties with LabelAttribute
+            Type objectType = baseObject.GetType();
+            PropertyInfo[] properties = objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            
+            foreach (PropertyInfo property in properties)
             {
-                object v = baseObject[k];
+                // Check if property has LabelAttribute
+                var labelAttribute = property.GetCustomAttribute<LabelAttribute>();
+                if (labelAttribute == null) continue;
                 
-                if (v == null) continue;
-                if (v == DBNull.Value) continue;
-                if (string.IsNullOrEmpty(v.ToString())) continue;
-
+                // Get the value using the property getter (which handles defaults)
+                object value = property.GetValue(baseObject);
+                
+                
                 if (cols.Length > 0)
                 {
                     cols.Append(",");
                     vals.Append(",");
                 }
-                cols.Append(_provider.FormatColumnName(k));
-                vals.Append(_provider.FormatValue(v));
+                cols.Append(_provider.FormatColumnName(property.Name));
+                vals.Append(_provider.FormatValue(value));
             }
 
             sql.Append("(");

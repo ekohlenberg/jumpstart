@@ -68,9 +68,17 @@ namespace @namespaceName
                         }
                     }
                     
-                    if(this.ContainsKey("@attr.Name"))
+                    try
                     {
-                       _@attr.Name = Convert.@(attr.ConvertMethod)(this["@attr.Name"].ToString());
+                        if(this.ContainsKey("@attr.Name"))
+                        {
+                        _@attr.Name = Convert.@(attr.ConvertMethod)(this["@attr.Name"].ToString());
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        //Logger.Error($"Error getting @attr.Name: {e.Message}");
+                        _@attr.Name = default(@attr.DotNetType);
                     }
                     return _@attr.Name;
                 }
