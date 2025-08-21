@@ -46,6 +46,48 @@ namespace @Model.Namespace
             }
         }
 
+        public static async Task testInsertRwkOnly()
+        {
+            var @(Model.DomainVar) = new @(Model.DomainObj)();
+
+            @foreach (var attr in Model.Attributes)
+            {
+                if (attr.IsGlobal()) continue;
+                
+                // Only assign values to RWK fields
+                if (attr.RWK == "1")
+                {
+                    if (attr.Name.EndsWith("id"))
+                    {
+                        if (!string.IsNullOrEmpty(attr.FkObject))
+                        {
+                        <text>
+                        @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                        </text>
+                        }
+                    }
+                    else
+                    {
+                        var testDataSet = "random";
+                        if (!string.IsNullOrEmpty(attr.TestDataSet))
+                        {
+                            testDataSet = attr.TestDataSet;
+                        }
+                        <text>
+                        @(Model.DomainVar).@attr.Name = Convert.@(attr.ConvertMethod)(BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet));
+                        </text>
+                    }
+                }
+            }
+            @{
+            <text>
+                Console.WriteLine("Testing @(Model.DomainObj) API insert (RWK only): " + @(Model.DomainVar).ToString());
+                await PostAsync("@(Model.DomainObj)", @(Model.DomainVar));
+                BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar).id);
+            </text>
+            }
+        }
+
         public static async Task testUpdate()
         {
             long lastId = BaseTest.getLastId("@(Model.DomainObj)");

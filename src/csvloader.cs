@@ -130,17 +130,17 @@ public class CSVLoader
                 SqlDataType = mr.DATA_TYPE,
                 MSSQLDataType = TypeMapping.PostgreSQLToMSSQLMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), mr.DATA_TYPE),
                 Length = mr.CHARACTER_MAXIMUM_LENGTH.Trim(),
-                DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), "object"),
-                ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), ""),
+                DotNetType = TypeMapping.DataTypeMap.GetValueOrDefault(TypeMapping.GetBaseDataType(mr.DATA_TYPE), "object"),
+                ConvertMethod = TypeMapping.ConvertMap.GetValueOrDefault(TypeMapping.GetBaseDataType(mr.DATA_TYPE), ""),
                 InputType = TypeMapping.InputMap.GetValueOrDefault(mr.DATA_TYPE.ToLower().Trim(), "Text"),
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
-								IsNullable =((mr.IS_NULLABLE.Trim() == "1" || mr.IS_NULLABLE.Trim().ToLower() == "yes") ? true : false),
+				IsNullable =((mr.IS_NULLABLE.Trim() == "1" || mr.IS_NULLABLE.Trim().ToLower() == "yes") ? true : false),
                 FkObject= mr.FK_OBJECT.ToLower(),
                 FkType=mr.FK_TYPE,
                 TestDataSet=mr.TEST_DATA_SET
             };
-            bool hasKey = TypeMapping.ConvertMap.ContainsKey(mr.DATA_TYPE.ToLower().Trim());
+            bool hasKey = TypeMapping.ConvertMap.ContainsKey(TypeMapping.GetBaseDataType(mr.DATA_TYPE));
 
             Console.WriteLine($"{mr.TABLE_NAME} {mr.COLUMN_NAME} >{mr.DATA_TYPE}< {hasKey}");
             metaObject.Attributes.Add( attribute );
