@@ -83,14 +83,19 @@ namespace @Model.Name
 
     public class Logger
     {	
+        [Flags]
         public enum Level 
         {
-            info,
-            debug
+            None = 0,
+            Error = 1 << 0,
+            Info = 1 << 1,
+            Debug = 1 << 2,
+            Warning = 1 << 3,
+            Sql = 1 << 4
         }
 
         private static List<ILogWriter> LogWriters = null;
-        private static Level level = Level.info;
+        private static Level enabledLevels = Level.Error; // Error is always enabled
 
 
         protected static void Init()
@@ -101,13 +106,56 @@ namespace @Model.Name
                 
                 LogWriters = CreateLogWriters(logWriterNames);
 
-                string logLevel = Config.getString("loglevel").ToLower();
-                if (logLevel == "debug")
+                string logLevel = Config.getString("loglevel", "info").ToLower();
+                enabledLevels = ParseLogLevels(logLevel) | Level.Error; // Error is always enabled
+            }
+        }
+
+        private static Level ParseLogLevels(string logLevelString)
+        {
+            Level levels = Level.None;
+            
+            if (string.IsNullOrEmpty(logLevelString))
+                return Level.None; // Default fallback (Error will be added automatically)
+
+            string[] levelNames = logLevelString.Split(',', ';', '|', ' ');
+            
+            foreach (string levelName in levelNames)
+            {
+                string trimmedLevel = levelName.Trim().ToLower();
+                
+                switch (trimmedLevel)
                 {
-                        level = Level.debug;
+                    case "error":
+                        levels |= Level.Error;
+                        break;
+                    case "info":
+                        levels |= Level.Info;
+                        break;
+                    case "debug":
+                        levels |= Level.Debug;
+                        break;
+                    case "warning":
+                    case "warn":
+                        levels |= Level.Warning;
+                        break;
+                    case "sql":
+                        levels |= Level.Sql;
+                        break;
+                    case "all":
+                        levels = Level.Error | Level.Info | Level.Debug | Level.Warning | Level.Sql;
+                        break;
+                    case "none":
+                        levels = Level.None;
+                        break;
                 }
             }
-
+            
+            // If no valid levels were found, return None (Error will be added automatically)
+            if (levels == Level.None)
+                levels = Level.None;
+                
+            return levels;
         }
 
         public static List<ILogWriter> CreateLogWriters(string logWriterClasses)
@@ -138,7 +186,10 @@ namespace @Model.Name
         [CallerMemberName] string memberName = "")
         {
             Init();
-            Write("ERROR", message, filePath, lineNumber, memberName);
+            if ((enabledLevels & Level.Error) != 0)
+            {
+                Write("ERROR", message, filePath, lineNumber, memberName);
+            }
         }
         
         public static void Error(string message, Exception x,  [CallerFilePath] string filePath = "",
@@ -146,19 +197,22 @@ namespace @Model.Name
         [CallerMemberName] string memberName = "")
         {
             Init();
-            string m = string.Empty;
-            string s = string.Empty;
-
-            while (x != null)
+            if ((enabledLevels & Level.Error) != 0)
             {
-                m += x.Message;
-                m += "\n";
-                s += x.StackTrace;
-                s += "\n";				
-                x = x.InnerException;
+                string m = string.Empty;
+                string s = string.Empty;
+
+                while (x != null)
+                {
+                    m += x.Message;
+                    m += "\n";
+                    s += x.StackTrace;
+                    s += "\n";				
+                    x = x.InnerException;
+                }
+                
+                Write("ERROR", m + "\n" + s, filePath, lineNumber, memberName);
             }
-            
-            Write("ERROR", m + "\n" + s, filePath, lineNumber, memberName);
         }
 
         public static void Info( string message,  [CallerFilePath] string filePath = "",
@@ -166,19 +220,42 @@ namespace @Model.Name
         [CallerMemberName] string memberName = "" )
         {
             Init();
-            Write("INFO", message, filePath, lineNumber, memberName );
+            if ((enabledLevels & Level.Info) != 0)
+            {
+                Write("INFO", message, filePath, lineNumber, memberName );
+            }
         }
-
 
         public static void Debug( string message,  [CallerFilePath] string filePath = "",
         [CallerLineNumber] int lineNumber = 0,
         [CallerMemberName] string memberName = "" )
         {
             Init();
-
-            if (level == Level.debug) 
+            if ((enabledLevels & Level.Debug) != 0)
             {
-                Write("DEBUG", message );
+                Write("DEBUG", message, filePath, lineNumber, memberName);
+            }
+        }
+
+        public static void Warning( string message,  [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "" )
+        {
+            Init();
+            if ((enabledLevels & Level.Warning) != 0)
+            {
+                Write("WARNING", message, filePath, lineNumber, memberName);
+            }
+        }
+
+        public static void Sql( string message,  [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "" )
+        {
+            Init();
+            if ((enabledLevels & Level.Sql) != 0)
+            {
+                Write("SQL", message, filePath, lineNumber, memberName);
             }
         }
 
@@ -246,7 +323,7 @@ namespace @Model.Name
                         //Console.WriteLine("LogTableWriter: connection.Open()");
                         //connection.Open();
 
-                        Console.WriteLine("LogTableWriter: _insertSql: " + _insertSql);
+                        //Console.WriteLine("LogTableWriter: _insertSql: " + _insertSql);
 
                         var command = _provider.CreateCommand(_insertSql, connection);
                         command.Parameters.Add(_provider.CreateParameter());
@@ -281,10 +358,10 @@ namespace @Model.Name
                         command.Parameters[7].ParameterName = "@@message";
                         command.Parameters[7].Value = message;
                         
-                        Console.WriteLine("LogTableWriter: command.ExecuteNonQuery()");
+                        //Console.WriteLine("LogTableWriter: command.ExecuteNonQuery()");
                         command.ExecuteNonQuery();
 
-                        Console.WriteLine("LogTableWriter: connection.Close()");    
+                        //Console.WriteLine("LogTableWriter: connection.Close()");    
                         connection.Close();
                     }
                 }
@@ -304,7 +381,15 @@ namespace @Model.Name
             lock (Lock)
             {
                 string logMessage = FormatLogMessage(level, message, filePath, lineNumber, memberName);
-								
+    
+                if (level == "ERROR")
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else
+                {
+                    Console.ResetColor();
+                }
                 Console.WriteLine(logMessage);
             }
         }

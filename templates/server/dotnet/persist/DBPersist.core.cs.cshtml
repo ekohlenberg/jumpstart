@@ -19,7 +19,7 @@ namespace @Model.Name
         
         static public void select( SelectCallback selectCallback, string sql)
         {
-            Logger.Debug($"Executing sql {sql}.");
+            Logger.Sql($"Executing sql {sql}.");
             
             try
             {
@@ -113,16 +113,17 @@ namespace @Model.Name
         {
             try
             {
+                Logger.Sql($"Executing sql {sql}.");
+
                 string connectionStr = Config.getString("db.connection");
 
                 using (DbConnection connection = _provider.CreateConnection(connectionStr))
                 {
                     
-
                     using (DbCommand command = _provider.CreateCommand(sql, connection))
                     {
                         command.ExecuteNonQuery();
-                        Logger.Debug(sql);
+                        
                     }
                 }
             }
