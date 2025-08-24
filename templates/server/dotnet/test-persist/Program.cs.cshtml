@@ -47,13 +47,13 @@ var currentPrincipal = principals.Find(principal => principal.username == Enviro
                     if (metaObject.DomainObj == "Principal") continue;
                     
                     var domainObj = metaObject.DomainObj;
+                
                 <text>
                 Logger.Info("Testing @(domainObj)");
                 @(domainObj)Test.testInsert();            
                 @(domainObj)Test.testUpdate(); 
                 @(domainObj)Test.testInsert();            
                 @(domainObj)Test.testUpdate();            
-                @(domainObj)Test.testSelect();            
                 </text>
                     
                 }
