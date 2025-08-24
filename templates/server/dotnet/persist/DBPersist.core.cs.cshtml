@@ -76,7 +76,8 @@ namespace @Model.Name
 
         static public long audit( BaseObject baseObject )
         {
-            BaseObject auditBaseObject = new BaseObject(baseObject);
+            // Create the appropriate History object using factory pattern
+            BaseObject auditBaseObject = CreateHistoryObject(baseObject);
 
             string auditFKCol = baseObject.tableBaseName + "_id";
             auditBaseObject[auditFKCol] = baseObject["id"];
@@ -89,6 +90,50 @@ namespace @Model.Name
             execCmd(sql);
 
             return id;
+        }
+
+        private static BaseObject CreateHistoryObject(BaseObject baseObject)
+        {
+            // Get the type of the base object
+            Type baseObjectType = baseObject.GetType();
+            
+            // Construct the History class name
+            string historyClassName = baseObjectType.Name + "History";
+            
+            // Get the History type from the same assembly
+            Type historyType = baseObjectType.Assembly.GetType(baseObjectType.Namespace + "." + historyClassName);
+            
+            if (historyType == null)
+            {
+                // Fallback to original behavior if History class doesn't exist
+                Logger.Warning($"History class {historyClassName} not found for {baseObjectType.Name}, using BaseObject fallback");
+                return new BaseObject(baseObject);
+            }
+            
+            try
+            {
+                // Create an instance of the History class
+                var historyObject = Activator.CreateInstance(historyType) as BaseObject;
+                
+                if (historyObject == null)
+                {
+                    Logger.Error($"Failed to create instance of {historyClassName}");
+                    return new BaseObject(baseObject);
+                }
+                
+                // Copy all properties from the base object to the history object
+                foreach (var key in baseObject.Keys)
+                {
+                    historyObject[key] = baseObject[key];
+                }
+                
+                return historyObject;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error creating History object for {baseObjectType.Name}: {ex.Message}");
+                return new BaseObject(baseObject);
+            }
         }
         
         static public void update(BaseObject baseObject)
