@@ -13,6 +13,7 @@ namespace @Model.Name
     public class Config
     {
         static IConfiguration configBuilder = null;
+        static Dictionary<string, string> _dbparams = null;
 
         static IConfiguration getConfigBuilder()
         {
@@ -27,9 +28,20 @@ namespace @Model.Name
         }
         static public string getString(string param)
         {
+            // Check if _dbparams is null or empty, populate it if needed
+            if (_dbparams == null || _dbparams.Count == 0)
+            {
+                getDbConnection();  // side effect: populates _dbparams
+            }
+
             string result = string.Empty;
 
-            if (param == "db.connection")
+            // Check if the requested parameter is in the _dbparams cache
+            if (_dbparams != null && _dbparams.ContainsKey(param))
+            {
+                result = _dbparams[param];
+            }
+            else if (param == "db.connection")
             {
                 result = getDbConnection();
             }
@@ -50,34 +62,47 @@ namespace @Model.Name
 
         static public string getDbConnection()
         {
-            // Path to the .namespace file in the user's home directory
-            string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string filePath = Path.Combine(homeDirectory, ".@(Model.Name)");
-
-            // Check if the file exists
-            if (!File.Exists(filePath))
+            // Initialize cache if needed
+            if (_dbparams == null)
             {
-                throw new FileNotFoundException("The .@(Model.Name) file was not found in the user's home directory.", filePath);
+                _dbparams = new Dictionary<string, string>();
+                
+                // Path to the .namespace file in the user's home directory
+                string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string filePath = Path.Combine(homeDirectory, ".@(Model.Name)");
+
+                // Check if the file exists
+                if (!File.Exists(filePath))
+                {
+                    throw new FileNotFoundException("The .@(Model.Name) file was not found in the user's home directory.", filePath);
+                }
+
+                // Read the file content
+                string fileContent = File.ReadAllText(filePath).Trim();
+
+                // Split the content by colon (:) to extract parameters
+                string[] parameters = fileContent.Split(':');
+                if (parameters.Length != 4 && parameters.Length != 6)
+                {
+                    throw new FormatException("The .@(Model.Name) file must contain either 4 or 6 parameters separated by colons (:).\nFormat: dbtype:server:port:database[:username:password]");
+                }
+
+                // Populate the cache
+                _dbparams["dbType"] = parameters[0].ToLower().Trim();
+                _dbparams["server"] = parameters[1];
+                _dbparams["port"] = parameters[2];
+                _dbparams["database"] = parameters[3];
+                _dbparams["username"] = parameters.Length >= 5 ? parameters[4] : string.Empty;
+                _dbparams["password"] = parameters.Length >= 6 ? parameters[5] : string.Empty;
             }
 
-            // Read the file content
-            string fileContent = File.ReadAllText(filePath).Trim();
-
-            // Split the content by colon (:) to extract parameters
-            string[] parameters = fileContent.Split(':');
-            if (parameters.Length != 3 && parameters.Length != 5)
-            {
-                throw new FormatException("The .@(Model.Name) file must contain either 3 or 5 parameters separated by colons (:).\nFormat: server:port:database[:username:password]");
-            }
-
-            string server = parameters[0];
-            string port = parameters[1];
-            string database = parameters[2];
-            string username = parameters.Length >= 4 ? parameters[3] : string.Empty;
-            string password = parameters.Length >= 5 ? parameters[4] : string.Empty;
-
-            // Get database type from config (default to postgresql)
-            string dbType = getString("db.type", "postgresql").ToLower();
+            // Get values from cache
+            string dbType = _dbparams["dbType"];
+            string server = _dbparams["server"];
+            string port = _dbparams["port"];
+            string database = _dbparams["database"];
+            string username = _dbparams["username"];
+            string password = _dbparams["password"];
 
             // Create the connection string based on database type and whether username/password are provided
             string dbcon;

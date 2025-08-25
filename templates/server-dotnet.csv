@@ -9,6 +9,7 @@ dotnet server templates-common,model,shared/dotnet/common/common.csproj.cshtml,.
 dotnet server templates-common,model,shared/dotnet/common/IDatabaseProvider.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/PostgreSQLProvider.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/SqlServerProvider.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/JsonHelper.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/DatabaseProviderFactory.cs.cshtml,./shared/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE

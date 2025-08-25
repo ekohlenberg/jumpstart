@@ -8,7 +8,7 @@ namespace @Model.Name
         {
             if (string.IsNullOrEmpty(databaseType))
             {
-                databaseType = Config.getString("db.type", "postgresql").ToLower();
+                databaseType = Config.getString("dbType", "postgresql").ToLower();
             }
 
             return databaseType switch
