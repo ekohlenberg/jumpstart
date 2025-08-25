@@ -44,6 +44,10 @@ namespace @(namespaceName).Controllers
         public @(domainObj) Post([FromBody] @(domainObj) @(domainVar))
         {
             //Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
+            
+            // Process any JsonElement values to ensure proper type conversion
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
             @(domainObj)Logic.Create().insert(@(domainVar)); 
 
             return @(domainVar);
@@ -54,6 +58,10 @@ namespace @(namespaceName).Controllers
         public @(domainObj) Put(long id, [FromBody] @(domainObj) @(domainVar))
         {
             //Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
+            
+            // Process any JsonElement values to ensure proper type conversion
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
             @(domainObj)Logic.Create().update(id, @(domainVar));
 
             return @(domainVar);

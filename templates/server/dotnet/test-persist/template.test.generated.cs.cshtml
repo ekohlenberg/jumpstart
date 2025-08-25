@@ -48,7 +48,7 @@ namespace @Model.Namespace
 
         public static void testUpdate()
         {
-            long lastId = BaseTest.getLastId("@(Model.DomainObj)");
+            long lastId = BaseTest.getLastId("@(Model.DomainVar)");
             var @(Model.DomainVar) = @(Model.DomainObj)Logic.Create().get(lastId);
 
             @foreach (var attr in Model.Attributes)

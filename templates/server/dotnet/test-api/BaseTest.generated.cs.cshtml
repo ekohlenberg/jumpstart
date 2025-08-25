@@ -353,6 +353,22 @@ private static Dictionary<string, long> _lastIdMap = null;
             response.EnsureSuccessStatusCode();
         }
 
+        protected static async Task<T> PostAsyncReturn<T>(string endpoint, T obj) where T : BaseObject
+        {
+            var json = JsonSerializer.Serialize(obj);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync($"api/{endpoint}", content);
+            response.EnsureSuccessStatusCode();
+            
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<T>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            
+            // Process any JsonElement values to ensure proper type conversion
+            JsonHelper.ProcessJsonElements(result);
+            
+            return result;
+        }
+
         protected static async Task PutAsync<T>(string endpoint, long id, T obj)
         {
             var json = JsonSerializer.Serialize(obj);

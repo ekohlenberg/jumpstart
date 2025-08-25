@@ -40,8 +40,8 @@ namespace @Model.Namespace
             @{
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj) API insert: " + @(Model.DomainVar).ToString());
-                await PostAsync("@(Model.DomainObj)", @(Model.DomainVar));
-                BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar).id);
+                var created@(Model.DomainObj) = await PostAsyncReturn("@(Model.DomainObj)", @(Model.DomainVar));
+                BaseTest.addLastId("@(Model.DomainVar)", created@(Model.DomainObj).id);
             </text>
             }
         }
@@ -82,15 +82,15 @@ namespace @Model.Namespace
             @{
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj) API insert (RWK only): " + @(Model.DomainVar).ToString());
-                await PostAsync("@(Model.DomainObj)", @(Model.DomainVar));
-                BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar).id);
+                var created@(Model.DomainObj) = await PostAsyncReturn("@(Model.DomainObj)", @(Model.DomainVar));
+                BaseTest.addLastId("@(Model.DomainVar)", created@(Model.DomainObj).id);
             </text>
             }
         }
 
         public static async Task testUpdate()
         {
-            long lastId = BaseTest.getLastId("@(Model.DomainObj)");
+            long lastId = BaseTest.getLastId("@(Model.DomainVar)");
             var @(Model.DomainVar) = await GetByIdAsync<@(Model.DomainObj)>("@(Model.DomainObj)", lastId);
 
             @foreach (var attr in Model.Attributes)
