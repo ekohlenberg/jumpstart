@@ -5,6 +5,12 @@ SET ANSI_PADDING OFF;
 SET QUOTED_IDENTIFIER OFF;
 USE [@Model.Namespace];
 GO
-CREATE SCHEMA @Model.Name; 
+
+-- Create schema only if it doesn't exist
+IF NOT EXISTS (SELECT name FROM sys.schemas WHERE name = '@Model.Name')
+BEGIN
+    DECLARE @@sql NVARCHAR(MAX) = 'CREATE SCHEMA [@Model.Name]';
+    EXEC sp_executesql @@sql;
+END 
 
 
