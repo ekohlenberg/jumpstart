@@ -1,0 +1,72 @@
+# PowerShell script to build the database
+# Reads server information from .namespace file in user's home directory
+
+# Get the user's home directory and read the .namespace file
+$namespaceFile = Join-Path $env:USERPROFILE ".@(Model.Name)"
+
+if (-not (Test-Path $namespaceFile)) {
+    Write-Error "Namespace file not found at: $namespaceFile"
+    Write-Error "Please create a .namespace file in your home directory with format: dbtype:server:port:database"
+    exit 1
+}
+
+# Read and parse the namespace file
+$namespaceContent = Get-Content $namespaceFile -Raw
+$namespaceParts = $namespaceContent.Trim().Split(':')
+
+if ($namespaceParts.Count -ne 4) {
+    Write-Error "Invalid namespace file format. Expected: dbtype:server:port:database"
+    Write-Error "Found: $namespaceContent"
+    exit 1
+}
+
+$dbType = $namespaceParts[0]
+$server = $namespaceParts[1]
+$port = $namespaceParts[2]
+$database = $namespaceParts[3]
+
+# Validate that this is for SQL Server
+if ($dbType -ne "mssql" -and $dbType -ne "sqlserver") {
+    Write-Error "This script is for SQL Server databases. Namespace file specifies: $dbType"
+    exit 1
+}
+
+# Build the connection string
+$connectionString = "$server"
+if ($port -and $port -ne "1433") {
+    $connectionString += ",$port"
+}
+
+Write-Host "Connecting to SQL Server: $connectionString"
+Write-Host "Database: $database"
+
+# Execute the database creation script
+Write-Host "Executing database creation script..."
+sqlcmd -S $connectionString -i ".\@(Model.Name + ".database.create.generated.sql")"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to execute database creation script"
+    exit $LASTEXITCODE
+}
+
+# Execute all other SQL files
+@foreach( string sourceFile in Model.sourceFiles) {
+    if (sourceFile == Model.Name + ".database.create.generated.sql") {
+        continue;
+    }
+    else if (sourceFile.Contains("build")) {
+        continue;
+    }
+    else {
+        <text>
+Write-Host "Executing: @sourceFile"
+sqlcmd -S $connectionString -i ".\@sourceFile"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to execute: @sourceFile"
+    exit $LASTEXITCODE
+}
+        </text>
+    }
+}
+
+Write-Host "Database build completed successfully!"

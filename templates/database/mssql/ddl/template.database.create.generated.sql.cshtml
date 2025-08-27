@@ -6,28 +6,67 @@ SET QUOTED_IDENTIFIER OFF;
 USE [master];
 GO
 
-IF EXISTS (SELECT name FROM sys.databases WHERE name = N'@Model.Name')
+-- Create the database only if it doesn't exist
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'@Model.Name')
 BEGIN
-    -- Set the database to single-user mode to disconnect existing connections
-    ALTER DATABASE [@Model.Name] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-
-    -- Drop the database
-    DROP DATABASE [@Model.Name];
+    CREATE DATABASE [@Model.Name];
 END
+
 GO
 
--- Create the database
-CREATE DATABASE [@Model.Name];
-GO
-
--- Create a user in the database for the login
+-- Create a user in the database for the login (only if it doesn't exist)
 USE [@Model.Name];
 IF NOT EXISTS (SELECT name FROM sys.database_principals WHERE name = '@Model.Name')
 BEGIN
     CREATE USER [@Model.Name] FOR LOGIN [@Model.Name];
 END
 
--- Grant db_owner role to the user
-ALTER ROLE db_owner ADD MEMBER [@Model.Name];
+-- Grant db_owner role to the user (this will work even if user already exists)
+IF NOT EXISTS (SELECT 1 FROM sys.database_role_members drm
+               INNER JOIN sys.database_principals dp ON drm.member_principal_id = dp.principal_id
+               INNER JOIN sys.database_principals rp ON drm.role_principal_id = rp.principal_id
+               WHERE dp.name = '@Model.Name' AND rp.name = 'db_owner')
+BEGIN
+    ALTER ROLE db_owner ADD MEMBER [@Model.Name];
+END
 
+GO
+
+-- Drop all user-created objects if database exists
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'@Model.Name')
+BEGIN
+    USE [@Model.Name];
+    
+    -- Disable foreign key constraints temporarily
+    EXEC sp_MSforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT ALL";
+    
+    -- Drop all user tables (excluding system tables)
+    DECLARE @@sql NVARCHAR(MAX) = '';
+    SELECT @@sql = @@sql + 'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + '];' + CHAR(13)
+    FROM sys.tables 
+    WHERE type = 'U' -- User tables only
+    AND name NOT LIKE 'sys%' -- Exclude system tables
+    AND name NOT LIKE 'INFORMATION_SCHEMA%'; -- Exclude information schema
+    
+    IF LEN(@@sql) > 0
+    BEGIN
+        EXEC sp_executesql @@sql;
+    END
+    
+    -- Drop all user sequences (excluding system sequences)
+    DECLARE @@seqSql NVARCHAR(MAX) = '';
+    SELECT @@seqSql = @@seqSql + 'DROP SEQUENCE [' + SCHEMA_NAME(schema_id) + '].[' + name + '];' + CHAR(13)
+    FROM sys.sequences 
+    WHERE name NOT LIKE 'sys%' -- Exclude system sequences
+    AND name NOT LIKE 'INFORMATION_SCHEMA%'; -- Exclude information schema
+    
+    IF LEN(@@seqSql) > 0
+    BEGIN
+        EXEC sp_executesql @@seqSql;
+    END
+    
+    -- Re-enable foreign key constraints (for any remaining tables)
+    EXEC sp_MSforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL";
+END
+GO
 

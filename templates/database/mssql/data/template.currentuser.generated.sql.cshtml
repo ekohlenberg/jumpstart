@@ -48,7 +48,7 @@ WITH os_user_principal_id AS (
 )
 
 INSERT INTO sec.principal_password(
-    id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_login_date, last_updated, last_updated_by, version)
+    id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by, version)
 SELECT  @@password_id,
     os_user_principal_id.id,
      CAST(FLOOR(RAND(CHECKSUM(NEWID())) * 100000 + 1) AS NVARCHAR(10)),  
@@ -56,7 +56,6 @@ SELECT  @@password_id,
      1,
      1,
      SYSTEM_USER,
-     GETDATE(),
      GETDATE(),
      SYSTEM_USER,
      1

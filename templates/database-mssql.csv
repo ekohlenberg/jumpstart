@@ -6,12 +6,10 @@ sqlserver database-create app tables,object,database/mssql/ddl/template.table.ge
 sqlserver database-create audit tables,object,database/mssql/ddl/template.audit.generated.sql.cshtml,./database/ddl,true
 sqlserver database-create sequences,object,database/mssql/ddl/template.sequence.generated.sql.cshtml,./database/ddl,true
 sqlserver database-create rwk indexes,object,database/mssql/ddl/template.rwkindex.generated.sql.cshtml,./database/ddl,true
-sqlserver database-bash build script,build, database/mssql/ddl/build.sh.cshtml,./database/ddl,true
-sqlserver database-cmd build script,build, database/mssql/ddl/build.cmd.cshtml,./database/ddl,true
+sqlserver database-cmd build script,build, database/mssql/ddl/build.ps1.cshtml,./database/ddl,true
 sqlserver database-static data,model,database/mssql/data/template.static.generated.sql.cshtml,./database/data,true
 sqlserver database-admin initial data,model,database/mssql/data/template.admin.generated.sql.cshtml,./database/data,true
 sqlserver database-current user initial data,model,database/mssql/data/template.currentuser.generated.sql.cshtml,./database/data,true
 sqlserver database-current user initial data,model,database/mssql/data/template.event.test.sql.cshtml,./database/data,true
-sqlserver database-bash load script,build, database/mssql/data/load.sh.cshtml,./database/data,true
-sqlserver database-bash load script,build, database/mssql/data/load.cmd.cshtml,./database/data,true
+sqlserver database-bash load script,build, database/mssql/data/load.ps1.cshtml,./database/data,true
 sqlserver database-query generation,object,database/mssql/data/template.query.generated.sql.cshtml,./database/data,true

@@ -5,8 +5,15 @@ SET ANSI_PADDING OFF;
 SET QUOTED_IDENTIFIER OFF;
 USE [@Model.Namespace];
 GO
-CREATE SCHEMA history; 
+
+-- Create history schema only if it doesn't exist
+IF NOT EXISTS (SELECT name FROM sys.schemas WHERE name = 'history')
+BEGIN
+    DECLARE @@sql NVARCHAR(MAX) = 'CREATE SCHEMA [history]';
+    EXEC sp_executesql @@sql;
+END
 GO
+
 CREATE TABLE history.log (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     timestamp DATETIME NOT NULL,
