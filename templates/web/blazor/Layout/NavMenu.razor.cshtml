@@ -14,16 +14,23 @@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
-       @foreach( var obj in Model.PrimaryObjects)
-       {
-        <text>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="@obj.DomainVar">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
-            </NavLink>
-        </div>
-        </text>
-        }
+        @foreach( var navMenu in Model.NavMenus)
+        {
+         <text>
+         <div class="nav-item px-3">
+             <div class="nav-link text-muted small">@navMenu.Key</div>
+         </text>
+         @foreach( var obj in navMenu.Value)
+         {
+         <text>
+         <div class="nav-item px-3">
+             <NavLink class="nav-link" href="@obj.DomainVar">
+                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @obj.Label
+             </NavLink>
+         </div>
+         </text>
+         }
+         }
     </nav>
 </div>
 

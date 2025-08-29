@@ -275,19 +275,7 @@ namespace jumpstart {
 
         public string Label {get; private set;}
         public string SchemaName {get; set;}
-
-        public string Primary {get;set;}
-
-        public bool IsPrimary
-        {
-            get {
-                bool result = false;
-
-                if (Primary == "1") result = true;
-
-                return result;
-            }
-        }
+        public string NavMenu {get; set;}
 
         public MetaModel Model {get;set;}
         
@@ -321,7 +309,7 @@ namespace jumpstart {
                 return _globalAttributes;
             }
         }
-        public MetaObject(string _namespace, string tableName, string schemaName, string label, string primary)
+        public MetaObject(string _namespace, string tableName, string schemaName, string label, string navMenu)
         {
             Namespace = _namespace;
             TableName = tableName;
@@ -329,7 +317,7 @@ namespace jumpstart {
             DomainVar = DomainObj.ToLower();
             Name = tableName;
             Label = label;
-            Primary = primary;
+            NavMenu = navMenu;
             SchemaName = schemaName;
             FileName = DomainObj;
         }
@@ -411,7 +399,7 @@ namespace jumpstart {
 
         public Dictionary<string, MetaSchema> Schemas { get; private set; } = new();
         public List<MetaObject> Objects { get; private set; } = new();
-        public List<MetaObject> PrimaryObjects { get; private set; } = new();
+        public Dictionary<string, List<MetaObject>> NavMenus { get; private set; } = new();
 
         public List<MetaAttribute> GlobalAttributes {get; private set;} = new();
 

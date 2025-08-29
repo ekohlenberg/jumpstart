@@ -9,9 +9,8 @@ TABLE_NAME,				-- Table name using "snake" naming style.
 '' as TABLE_LABEL, 		-- A TitleCase representation of the table name.  
 						-- Appears on the first row of the table.
 						
-'' as PRIMARY_TABLE, 	-- 1 or 0 indicating whether or not a table is a primary table.  
-						-- Mapping tables and detail tables in master-detail relationships are not considered primary.  
-						-- Table labels of primary tables appear as menu items.
+'' as NAV_MENU, 		-- Navigation menu name for grouping tables.  
+						-- Tables with the same NAV_MENU value will be grouped together in the navigation menu.
 						
 COLUMN_NAME,			-- A column name in "snake" style.  
 						-- The first column of every table is "id", the primary key.  
