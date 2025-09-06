@@ -8,7 +8,7 @@ sqlserver database-create sequences,object,database/mssql/ddl/template.sequence.
 sqlserver database-create rwk indexes,object,database/mssql/ddl/template.rwkindex.generated.sql.cshtml,./database/ddl,true
 sqlserver database-cmd build script,build, database/mssql/ddl/build.ps1.cshtml,./database/ddl,true
 sqlserver database-static data,model,database/mssql/data/template.static.generated.sql.cshtml,./database/data,true
-sqlserver database-static data,model,database/mssql/data/template.nav_parents.sql.cshtml,./database/data,true
+sqlserver database-static data,model,database/mssql/data/template.nav_menu.sql.cshtml,./database/data,true
 sqlserver database-admin initial data,model,database/mssql/data/template.admin.generated.sql.cshtml,./database/data,true
 sqlserver database-current user initial data,model,database/mssql/data/template.currentuser.generated.sql.cshtml,./database/data,true
 sqlserver database-current user initial data,model,database/mssql/data/template.event.test.sql.cshtml,./database/data,true

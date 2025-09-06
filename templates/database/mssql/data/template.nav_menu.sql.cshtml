@@ -1,0 +1,40 @@
+
+-- Insert parent and child navigation menu items
+@foreach( var navMenuParent in Model.NavMenus.Keys)
+{
+    var ordinal = 0;
+    @foreach( var navMenuParentKey in Model.NavMenus.Keys)
+    {
+        if (navMenuParentKey == navMenuParent)
+        {
+            break;
+        }
+        ordinal++;
+    }
+    <text>
+-- Insert parent menu item
+INSERT INTO core.nav_menu(
+	id, parent_id, ordinal, name, link, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (NEXT VALUE FOR core.nav_menu_identity, 0, @ordinal, '@navMenuParent', '', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+
+-- Insert child menu items for @navMenuParent
+    </text>
+    var navMenuChildList = Model.NavMenus[navMenuParent];
+    @foreach( var navChild in navMenuChildList)
+    {
+        var childOrdinal = 0;
+        @foreach( var child in navMenuChildList)
+        {
+            if (child == navChild)
+            {
+                break;
+            }
+            childOrdinal++;
+        }
+        <text>
+INSERT INTO core.nav_menu(
+	id, parent_id, ordinal, name, link, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (NEXT VALUE FOR core.nav_menu_identity, (SELECT id FROM core.nav_menu WHERE parent_id = 0 AND name = '@navMenuParent'), @childOrdinal, '@navChild.Label', '/@navChild.DomainVar', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+        </text>
+    }
+}
