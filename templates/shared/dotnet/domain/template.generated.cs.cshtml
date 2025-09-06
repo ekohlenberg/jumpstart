@@ -75,7 +75,7 @@ namespace @namespaceName
                         _@attr.Name = Convert.@(attr.ConvertMethod)(this["@attr.Name"].ToString());
                         }
                     }
-                    catch(Exception e)
+                    catch(Exception )
                     {
                         //Logger.Error($"Error getting @attr.Name: {e.Message}");
                         _@attr.Name = default(@attr.DotNetType);
@@ -124,7 +124,7 @@ namespace @namespaceName
                         _@(tableName)_id = Convert.ToInt64(this["@(tableName)_id"].ToString());
                     }
                 }
-                catch(Exception e)
+                catch(Exception)
                 {
                     //Logger.Error($"Error getting @(tableName)_id: {e.Message}");
                     _@(tableName)_id = default(long);

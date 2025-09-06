@@ -1,11 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">@Model.Name</a>
-        <button title="Navigation menu" class="navbar-toggler" @@onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿@@* Parameters *@@
+@@code {
+    [Parameter] public string? SelectedParent { get; set; }
+}
 
 <div class="@@NavMenuCssClass nav-scrollable" @@onclick="ToggleNavMenu">
     <nav class="nav flex-column">
@@ -14,23 +10,50 @@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
+        
+        <!-- Parent Navigation Display -->
+        @@if (!string.IsNullOrEmpty(SelectedParent))
+        {
+            <div class="nav-section-header px-3 py-2">
+                <h6 class="text-muted mb-0">@@SelectedParent</h6>
+            </div>
+        }
+        
+        <!-- Navigation Content for each parent -->
         @foreach( var navMenuParent in Model.NavMenus.Keys)
         {
             var navMenuChildList = Model.NavMenus[navMenuParent];
-         
-             <div class="nav-link px-3">@navMenuParent</div>
-         
-            @foreach( var navChild in navMenuChildList)
+            <text>
+            @@if (SelectedParent == "@navMenuParent")
             {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/@navChild.DomainVar">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @navChild.Label
-                </NavLink>
-            </div>
+                <div class="nav-content">
+                    @foreach( var navChild in navMenuChildList)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="/@navChild.DomainVar">
+                                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @navChild.Label
+                            </NavLink>
+                        </div>
+                    }
+                </div>
             }
-         }
+            </text>
+        }
     </nav>
 </div>
+
+<style>
+    .nav-section-header {
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+    }
+    
+    .nav-content {
+        margin-bottom: 1rem;
+    }
+</style>
 
 @@code {
     private bool collapseNavMenu = true;
@@ -40,14 +63,5 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
-    }
-
-    // Navigation menu data structure
-    public Dictionary<string, List<NavMenuItem>> NavMenus { get; set; } = new();
-
-    public class NavMenuItem
-    {
-        public string DomainVar { get; set; } = "";
-        public string Label { get; set; } = "";
     }
 }

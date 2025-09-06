@@ -1,0 +1,46 @@
+﻿@@inherits LayoutComponentBase
+<div class="page">
+    <div class="sidebar">
+        <div class="top-row ps-3 navbar navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">@Model.Name</a>
+            </div>
+        </div>
+        
+        
+        <NavMenuLayout SelectedParent="@@selectedParent" />
+    </div>
+
+    <main>
+        <!-- Parent Navigation Menu - Top Row -->
+        <div class="top-row px-4">
+            <nav class="nav nav-pills">
+                @foreach( var navMenuParent in Model.NavMenus.Keys)
+                {
+                    <text>
+                    <div class="nav-item">
+                        <button class="nav-link @@(selectedParent == "@navMenuParent" ? "active" : "")" @@onclick="@@(() => SelectParent("@navMenuParent"))">
+                            <span class="bi bi-folder-fill" aria-hidden="true"></span> @navMenuParent
+                        </button>
+                    </div>
+                    </text>
+                }
+            </nav>
+            
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank" class="ms-auto">About</a>
+        </div>
+
+        <article class="content px-4">
+            @@Body
+        </article>
+    </main>
+</div>
+
+@@code {
+    private string? selectedParent = null;
+    
+    private void SelectParent(string parent)
+    {
+        selectedParent = parent;
+    }
+}
