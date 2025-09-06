@@ -15,6 +15,9 @@
         <!-- Parent Navigation Menu - Top Row -->
         <div class="top-row px-4">
             <nav class="nav nav-pills">
+                <button class="nav-link @@(selectedParent == "Home" ? "active" : "")" @@onclick="@@(() => SelectParent("Home"))">
+                            <span class="bi bi-folder-fill" aria-hidden="true"></span> Home
+                    </button>
                 @foreach( var navMenuParent in Model.NavMenus.Keys)
                 {
                     <text>
