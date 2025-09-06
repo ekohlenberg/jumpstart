@@ -1,0 +1,18 @@
+-- Insert parent navigation menu items
+@foreach( var navMenuParent in Model.NavMenus.Keys)
+{
+    var ordinal = 0;
+    @foreach( var navMenuParentKey in Model.NavMenus.Keys)
+    {
+        if (navMenuParentKey == navMenuParent)
+        {
+            break;
+        }
+        ordinal++;
+    }
+    <text>
+INSERT INTO core.nav_menu(
+	id, parent_id, ordinal, name, link, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.nav_menu_identity'), 0, @ordinal, '@navMenuParent', '', 1, current_user, now(), current_user, 1);
+    </text>
+}

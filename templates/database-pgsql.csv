@@ -9,6 +9,7 @@ postgresql database-create rwk indexes,object,database/pgsql/ddl/template.rwkind
 postgresql database-bash build script,build, database/pgsql/ddl/build.sh.cshtml,./database/ddl,true
 postgresql database-cmd build script,build, database/pgsql/ddl/build.cmd.cshtml,./database/ddl,true
 postgresql database-static data,model,database/pgsql/data/template.static.generated.sql.cshtml,./database/data,true
+postgresql database-static data,model,database/pgsql/data/template.nav_parents.sql.cshtml,./database/data,true
 postgresql database-admin initial data,model,database/pgsql/data/template.admin.generated.sql.cshtml,./database/data,true
 postgresql database-current user initial data,model,database/pgsql/data/template.currentuser.generated.sql.cshtml,./database/data,true
 postgresql database-current user initial data,model,database/pgsql/data/template.event.test.sql.cshtml,./database/data,true
