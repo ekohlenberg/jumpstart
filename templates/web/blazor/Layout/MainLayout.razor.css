@@ -75,3 +75,27 @@ main {
         padding-right: 1.5rem !important;
     }
 }
+
+/* Navigation button text color for main content area */
+main .nav-link {
+    color: #212529 !important;
+}
+
+main .nav-link:hover {
+    color: #000000 !important;
+}
+
+main .nav-link.active {
+    color: #ffffff !important;
+    background-color: #007bff !important;
+}
+
+/* Bootstrap nav-pills active state override */
+main .nav-pills .nav-link.active {
+    color: #ffffff !important;
+    background-color: #007bff !important;
+}
+/* Navbar brand text color - override navbar-dark */
+.navbar-dark .navbar-brand {
+    color: #212529 !important;
+}
