@@ -14,7 +14,7 @@
         </div>
         
         
-        <NavMenuLayout SelectedParent="@@selectedParent" />
+        <NavMenuLayout SelectedParentId="@@selectedParentId" />
     </div>
 
     <main>
@@ -52,6 +52,7 @@
 
 @@code {
     private string? selectedParent = null;
+    private long? selectedParentId = null;
     protected NavMenu[]? navMenuList;
     
     protected override async Task OnInitializedAsync()
@@ -63,6 +64,8 @@
     private void SelectParent(string parent)
     {
         selectedParent = parent;
+        // Find the parent ID from the navMenuList
+        selectedParentId = navMenuList?.FirstOrDefault(n => n.name == parent)?.id;
     }
     
     

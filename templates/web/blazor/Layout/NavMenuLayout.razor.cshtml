@@ -1,6 +1,11 @@
 ﻿@@* Parameters *@@
+@@using System.Net.Http;
+@@using Microsoft.Extensions.DependencyInjection;
+@@inject HttpClient Http
+@@inject IHttpClientFactory ClientFactory
+@@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
 @@code {
-    [Parameter] public string? SelectedParent { get; set; }
+    [Parameter] public long? SelectedParentId { get; set; }
 }
 
 <div class="@@NavMenuCssClass nav-scrollable" @@onclick="ToggleNavMenu">
@@ -8,32 +13,30 @@
         
         
         <!-- Parent Navigation Display -->
-        @@if (!string.IsNullOrEmpty(SelectedParent))
+        @@if (SelectedParentId.HasValue && !string.IsNullOrEmpty(selectedParentName))
         {
             <div class="nav-section-header px-3 py-2">
-                <h6 class="text-muted mb-0">@@SelectedParent</h6>
+                <h6 class="text-muted mb-0">@@selectedParentName</h6>
             </div>
         }
         
-        <!-- Navigation Content for each parent -->
-        @foreach( var navMenuParent in Model.NavMenus.Keys)
+        <!-- Navigation Content for selected parent -->
+        @@if (childMenuList == null && SelectedParentId.HasValue)
         {
-            var navMenuChildList = Model.NavMenus[navMenuParent];
-            <text>
-            @@if (SelectedParent == "@navMenuParent")
-            {
-                <div class="nav-content">
-                    @foreach( var navChild in navMenuChildList)
-                    {
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="/@navChild.DomainVar">
-                                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @navChild.Label
-                            </NavLink>
-                        </div>
-                    }
-                </div>
-            }
-            </text>
+            <p><em>Loading menu items...</em></p>
+        }
+        else if (childMenuList != null && childMenuList.Length > 0)
+        {
+            <div class="nav-content">
+                @@foreach (var childMenu in childMenuList)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@@childMenu.link">
+                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @@childMenu.name
+                        </NavLink>
+                    </div>
+                }
+            </div>
         }
     </nav>
 </div>
@@ -53,6 +56,8 @@
 
 @@code {
     private bool collapseNavMenu = true;
+    protected NavMenu[]? childMenuList;
+    protected string? selectedParentName;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
@@ -60,4 +65,35 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SelectedParentId.HasValue)
+        {
+            await LoadChildMenuItems();
+        }
+        else
+        {
+            childMenuList = null;
+            selectedParentName = null;
+        }
+    }
+    
+    private async Task LoadChildMenuItems()
+    {
+        if (!SelectedParentId.HasValue) return;
+        
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+        childMenuList = await remoteClient.GetFromJsonAsync<NavMenu[]>($"api/navmenu/byparent?parent_id={SelectedParentId.Value}&orderby=ordinal");
+        
+        // Get the parent name for display
+        if (childMenuList != null && childMenuList.Length > 0)
+        {
+            // Get parent info from the first child's parent_id
+            var parentClient = ClientFactory.CreateClient("RemoteAPI");
+            var parentMenu = await parentClient.GetFromJsonAsync<NavMenu>($"api/navmenu/{SelectedParentId.Value}");
+            selectedParentName = parentMenu?.name;
+        }
+    }
+    
 }
