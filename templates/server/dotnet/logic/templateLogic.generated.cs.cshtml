@@ -33,17 +33,20 @@ namespace @namespaceName
             return proxy;
         }
 
-
-
         public  List<@(domainObj)> select()
         {
-            Console.WriteLine("Processing @(domainObj)Logic select List");
+            return select<@(domainObj)>();
+        }
+    
+        public  List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new()
+        {
+            Console.WriteLine("Processing @(domainObj)Logic select<TBaseObject> List");
 
-            List<@(domainObj)> @(domainVar)s = new List<@(domainObj)>();
+            List<TBaseObject> @(domainVar)s = new List<TBaseObject>();
 
             void @(domainVar)Callback(System.Data.Common.DbDataReader rdr)
             {
-                @(domainObj) @(domainVar) = new @(domainObj)();
+                TBaseObject @(domainVar) = new TBaseObject();
 
                 DBPersist.autoAssign(rdr, @(domainVar));
 

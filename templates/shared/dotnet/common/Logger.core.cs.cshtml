@@ -91,11 +91,12 @@ namespace @Model.Name
             Info = 1 << 1,
             Debug = 1 << 2,
             Warning = 1 << 3,
-            Sql = 1 << 4
+            Sql = 1 << 4,
+            Data = 1 << 5
         }
 
         private static List<ILogWriter> LogWriters = null;
-        private static Level enabledLevels = Level.Error; // Error is always enabled
+        public static Level enabledLevels = Level.Error; // Error is always enabled
 
 
         protected static void Init()
@@ -142,8 +143,11 @@ namespace @Model.Name
                     case "sql":
                         levels |= Level.Sql;
                         break;
+                    case "data":
+                        levels |= Level.Data;
+                        break;
                     case "all":
-                        levels = Level.Error | Level.Info | Level.Debug | Level.Warning | Level.Sql;
+                        levels = Level.Error | Level.Info | Level.Debug | Level.Warning | Level.Sql | Level.Data;
                         break;
                     case "none":
                         levels = Level.None;
@@ -257,6 +261,18 @@ namespace @Model.Name
             {
                 Write("SQL", message, filePath, lineNumber, memberName);
             }
+        }
+
+        public static void Data( string message,  [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "" )
+        {
+            if ((enabledLevels & Level.Data) == 0) return;
+
+            Init();
+            
+            Write("DATA", message, filePath, lineNumber, memberName);
+            
         }
 
         private static void Write( string level, string message, string filePath = "",

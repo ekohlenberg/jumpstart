@@ -2,6 +2,7 @@
     string namespaceName = @Model.Namespace; 
     string domainObj = @Model.DomainObj; 
     string domainVar = @Model.DomainVar; 
+    string domainObjView = domainObj+"View"; 
 }
 
 using Microsoft.AspNetCore.Mvc;
@@ -19,11 +20,11 @@ namespace @(namespaceName).Controllers
     {
         // GET: api/<@(domainObj)Controller>
         [HttpGet]
-        public IEnumerable<@(domainObj)> Get()
+        public IEnumerable<@(domainObjView)> Get()
         {
             //Console.WriteLine("Processing GET List");
 
-            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select();
+            List<@(domainObjView)> @(domainVar)s = @(domainObj)Logic.Create().select<@(domainObjView)>();
 
             return @(domainVar)s;
         }

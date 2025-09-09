@@ -34,6 +34,7 @@ namespace @Model.Name
                         {
                             while (rdr.Read())
                             {
+                                LogRowData(rdr);
                                 selectCallback(rdr);
                             }
                         }
@@ -416,6 +417,21 @@ namespace @Model.Name
                 if (t.ContainsKey(k)) { t[k] = rdr.GetValue(i); }
                 else { t.Add(k, rdr.GetValue(i)); }
             }
+        }
+
+        private static void LogRowData(DbDataReader rdr)
+        {
+            if ((Logger.enabledLevels & Logger.Level.Data) == 0) return;
+            
+            object[] values = new object[rdr.FieldCount];
+            rdr.GetValues(values);
+            
+            var fieldData = new List<string>();
+            for (int i = 0; i < rdr.FieldCount; i++)
+            {
+                fieldData.Add($"{rdr.GetName(i)}={values[i]}");
+            }
+            Logger.Data($"Row data: {string.Join(";", fieldData)}");
         }
 
         protected static string substituteTemplate( BaseObject parameters, string sqlTemplate)

@@ -1,10 +1,15 @@
 ﻿@@page "/@(Model.DomainVar)"
 @@using System.Net.Http;
 @@using Microsoft.Extensions.DependencyInjection;
+@@using System.Reflection;
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
+@using jumpstart;
+@using System.Collections.Generic;
+
+
 <PageTitle>@(Model.Label)</PageTitle>
 
 <h1>@(Model.Label)</h1>
@@ -20,14 +25,10 @@ else
     <table class="table table-striped table-bordered table-hover">
         <thead class="table-dark">
             <tr>
-                @foreach( var a in @Model.Attributes)
+                @@foreach (var property in GetDisplayProperties())
                 {
-                <text>
-                <th>@a.Label</th>
-                </text>
-            
+                    <th>@@GetPropertyLabel(property)</th>
                 }
-
                 <th></th>
             </tr>
         </thead>
@@ -35,12 +36,9 @@ else
             @@foreach (var @(Model.DomainVar) in @(Model.DomainVar)List)
             {
                 <tr>
-                    @foreach( var a in @Model.Attributes)
+                    @@foreach (var property in GetDisplayProperties())
                     {
-                    <text>
-                    <td>@@@(Model.DomainVar).@(a.Name).ToString()</td>
-                    </text>
-                    
+                        <td>@@GetPropertyValue(@(Model.DomainVar), property)?.ToString()</td>
                     }
                     <td><button class="btn btn-primary" @@onclick="@@(()=> Edit@(Model.DomainObj)(@@@(Model.DomainVar).id))">Edit</button></td>
                 </tr>
@@ -51,13 +49,13 @@ else
 }
 
 @@code {
-    protected  @(Model.DomainObj)[]? @(Model.DomainVar)List;
+    protected  @(Model.DomainObj)View[]? @(Model.DomainVar)List;
 
     protected override async Task OnInitializedAsync()
     {
         var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
-        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
+        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View[]>("api/@(Model.DomainVar)");
     }
 
     void Add@(Model.DomainObj)()
@@ -70,6 +68,67 @@ else
     {
         Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
     }
+
+    // Reflection methods for dynamic table generation
+    private System.Reflection.PropertyInfo[] GetDisplayProperties()
+    {
+        var viewType = typeof(@(Model.DomainObj)View);
+        return viewType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                      .Where(p => p.CanRead && 
+                                  p.GetCustomAttribute<LabelAttribute>() != null &&
+                                  !p.Name.EndsWith("_id"))
+                      .OrderBy(p => GetPropertyOrder(p))
+                      .ToArray();
+    }
+
+    private string GetPropertyLabel(System.Reflection.PropertyInfo property)
+    {
+        // Check for Label attribute first
+        var labelAttr = property.GetCustomAttribute<LabelAttribute>();
+        if (labelAttr != null)
+        {
+            return labelAttr.Label;
+        }
+
+        // Fallback to property name with proper formatting
+        return FormatPropertyName(property.Name);
+    }
+
+    private object GetPropertyValue(object obj, System.Reflection.PropertyInfo property)
+    {
+        try
+        {
+            return property.GetValue(obj);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private int GetPropertyOrder(System.Reflection.PropertyInfo property)
+    {
+        // Check for Label attribute with order
+        /*
+        var labelAttr = property.GetCustomAttribute<LabelAttribute>();
+        if (labelAttr != null && labelAttr.Order > 0)
+        {
+            return labelAttr.Order;
+        }
+*/
+        // Default ordering: id first, then alphabetical
+        if (property.Name.ToLower() == "id")
+            return 0;
+        
+        return 1000; // Default order for properties without explicit ordering
+    }
+
+    private string FormatPropertyName(string propertyName)
+    {
+        // Convert camelCase/PascalCase to Title Case
+        return System.Text.RegularExpressions.Regex.Replace(propertyName, "([a-z])([A-Z])", "$1 $2");
+    }
+
 
 
    

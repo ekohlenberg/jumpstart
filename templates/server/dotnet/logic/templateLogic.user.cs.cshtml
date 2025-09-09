@@ -15,6 +15,7 @@ namespace @Model.Namespace
     {  
         // Generated methods
         List<@(domainObj)> select();
+        List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new();
         @(domainObj) get(long id);
         void insert(@(domainObj) @(domainVar));
         void update(long id, @(domainObj) @(domainVar));
