@@ -518,6 +518,69 @@ namespace @Model.Name
         }
 
         /// <summary>
+        /// Executes a query by name and returns a List<T> where T derives from BaseObject
+        /// </summary>
+        /// <typeparam name="T">Type that derives from BaseObject</typeparam>
+        /// <param name="queryName">The name of the query to execute</param>
+        /// <returns>List of T objects</returns>
+        public static List<T> ExecuteQueryByName<T>(string queryName) where T : BaseObject, new()
+        {
+            BaseObject query = GetQueryByName(queryName);
+            if (query == null)
+            {
+                throw new Exception($"Query '{queryName}' not found in core.sql table");
+            }
+
+            List<T> baseObjects = new List<T>();
+
+            void baseObjectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                T baseObject = new T();
+
+                DBPersist.autoAssign(rdr, baseObject);
+
+                baseObjects.Add(baseObject);
+            };
+
+            string sql = query["sql_text"].ToString();
+            select(baseObjectCallback, sql);
+
+            return baseObjects;
+        }
+
+        /// <summary>
+        /// Executes a query by name with template substitution and returns a List<T> where T derives from BaseObject
+        /// </summary>
+        /// <typeparam name="T">Type that derives from BaseObject</typeparam>
+        /// <param name="queryName">The name of the query to execute</param>
+        /// <param name="filter">BaseObject containing parameters for template substitution</param>
+        /// <returns>List of T objects</returns>
+        public static List<T> ExecuteQueryByName<T>(string queryName, BaseObject filter) where T : BaseObject, new()
+        {
+            BaseObject query = GetQueryByName(queryName);
+            if (query == null)
+            {
+                throw new Exception($"Query '{queryName}' not found in core.sql table");
+            }
+
+            List<T> baseObjects = new List<T>();
+
+            void baseObjectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                T baseObject = new T();
+
+                DBPersist.autoAssign(rdr, baseObject);
+
+                baseObjects.Add(baseObject);
+            };
+
+            string sqlTemplate = query["sql_text"].ToString();
+            select(baseObjectCallback, sqlTemplate, filter);
+
+            return baseObjects;
+        }
+
+        /// <summary>
         /// Clears the query cache
         /// </summary>
         public static void ClearQueryCache()

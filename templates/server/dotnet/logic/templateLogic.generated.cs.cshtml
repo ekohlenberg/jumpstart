@@ -42,20 +42,9 @@ namespace @namespaceName
         {
             Console.WriteLine("Processing @(domainObj)Logic select<TBaseObject> List");
 
-            List<TBaseObject> @(domainVar)s = new List<TBaseObject>();
+            List<TBaseObject> @(domainVar)s = DBPersist.ExecuteQueryByName<TBaseObject>("@(schemaName).@(tableName)-select");
 
-            void @(domainVar)Callback(System.Data.Common.DbDataReader rdr)
-            {
-                TBaseObject @(domainVar) = new TBaseObject();
-
-                DBPersist.autoAssign(rdr, @(domainVar));
-
-                @(domainVar)s.Add(@(domainVar));
-            };
-
-            //DBPersist.select(@(domainVar)Callback, $"select * from @schemaName.@tableName");
-            DBPersist.ExecuteQueryByName("@(schemaName).@(tableName)-select", @(domainVar)Callback);
-
+            
             return @(domainVar)s;
         }
 
@@ -63,10 +52,11 @@ namespace @namespaceName
         {
             Console.WriteLine($"Processing @(domainObj)Logic get ID={id}");
 
-            @(domainObj) @(domainVar) = new @(domainObj)();
-            @(domainVar).id = id;
+            BaseObject filter = new BaseObject();
+            filter["id"] = id;
 
-            DBPersist.get(@(domainVar));
+            @(domainObj) @(domainVar) = DBPersist.ExecuteQueryByName<@(domainObj)>("@(schemaName).@(tableName)-get", filter).FirstOrDefault();
+            
 
             return @(domainVar);
         }

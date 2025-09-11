@@ -123,6 +123,30 @@ INSERT INTO core.sql (
     1
 );
 
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+    last_updated, 
+    last_updated_by,
+    is_active,
+    version
+) VALUES (
+     nextval('core.sql_identity'),
+    '@(schemaName).@(tableName)-get',
+    'SELECT 
+        @(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
+    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
+    WHERE @(schemaName).@(tableName).id = ^(id);',
+    'Select single @(domainObj) record by ID with related @(string.Join(", ", fkTableNames)) information',
+    NOW(),
+    CURRENT_USER,
+    1,
+    1
+);
+
+
         </text>
     
 } 

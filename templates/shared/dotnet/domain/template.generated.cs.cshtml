@@ -20,6 +20,11 @@ namespace @namespaceName
     [Label("@classLabel")]
     public partial class @className : BaseObject
     {
+        public @(className)(BaseObject baseObject) : base(baseObject)
+        {
+            Initialize();
+        }
+
         protected override void Initialize()
         {
             // Default initializer
