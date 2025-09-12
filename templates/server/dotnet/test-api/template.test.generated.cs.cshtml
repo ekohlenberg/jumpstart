@@ -91,7 +91,47 @@ namespace @Model.Namespace
         public static async Task testUpdate()
         {
             long lastId = BaseTest.getLastId("@(Model.DomainVar)");
-            var @(Model.DomainVar) = await GetByIdAsync<@(Model.DomainObj)>("@(Model.DomainObj)", lastId);
+            var @(Model.DomainVar)View = await GetByIdAsync<@(Model.DomainObj)View>("@(Model.DomainObj)", lastId);
+            var @(Model.DomainVar) = new @(Model.DomainObj)(@(Model.DomainVar)View);
+
+            @foreach (var attr in Model.Attributes)
+            {
+                if (attr.IsGlobal()) continue;
+
+                if (attr.Name.EndsWith("id"))
+                {
+                    if (!string.IsNullOrEmpty(attr.FkObject))
+                    {
+                        <text>
+                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                        </text>
+                    }
+                }
+                else
+                {
+                    var testDataSet = "random";
+                    if (!string.IsNullOrEmpty(attr.TestDataSet))
+                    {
+                        testDataSet = attr.TestDataSet;
+                    }
+                    <text>
+                        @(Model.DomainVar).@attr.Name = (@attr.DotNetType) BaseTest.getTestData(@(Model.DomainVar), "@attr.SqlDataType", TestDataType.@testDataSet);
+                    </text>
+                }
+            }
+            @{
+            <text>
+                Console.WriteLine("Testing @(Model.DomainObj) API update: " + @(Model.DomainVar).ToString());
+                await PutAsync("@(Model.DomainObj)", lastId, @(Model.DomainVar));
+            </text>
+            }
+        }
+
+        public static async Task testPut()
+        {
+            long lastId = BaseTest.getLastId("@(Model.DomainVar)");
+            var @(Model.DomainVar)View = await GetByIdAsync<@(Model.DomainObj)View>("@(Model.DomainObj)", lastId);
+            var @(Model.DomainVar) = new @(Model.DomainObj)(@(Model.DomainVar)View);
 
             @foreach (var attr in Model.Attributes)
             {

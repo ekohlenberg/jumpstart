@@ -49,7 +49,7 @@ namespace @(namespaceName).Controllers
             // Process any JsonElement values to ensure proper type conversion
             JsonHelper.ProcessJsonElements(@(domainVar));
             
-            @(domainObj)Logic.Create().insert(@(domainVar)); 
+            @(domainObj)Logic.Create().put(@(domainVar)); 
 
             return @(domainVar);
         }

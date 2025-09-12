@@ -322,27 +322,37 @@ namespace @Model.Name
 
         static public void put(BaseObject baseObject)
         {
-            string sql = "select * from " + _provider.FormatTableName("^(tableName)") + " where ^(expression)";
+            string sql = "select * from " + _provider.FormatTableName("^(schemaName).^(tableName)") + " where ^(expression)";
             int count = 0;
             StringBuilder expression = new StringBuilder();
+            bool hasId = false;
 
-            if (baseObject.getRwk().Count <= 0) throw new Exception(baseObject.GetType().Name + ".rwk list is empty. DBPersist.put(BaseObject) requires at least one attribute in the rwk list.");
-
-            exprSql(baseObject, baseObject.getRwk(), " and ", expression);
-
-            BaseObject filter = new BaseObject();
-            filter["tableName"] = baseObject.tableName;
-            filter["expression"] = expression.ToString();
-
-            SelectCallback scb = (rdr) =>
+            if (baseObject.ContainsKey("id"))
             {
-                count++;
-                baseObject["id"] = rdr["id"];
-            };
+                if(Convert.ToInt64(baseObject["id"]) != default(long)) hasId = true;
+            }
 
-            select(scb, sql, filter);
+            if(!hasId)
+            {
+                if (baseObject.getRwk().Count <= 0) throw new Exception(baseObject.GetType().Name + ".rwk list is empty. DBPersist.put(BaseObject) requires at least one attribute in the rwk list.");
 
-            if (count == 1)
+                exprSql(baseObject, baseObject.getRwk(), " and ", expression);
+
+                BaseObject filter = new BaseObject();
+                filter["schemaName"] = baseObject.schemaName;
+                filter["tableName"] = baseObject.tableBaseName;
+                filter["expression"] = expression.ToString();
+
+                SelectCallback scb = (rdr) =>
+                {
+                    count++;
+                    baseObject["id"] = rdr["id"];
+                };
+
+                select(scb, sql, filter);
+            }
+
+            if (count == 1 || hasId)
             {
                 update(baseObject);
             }

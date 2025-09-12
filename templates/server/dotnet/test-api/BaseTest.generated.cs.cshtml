@@ -323,64 +323,165 @@ private static Dictionary<string, long> _lastIdMap = null;
         // HTTP Helper Methods
         protected static async Task<T> GetAsync<T>(string endpoint)
         {
-            var response = await httpClient.GetAsync($"api/{endpoint}");
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            HttpResponseMessage response = null;
+            string json = null;
+            T result = default(T);
+            
+            try
+            {
+                response = await httpClient.GetAsync($"api/{endpoint}");
+                response.EnsureSuccessStatusCode();
+                json = await response.Content.ReadAsStringAsync();
+                result = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetAsync for endpoint '{endpoint}': {ex.Message}");
+                Console.WriteLine($"Response status: {response?.StatusCode}");
+                Console.WriteLine($"Response content: {json}");
+                throw;
+            }
         }
 
         protected static async Task<T> GetByIdAsync<T>(string endpoint, long id)
         {
-            var response = await httpClient.GetAsync($"api/{endpoint}/{id}");
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            HttpResponseMessage response = null;
+            string json = null;
+            T result = default(T);
+            
+            try
+            {
+                response = await httpClient.GetAsync($"api/{endpoint}/{id}");
+                response.EnsureSuccessStatusCode();
+                json = await response.Content.ReadAsStringAsync();
+                result = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetByIdAsync for endpoint '{endpoint}' with id '{id}': {ex.Message}");
+                Console.WriteLine($"Response status: {response?.StatusCode}");
+                Console.WriteLine($"Response content: {json}");
+                throw;
+            }
         }
 
         public static async Task<List<T>> GetListAsync<T>(string endpoint)
         {
-            var response = await httpClient.GetAsync($"api/{endpoint}");
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<T>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            HttpResponseMessage response = null;
+            string json = null;
+            List<T> result = null;
+            
+            try
+            {
+                response = await httpClient.GetAsync($"api/{endpoint}");
+                response.EnsureSuccessStatusCode();
+                json = await response.Content.ReadAsStringAsync();
+                result = JsonSerializer.Deserialize<List<T>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetListAsync for endpoint '{endpoint}': {ex.Message}");
+                Console.WriteLine($"Response status: {response?.StatusCode}");
+                Console.WriteLine($"Response content: {json}");
+                throw;
+            }
         }
 
         protected static async Task PostAsync<T>(string endpoint, T obj)
         {
-            var json = JsonSerializer.Serialize(obj);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync($"api/{endpoint}", content);
-            response.EnsureSuccessStatusCode();
+            string json = null;
+            StringContent content = null;
+            HttpResponseMessage response = null;
+            
+            try
+            {
+                json = JsonSerializer.Serialize(obj);
+                content = new StringContent(json, Encoding.UTF8, "application/json");
+                response = await httpClient.PostAsync($"api/{endpoint}", content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PostAsync for endpoint '{endpoint}': {ex.Message}");
+                Console.WriteLine($"Request JSON: {json}");
+                Console.WriteLine($"Response status: {response?.StatusCode}");
+                throw;
+            }
         }
 
         protected static async Task<T> PostAsyncReturn<T>(string endpoint, T obj) where T : BaseObject
         {
-            var json = JsonSerializer.Serialize(obj);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync($"api/{endpoint}", content);
-            response.EnsureSuccessStatusCode();
+            string json = null;
+            StringContent content = null;
+            HttpResponseMessage response = null;
+            string responseJson = null;
+            T result = default(T);
             
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<T>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            
-            // Process any JsonElement values to ensure proper type conversion
-            JsonHelper.ProcessJsonElements(result);
-            
-            return result;
+            try
+            {
+                json = JsonSerializer.Serialize(obj);
+                content = new StringContent(json, Encoding.UTF8, "application/json");
+                response = await httpClient.PostAsync($"api/{endpoint}", content);
+                response.EnsureSuccessStatusCode();
+                
+                responseJson = await response.Content.ReadAsStringAsync();
+                result = JsonSerializer.Deserialize<T>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                
+                // Process any JsonElement values to ensure proper type conversion
+                JsonHelper.ProcessJsonElements(result);
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PostAsyncReturn for endpoint '{endpoint}': {ex.Message}");
+                Console.WriteLine($"Request JSON: {json}");
+                Console.WriteLine($"Response status: {response?.StatusCode}");
+                Console.WriteLine($"Response JSON: {responseJson}");
+                throw;
+            }
         }
 
         protected static async Task PutAsync<T>(string endpoint, long id, T obj)
         {
-            var json = JsonSerializer.Serialize(obj);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await httpClient.PutAsync($"api/{endpoint}/{id}", content);
-            response.EnsureSuccessStatusCode();
+            string json = null;
+            StringContent content = null;
+            HttpResponseMessage response = null;
+            
+            try
+            {
+                json = JsonSerializer.Serialize(obj);
+                content = new StringContent(json, Encoding.UTF8, "application/json");
+                response = await httpClient.PutAsync($"api/{endpoint}/{id}", content);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PutAsync for endpoint '{endpoint}' with id '{id}': {ex.Message}");
+                Console.WriteLine($"Request JSON: {json}");
+                Console.WriteLine($"Response status: {response?.StatusCode}");
+                throw;
+            }
         }
 
         protected static async Task DeleteAsync(string endpoint, long id)
         {
-            var response = await httpClient.DeleteAsync($"api/{endpoint}/{id}");
-            response.EnsureSuccessStatusCode();
+            HttpResponseMessage response = null;
+            
+            try
+            {
+                response = await httpClient.DeleteAsync($"api/{endpoint}/{id}");
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DeleteAsync for endpoint '{endpoint}' with id '{id}': {ex.Message}");
+                Console.WriteLine($"Response status: {response?.StatusCode}");
+                throw;
+            }
         }
     }
 }

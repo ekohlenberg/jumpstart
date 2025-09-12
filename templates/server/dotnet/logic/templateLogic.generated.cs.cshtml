@@ -70,6 +70,15 @@ namespace @namespaceName
             DBPersist.insert(@(domainVar));
         }
 
+        public  void put(@(domainObj) @(domainVar))
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic put: {@(domainVar)}");
+
+            @(domainVar).is_active = 1;
+
+            DBPersist.put(@(domainVar));
+        }
+
         public  void update(long id, @(domainObj) @(domainVar))
         {
             Console.WriteLine($"Processing @(domainObj)Logic update: ID = {id}\n{@(domainVar)}");

@@ -98,6 +98,18 @@
 			joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + tableName + "." + fk.Name + " = " + alias + ".id");
 		}
 	}
+	
+	// Build RWK expression for get-by-rwk query
+	var rwkExpressions = new List<string>();
+	foreach(var attr in attributes)
+	{
+		if (attr.RWK == "1")
+		{
+			rwkExpressions.Add(tableName + "." + attr.Name + " = ^(" + attr.Name + ")");
+		}
+	}
+	var rwkExpression = string.Join(" AND ", rwkExpressions);
+	
         <text>
 -- =====================================
 -- Query for @(domainObj) (@(schemaName).@(tableName))
@@ -122,6 +134,60 @@ INSERT INTO core.sql (
     FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
     ORDER BY @(tableName).id;',
     'Select all @(domainObj) records with related @(string.Join(", ", fkTableNames)) information',
+    SYSTEM_USER,
+	GETDATE(),
+    SYSTEM_USER,
+	1,
+	1	
+);
+
+SET @@sql_id = NEXT VALUE FOR core.sql_identity;
+
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+	created_by,
+    last_updated, 
+    last_updated_by,
+	is_active,
+	version
+) VALUES (
+    @@sql_id,
+    '@(schemaName).@(tableName)-get',
+    'SELECT 
+        @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
+    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
+    WHERE @(tableName).id = ^(id);',
+    'Select single @(domainObj) record by ID with related @(string.Join(", ", fkTableNames)) information',
+    SYSTEM_USER,
+	GETDATE(),
+    SYSTEM_USER,
+	1,
+	1	
+);
+
+SET @@sql_id = NEXT VALUE FOR core.sql_identity;
+
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+	created_by,
+    last_updated, 
+    last_updated_by,
+	is_active,
+	version
+) VALUES (
+    @@sql_id,
+    '@(schemaName).@(tableName)-get-by-rwk',
+    'SELECT 
+        @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
+    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
+    WHERE @(rwkExpression);',
+    'Select single @(domainObj) record by RWK columns with related @(string.Join(", ", fkTableNames)) information',
     SYSTEM_USER,
 	GETDATE(),
     SYSTEM_USER,
