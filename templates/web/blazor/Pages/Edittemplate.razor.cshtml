@@ -54,9 +54,9 @@ else
 		Console.WriteLine("getting data");
 		if (id is not null) {
 			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-		var result = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}");
+		var result = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View>($"api/@(Model.DomainVar)/{id}");
 		if (result is not null)
-			@(Model.DomainVar) = result;
+			@(Model.DomainVar) = new @(Model.DomainObj)(result);
 		}
 	
 	}
