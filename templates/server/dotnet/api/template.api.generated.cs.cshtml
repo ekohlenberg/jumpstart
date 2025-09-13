@@ -42,30 +42,40 @@ namespace @(namespaceName).Controllers
 
         // POST api/<@(domainObj)Controller>
         [HttpPost]
-        public @(domainObj) Post([FromBody] @(domainObj) @(domainVar))
+        public @(domainObj)View Post([FromBody] @(domainObj)View @(domainVar)View)
         {
             //Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
             
+            JsonHelper.ProcessJsonElements(@(domainVar)View);
+            
             // Process any JsonElement values to ensure proper type conversion
-            JsonHelper.ProcessJsonElements(@(domainVar));
+            @(domainObj) @(domainVar) = new @(domainObj)(@(domainVar)View);
+
+            
             
             @(domainObj)Logic.Create().put(@(domainVar)); 
 
-            return @(domainVar);
+            @(domainVar)View.id = @(domainVar).id;
+
+            return @(domainVar)View;
         }
 
         // PUT api/<@(domainObj)Controller>/5
         [HttpPut("{id}")]
-        public @(domainObj) Put(long id, [FromBody] @(domainObj) @(domainVar))
+        public @(domainObj)View Put(long id, [FromBody] @(domainObj)View @(domainVar)View)
         {
             //Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
             
             // Process any JsonElement values to ensure proper type conversion
-            JsonHelper.ProcessJsonElements(@(domainVar));
+            JsonHelper.ProcessJsonElements(@(domainVar)View);
             
+            @(domainObj) @(domainVar) = new @(domainObj)(@(domainVar)View);
+
             @(domainObj)Logic.Create().update(id, @(domainVar));
 
-            return @(domainVar);
+            @(domainVar)View.id = @(domainVar).id;
+
+            return @(domainVar)View;
         }
 
         // DELETE api/<@(domainObj)Controller>/5
