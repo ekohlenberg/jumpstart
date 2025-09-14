@@ -8,97 +8,140 @@
 @@using Microsoft.AspNetCore.Components.Forms
 @@using Microsoft.AspNetCore.Components
 
+<style>
+    .form-label {
+        color: #6c757d !important;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+        margin-bottom: 0.25rem !important;
+        line-height: 1.2 !important;
+    }
+    .table td {
+        padding: 1rem 0.5rem !important;
+        vertical-align: top !important;
+        height: auto !important;
+        min-height: 5rem !important;
+    }
+    .form-control {
+        border: 1px solid #ced4da !important;
+        border-radius: 0.25rem !important;
+        padding: 0.375rem 0.75rem !important;
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+        background-color: #fff !important;
+        box-shadow: none !important;
+    }
+    .form-control:focus {
+        border-color: #80bdff !important;
+        outline: 0 !important;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    }
+</style>
+
 @@if(id == null)
 {
 	<h3>Create @(Model.Label)</h3>
 }
 else
 {
-	<h3>Edit @(Model.Label) @(Model.DomainVar).getRwkString() @(Model.DomainVar).id	</h3>
+	<h3>Edit @(Model.Label) @@(@(Model.DomainVar).getRwkString()) @@(@(Model.DomainVar).id.ToString())	</h3>
 }
+*/
 
 <EditForm Model="@(Model.DomainVar)" OnValidSubmit="HandleSubmit">
 	<div class="form-group">
-        @@foreach (var property in GetEditableProperties())
-        {
-            <div class="mb-3">
-                <label for="@@property.Name" class="form-label">@@GetPropertyLabel(property)</label>
-                @@{
-                    var propertyType = property.PropertyType;
-                    var isNullable = Nullable.GetUnderlyingType(propertyType) != null;
-                    var underlyingType = isNullable ? Nullable.GetUnderlyingType(propertyType) : propertyType;
-                }
-                
-                @@if (underlyingType == typeof(string))
-                {
-                    <input type="text" id="@@property.Name" value="@@GetStringProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetStringProperty(property, e.Value?.ToString()))" class="form-control" />
-                }
-                else if (underlyingType == typeof(int))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetIntProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetIntProperty(property, int.Parse(e.Value?.ToString() ?? "0")))" class="form-control" />
-                }
-                else if (underlyingType == typeof(int?))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetNullableIntProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableIntProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : int.Parse(e.Value.ToString())))" class="form-control" />
-                }
-                else if (underlyingType == typeof(long))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetLongProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetLongProperty(property, long.Parse(e.Value?.ToString() ?? "0")))" class="form-control" />
-                }
-                else if (underlyingType == typeof(long?))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetNullableLongProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableLongProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : long.Parse(e.Value.ToString())))" class="form-control" />
-                }
-                else if (underlyingType == typeof(decimal))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetDecimalProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetDecimalProperty(property, decimal.Parse(e.Value?.ToString() ?? "0")))" class="form-control" step="0.01" />
-                }
-                else if (underlyingType == typeof(decimal?))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetNullableDecimalProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDecimalProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : decimal.Parse(e.Value.ToString())))" class="form-control" step="0.01" />
-                }
-                else if (underlyingType == typeof(double))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetDoubleProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetDoubleProperty(property, double.Parse(e.Value?.ToString() ?? "0")))" class="form-control" step="0.01" />
-                }
-                else if (underlyingType == typeof(double?))
-                {
-                    <input type="number" id="@@property.Name" value="@@GetNullableDoubleProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDoubleProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : double.Parse(e.Value.ToString())))" class="form-control" step="0.01" />
-                }
-                else if (underlyingType == typeof(bool))
-                {
-                    <input type="checkbox" id="@@property.Name" checked="@@GetBoolProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetBoolProperty(property, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
-                }
-                else if (underlyingType == typeof(bool?))
-                {
-                    <input type="checkbox" id="@@property.Name" checked="@@GetBoolProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetBoolProperty(property, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
-                }
-                else if (underlyingType == typeof(int) && property.Name == "is_active")
-                {
-                    <input type="checkbox" id="@@property.Name" checked="@@GetIntAsBoolProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetIntAsBoolProperty(property, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
-                }
-                else if (underlyingType == typeof(DateTime))
-                {
-                    <input type="date" id="@@property.Name" value="@@GetDateTimeProperty(property).ToString("yyyy-MM-dd")" @@onchange="@@(async (ChangeEventArgs e) => await SetDateTimeProperty(property, DateTime.Parse(e.Value?.ToString() ?? DateTime.MinValue.ToString())))" class="form-control" />
-                }
-                else if (underlyingType == typeof(DateTime?))
-                {
-                    <input type="date" id="@@property.Name" value="@@(GetNullableDateTimeProperty(property)?.ToString("yyyy-MM-dd") ?? "")" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDateTimeProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : DateTime.Parse(e.Value.ToString())))" class="form-control" />
-                }
-                else if (underlyingType == typeof(DateOnly))
-                {
-                    <input type="date" id="@@property.Name" value="@@GetDateOnlyProperty(property).ToString("yyyy-MM-dd")" @@onchange="@@(async (ChangeEventArgs e) => await SetDateOnlyProperty(property, DateOnly.FromDateTime(DateTime.Parse(e.Value?.ToString() ?? DateTime.MinValue.ToString()))))" class="form-control" />
-                }
-                else if (underlyingType == typeof(DateOnly?))
-                {
-                    <input type="date" id="@@property.Name" value="@@(GetNullableDateOnlyProperty(property)?.ToString("yyyy-MM-dd") ?? "")" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDateOnlyProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : DateOnly.FromDateTime(DateTime.Parse(e.Value.ToString()))))" class="form-control" />
-                }
-                else
-                {
-                    <input type="text" id="@@property.Name" value="@@GetStringProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetStringProperty(property, e.Value?.ToString()))" class="form-control" />
-                }
-            </div>
-        }
+        <table class="table table-borderless">
+            @@{
+                var properties = GetEditableProperties();
+                var propertiesPerRow = 3;
+            }
+            @@for (int i = 0; i < properties.Length; i += propertiesPerRow)
+            {
+                <tr>
+                    @@for (int j = 0; j < propertiesPerRow && (i + j) < properties.Length; j++)
+                    {
+                        var property = properties[i + j];
+                        <td>
+                            <label for="@@property.Name" class="form-label">@@GetPropertyLabel(property)</label>
+                            @@{
+                                var propertyType = property.PropertyType;
+                                var isNullable = Nullable.GetUnderlyingType(propertyType) != null;
+                                var underlyingType = isNullable ? Nullable.GetUnderlyingType(propertyType) : propertyType;
+                            }
+                            
+                            @@if (underlyingType == typeof(string))
+                            {
+                                <input type="text" id="@@property.Name" value="@@GetStringProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetStringProperty(property, e.Value?.ToString()))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(int))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetIntProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetIntProperty(property, int.Parse(e.Value?.ToString() ?? "0")))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(int?))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetNullableIntProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableIntProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : int.Parse(e.Value.ToString())))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(long))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetLongProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetLongProperty(property, long.Parse(e.Value?.ToString() ?? "0")))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(long?))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetNullableLongProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableLongProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : long.Parse(e.Value.ToString())))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(decimal))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetDecimalProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetDecimalProperty(property, decimal.Parse(e.Value?.ToString() ?? "0")))" class="form-control" step="0.01" />
+                            }
+                            else if (underlyingType == typeof(decimal?))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetNullableDecimalProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDecimalProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : decimal.Parse(e.Value.ToString())))" class="form-control" step="0.01" />
+                            }
+                            else if (underlyingType == typeof(double))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetDoubleProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetDoubleProperty(property, double.Parse(e.Value?.ToString() ?? "0")))" class="form-control" step="0.01" />
+                            }
+                            else if (underlyingType == typeof(double?))
+                            {
+                                <input type="number" id="@@property.Name" value="@@GetNullableDoubleProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDoubleProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : double.Parse(e.Value.ToString())))" class="form-control" step="0.01" />
+                            }
+                            else if (underlyingType == typeof(bool))
+                            {
+                                <input type="checkbox" id="@@property.Name" checked="@@GetBoolProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetBoolProperty(property, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
+                            }
+                            else if (underlyingType == typeof(bool?))
+                            {
+                                <input type="checkbox" id="@@property.Name" checked="@@GetBoolProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetBoolProperty(property, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
+                            }
+                            else if (underlyingType == typeof(int) && property.Name == "is_active")
+                            {
+                                <input type="checkbox" id="@@property.Name" checked="@@GetIntAsBoolProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetIntAsBoolProperty(property, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
+                            }
+                            else if (underlyingType == typeof(DateTime))
+                            {
+                                <input type="date" id="@@property.Name" value="@@GetDateTimeProperty(property).ToString("yyyy-MM-dd")" @@onchange="@@(async (ChangeEventArgs e) => await SetDateTimeProperty(property, DateTime.Parse(e.Value?.ToString() ?? DateTime.MinValue.ToString())))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(DateTime?))
+                            {
+                                <input type="date" id="@@property.Name" value="@@(GetNullableDateTimeProperty(property)?.ToString("yyyy-MM-dd") ?? "")" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDateTimeProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : DateTime.Parse(e.Value.ToString())))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(DateOnly))
+                            {
+                                <input type="date" id="@@property.Name" value="@@GetDateOnlyProperty(property).ToString("yyyy-MM-dd")" @@onchange="@@(async (ChangeEventArgs e) => await SetDateOnlyProperty(property, DateOnly.FromDateTime(DateTime.Parse(e.Value?.ToString() ?? DateTime.MinValue.ToString()))))" class="form-control" />
+                            }
+                            else if (underlyingType == typeof(DateOnly?))
+                            {
+                                <input type="date" id="@@property.Name" value="@@(GetNullableDateOnlyProperty(property)?.ToString("yyyy-MM-dd") ?? "")" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDateOnlyProperty(property, string.IsNullOrEmpty(e.Value?.ToString()) ? null : DateOnly.FromDateTime(DateTime.Parse(e.Value.ToString()))))" class="form-control" />
+                            }
+                            else
+                            {
+                                <input type="text" id="@@property.Name" value="@@GetStringProperty(property)" @@onchange="@@(async (ChangeEventArgs e) => await SetStringProperty(property, e.Value?.ToString()))" class="form-control" />
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
         @*
         @@foreach (var property in GetReadOnlyProperties())
         {
