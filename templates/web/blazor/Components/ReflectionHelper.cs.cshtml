@@ -8,7 +8,7 @@ namespace @Model.Namespace
     public static class ReflectionHelper
     {
         /// <summary>
-        /// Gets all properties that should be displayed in UI (has LabelAttribute and doesn't end with _id)
+        /// Gets all properties that should be displayed in UI (has ColumnInfoAttribute and doesn't end with _id)
         /// </summary>
         /// <typeparam name="T">Type to get properties from</typeparam>
         /// <returns>Array of PropertyInfo for displayable properties</returns>
@@ -17,14 +17,14 @@ namespace @Model.Namespace
             var type = typeof(T);
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                       .Where(p => p.CanRead && 
-                                  p.GetCustomAttribute<LabelAttribute>() != null &&
+                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null &&
                                   !p.Name.EndsWith("_id"))
                       .OrderBy(p => GetPropertyOrder(p))
                       .ToArray();
         }
 
         /// <summary>
-        /// Gets all properties that should be displayed in UI (has LabelAttribute and doesn't end with _id)
+        /// Gets all properties that should be displayed in UI (has ColumnInfoAttribute and doesn't end with _id)
         /// </summary>
         /// <param name="type">Type to get properties from</param>
         /// <returns>Array of PropertyInfo for displayable properties</returns>
@@ -32,7 +32,7 @@ namespace @Model.Namespace
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                       .Where(p => p.CanRead && 
-                                  p.GetCustomAttribute<LabelAttribute>() != null &&
+                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null &&
                                   !p.Name.EndsWith("_id"))
                       .OrderBy(p => GetPropertyOrder(p))
                       .ToArray();
@@ -42,11 +42,11 @@ namespace @Model.Namespace
         /// Gets the display label for a property
         /// </summary>
         /// <param name="property">PropertyInfo to get label for</param>
-        /// <returns>Label from LabelAttribute or formatted property name</returns>
+        /// <returns>Label from ColumnInfoAttribute or formatted property name</returns>
         public static string GetPropertyLabel(PropertyInfo property)
         {
             // Check for Label attribute first
-            var labelAttr = property.GetCustomAttribute<LabelAttribute>();
+            var labelAttr = property.GetCustomAttribute<ColumnInfoAttribute>();
             if (labelAttr != null)
             {
                 return labelAttr.Label;
@@ -386,7 +386,7 @@ namespace @Model.Namespace
         {
             // Check for Label attribute with order
             /*
-            var labelAttr = property.GetCustomAttribute<LabelAttribute>();
+            var labelAttr = property.GetCustomAttribute<ColumnInfoAttribute>();
             if (labelAttr != null && labelAttr.Order > 0)
             {
                 return labelAttr.Order;
@@ -412,7 +412,7 @@ namespace @Model.Namespace
         }
 
         /// <summary>
-        /// Gets all properties that have a LabelAttribute (including those ending with _id)
+        /// Gets all properties that have a ColumnInfoAttribute (including those ending with _id)
         /// </summary>
         /// <typeparam name="T">Type to get properties from</typeparam>
         /// <returns>Array of PropertyInfo for all labeled properties</returns>
@@ -421,13 +421,13 @@ namespace @Model.Namespace
             var type = typeof(T);
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                       .Where(p => p.CanRead && 
-                                  p.GetCustomAttribute<LabelAttribute>() != null)
+                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null)
                       .OrderBy(p => GetPropertyOrder(p))
                       .ToArray();
         }
 
         /// <summary>
-        /// Gets all properties that have a LabelAttribute (including those ending with _id)
+        /// Gets all properties that have a ColumnInfoAttribute (including those ending with _id)
         /// </summary>
         /// <param name="type">Type to get properties from</param>
         /// <returns>Array of PropertyInfo for all labeled properties</returns>
@@ -435,29 +435,29 @@ namespace @Model.Namespace
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                       .Where(p => p.CanRead && 
-                                  p.GetCustomAttribute<LabelAttribute>() != null)
+                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null)
                       .OrderBy(p => GetPropertyOrder(p))
                       .ToArray();
         }
 
         /// <summary>
-        /// Checks if a property has a LabelAttribute
+        /// Checks if a property has a ColumnInfoAttribute
         /// </summary>
         /// <param name="property">PropertyInfo to check</param>
-        /// <returns>True if property has LabelAttribute</returns>
-        public static bool HasLabelAttribute(PropertyInfo property)
+        /// <returns>True if property has ColumnInfoAttribute</returns>
+        public static bool HasColumnInfoAttribute(PropertyInfo property)
         {
-            return property.GetCustomAttribute<LabelAttribute>() != null;
+            return property.GetCustomAttribute<ColumnInfoAttribute>() != null;
         }
 
         /// <summary>
-        /// Gets the LabelAttribute from a property
+        /// Gets the ColumnInfoAttribute from a property
         /// </summary>
         /// <param name="property">PropertyInfo to get attribute from</param>
-        /// <returns>LabelAttribute or null if not found</returns>
-        public static LabelAttribute GetLabelAttribute(PropertyInfo property)
+        /// <returns>ColumnInfoAttribute or null if not found</returns>
+        public static ColumnInfoAttribute GetColumnInfoAttribute(PropertyInfo property)
         {
-            return property.GetCustomAttribute<LabelAttribute>();
+            return property.GetCustomAttribute<ColumnInfoAttribute>();
         }
     }
 }

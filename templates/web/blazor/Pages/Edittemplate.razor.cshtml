@@ -46,7 +46,7 @@ else
 {
 	<h3>Edit @(Model.Label) @@(@(Model.DomainVar).getRwkString()) @@(@(Model.DomainVar).id.ToString())	</h3>
 }
-*/
+
 
 <EditForm Model="@(Model.DomainVar)" OnValidSubmit="HandleSubmit">
 	<div class="form-group">
@@ -221,7 +221,7 @@ else
 
 	private System.Reflection.PropertyInfo[] GetReadOnlyProperties()
 	{
-		// Get properties that have LabelAttribute but are typically read-only (like created_date, last_updated, etc.)
+		// Get properties that have ColumnInfoAttribute but are typically read-only (like created_date, last_updated, etc.)
 		var allLabeled = ReflectionHelper.GetAllLabeledProperties<@(Model.DomainObj)View>();
 		var editable = GetEditableProperties();
 		

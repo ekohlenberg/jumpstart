@@ -14,17 +14,17 @@ namespace @Model.Name
         {
             if (t == null) return;
 
-            // Use reflection to copy properties with LabelAttribute
+            // Use reflection to copy properties with ColumnInfoAttribute
             Type currentType = this.GetType();
             Type sourceType = t.GetType();
             
-            // Get all public properties with LabelAttribute from the current object
+            // Get all public properties with ColumnInfoAttribute from the current object
             PropertyInfo[] properties = currentType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             
             foreach (PropertyInfo property in properties)
             {
-                // Check if property has LabelAttribute
-                var labelAttribute = property.GetCustomAttribute<LabelAttribute>();
+                // Check if property has ColumnInfoAttribute
+                var labelAttribute = property.GetCustomAttribute<ColumnInfoAttribute>();
                 if (labelAttribute == null) continue;
                 
                 // Check if property has a setter

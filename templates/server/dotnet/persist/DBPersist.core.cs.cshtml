@@ -193,14 +193,14 @@ namespace @Model.Name
             StringBuilder vals = new StringBuilder("");
             var parameters = new Dictionary<string, object>();
 
-            // Use reflection to get all properties with LabelAttribute
+            // Use reflection to get all properties with ColumnInfoAttribute
             Type objectType = baseObject.GetType();
             PropertyInfo[] properties = objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             
             foreach (PropertyInfo property in properties)
             {
-                // Check if property has LabelAttribute
-                var labelAttribute = property.GetCustomAttribute<LabelAttribute>();
+                // Check if property has ColumnInfoAttribute
+                var labelAttribute = property.GetCustomAttribute<ColumnInfoAttribute>();
                 if (labelAttribute == null) continue;
                 
                 // Get the value directly from the underlying dictionary to preserve type information
