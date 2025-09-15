@@ -46,7 +46,7 @@ Jumpstart transforms tabular metadata into complete, production-ready applicatio
 | Component | Technology |
 |-----------|------------|
 | **Backend** | .NET 9, ASP.NET Core |
-| **Database** | PostgreSQL 15+ |
+| **Database** | PostgreSQL 15+, MS SQL Server 2022+ |
 | **Frontend** | Blazor WebAssembly |
 | **Testing** | Generated Persist and HTTP Client |
 | **Templating** | RazorLight |
@@ -69,7 +69,9 @@ cd jumpstart
 ### 2. Build the Project
 
 ```bash
+cd jumpstart/src
 dotnet build
+
 ```
 
 ### 3. Generate an Application
