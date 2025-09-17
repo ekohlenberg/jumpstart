@@ -26,11 +26,15 @@ namespace @Model.Namespace
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field)]
 	public class ColumnInfoAttribute : Attribute
 	{
-	    public string Label { get; }
+	    public string Label { get; set; }
+		public string fkObject { get; set; }
+		public string fkType { get; set; }
 
-	    public ColumnInfoAttribute(string label)
+	    public ColumnInfoAttribute(string label, string fkObject = "", string fkType = "")
 	    {
-	        Label = label;
+	        this.Label = label;
+			this.fkObject = fkObject;
+			this.fkType = fkType;
 	    }
 
 	  

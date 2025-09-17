@@ -52,10 +52,7 @@ namespace @namespaceName
         {
             Console.WriteLine($"Processing @(domainObj)Logic get ID={id}");
 
-            BaseObject filter = new BaseObject();
-            filter["id"] = id;
-
-            @(domainObj) @(domainVar) = DBPersist.ExecuteQueryByName<@(domainObj)>("@(schemaName).@(tableName)-get", filter).FirstOrDefault();
+            @(domainObj) @(domainVar) = DBPersist.select<@(domainObj)>($"SELECT * FROM @(schemaName).@(tableName) WHERE id = {id}").FirstOrDefault();
             
 
             return @(domainVar);

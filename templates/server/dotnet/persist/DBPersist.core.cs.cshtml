@@ -56,6 +56,29 @@ namespace @Model.Name
             select(selectCallback, sql);
         }
 
+        /// <summary>
+        /// Executes a SQL query and returns a List<T> where T derives from BaseObject
+        /// </summary>
+        /// <typeparam name="T">Type that derives from BaseObject</typeparam>
+        /// <param name="sql">The SQL query to execute</param>
+        /// <returns>List of T objects</returns>
+        public static List<T> select<T>(string sql) where T : BaseObject, new()
+        {
+            Logger.Sql($"Executing generic select sql: {sql}");
+
+            List<T> baseObjects = new List<T>();
+
+            void baseObjectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                T baseObject = new T();
+                DBPersist.autoAssign(rdr, baseObject);
+                baseObjects.Add(baseObject);
+            };
+
+            select(baseObjectCallback, sql);
+            return baseObjects;
+        }
+
         static public long insert( BaseObject baseObject )
         {
             long id = identity(baseObject);

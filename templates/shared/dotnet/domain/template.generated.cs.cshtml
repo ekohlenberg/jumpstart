@@ -59,7 +59,7 @@ namespace @namespaceName
         @foreach (var attr in Model.Attributes)
         {
             <text>
-            [ColumnInfo("@attr.Label")]
+            [ColumnInfo("@attr.Label", "@attr.FkObject", "@attr.FkType")]
             public @attr.DotNetType @attr.Name
             {
                 get

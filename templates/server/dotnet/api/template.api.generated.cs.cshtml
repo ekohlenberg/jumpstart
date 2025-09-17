@@ -40,6 +40,17 @@ namespace @(namespaceName).Controllers
             return @(domainVar);
         }
 
+        // GET api/<@(domainObj)Controller>/enum
+        [HttpGet("enum")]
+        public IEnumerable<EnumHelper> GetEnum()
+        {
+            //Console.WriteLine("Processing GET Enum");
+
+            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select<@(domainObj)>();
+
+            return @(domainVar)s.Select(@(domainVar) => new EnumHelper(@(domainVar).id, @(domainVar).getRwkString()));
+        }
+
         // POST api/<@(domainObj)Controller>
         [HttpPost]
         public @(domainObj)View Post([FromBody] @(domainObj)View @(domainVar)View)
