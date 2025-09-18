@@ -1,8 +1,10 @@
 ﻿@@* Parameters *@@
 @@using System.Net.Http;
 @@using Microsoft.Extensions.DependencyInjection;
+@@using System.Linq;
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
+@@inject NavigationManager NavigationManager
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
 @@code {
     [Parameter] public long? SelectedParentId { get; set; }
@@ -58,6 +60,7 @@
     private bool collapseNavMenu = true;
     protected NavMenu[]? childMenuList;
     protected string? selectedParentName;
+    private long? previousParentId;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
@@ -70,16 +73,20 @@
     {
         if (SelectedParentId.HasValue)
         {
-            await LoadChildMenuItems();
+            // Only navigate if the parent actually changed
+            bool parentChanged = previousParentId != SelectedParentId.Value;
+            await LoadChildMenuItems(parentChanged);
+            previousParentId = SelectedParentId.Value;
         }
         else
         {
             childMenuList = null;
             selectedParentName = null;
+            previousParentId = null;
         }
     }
     
-    private async Task LoadChildMenuItems()
+    private async Task LoadChildMenuItems(bool shouldNavigate = false)
     {
         if (!SelectedParentId.HasValue) return;
         
@@ -93,6 +100,16 @@
             var parentClient = ClientFactory.CreateClient("RemoteAPI");
             var parentMenu = await parentClient.GetFromJsonAsync<NavMenu>($"api/navmenu/{SelectedParentId.Value}");
             selectedParentName = parentMenu?.name;
+            
+            // Navigate to the first link in the list only if parent changed
+            if (shouldNavigate)
+            {
+                var firstChild = childMenuList.FirstOrDefault();
+                if (firstChild != null && !string.IsNullOrEmpty(firstChild.link))
+                {
+                    NavigationManager.NavigateTo(firstChild.link);
+                }
+            }
         }
     }
     
