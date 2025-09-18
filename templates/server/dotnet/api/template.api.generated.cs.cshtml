@@ -95,5 +95,16 @@ namespace @(namespaceName).Controllers
         {
             @(domainObj)Logic.Create().delete(id);
         }
+
+        // GET api/<@(domainObj)Controller>/5/history
+        [HttpGet("{id}/history")]
+        public IEnumerable<@(domainObj)History> GetHistory(long id)
+        {
+            //Console.WriteLine($"Processing GET History for ID={id}");
+
+            List<@(domainObj)History> historyList = @(domainObj)Logic.Create().select<@(domainObj)History>();
+
+            return historyList.Where(h => h.@(Model.TableName)_id == id).OrderByDescending(h => h.last_updated);
+        }
     }
 }

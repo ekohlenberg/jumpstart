@@ -37,6 +37,40 @@
         outline: 0 !important;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
     }
+    
+    /* Tab styling */
+    .nav-tabs {
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 0;
+    }
+    
+    .nav-tabs .nav-link {
+        border: 1px solid transparent;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        color: #495057;
+        background-color: #f8f9fa;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-color: #e9ecef #e9ecef #dee2e6;
+        background-color: #e9ecef;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #495057;
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 transparent;
+        border-bottom: 1px solid #fff;
+    }
+    
+    .tab-content {
+        border: 1px solid #dee2e6;
+        border-top: none; 
+        /*border-radius: 0 0 0.25rem 0.25rem;*/
+        /*padding: 1rem;*/
+        background-color: #fff;
+    }
 </style>
 
 @@if(id == null)
@@ -48,8 +82,44 @@ else
 	<h3>Edit @(Model.Label) @@(@(Model.DomainVar).getRwkString())</h3>
 }
 
+<!-- Tab Navigation -->
+<ul class="nav nav-tabs" id="editTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @@(activeTab == "edit" ? "active" : "")" 
+                id="edit-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#edit-pane" 
+                type="button" 
+                role="tab" 
+                aria-controls="edit-pane" 
+                aria-selected="@@(activeTab == "edit" ? "true" : "false")"
+                @@onclick="@@(() => SetActiveTab("edit"))">
+            Edit
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @@(activeTab == "tab2" ? "active" : "")" 
+                id="tab2-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#tab2-pane" 
+                type="button" 
+                role="tab" 
+                aria-controls="tab2-pane" 
+                aria-selected="@@(activeTab == "tab2" ? "true" : "false")"
+                @@onclick="@@(() => SetActiveTab("tab2"))">
+            Tab 2
+        </button>
+    </li>
+</ul>
 
-<EditForm Model="@(Model.DomainVar)" OnValidSubmit="HandleSubmit">
+<!-- Tab Content -->
+<div class="tab-content" id="editTabContent">
+    <!-- Edit Tab -->
+    <div class="tab-pane fade @@(activeTab == "edit" ? "show active" : "")" 
+         id="edit-pane" 
+         role="tabpanel" 
+         aria-labelledby="edit-tab">
+        <EditForm Model="@(Model.DomainVar)" OnValidSubmit="HandleSubmit">
 	<div class="form-group">
         <table class="table table-borderless">
             @@{
@@ -173,6 +243,18 @@ else
 		<button type="button" class="btn btn-secondary" @@onclick="Cancel">Cancel</button>
 	</div>
 </EditForm>
+    </div>
+    
+    <!-- Tab 2 -->
+    <div class="tab-pane fade @@(activeTab == "tab2" ? "show active" : "")" 
+         id="tab2-pane" 
+         role="tabpanel" 
+         aria-labelledby="tab2-tab">
+        <div class="text-center">
+            Hello from Tab 2
+        </div>
+    </div>
+</div>
 
 @@code {
 	[Parameter]
@@ -182,16 +264,19 @@ else
 	
 	// Dictionary to store enum data for dropdowns
 	private Dictionary<string, List<EnumHelper>> enumData = new Dictionary<string, List<EnumHelper>>();
+	
+	// Tab management
+	private string activeTab = "edit";
 
 	protected override async Task OnParametersSetAsync()
 	{
 		if (id is not null) {
 			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-			var result = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}");
-			if (result is not null)
-				@(Model.DomainVar) = result;
+		var result = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}");
+		if (result is not null)
+			@(Model.DomainVar) = result;
 		}
-		
+	
 		// Load enum data for dropdowns
 		await LoadEnumData();
 	}
@@ -241,27 +326,27 @@ else
 			
 			var result = await remoteClient.PutAsJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}", @(Model.DomainVar));
 			if (result.IsSuccessStatusCode)
-			{
-				var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
-				if (readResult is not null) 
 				{
-					@(Model.DomainVar) = readResult;
+					var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
+					if (readResult is not null) 
+					{
+						@(Model.DomainVar) = readResult;
+					}
 				}
-			}
 		}
 		else
 		{
 			var result = await remoteClient.PostAsJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)", @(Model.DomainVar));	
 			if (result.IsSuccessStatusCode)
-			{
-				var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
-				if (readResult is not null)
 				{
-					@(Model.DomainVar) = readResult;
+					var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
+					if (readResult is not null)
+					{
+						@(Model.DomainVar) = readResult;
+					}
 				}
-			}
 		}
-		
+
 		// Navigate back to list after successful save
 		Navigation.NavigateTo("/@(Model.DomainVar)");
 	}
@@ -269,6 +354,13 @@ else
 	void Cancel()
 	{
 		Navigation.NavigateTo("/@(Model.DomainVar)");
+	}
+	
+	// Tab management method
+	private void SetActiveTab(string tabName)
+	{
+		activeTab = tabName;
+		StateHasChanged();
 	}
 
 	// Helper methods using ReflectionHelper
