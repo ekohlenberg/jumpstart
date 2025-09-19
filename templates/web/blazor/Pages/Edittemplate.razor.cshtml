@@ -8,6 +8,7 @@
 @@using Microsoft.AspNetCore.Components.Forms
 @@using Microsoft.AspNetCore.Components
 @@using @(Model.Namespace)
+@@using @(Model.Namespace).Components
 
 <style>
     .form-label {
@@ -15,13 +16,7 @@
         font-size: 0.875rem !important;
         font-weight: 500 !important;
         margin-bottom: 0.25rem !important;
-        line-height: 1.2 !important;
-    }
-    .table td {
-        padding: 1rem 0.5rem !important;
-        vertical-align: top !important;
-        height: auto !important;
-        min-height: 5rem !important;
+        padding-top: 0.25rem !important;
     }
     .form-control {
         border: 1px solid #ced4da !important;
@@ -37,40 +32,6 @@
         outline: 0 !important;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
     }
-    
-    /* Tab styling */
-    .nav-tabs {
-        border-bottom: 1px solid #dee2e6;
-        margin-bottom: 0;
-    }
-    
-    .nav-tabs .nav-link {
-        border: 1px solid transparent;
-        border-top-left-radius: 0.25rem;
-        border-top-right-radius: 0.25rem;
-        color: #495057;
-        background-color: #f8f9fa;
-    }
-    
-    .nav-tabs .nav-link:hover {
-        border-color: #e9ecef #e9ecef #dee2e6;
-        background-color: #e9ecef;
-    }
-    
-    .nav-tabs .nav-link.active {
-        color: #495057;
-        background-color: #fff;
-        border-color: #dee2e6 #dee2e6 transparent;
-        border-bottom: 1px solid #fff;
-    }
-    
-    .tab-content {
-        border: 1px solid #dee2e6;
-        border-top: none; 
-        /*border-radius: 0 0 0.25rem 0.25rem;*/
-        /*padding: 1rem;*/
-        background-color: #fff;
-    }
 </style>
 
 @@if(id == null)
@@ -82,179 +43,7 @@ else
 	<h3>Edit @(Model.Label) @@(@(Model.DomainVar).getRwkString())</h3>
 }
 
-<!-- Tab Navigation -->
-<ul class="nav nav-tabs" id="editTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link @@(activeTab == "edit" ? "active" : "")" 
-                id="edit-tab" 
-                data-bs-toggle="tab" 
-                data-bs-target="#edit-pane" 
-                type="button" 
-                role="tab" 
-                aria-controls="edit-pane" 
-                aria-selected="@@(activeTab == "edit" ? "true" : "false")"
-                @@onclick="@@(() => SetActiveTab("edit"))">
-            Edit
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link @@(activeTab == "tab2" ? "active" : "")" 
-                id="tab2-tab" 
-                data-bs-toggle="tab" 
-                data-bs-target="#tab2-pane" 
-                type="button" 
-                role="tab" 
-                aria-controls="tab2-pane" 
-                aria-selected="@@(activeTab == "tab2" ? "true" : "false")"
-                @@onclick="@@(() => SetActiveTab("tab2"))">
-            Tab 2
-        </button>
-    </li>
-</ul>
-
-<!-- Tab Content -->
-<div class="tab-content" id="editTabContent">
-    <!-- Edit Tab -->
-    <div class="tab-pane fade @@(activeTab == "edit" ? "show active" : "")" 
-         id="edit-pane" 
-         role="tabpanel" 
-         aria-labelledby="edit-tab">
-        <EditForm Model="@(Model.DomainVar)" OnValidSubmit="HandleSubmit">
-	<div class="form-group">
-        <table class="table table-borderless">
-            @@{
-                var properties = GetEditableProperties();
-                var propertiesPerRow = 3;
-            }
-            @@for (int i = 0; i < properties.Length; i += propertiesPerRow)
-            {
-                <tr>
-                    @@for (int j = 0; j < propertiesPerRow && (i + j) < properties.Length; j++)
-                    {
-                        PropertyInfo? propInfo = null;
-                        propInfo = properties[i + j];
-                        <td>
-                            <label for="@@propInfo.Name" class="form-label">@@GetPropertyLabel(propInfo)</label>
-                            @@{
-                                var propertyType = propInfo.PropertyType;
-                                var isNullable = Nullable.GetUnderlyingType(propertyType) != null;
-                                var underlyingType = isNullable ? Nullable.GetUnderlyingType(propertyType) : propertyType;
-                            }
-                            
-                            @@if (IsEnumForeignKey(propInfo))
-                            {
-                                <select id="@@propInfo.Name" value="@@GetEnumProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetEnumProperty(propInfo, e.Value?.ToString()))" class="form-control">
-                                    <option value="">-- Select --</option>
-                                    @@if (enumData.ContainsKey(propInfo.Name))
-                                    {
-                                        @@foreach (var enumItem in enumData[propInfo.Name])
-                                        {
-                                            <option value="@@enumItem.id">@@enumItem.rwkString</option>
-                                        }
-                                    }
-                                </select>
-                            }
-                            else if (underlyingType == typeof(string))
-                            {
-                                <input type="text" id="@@propInfo.Name" value="@@GetStringProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetStringProperty(propInfo, e.Value?.ToString()))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(int))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetIntProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetIntProperty(propInfo, int.Parse(e.Value?.ToString() ?? "0")))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(int?))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetNullableIntProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableIntProperty(propInfo, string.IsNullOrEmpty(e.Value?.ToString()) ? null : int.Parse(e.Value.ToString())))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(long))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetLongProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetLongProperty(propInfo, long.Parse(e.Value?.ToString() ?? "0")))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(long?))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetNullableLongProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableLongProperty(propInfo, string.IsNullOrEmpty(e.Value?.ToString()) ? null : long.Parse(e.Value.ToString())))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(decimal))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetDecimalProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetDecimalProperty(propInfo, decimal.Parse(e.Value?.ToString() ?? "0")))" class="form-control" step="0.01" />
-                            }
-                            else if (underlyingType == typeof(decimal?))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetNullableDecimalProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDecimalProperty(propInfo, string.IsNullOrEmpty(e.Value?.ToString()) ? null : decimal.Parse(e.Value.ToString())))" class="form-control" step="0.01" />
-                            }
-                            else if (underlyingType == typeof(double))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetDoubleProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetDoubleProperty(propInfo, double.Parse(e.Value?.ToString() ?? "0")))" class="form-control" step="0.01" />
-                            }
-                            else if (underlyingType == typeof(double?))
-                            {
-                                <input type="number" id="@@propInfo.Name" value="@@GetNullableDoubleProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDoubleProperty(propInfo, string.IsNullOrEmpty(e.Value?.ToString()) ? null : double.Parse(e.Value.ToString())))" class="form-control" step="0.01" />
-                            }
-                            else if (underlyingType == typeof(bool))
-                            {
-                                <input type="checkbox" id="@@propInfo.Name" checked="@@GetBoolProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetBoolProperty(propInfo, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
-                            }
-                            else if (underlyingType == typeof(bool?))
-                            {
-                                <input type="checkbox" id="@@propInfo.Name" checked="@@GetBoolProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetBoolProperty(propInfo, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
-                            }
-                            else if (underlyingType == typeof(int) && propInfo.Name == "is_active")
-                            {
-                                <input type="checkbox" id="@@propInfo.Name" checked="@@GetIntAsBoolProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetIntAsBoolProperty(propInfo, bool.Parse(e.Value?.ToString() ?? "false")))" class="form-check-input" />
-                            }
-                            else if (underlyingType == typeof(DateTime))
-                            {
-                                <input type="date" id="@@propInfo.Name" value="@@GetDateTimeProperty(propInfo).ToString("yyyy-MM-dd")" @@onchange="@@(async (ChangeEventArgs e) => await SetDateTimeProperty(propInfo, DateTime.Parse(e.Value?.ToString() ?? DateTime.MinValue.ToString())))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(DateTime?))
-                            {
-                                <input type="date" id="@@propInfo.Name" value="@@(GetNullableDateTimeProperty(propInfo)?.ToString("yyyy-MM-dd") ?? "")" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDateTimeProperty(propInfo, string.IsNullOrEmpty(e.Value?.ToString()) ? null : DateTime.Parse(e.Value.ToString())))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(DateOnly))
-                            {
-                                <input type="date" id="@@propInfo.Name" value="@@GetDateOnlyProperty(propInfo).ToString("yyyy-MM-dd")" @@onchange="@@(async (ChangeEventArgs e) => await SetDateOnlyProperty(propInfo, DateOnly.FromDateTime(DateTime.Parse(e.Value?.ToString() ?? DateTime.MinValue.ToString()))))" class="form-control" />
-                            }
-                            else if (underlyingType == typeof(DateOnly?))
-                            {
-                                <input type="date" id="@@propInfo.Name" value="@@(GetNullableDateOnlyProperty(propInfo)?.ToString("yyyy-MM-dd") ?? "")" @@onchange="@@(async (ChangeEventArgs e) => await SetNullableDateOnlyProperty(propInfo, string.IsNullOrEmpty(e.Value?.ToString()) ? null : DateOnly.FromDateTime(DateTime.Parse(e.Value.ToString()))))" class="form-control" />
-                            }
-                            else
-                            {
-                                <input type="text" id="@@propInfo.Name" value="@@GetStringProperty(propInfo)" @@onchange="@@(async (ChangeEventArgs e) => await SetStringProperty(propInfo, e.Value?.ToString()))" class="form-control" />
-                            }
-                        </td>
-                    }
-                </tr>
-            }
-        </table>
-        @*
-        @@foreach (var property in GetReadOnlyProperties())
-        {
-            <div class="mb-3">
-                <label class="form-label">@@GetPropertyLabel(property)</label>
-                <div class="form-control-plaintext">@@GetPropertyValue(@(Model.DomainVar), property)?.ToString()</div>
-            </div>
-        }
-        *@
-	</div>
-	
-	<div class="mb-3">
-		<button type="submit" class="btn btn-primary">Save</button>
-		<button type="button" class="btn btn-secondary" @@onclick="Cancel">Cancel</button>
-	</div>
-</EditForm>
-    </div>
-    
-    <!-- Tab 2 -->
-    <div class="tab-pane fade @@(activeTab == "tab2" ? "show active" : "")" 
-         id="tab2-pane" 
-         role="tabpanel" 
-         aria-labelledby="tab2-tab">
-        <div class="text-center">
-            Hello from Tab 2
-        </div>
-    </div>
-</div>
+<TabControl Id="editTabs" Tabs="@@editTabs" ActiveTab="@@activeTabIndex" OnTabChanged="@@OnTabChanged" />
 
 @@code {
 	[Parameter]
@@ -266,7 +55,8 @@ else
 	private Dictionary<string, List<EnumHelper>> enumData = new Dictionary<string, List<EnumHelper>>();
 	
 	// Tab management
-	private string activeTab = "edit";
+	private List<TabItem> editTabs = new();
+	private int activeTabIndex = 0;
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -279,7 +69,199 @@ else
 	
 		// Load enum data for dropdowns
 		await LoadEnumData();
+		InitializeTabs();
 	}
+	
+	private void InitializeTabs()
+	{
+		editTabs = new List<TabItem>
+		{
+			new TabItem 
+			{ 
+				Title = "Edit",
+				Content = CreateEditTabContent()
+			},
+			new TabItem 
+			{ 
+				Title = "Tab 2",
+				Content = CreateTab2Content()
+			}
+		};
+	}
+	
+	private RenderFragment CreateEditTabContent() => builder =>
+	{
+		builder.OpenComponent<EditForm>(0);
+		builder.AddAttribute(1, "Model", @(Model.DomainVar));
+		builder.AddAttribute(2, "OnValidSubmit", EventCallback.Factory.Create<EditContext>(this, HandleSubmit));
+		builder.AddAttribute(3, "ChildContent", (RenderFragment<EditContext>)(context => editBuilder =>
+		{
+			editBuilder.OpenElement(4, "div");
+			editBuilder.AddAttribute(5, "class", "form-group");
+			
+			// Add the form table content here
+			editBuilder.OpenElement(6, "table");
+			editBuilder.AddAttribute(7, "class", "table table-borderless");
+			
+			// Generate dynamic form fields
+			var properties = GetEditableProperties();
+			var propertiesPerRow = 3;
+			
+			for (int i = 0; i < properties.Length; i += propertiesPerRow)
+			{
+				editBuilder.OpenElement(8 + i, "tr");
+				
+				for (int j = 0; j < propertiesPerRow && (i + j) < properties.Length; j++)
+				{
+					var propInfo = properties[i + j];
+					editBuilder.OpenElement(9 + i + j, "td");
+					editBuilder.AddAttribute(10 + i + j, "style", "width: 33%; padding: 0.5rem;");
+					
+					// Label
+					editBuilder.OpenElement(11 + i + j, "div");
+					editBuilder.AddAttribute(12 + i + j, "class", "mb-2");
+					
+					editBuilder.OpenElement(13 + i + j, "label");
+					editBuilder.AddAttribute(14 + i + j, "for", propInfo.Name);
+					editBuilder.AddAttribute(15 + i + j, "class", "form-label");
+					editBuilder.AddContent(16 + i + j, GetPropertyLabel(propInfo));
+					editBuilder.CloseElement(); // label
+					
+					// Input field based on type
+					var underlyingType = Nullable.GetUnderlyingType(propInfo.PropertyType) ?? propInfo.PropertyType;
+					
+					if (IsEnumForeignKey(propInfo))
+					{
+						// Enum dropdown
+						editBuilder.OpenElement(17 + i + j, "select");
+						editBuilder.AddAttribute(18 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(19 + i + j, "class", "form-control");
+						editBuilder.AddAttribute(20 + i + j, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, async (e) => await SetEnumProperty(propInfo, e.Value?.ToString() ?? "")));
+						
+						editBuilder.OpenElement(21 + i + j, "option");
+						editBuilder.AddAttribute(22 + i + j, "value", "");
+						editBuilder.AddContent(23 + i + j, "-- Select --");
+						editBuilder.CloseElement(); // option
+						
+						if (enumData.ContainsKey(propInfo.Name))
+						{
+							var currentValue = GetEnumProperty(propInfo);
+							foreach (var enumItem in enumData[propInfo.Name])
+							{
+								editBuilder.OpenElement(24 + i + j, "option");
+								editBuilder.AddAttribute(25 + i + j, "value", enumItem.id.ToString());
+								if (enumItem.id == currentValue)
+								{
+									editBuilder.AddAttribute(26 + i + j, "selected", "selected");
+								}
+								editBuilder.AddContent(27 + i + j, enumItem.rwkString);
+								editBuilder.CloseElement(); // option
+							}
+						}
+						
+						editBuilder.CloseElement(); // select
+					}
+					else if (underlyingType == typeof(string))
+					{
+						editBuilder.OpenElement(17 + i + j, "input");
+						editBuilder.AddAttribute(18 + i + j, "type", "text");
+						editBuilder.AddAttribute(19 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(20 + i + j, "value", GetStringProperty(propInfo));
+						editBuilder.AddAttribute(21 + i + j, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, async (e) => await SetStringProperty(propInfo, e.Value?.ToString() ?? "")));
+						editBuilder.AddAttribute(22 + i + j, "class", "form-control");
+						editBuilder.CloseElement(); // input
+					}
+					else if (underlyingType == typeof(int))
+					{
+						editBuilder.OpenElement(17 + i + j, "input");
+						editBuilder.AddAttribute(18 + i + j, "type", "number");
+						editBuilder.AddAttribute(19 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(20 + i + j, "value", GetIntProperty(propInfo).ToString());
+						editBuilder.AddAttribute(21 + i + j, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, async (e) => await SetIntProperty(propInfo, int.TryParse(e.Value?.ToString(), out var val) ? val : 0)));
+						editBuilder.AddAttribute(22 + i + j, "class", "form-control");
+						editBuilder.CloseElement(); // input
+					}
+					else if (underlyingType == typeof(long))
+					{
+						editBuilder.OpenElement(17 + i + j, "input");
+						editBuilder.AddAttribute(18 + i + j, "type", "number");
+						editBuilder.AddAttribute(19 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(20 + i + j, "value", GetLongProperty(propInfo).ToString());
+						editBuilder.AddAttribute(21 + i + j, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, async (e) => await SetLongProperty(propInfo, long.TryParse(e.Value?.ToString(), out var val) ? val : 0)));
+						editBuilder.AddAttribute(22 + i + j, "class", "form-control");
+						editBuilder.CloseElement(); // input
+					}
+					else if (underlyingType == typeof(bool))
+					{
+						editBuilder.OpenElement(17 + i + j, "input");
+						editBuilder.AddAttribute(18 + i + j, "type", "checkbox");
+						editBuilder.AddAttribute(19 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(20 + i + j, "checked", GetBoolProperty(propInfo));
+						editBuilder.AddAttribute(21 + i + j, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, async (e) => await SetBoolProperty(propInfo, bool.TryParse(e.Value?.ToString(), out var val) ? val : false)));
+						editBuilder.AddAttribute(22 + i + j, "class", "form-check-input");
+						editBuilder.CloseElement(); // input
+					}
+					else if (underlyingType == typeof(DateTime))
+					{
+						editBuilder.OpenElement(17 + i + j, "input");
+						editBuilder.AddAttribute(18 + i + j, "type", "date");
+						editBuilder.AddAttribute(19 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(20 + i + j, "value", GetDateTimeProperty(propInfo).ToString("yyyy-MM-dd"));
+						editBuilder.AddAttribute(21 + i + j, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, async (e) => await SetDateTimeProperty(propInfo, DateTime.Parse(e.Value?.ToString() ?? DateTime.MinValue.ToString()))));
+						editBuilder.AddAttribute(22 + i + j, "class", "form-control");
+						editBuilder.CloseElement(); // input
+					}
+					else
+					{
+						// Default to string input
+						editBuilder.OpenElement(17 + i + j, "input");
+						editBuilder.AddAttribute(18 + i + j, "type", "text");
+						editBuilder.AddAttribute(19 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(20 + i + j, "value", GetStringProperty(propInfo));
+						editBuilder.AddAttribute(21 + i + j, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, async (e) => await SetStringProperty(propInfo, e.Value?.ToString() ?? "")));
+						editBuilder.AddAttribute(22 + i + j, "class", "form-control");
+						editBuilder.CloseElement(); // input
+					}
+					
+					editBuilder.CloseElement(); // div mb-2
+					editBuilder.CloseElement(); // td
+				}
+				
+				editBuilder.CloseElement(); // tr
+			}
+			
+			editBuilder.CloseElement(); // table
+			editBuilder.CloseElement(); // div
+			
+			// Add buttons
+			editBuilder.OpenElement(9, "div");
+			editBuilder.AddAttribute(10, "class", "mb-3");
+			
+			editBuilder.OpenElement(11, "button");
+			editBuilder.AddAttribute(12, "type", "submit");
+			editBuilder.AddAttribute(13, "class", "btn btn-primary");
+			editBuilder.AddContent(14, "Save");
+			editBuilder.CloseElement(); // button
+			
+			editBuilder.OpenElement(15, "button");
+			editBuilder.AddAttribute(16, "type", "button");
+			editBuilder.AddAttribute(17, "class", "btn btn-secondary");
+			editBuilder.AddAttribute(18, "onclick", EventCallback.Factory.Create(this, Cancel));
+			editBuilder.AddContent(19, "Cancel");
+			editBuilder.CloseElement(); // button
+			
+			editBuilder.CloseElement(); // div
+		}));
+		builder.CloseComponent(); // EditForm
+	};
+	
+	private RenderFragment CreateTab2Content() => builder =>
+	{
+		builder.OpenElement(0, "div");
+		builder.AddAttribute(1, "class", "text-center");
+		builder.AddContent(2, "Hello from Tab 2");
+		builder.CloseElement();
+	};
 	
 	// Method to identify if a property is an enum foreign key
 	private bool IsEnumForeignKey(System.Reflection.PropertyInfo propInfo)
@@ -290,61 +272,74 @@ else
 			   !string.IsNullOrEmpty(columnInfo.fkType) &&
 			   columnInfo.fkType.ToLower() == "enum";
 	}
-	
-	// Method to load enum data for all enum foreign key properties
+
+	// Load enum data for dropdowns
 	private async Task LoadEnumData()
 	{
-		var enumProperties = GetEditableProperties().Where(IsEnumForeignKey);
-		
-		foreach (var propInfo in enumProperties)
+		try
 		{
-			var columnInfo = propInfo.GetCustomAttribute<ColumnInfoAttribute>();
-			if (columnInfo != null && !string.IsNullOrEmpty(columnInfo.fkObject))
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+			var properties = GetEditableProperties();
+			
+			foreach (var propInfo in properties)
 			{
-				try
+				if (IsEnumForeignKey(propInfo))
 				{
-					var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-					var enumItems = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/{columnInfo.fkObject.ToLower()}/enum");
-					if (enumItems != null)
+					var columnInfo = propInfo.GetCustomAttribute<ColumnInfoAttribute>();
+					if (columnInfo != null && !string.IsNullOrEmpty(columnInfo.fkObject))
 					{
-						enumData[propInfo.Name] = enumItems;
+						var enumDataResult = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/{columnInfo.fkObject.ToLower()}/enum");
+						if (enumDataResult != null)
+						{
+							enumData[propInfo.Name] = enumDataResult;
+						}
 					}
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine($"Error loading enum data for {columnInfo.fkObject}: {ex.Message}");
 				}
 			}
 		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error loading enum data: {ex.Message}");
+		}
 	}
 
-	async Task HandleSubmit()
+	// Tab management method
+	private void OnTabChanged(int tabIndex)
 	{
-		var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+		activeTabIndex = tabIndex;
+		StateHasChanged();
+	}
 
-		if (id is not null) {
-			
-			var result = await remoteClient.PutAsJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}", @(Model.DomainVar));
-			if (result.IsSuccessStatusCode)
-				{
-					var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
-					if (readResult is not null) 
-					{
-						@(Model.DomainVar) = readResult;
-					}
-				}
-		}
-		else
+	async Task HandleSubmit(EditContext context)
+	{
+		if (context.Validate())
 		{
-			var result = await remoteClient.PostAsJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)", @(Model.DomainVar));	
-			if (result.IsSuccessStatusCode)
+			try
+			{
+				var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+				if (id is null)
 				{
-					var readResult = await result.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
-					if (readResult is not null)
+					// Create new record
+					var response = await remoteClient.PostAsJsonAsync($"api/@(Model.DomainVar)", @(Model.DomainVar));
+					if (response.IsSuccessStatusCode)
 					{
-						@(Model.DomainVar) = readResult;
+						var createdObj = await response.Content.ReadFromJsonAsync<@(Model.DomainObj)>();
+						if (createdObj != null)
+						{
+							@(Model.DomainVar) = createdObj;
+						}
 					}
 				}
+				else
+				{
+					// Update existing record
+					await remoteClient.PutAsJsonAsync($"api/@(Model.DomainVar)/{id}", @(Model.DomainVar));
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error saving @(Model.DomainVar): {ex.Message}");
+			}
 		}
 
 		// Navigate back to list after successful save
@@ -355,13 +350,6 @@ else
 	{
 		Navigation.NavigateTo("/@(Model.DomainVar)");
 	}
-	
-	// Tab management method
-	private void SetActiveTab(string tabName)
-	{
-		activeTab = tabName;
-		StateHasChanged();
-	}
 
 	// Helper methods using ReflectionHelper
 	private System.Reflection.PropertyInfo[] GetEditableProperties()
@@ -369,40 +357,88 @@ else
 		return ReflectionHelper.GetDisplayProperties<@(Model.DomainObj)>();
 	}
 
-	private System.Reflection.PropertyInfo[] GetReadOnlyProperties()
-	{
-		// Get properties that have ColumnInfoAttribute but are typically read-only (like created_date, last_updated, etc.)
-		var allLabeled = ReflectionHelper.GetAllLabeledProperties<@(Model.DomainObj)>();
-		var editable = GetEditableProperties();
-		
-		return allLabeled.Except(editable)
-						.Where(p => p.Name.ToLower().Contains("created") || 
-								   p.Name.ToLower().Contains("updated") || 
-								   p.Name.ToLower().Contains("version") ||
-								   p.Name.ToLower() == "id")
-						.ToArray();
-	}
-
 	private string GetPropertyLabel(System.Reflection.PropertyInfo propInfo)
 	{
 		return ReflectionHelper.GetPropertyLabel(propInfo);
 	}
 
-	// Property-based getters and setters for bind-Value
+	// Property getter methods
 	private string GetStringProperty(System.Reflection.PropertyInfo propInfo)
 	{
 		return ReflectionHelper.GetPropertyValueAsString(@(Model.DomainVar), propInfo);
 	}
 
+	private int GetIntProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsInt(@(Model.DomainVar), propInfo);
+	}
+
+	private int? GetNullableIntProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsNullableInt(@(Model.DomainVar), propInfo);
+	}
+
+	private long GetLongProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsLong(@(Model.DomainVar), propInfo);
+	}
+
+	private long? GetNullableLongProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsNullableLong(@(Model.DomainVar), propInfo);
+	}
+
+	private decimal GetDecimalProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsDecimal(@(Model.DomainVar), propInfo);
+	}
+
+	private decimal? GetNullableDecimalProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsNullableDecimal(@(Model.DomainVar), propInfo);
+	}
+
+	private bool GetBoolProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsBool(@(Model.DomainVar), propInfo);
+	}
+
+	private bool? GetNullableBoolProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsNullableBool(@(Model.DomainVar), propInfo);
+	}
+
+	private DateTime GetDateTimeProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsDateTime(@(Model.DomainVar), propInfo);
+	}
+
+	private DateTime? GetNullableDateTimeProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsNullableDateTime(@(Model.DomainVar), propInfo);
+	}
+
+	private DateOnly GetDateOnlyProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsDateOnly(@(Model.DomainVar), propInfo);
+	}
+
+	private DateOnly? GetNullableDateOnlyProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		return ReflectionHelper.GetPropertyValueAsNullableDateOnly(@(Model.DomainVar), propInfo);
+	}
+
+	private long GetEnumProperty(System.Reflection.PropertyInfo propInfo)
+	{
+		var value = propInfo.GetValue(@(Model.DomainVar));
+		return value != null ? Convert.ToInt64(value) : 0;
+	}
+
+	// Property setter methods
 	private async Task SetStringProperty(System.Reflection.PropertyInfo propInfo, string value)
 	{
 		propInfo.SetValue(@(Model.DomainVar), value);
 		await InvokeAsync(StateHasChanged);
-	}
-
-	private int GetIntProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsInt(@(Model.DomainVar), propInfo);
 	}
 
 	private async Task SetIntProperty(System.Reflection.PropertyInfo propInfo, int value)
@@ -411,20 +447,10 @@ else
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private int? GetNullableIntProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsNullableInt(@(Model.DomainVar), propInfo);
-	}
-
 	private async Task SetNullableIntProperty(System.Reflection.PropertyInfo propInfo, int? value)
 	{
 		propInfo.SetValue(@(Model.DomainVar), value);
 		await InvokeAsync(StateHasChanged);
-	}
-
-	private long GetLongProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsLong(@(Model.DomainVar), propInfo);
 	}
 
 	private async Task SetLongProperty(System.Reflection.PropertyInfo propInfo, long value)
@@ -433,20 +459,10 @@ else
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private long? GetNullableLongProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsNullableLong(@(Model.DomainVar), propInfo);
-	}
-
 	private async Task SetNullableLongProperty(System.Reflection.PropertyInfo propInfo, long? value)
 	{
 		propInfo.SetValue(@(Model.DomainVar), value);
 		await InvokeAsync(StateHasChanged);
-	}
-
-	private decimal GetDecimalProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsDecimal(@(Model.DomainVar), propInfo);
 	}
 
 	private async Task SetDecimalProperty(System.Reflection.PropertyInfo propInfo, decimal value)
@@ -455,42 +471,10 @@ else
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private decimal? GetNullableDecimalProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsNullableDecimal(@(Model.DomainVar), propInfo);
-	}
-
 	private async Task SetNullableDecimalProperty(System.Reflection.PropertyInfo propInfo, decimal? value)
 	{
 		propInfo.SetValue(@(Model.DomainVar), value);
 		await InvokeAsync(StateHasChanged);
-	}
-
-	private double GetDoubleProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsDouble(@(Model.DomainVar), propInfo);
-	}
-
-	private async Task SetDoubleProperty(System.Reflection.PropertyInfo propInfo, double value)
-	{
-		propInfo.SetValue(@(Model.DomainVar), value);
-		await InvokeAsync(StateHasChanged);
-	}
-
-	private double? GetNullableDoubleProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsNullableDouble(@(Model.DomainVar), propInfo);
-	}
-
-	private async Task SetNullableDoubleProperty(System.Reflection.PropertyInfo propInfo, double? value)
-	{
-		propInfo.SetValue(@(Model.DomainVar), value);
-		await InvokeAsync(StateHasChanged);
-	}
-
-	private bool GetBoolProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsBool(@(Model.DomainVar), propInfo);
 	}
 
 	private async Task SetBoolProperty(System.Reflection.PropertyInfo propInfo, bool value)
@@ -499,20 +483,10 @@ else
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private bool? GetNullableBoolProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsNullableBool(@(Model.DomainVar), propInfo);
-	}
-
 	private async Task SetNullableBoolProperty(System.Reflection.PropertyInfo propInfo, bool? value)
 	{
 		propInfo.SetValue(@(Model.DomainVar), value);
 		await InvokeAsync(StateHasChanged);
-	}
-
-	private DateTime GetDateTimeProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsDateTime(@(Model.DomainVar), propInfo);
 	}
 
 	private async Task SetDateTimeProperty(System.Reflection.PropertyInfo propInfo, DateTime value)
@@ -521,20 +495,10 @@ else
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private DateTime? GetNullableDateTimeProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsNullableDateTime(@(Model.DomainVar), propInfo);
-	}
-
 	private async Task SetNullableDateTimeProperty(System.Reflection.PropertyInfo propInfo, DateTime? value)
 	{
 		propInfo.SetValue(@(Model.DomainVar), value);
 		await InvokeAsync(StateHasChanged);
-	}
-
-	private DateOnly GetDateOnlyProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsDateOnly(@(Model.DomainVar), propInfo);
 	}
 
 	private async Task SetDateOnlyProperty(System.Reflection.PropertyInfo propInfo, DateOnly value)
@@ -543,55 +507,18 @@ else
 		await InvokeAsync(StateHasChanged);
 	}
 
-	private DateOnly? GetNullableDateOnlyProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		return ReflectionHelper.GetPropertyValueAsNullableDateOnly(@(Model.DomainVar), propInfo);
-	}
-
 	private async Task SetNullableDateOnlyProperty(System.Reflection.PropertyInfo propInfo, DateOnly? value)
 	{
 		propInfo.SetValue(@(Model.DomainVar), value);
 		await InvokeAsync(StateHasChanged);
 	}
 
-	// Special handling for int properties that should be displayed as booleans (like is_active)
-	private bool GetIntAsBoolProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		var intValue = ReflectionHelper.GetPropertyValueAsInt(@(Model.DomainVar), propInfo);
-		return intValue != 0;
-	}
-
-	private async Task SetIntAsBoolProperty(System.Reflection.PropertyInfo propInfo, bool value)
-	{
-		propInfo.SetValue(@(Model.DomainVar), value ? 1 : 0);
-		await InvokeAsync(StateHasChanged);
-	}
-	
-	// Enum foreign key property getter and setter
-	private string GetEnumProperty(System.Reflection.PropertyInfo propInfo)
-	{
-		var value = propInfo.GetValue(@(Model.DomainVar));
-		return value?.ToString() ?? "";
-	}
-	
 	private async Task SetEnumProperty(System.Reflection.PropertyInfo propInfo, string value)
 	{
-		if (string.IsNullOrEmpty(value))
+		if (long.TryParse(value, out var longValue))
 		{
-			propInfo.SetValue(@(Model.DomainVar), null);
+			propInfo.SetValue(@(Model.DomainVar), longValue);
+			await InvokeAsync(StateHasChanged);
 		}
-		else
-		{
-			// Try to parse as long (for ID values)
-			if (long.TryParse(value, out long longValue))
-			{
-				propInfo.SetValue(@(Model.DomainVar), longValue);
-			}
-			else
-			{
-				propInfo.SetValue(@(Model.DomainVar), value);
-			}
-		}
-		await InvokeAsync(StateHasChanged);
 	}
-}   
+}
