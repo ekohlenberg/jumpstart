@@ -110,6 +110,17 @@
 	}
 	var rwkExpression = string.Join(" AND ", rwkExpressions);
 	
+	// Build history column list for the history query
+	var historyColumns = new List<string>();
+	foreach(var attr in attributes)
+	{
+		if (attr.Name != "id")
+		{
+			historyColumns.Add("history.@(schemaName)_@(tableName)." + attr.Name);
+		}
+	}
+	var historyColumnList = historyColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", historyColumns) : "";
+	
         <text>
 -- =====================================
 -- Query for @(domainObj) (@(schemaName).@(tableName))
@@ -217,7 +228,7 @@ INSERT INTO core.sql (
         history.@(schemaName)_@(tableName).created_by,
         history.@(schemaName)_@(tableName).last_updated,
         history.@(schemaName)_@(tableName).last_updated_by,
-        history.@(schemaName)_@(tableName).version@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns.Select(col => "history.@(schemaName)_@(tableName)." + col.Replace("@(schemaName).@(tableName).", ""))) : "")
+        history.@(schemaName)_@(tableName).version@(historyColumnList)
     FROM history.@(schemaName)_@(tableName)
     WHERE history.@(schemaName)_@(tableName).@(tableName)_id = ^(id)
     ORDER BY history.@(schemaName)_@(tableName).last_updated DESC;',
