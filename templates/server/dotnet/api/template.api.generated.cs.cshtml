@@ -102,9 +102,9 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing GET History for ID={id}");
 
-            List<@(domainObj)History> historyList = @(domainObj)Logic.Create().select<@(domainObj)History>();
+            List<@(domainObj)History> historyList = @(domainObj)Logic.Create().history(id);
 
-            return historyList.Where(h => h.@(Model.TableName)_id == id).OrderByDescending(h => h.last_updated);
+            return historyList;
         }
     }
 }

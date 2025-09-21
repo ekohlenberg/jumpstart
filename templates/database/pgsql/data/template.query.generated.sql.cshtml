@@ -180,6 +180,36 @@ INSERT INTO core.sql (
     1
 );
 
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+    last_updated, 
+    last_updated_by,
+    is_active,
+    version
+) VALUES (
+     nextval('core.sql_identity'),
+    '@(schemaName).@(tableName)-get-history',
+    'SELECT 
+        history.@(schemaName)_@(tableName).@(tableName)_id,
+        history.@(schemaName)_@(tableName).id,
+        history.@(schemaName)_@(tableName).is_active,
+        history.@(schemaName)_@(tableName).created_by,
+        history.@(schemaName)_@(tableName).last_updated,
+        history.@(schemaName)_@(tableName).last_updated_by,
+        history.@(schemaName)_@(tableName).version@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns.Select(col => "history.@(schemaName)_@(tableName)." + col.Replace("@(schemaName).@(tableName).", ""))) : "")
+    FROM history.@(schemaName)_@(tableName)
+    WHERE history.@(schemaName)_@(tableName).@(tableName)_id = ^(id)
+    ORDER BY history.@(schemaName)_@(tableName).last_updated DESC;',
+    'Select all history records for @(domainObj) where @(tableName)_id matches the provided id',
+    NOW(),
+    CURRENT_USER,
+    1,
+    1
+);
+
 
         </text>
     

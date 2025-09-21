@@ -37,15 +37,33 @@ namespace @namespaceName
         {
             return select<@(domainObj)>();
         }
+
+       
     
         public  List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new()
         {
             Console.WriteLine("Processing @(domainObj)Logic select<TBaseObject> List");
 
-            List<TBaseObject> @(domainVar)s = DBPersist.ExecuteQueryByName<TBaseObject>("@(schemaName).@(tableName)-select");
+            List<TBaseObject> @(domainVar)s = select<TBaseObject>("@(schemaName).@(tableName)-select");
 
             
             return @(domainVar)s;
+        }
+
+        public List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new()
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic select<TBaseObject> with query: {queryName}");
+
+            List<TBaseObject> @(domainVar)s = DBPersist.ExecuteQueryByName<TBaseObject>(queryName);
+
+            return @(domainVar)s;
+        }
+
+         public  List<@(domainObj)History> history(long id)
+        {
+            List<@(domainObj)History> @(domainVar)History = DBPersist.ExecuteQueryByName<@(domainObj)History>("@(schemaName).@(tableName)-get-history", new BaseObject() { { "id", id } });
+
+            return @(domainVar)History;
         }
 
         public  @(domainObj) get(long id)
