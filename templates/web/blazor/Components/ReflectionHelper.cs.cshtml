@@ -18,8 +18,8 @@ namespace @Model.Namespace
             var type = typeof(T);
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                       .Where(p => p.CanRead && 
-                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null 
-                                  )
+                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null &&
+                                  !p.Name.EndsWith("_id"))
                       .OrderBy(p => GetPropertyOrder(p))
                       .ToArray();
         }
@@ -33,7 +33,8 @@ namespace @Model.Namespace
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                       .Where(p => p.CanRead && 
-                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null )
+                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null &&
+                                  !p.Name.EndsWith("_id"))
                       .OrderBy(p => GetPropertyOrder(p))
                       .ToArray();
         }
