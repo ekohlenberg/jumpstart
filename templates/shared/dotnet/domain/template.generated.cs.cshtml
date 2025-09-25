@@ -205,7 +205,7 @@ namespace @namespaceName
                         {
                             string fkAttrName = alias + "_" + fkAttr.Name;
                              <text>
-            [ColumnInfo("@aliasLabel @fkAttr.Label", "@fkAttr.FkObject", "@fkAttr.FkType", "@fkAttr.FkTable", "@fkAttr.FkVar")]
+            [ColumnInfo("@fk.Label", "@fkAttr.FkObject", "@fkAttr.FkType", "@fkAttr.FkTable", "@fkAttr.FkVar")]
             public @fkAttr.DotNetType @fkAttrName
             {
                 get
