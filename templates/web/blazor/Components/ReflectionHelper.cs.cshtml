@@ -24,6 +24,17 @@ namespace @Model.Namespace
                       .ToArray();
         }
 
+      public static PropertyInfo[] GetEditFormProperties<T>()
+        {
+            var type = typeof(T);
+            return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                      .Where(p => p.CanRead && 
+                                  p.GetCustomAttribute<ColumnInfoAttribute>() != null
+                                  )
+                      .OrderBy(p => GetPropertyOrder(p))
+                      .ToArray();
+        }
+
         /// <summary>
         /// Gets all properties that should be displayed in UI (has ColumnInfoAttribute and doesn't end with _id)
         /// </summary>

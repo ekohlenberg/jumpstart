@@ -21,7 +21,7 @@ namespace @Model.Namespace
                     if (!string.IsNullOrEmpty(attr.FkObject))
                     {
                     <text>
-                    @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                    @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkVar");
                     </text>
                     }
                 }
@@ -61,7 +61,7 @@ namespace @Model.Namespace
                     if (!string.IsNullOrEmpty(attr.FkObject))
                     {
                         <text>
-                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkVar");
                         </text>
                     }
                 }

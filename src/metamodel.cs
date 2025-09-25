@@ -216,11 +216,6 @@ namespace jumpstart {
         }
 
         public readonly string  CR = "\n";
-        protected static string ConvertToPascalCase(string input)
-        {
-            string[] parts = input.Split('_');
-            return string.Concat(Array.ConvertAll(parts, part => char.ToUpper(part[0]) + part.Substring(1).ToLower()));
-        }
     }
     public class MetaAttribute : MetaBaseElement
     {
@@ -233,7 +228,7 @@ namespace jumpstart {
 
         public string PascalName {
             get {
-                if (_pascalName == null) _pascalName =  ConvertToPascalCase(Name);
+                if (_pascalName == null) _pascalName =  Utils.ConvertToPascalCase(Name);
                 return _pascalName;
             }
         }
@@ -242,7 +237,10 @@ namespace jumpstart {
         public string Label { get; set; }
         public string RWK { get; set; }
         public string FkType {get;set;}
+        public string FkTable {get;set;}
         public string FkObject {get;set;}
+        public string FkVar {get;set;}
+
 
         public bool IsNullable{get;set;} = false;
 
@@ -313,7 +311,7 @@ namespace jumpstart {
         {
             Namespace = _namespace;
             TableName = tableName;
-            DomainObj = ConvertToPascalCase(tableName);
+            DomainObj = Utils.ConvertToPascalCase(tableName);
             DomainVar = DomainObj.ToLower();
             Name = tableName;
             Label = label;
@@ -524,7 +522,7 @@ namespace jumpstart {
                 {
                     if (!string.IsNullOrEmpty(attribute.FkObject))
                     {
-                        var fkObject = metaObjects.FirstOrDefault(mo => mo.Name == attribute.FkObject);
+                        var fkObject = metaObjects.FirstOrDefault(mo => mo.Name == attribute.FkTable);
                         if (fkObject != null)
                         {
                             // fkObject -> metaObject

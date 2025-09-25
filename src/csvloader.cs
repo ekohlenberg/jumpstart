@@ -15,7 +15,7 @@ public class MetadataRecord {
     public string COLUMN_NAME {get;set;}
     public string COLUMN_LABEL {get;set;}
     public string FK_TYPE {get;set;}
-    public string FK_OBJECT {get;set;}
+    public string FK_TABLE {get;set;}
     public string TEST_DATA_SET {get;set;}
     public string ORDINAL_POSITION {get;set;}
     public string COLUMN_DEFAULT {get;set;}
@@ -142,13 +142,15 @@ public class CSVLoader
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
 				IsNullable =((mr.IS_NULLABLE.Trim() == "1" || mr.IS_NULLABLE.Trim().ToLower() == "yes") ? true : false),
-                FkObject= mr.FK_OBJECT.ToLower(),
+                FkTable= mr.FK_TABLE.ToLower(),
+                FkObject= Utils.ConvertToPascalCase(mr.FK_TABLE.ToLower()),
+                FkVar= Utils.ConvertToPascalCase(mr.FK_TABLE.ToLower()).ToLower(),
                 FkType=mr.FK_TYPE,
                 TestDataSet=mr.TEST_DATA_SET
             };
             bool hasKey = TypeMapping.ConvertMap.ContainsKey(TypeMapping.GetBaseDataType(mr.DATA_TYPE));
 
-            Console.WriteLine($"{mr.TABLE_NAME} {mr.COLUMN_NAME} >{mr.DATA_TYPE}< {hasKey}");
+            Console.WriteLine($"{metaObject.TableName} {attribute.Name} {attribute.SqlDataType} {attribute.FkTable} {attribute.FkObject} {attribute.FkVar} {attribute.FkType} {hasKey}");
             metaObject.Attributes.Add( attribute );
         }
     }

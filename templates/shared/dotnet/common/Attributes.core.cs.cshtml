@@ -29,12 +29,16 @@ namespace @Model.Namespace
 	    public string Label { get; set; }
 		public string fkObject { get; set; }
 		public string fkType { get; set; }
+		public string fkTable { get; set; }
+		public string fkVar { get; set; }
 
-	    public ColumnInfoAttribute(string label, string fkObject = "", string fkType = "")
+	    public ColumnInfoAttribute(string label, string fkObject = "", string fkType = "", string fkTable = "", string fkVar = "")
 	    {
 	        this.Label = label;
 			this.fkObject = fkObject;
 			this.fkType = fkType;
+			this.fkTable = fkTable;
+			this.fkVar = fkVar;
 	    }
 
 	  

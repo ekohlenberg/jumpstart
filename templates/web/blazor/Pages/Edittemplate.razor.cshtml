@@ -393,7 +393,7 @@ else
 	// Helper methods using ReflectionHelper
 	private System.Reflection.PropertyInfo[] GetEditableProperties()
 	{
-		return ReflectionHelper.GetDisplayProperties<@(Model.DomainObj)>();
+		return ReflectionHelper.GetEditFormProperties<@(Model.DomainObj)>();
 	}
 
 	private string GetPropertyLabel(System.Reflection.PropertyInfo propInfo)

@@ -59,7 +59,7 @@ namespace @namespaceName
         @foreach (var attr in Model.Attributes)
         {
             <text>
-            [ColumnInfo("@attr.Label", "@attr.FkObject", "@attr.FkType")]
+            [ColumnInfo("@attr.Label", "@attr.FkObject", "@attr.FkType", "@attr.FkTable", "@attr.FkVar")]
             public @attr.DotNetType @attr.Name
             {
                 get
@@ -173,7 +173,7 @@ namespace @namespaceName
                 var fkObject = (MetaObject)null;
                 foreach(var obj in Model.Model.Objects)
                 {
-                    if (obj.TableName == fk.FkObject)
+                    if (obj.TableName == fk.FkTable)
                     {
                         fkObject = obj;
                         break;
@@ -205,7 +205,7 @@ namespace @namespaceName
                         {
                             string fkAttrName = alias + "_" + fkAttr.Name;
                              <text>
-            [ColumnInfo("@aliasLabel @fkAttr.Label")]
+            [ColumnInfo("@aliasLabel @fkAttr.Label", "@fkAttr.FkObject", "@fkAttr.FkType", "@fkAttr.FkTable", "@fkAttr.FkVar")]
             public @fkAttr.DotNetType @fkAttrName
             {
                 get
