@@ -54,6 +54,27 @@ else
 	// History data
 	private @(Model.DomainObj)History[]? @(Model.DomainVar)HistoryList;
 	
+@{
+	// Get all child relationships
+	var children = Model.Children;
+	
+	if (children.Count > 0)
+	{
+		foreach(var child in children)
+		{
+			var childObject = child.Object;
+			var childRole = child.Role;
+			var childDomainObj = childObject.DomainObj;
+			var childDomainVar = childObject.DomainVar;
+			
+			<text>
+	// Child data for @(childRole)
+	private @(childDomainObj)[]? @(childDomainVar)List;
+			</text>
+		}
+	}
+}
+	
 	// Dictionary to store enum data for dropdowns
 	private Dictionary<string, List<EnumHelper>> enumData = new Dictionary<string, List<EnumHelper>>();
 	
@@ -71,6 +92,9 @@ else
 				
 			// Load history data
 			await LoadHistoryData();
+			
+			// Load child data
+			await LoadChildData();
 		}
 	
 		// Load enum data for dropdowns
@@ -92,6 +116,30 @@ else
 				Title = "History",
 				Content = CreateHistoryTabContent()
 			}
+@{
+
+	
+	if (children.Count > 0)
+	{
+		foreach(var child in children)
+		{
+			var childObject = child.Object;
+			var childRole = child.Role;
+			var childLabel = child.Label;
+			var childDomainObj = childObject.DomainObj;
+			var childDomainVar = childObject.DomainVar;
+			
+			<text>
+			,
+			new TabItem 
+			{ 
+				Title = "@(childDomainObj) @(childRole)",
+				Content = Create@(childDomainVar)_@(childRole)TabContent()
+			}
+			</text>
+		}
+	}
+}
 		};
 	}
 	
@@ -282,6 +330,48 @@ else
 		
 		builder.CloseElement(); // div
 	};
+
+@{
+	// Get all child relationships
+	
+	
+	if (children.Count > 0)
+	{
+		foreach(var child in children)
+		{
+			var childObject = child.Object;
+			var childRole = child.Role;
+			var childLabel = child.Label;
+			var childDomainObj = childObject.DomainObj;
+			var childDomainVar = childObject.DomainVar;
+			
+			<text>
+	private RenderFragment Create@(childDomainVar)_@(childRole)TabContent() => builder =>
+	{
+		builder.OpenElement(0, "div");
+		builder.AddAttribute(1, "class", "mt-3");
+		
+		// Add debug info
+		builder.OpenElement(2, "div");
+		builder.AddAttribute(3, "class", "alert alert-info");
+		builder.AddContent(4, $"@(childLabel) records: {@(childDomainVar)List?.Length ?? 0}");
+		builder.CloseElement(); // div
+		
+		// Add DataTable component
+		builder.OpenComponent<DataTable>(5);
+		builder.AddAttribute(6, "Data", @(childDomainVar)List);
+		builder.AddAttribute(7, "DataType", typeof(@(childDomainObj)));
+		builder.AddAttribute(8, "ShowActions", false);
+		builder.AddAttribute(9, "ShowAddButton", false);
+		builder.CloseComponent(); // DataTable
+		
+		builder.CloseElement(); // div
+	};
+
+			</text>
+		}
+	}
+}
 	
 	// Method to identify if a property is an enum foreign key
 	private bool IsEnumForeignKey(System.Reflection.PropertyInfo propInfo)
@@ -339,6 +429,56 @@ else
 		{
 			Console.WriteLine($"Error loading history data: {ex.Message}");
 			@(Model.DomainVar)HistoryList = new @(Model.DomainObj)History[0];
+		}
+	}
+
+	private async Task LoadChildData()
+	{
+		try
+		{
+			if (id is not null)
+			{
+				var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+@{
+
+	
+	if (children.Count > 0)
+	{
+		foreach(var child in children)
+		{
+			var childObject = child.Object;
+			var childRole = child.Role;
+			var childDomainObj = childObject.DomainObj;
+			var childDomainVar = childObject.DomainVar;
+			
+			<text>
+				@(childDomainVar)List = await remoteClient.GetFromJsonAsync<@(childDomainObj)[]>($"api/@(Model.DomainVar)/{id}/@(childDomainVar)_@(childRole)");
+				Console.WriteLine($"Loaded {@(childDomainVar)List?.Length ?? 0} @(childDomainVar)_@(childRole) records for @(Model.DomainVar) {id}");
+			</text>
+		}
+	}
+}
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error loading child data: {ex.Message}");
+@{
+	
+	if (children.Count > 0)
+	{
+		foreach(var child in children)
+		{
+			var childObject = child.Object;
+			var childDomainObj = childObject.DomainObj;
+			var childDomainVar = childObject.DomainVar;
+			
+			<text>
+			@(childDomainVar)List = new @(childDomainObj)[0];
+			</text>
+		}
+	}
+}
 		}
 	}
 

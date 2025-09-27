@@ -130,7 +130,7 @@ INSERT INTO core.sql (
     'SELECT 
         @(childSchemaName).@(childTableName).id@(childSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", childSelectColumns) : "")@(childFkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", childFkSelectColumns) : "")
     FROM @(childSchemaName).@(childTableName)@(childJoinClauses.Count > 0 ? "\n        " + string.Join("\n        ", childJoinClauses) : "")
-    WHERE @(childSchemaName).@(childTableName).@(childRole) = ^(id)
+    WHERE @(childSchemaName).@(childTableName).@(childRole)_id = ^(id)
     ORDER BY @(childSchemaName).@(childTableName).id;',
     'Select all @(childLabel) records for @(domainObj) with related @(string.Join(", ", childFkTableNames)) information',
     NOW(),
