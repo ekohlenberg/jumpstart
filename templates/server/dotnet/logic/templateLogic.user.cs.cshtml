@@ -23,6 +23,7 @@ namespace @Model.Namespace
         void update(long id, @(domainObj) @(domainVar));
         void put(@(domainObj) @(domainVar));
         void delete( long id );
+        List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new();
         //string getDomainName();
         // Add user-defined methods here
     }

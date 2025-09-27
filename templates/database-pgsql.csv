@@ -15,3 +15,4 @@ postgresql database-current user initial data,model,database/pgsql/data/template
 postgresql database-current user initial data,model,database/pgsql/data/template.event.test.sql.cshtml,./database/data,true
 postgresql database-bash load script,build, database/pgsql/data/load.sh.cshtml,./database/data,true
 postgresql database-query generation,object,database/pgsql/data/template.query.generated.sql.cshtml,./database/data,true
+postgresql database-children query generation,object,database/pgsql/data/template.children.generated.sql.cshtml,./database/data,true

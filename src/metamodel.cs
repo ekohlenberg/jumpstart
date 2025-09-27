@@ -189,6 +189,20 @@ namespace jumpstart {
         };
     }
 
+    public class ChildRelationship
+    {
+        public string Role { get; set; }
+        public string Label { get; set; }
+        public MetaObject Object { get; set; }
+        
+        public ChildRelationship(string role, string label, MetaObject obj)
+        {
+            Role = role;
+            Label = label;
+            Object = obj;
+        }
+    }
+
     public class MetaBaseElement
     {
         public string Name{get;set;}
@@ -278,6 +292,7 @@ namespace jumpstart {
         public MetaModel Model {get;set;}
         
         public List<MetaAttribute> Attributes { get; private set; } = new();
+        public List<ChildRelationship> Children { get; private set; } = new();
 
         public List<MetaAttribute> UserAttributes {
             get 
@@ -330,7 +345,44 @@ namespace jumpstart {
             return result;
         }
 
-        
+        /// <summary>
+        /// Processes children by finding parent foreign keys and establishing parent-child relationships.
+        /// Iterates through all attributes to find foreign keys of type "parent" and adds this object
+        /// to the Children list of the parent object with the appropriate role (column name).
+        /// </summary>
+        /// <param name="allObjects">Collection of all MetaObjects to search for parent references</param>
+        public void ProcessChildren(IEnumerable<MetaObject> allObjects)
+        {
+            foreach (var attribute in Attributes)
+            {
+                // Check if this attribute is a parent foreign key
+                if (!string.IsNullOrEmpty(attribute.FkType) && 
+                    attribute.FkType.ToLower() == "parent" && 
+                    !string.IsNullOrEmpty(attribute.FkTable))
+                {
+                    // Find the parent object by table name
+                    var parentObject = allObjects.FirstOrDefault(mo => mo.TableName == attribute.FkTable);
+                    
+                    if (parentObject != null)
+                    {
+                        // Use the attribute name as the role to distinguish multiple FKs to the same table
+                        string role = attribute.Name.Replace("_id", "");
+                        string label = attribute.Label ?? attribute.Name; // Use label if available, fallback to name
+                        
+                        // Check if this role-object combination already exists
+                        bool alreadyExists = parentObject.Children.Any(child => 
+                            child.Role == role && child.Object == this);
+                        
+                        if (!alreadyExists)
+                        {
+                            parentObject.Children.Add(new ChildRelationship(role, label, this));
+                        }
+                    }
+                }
+            }
+        }
+
+       
     }
 
     public class MetaSchema : MetaBaseElement
@@ -423,6 +475,15 @@ namespace jumpstart {
             }
             return result;  
         }
+
+        public void Process()
+        {
+           foreach(var obj in Objects)
+           {
+                obj.ProcessChildren(Objects);
+           }
+           
+        }   
 
         public void SortMetaObjectsByReference()
         {
@@ -722,7 +783,7 @@ namespace jumpstart {
             return sortedSccIndices.Select(sccIndex => sccs[sccIndex]).ToList();
         }
 
-
+        
 
     }
 

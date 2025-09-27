@@ -66,6 +66,16 @@ namespace @namespaceName
             return @(domainVar)History;
         }
 
+        public List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new()
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic children<TBaseObject> for ID={id}, childSuffix={childSuffix}");
+
+            string queryName = "@(schemaName).@(tableName)-children-" + childSuffix;
+            List<TBaseObject> children = DBPersist.ExecuteQueryByName<TBaseObject>(queryName, new BaseObject() { { "id", id } });
+
+            return children;
+        }
+
         public  @(domainObj) get(long id)
         {
             Console.WriteLine($"Processing @(domainObj)Logic get ID={id}");

@@ -106,5 +106,39 @@ namespace @(namespaceName).Controllers
 
             return historyList;
         }
+
+@{
+    // Get all child relationships
+    var children = Model.Children;
+    
+    if (children.Count > 0)
+    {
+        foreach(var child in children)
+        {
+            var childObject = child.Object;
+            var childRole = child.Role;
+            var childLabel = child.Label;
+            var childDomainObj = childObject.DomainObj;
+            var childDomainVar = childObject.DomainVar;
+            var childDomainObjView = childDomainObj + "View";
+            
+            <text>
+        // GET api/<@(domainObj)Controller>/5/@(childDomainVar)_@(childRole)
+        [HttpGet("{id}/@(childDomainVar)_@(childRole)")]
+        public IEnumerable<@(childDomainObjView)> Get@(childDomainVar)_@(childRole)(long id)
+        {
+            //Console.WriteLine($"Processing GET @(childLabel) for @(domainObj) ID={id}");
+
+            List<@(childDomainObjView)> @(childDomainVar)s = @(domainObj)Logic.Create().children<@(childDomainObjView)>(id, "@(childDomainVar)-@(childRole)");
+
+            return @(childDomainVar)s;
+        }
+
+            </text>
+        }
+    }
+}
+
+        
     }
 }
