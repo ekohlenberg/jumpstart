@@ -45,19 +45,35 @@ else
 
 <TabControl Id="editTabs" Tabs="@@editTabs" ActiveTab="@@activeTabIndex" OnTabChanged="@@OnTabChanged" />
 
-@@code {
+@{
+	
+	
+	if (Model.Children.Count > 0)
+	{
+		<text>
+<div class="mt-4">
+	<h4>Related Records</h4>
+	<TabControl Id="childTabs" Tabs="@@childTabs" ActiveTab="@@activeChildTabIndex" OnTabChanged="@@OnChildTabChanged" />
+</div>
+		</text>
+	}
+}
+
+&at;code {
 	[Parameter]
 	public long? id {get;set;}
 
 	public @(Model.DomainObj) @(Model.DomainVar) {get;set;} = new @(Model.DomainObj)();
 	
+	
+	
 	// History data
 	private @(Model.DomainObj)History[]? @(Model.DomainVar)HistoryList;
 	
 @{
-	// Get all child relationships
+	// Get all child relationships once
 	var children = Model.Children;
-	
+	// Generate child data properties
 	if (children.Count > 0)
 	{
 		foreach(var child in children)
@@ -81,6 +97,10 @@ else
 	// Tab management
 	private List<TabItem> editTabs = new();
 	private int activeTabIndex = 0;
+	
+	// Child tab management
+	private List<TabItem> childTabs = new();
+	private int activeChildTabIndex = 0;
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -100,6 +120,7 @@ else
 		// Load enum data for dropdowns
 		await LoadEnumData();
 		InitializeTabs();
+		InitializeChildTabs();
 	}
 	
 	private void InitializeTabs()
@@ -116,8 +137,14 @@ else
 				Title = "History",
 				Content = CreateHistoryTabContent()
 			}
-@{
+		};
+	}
 
+	private void InitializeChildTabs()
+	{
+		childTabs = new List<TabItem>();
+		
+@{
 	
 	if (children.Count > 0)
 	{
@@ -130,17 +157,15 @@ else
 			var childDomainVar = childObject.DomainVar;
 			
 			<text>
-			,
-			new TabItem 
-			{ 
-				Title = "@(childDomainObj) @(childRole)",
-				Content = Create@(childDomainVar)_@(childRole)TabContent()
-			}
+		childTabs.Add(new TabItem 
+		{ 
+			Title = "@(childObject.Label)",
+			Content = Create@(childDomainVar)_@(childRole)TabContent()
+		});
 			</text>
 		}
 	}
 }
-		};
 	}
 	
 	private RenderFragment CreateEditTabContent() => builder =>
@@ -486,6 +511,13 @@ else
 	private void OnTabChanged(int tabIndex)
 	{
 		activeTabIndex = tabIndex;
+		StateHasChanged();
+	}
+
+	// Child tab management method
+	private void OnChildTabChanged(int tabIndex)
+	{
+		activeChildTabIndex = tabIndex;
 		StateHasChanged();
 	}
 
