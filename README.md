@@ -46,7 +46,7 @@ Jumpstart transforms tabular metadata into complete, production-ready applicatio
 | Component | Technology |
 |-----------|------------|
 | **Backend** | .NET 9, ASP.NET Core |
-| **Database** | PostgreSQL 15+, MS SQL Server 2022+ |
+| **Database** | MS SQL Server 2019+, PostgreSQL 15+ |
 | **Frontend** | Blazor WebAssembly |
 | **Testing** | Generated Persist and HTTP Client |
 | **Templating** | RazorLight |
