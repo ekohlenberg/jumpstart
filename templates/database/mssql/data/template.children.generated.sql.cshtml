@@ -128,11 +128,11 @@ INSERT INTO core.sql (
 	version
 ) VALUES (
     @@sql_id,
-    '@(schemaName).@(tableName)-children-@(childRole)',
+    '@(schemaName).@(tableName)-children-@(childDomainVar)-@(childRole)',
     'SELECT 
         @(childTableName).id@(childSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", childSelectColumns) : "")@(childFkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", childFkSelectColumns) : "")
     FROM @(childSchemaName).@(childTableName)@(childJoinClauses.Count > 0 ? "\n    " + string.Join("\n    ", childJoinClauses) : "")
-    WHERE @(childTableName).@(childRole) = ^(id)
+    WHERE @(childTableName).@(childRole)_id = ^(id)
     ORDER BY @(childTableName).id;',
     'Select all @(childLabel) records for @(domainObj) with related @(string.Join(", ", childFkTableNames)) information',
     SYSTEM_USER,

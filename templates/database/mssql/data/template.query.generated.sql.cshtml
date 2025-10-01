@@ -116,7 +116,7 @@
 	{
 		if (attr.Name != "id")
 		{
-			historyColumns.Add("history.@(schemaName)_@(tableName)." + attr.Name);
+			historyColumns.Add("history." + schemaName + "_" + tableName + "." + attr.Name);
 		}
 	}
 	var historyColumnList = historyColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", historyColumns) : "";
