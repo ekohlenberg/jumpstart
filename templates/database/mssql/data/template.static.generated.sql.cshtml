@@ -13,12 +13,18 @@ DECLARE @@operation_id BIGINT;
 		
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'insert', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+
+		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'put', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
 		
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'update', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
 		
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'delete', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+
+		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'history', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
 		</text>
 
 	}

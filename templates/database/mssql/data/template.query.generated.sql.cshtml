@@ -58,7 +58,7 @@
 		var fkObject = (MetaObject)null;
 		foreach(var obj in metaObject.Model.Objects)
 		{
-			if (obj.TableName == fk.FkObject)
+			if (obj.TableName == fk.FkTable)
 			{
 				fkObject = obj;
 				break;
@@ -98,6 +98,29 @@
 			joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + tableName + "." + fk.Name + " = " + alias + ".id");
 		}
 	}
+	
+	// Build RWK expression for get-by-rwk query
+	var rwkExpressions = new List<string>();
+	foreach(var attr in attributes)
+	{
+		if (attr.RWK == "1")
+		{
+			rwkExpressions.Add(tableName + "." + attr.Name + " = ^(" + attr.Name + ")");
+		}
+	}
+	var rwkExpression = string.Join(" AND ", rwkExpressions);
+	
+	// Build history column list for the history query
+	var historyColumns = new List<string>();
+	foreach(var attr in attributes)
+	{
+		if (attr.Name != "id")
+		{
+			historyColumns.Add("history." + schemaName + "_" + tableName + "." + attr.Name);
+		}
+	}
+	var historyColumnList = historyColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", historyColumns) : "";
+	
         <text>
 -- =====================================
 -- Query for @(domainObj) (@(schemaName).@(tableName))
@@ -122,6 +145,94 @@ INSERT INTO core.sql (
     FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
     ORDER BY @(tableName).id;',
     'Select all @(domainObj) records with related @(string.Join(", ", fkTableNames)) information',
+    SYSTEM_USER,
+	GETDATE(),
+    SYSTEM_USER,
+	1,
+	1	
+);
+
+SET @@sql_id = NEXT VALUE FOR core.sql_identity;
+
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+	created_by,
+    last_updated, 
+    last_updated_by,
+	is_active,
+	version
+) VALUES (
+    @@sql_id,
+    '@(schemaName).@(tableName)-get',
+    'SELECT 
+        @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
+    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
+    WHERE @(tableName).id = ^(id);',
+    'Select single @(domainObj) record by ID with related @(string.Join(", ", fkTableNames)) information',
+    SYSTEM_USER,
+	GETDATE(),
+    SYSTEM_USER,
+	1,
+	1	
+);
+
+SET @@sql_id = NEXT VALUE FOR core.sql_identity;
+
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+	created_by,
+    last_updated, 
+    last_updated_by,
+	is_active,
+	version
+) VALUES (
+    @@sql_id,
+    '@(schemaName).@(tableName)-get-by-rwk',
+    'SELECT 
+        @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
+    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
+    WHERE @(rwkExpression);',
+    'Select single @(domainObj) record by RWK columns with related @(string.Join(", ", fkTableNames)) information',
+    SYSTEM_USER,
+	GETDATE(),
+    SYSTEM_USER,
+	1,
+	1	
+);
+
+SET @@sql_id = NEXT VALUE FOR core.sql_identity;
+
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+	created_by,
+    last_updated, 
+    last_updated_by,
+	is_active,
+	version
+) VALUES (
+    @@sql_id,
+    '@(schemaName).@(tableName)-get-history',
+    'SELECT 
+        history.@(schemaName)_@(tableName).@(tableName)_id,
+        history.@(schemaName)_@(tableName).id,
+        history.@(schemaName)_@(tableName).is_active,
+        history.@(schemaName)_@(tableName).created_by,
+        history.@(schemaName)_@(tableName).last_updated,
+        history.@(schemaName)_@(tableName).last_updated_by,
+        history.@(schemaName)_@(tableName).version@(historyColumnList)
+    FROM history.@(schemaName)_@(tableName)
+    WHERE history.@(schemaName)_@(tableName).@(tableName)_id = ^(id)
+    ORDER BY history.@(schemaName)_@(tableName).last_updated DESC;',
+    'Select all history records for @(domainObj) where @(tableName)_id matches the provided id',
     SYSTEM_USER,
 	GETDATE(),
     SYSTEM_USER,

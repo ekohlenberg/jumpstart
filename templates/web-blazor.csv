@@ -1,6 +1,10 @@
 COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
 dotnet server templates-common,model,shared/dotnet/common/Config.core.cs.cshtml,web/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/Attributes.core.cs.cshtml,web/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,web/common,TRUE
+dotnet server templates-common,model,web/blazor/Components/TabControl.razor.cshtml,web/components,TRUE
+dotnet server templates-common,model,web/blazor/Components/TabItem.cs.cshtml,web/components,TRUE
+dotnet server templates-common,model,web/blazor/Components/DataTable.razor.cshtml,web/components,TRUE
 dotnet server templates-common,model,shared/dotnet/common/Util.core.cs.cshtml,web/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,web/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,web/domain,TRUE
@@ -54,10 +58,11 @@ Blazor wasm content,model,web/blazor/wwwroot/lib/bootstrap/dist/js/bootstrap.esm
 Blazor wasm content,model,web/blazor/wwwroot/lib/bootstrap/dist/js/bootstrap.js.map,web/wwwroot/lib/bootstrap/dist/js,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/lib/bootstrap/dist/js/bootstrap.min.js.map,web/wwwroot/lib/bootstrap/dist/js,FALSE
 Blazor wasm content,model,web/blazor/template.sln,web/blazor,FALSE
+Blazor wasm content,model,web/blazor/Components/ReflectionHelper.cs.cshtml,web/Components,TRUE
 Blazor wasm content,model,web/blazor/Layout/MainLayout.razor.css,web/Layout,FALSE
-Blazor wasm content,model,web/blazor/Layout/MainLayout.razor,web/Layout,TRUE
-Blazor wasm content,model,web/blazor/Layout/NavMenu.razor.cshtml,web/Layout,TRUE
-Blazor wasm content,model,web/blazor/Layout/NavMenu.razor.css,web/Layout,FALSE
+Blazor wasm content,model,web/blazor/Layout/MainLayout.razor.cshtml,web/Layout,TRUE
+Blazor wasm content,model,web/blazor/Layout/NavMenuLayout.razor.cshtml,web/Layout,TRUE
+Blazor wasm content,model,web/blazor/Layout/NavMenuLayout.razor.css,web/Layout,FALSE
 Blazor wasm content,model,web/blazor/App.razor,web,TRUE
 Blazor wasm content,model,web/blazor/Properties/launchSettings.json,web/Properties,FALSE
 Blazor wasm content,model,web/blazor/_Imports.razor.cshtml,web/,TRUE

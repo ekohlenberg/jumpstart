@@ -1,10 +1,16 @@
 ﻿@@page "/@(Model.DomainVar)"
 @@using System.Net.Http;
 @@using Microsoft.Extensions.DependencyInjection;
+@@using System.Reflection;
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
+@using jumpstart;
+@@using System.Collections.Generic;
+@@using @(Model.Namespace).Components;
+
+
 <PageTitle>@(Model.Label)</PageTitle>
 
 <h1>@(Model.Label)</h1>
@@ -17,60 +23,44 @@
 }
 else
 {
-    <table class="table table-striped table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                @foreach( var a in @Model.Attributes)
-                {
-                <text>
-                <th>@a.Label</th>
-                </text>
-            
-                }
-
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @@foreach (var @(Model.DomainVar) in @(Model.DomainVar)List)
-            {
-                <tr>
-                    @foreach( var a in @Model.Attributes)
-                    {
-                    <text>
-                    <td>@@@(Model.DomainVar).@(a.Name).ToString()</td>
-                    </text>
-                    
-                    }
-                    <td><button class="btn btn-primary" @@onclick="@@(()=> Edit@(Model.DomainObj)(@@@(Model.DomainVar).id))">Edit</button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <td><button class="btn btn-primary" @@onclick="@@(()=> Add@(Model.DomainObj)())">Add</button></td>
+    Console.WriteLine($"ListTemplate: About to render DataTable with {@@@(Model.DomainVar)List.Length} items");
+ 
+    
+    <DataTable Data="&at;@(Model.DomainVar)List" 
+               DataType="typeof(@(Model.DomainObj)View)" 
+               ShowActions="true" 
+               ShowAddButton="true"
+               OnEdit="&at;OnEdit@(Model.DomainObj)"
+               OnAdd="&at;OnAdd@(Model.DomainObj)" />
+    
+    Console.WriteLine($"ListTemplate: DataTable rendered");
 }
 
 @@code {
-    protected  @(Model.DomainObj)[]? @(Model.DomainVar)List;
+    protected  @(Model.DomainObj)View[]? @(Model.DomainVar)List;
 
     protected override async Task OnInitializedAsync()
     {
         var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
-        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)[]>("api/@(Model.DomainVar)");
+        @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View[]>("api/@(Model.DomainVar)");
+        
+        Console.WriteLine($"ListTemplate: Loaded {@(Model.DomainVar)List?.Length ?? 0} @(Model.DomainVar) records");
+        if (@(Model.DomainVar)List != null && @(Model.DomainVar)List.Length > 0)
+        {
+            Console.WriteLine($"ListTemplate: First item type: {@(Model.DomainVar)List[0].GetType().Name}");
+        }
     }
 
-    void Add@(Model.DomainObj)()
+    async Task OnAdd@(Model.DomainObj)()
     {
-        
         Navigation.NavigateTo("edit-@(Model.DomainVar)");
     }
 
-    void Edit@(Model.DomainObj)(long id)
+    async Task OnEdit@(Model.DomainObj)(object item)
     {
-        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{id}");
+        var @(Model.DomainVar) = (@(Model.DomainObj)View)item;
+        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{@(Model.DomainVar).id}");
     }
 
-
-   
 }

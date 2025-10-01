@@ -189,6 +189,20 @@ namespace jumpstart {
         };
     }
 
+    public class ChildRelationship
+    {
+        public string Role { get; set; }
+        public string Label { get; set; }
+        public MetaObject Object { get; set; }
+        
+        public ChildRelationship(string role, string label, MetaObject obj)
+        {
+            Role = role;
+            Label = label;
+            Object = obj;
+        }
+    }
+
     public class MetaBaseElement
     {
         public string Name{get;set;}
@@ -216,11 +230,6 @@ namespace jumpstart {
         }
 
         public readonly string  CR = "\n";
-        protected static string ConvertToPascalCase(string input)
-        {
-            string[] parts = input.Split('_');
-            return string.Concat(Array.ConvertAll(parts, part => char.ToUpper(part[0]) + part.Substring(1).ToLower()));
-        }
     }
     public class MetaAttribute : MetaBaseElement
     {
@@ -233,7 +242,7 @@ namespace jumpstart {
 
         public string PascalName {
             get {
-                if (_pascalName == null) _pascalName =  ConvertToPascalCase(Name);
+                if (_pascalName == null) _pascalName =  Utils.ConvertToPascalCase(Name);
                 return _pascalName;
             }
         }
@@ -242,7 +251,10 @@ namespace jumpstart {
         public string Label { get; set; }
         public string RWK { get; set; }
         public string FkType {get;set;}
+        public string FkTable {get;set;}
         public string FkObject {get;set;}
+        public string FkVar {get;set;}
+
 
         public bool IsNullable{get;set;} = false;
 
@@ -275,23 +287,12 @@ namespace jumpstart {
 
         public string Label {get; private set;}
         public string SchemaName {get; set;}
-
-        public string Primary {get;set;}
-
-        public bool IsPrimary
-        {
-            get {
-                bool result = false;
-
-                if (Primary == "1") result = true;
-
-                return result;
-            }
-        }
+        public string NavMenu {get; set;}
 
         public MetaModel Model {get;set;}
         
         public List<MetaAttribute> Attributes { get; private set; } = new();
+        public List<ChildRelationship> Children { get; private set; } = new();
 
         public List<MetaAttribute> UserAttributes {
             get 
@@ -321,15 +322,15 @@ namespace jumpstart {
                 return _globalAttributes;
             }
         }
-        public MetaObject(string _namespace, string tableName, string schemaName, string label, string primary)
+        public MetaObject(string _namespace, string tableName, string schemaName, string label, string navMenu)
         {
             Namespace = _namespace;
             TableName = tableName;
-            DomainObj = ConvertToPascalCase(tableName);
+            DomainObj = Utils.ConvertToPascalCase(tableName);
             DomainVar = DomainObj.ToLower();
             Name = tableName;
             Label = label;
-            Primary = primary;
+            NavMenu = navMenu;
             SchemaName = schemaName;
             FileName = DomainObj;
         }
@@ -344,7 +345,44 @@ namespace jumpstart {
             return result;
         }
 
-        
+        /// <summary>
+        /// Processes children by finding parent foreign keys and establishing parent-child relationships.
+        /// Iterates through all attributes to find foreign keys of type "parent" and adds this object
+        /// to the Children list of the parent object with the appropriate role (column name).
+        /// </summary>
+        /// <param name="allObjects">Collection of all MetaObjects to search for parent references</param>
+        public void ProcessChildren(IEnumerable<MetaObject> allObjects)
+        {
+            foreach (var attribute in Attributes)
+            {
+                // Check if this attribute is a parent foreign key
+                if (!string.IsNullOrEmpty(attribute.FkType) && 
+                    attribute.FkType.ToLower() == "parent" && 
+                    !string.IsNullOrEmpty(attribute.FkTable))
+                {
+                    // Find the parent object by table name
+                    var parentObject = allObjects.FirstOrDefault(mo => mo.TableName == attribute.FkTable);
+                    
+                    if (parentObject != null)
+                    {
+                        // Use the attribute name as the role to distinguish multiple FKs to the same table
+                        string role = attribute.Name.Replace("_id", "");
+                        string label = attribute.Label ?? attribute.Name; // Use label if available, fallback to name
+                        
+                        // Check if this role-object combination already exists
+                        bool alreadyExists = parentObject.Children.Any(child => 
+                            child.Role == role && child.Object == this);
+                        
+                        if (!alreadyExists)
+                        {
+                            parentObject.Children.Add(new ChildRelationship(role, label, this));
+                        }
+                    }
+                }
+            }
+        }
+
+       
     }
 
     public class MetaSchema : MetaBaseElement
@@ -411,7 +449,7 @@ namespace jumpstart {
 
         public Dictionary<string, MetaSchema> Schemas { get; private set; } = new();
         public List<MetaObject> Objects { get; private set; } = new();
-        public List<MetaObject> PrimaryObjects { get; private set; } = new();
+        public Dictionary<string, List<MetaObject>> NavMenus { get; private set; } = new();
 
         public List<MetaAttribute> GlobalAttributes {get; private set;} = new();
 
@@ -437,6 +475,15 @@ namespace jumpstart {
             }
             return result;  
         }
+
+        public void Process()
+        {
+           foreach(var obj in Objects)
+           {
+                obj.ProcessChildren(Objects);
+           }
+           
+        }   
 
         public void SortMetaObjectsByReference()
         {
@@ -536,7 +583,7 @@ namespace jumpstart {
                 {
                     if (!string.IsNullOrEmpty(attribute.FkObject))
                     {
-                        var fkObject = metaObjects.FirstOrDefault(mo => mo.Name == attribute.FkObject);
+                        var fkObject = metaObjects.FirstOrDefault(mo => mo.Name == attribute.FkTable);
                         if (fkObject != null)
                         {
                             // fkObject -> metaObject
@@ -736,7 +783,7 @@ namespace jumpstart {
             return sortedSccIndices.Select(sccIndex => sccs[sccIndex]).ToList();
         }
 
-
+        
 
     }
 

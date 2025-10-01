@@ -2,6 +2,7 @@
     string namespaceName = @Model.Namespace; 
     string domainObj = @Model.DomainObj; 
     string domainVar = @Model.DomainVar; 
+    string domainObjView = domainObj+"View"; 
 }
 
 using Microsoft.AspNetCore.Mvc;
@@ -15,15 +16,15 @@ namespace @(namespaceName).Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class @(domainObj)Controller : ControllerBase
+    public partial class @(domainObj)Controller : ControllerBase
     {
         // GET: api/<@(domainObj)Controller>
         [HttpGet]
-        public IEnumerable<@(domainObj)> Get()
+        public IEnumerable<@(domainObjView)> Get()
         {
             //Console.WriteLine("Processing GET List");
 
-            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select();
+            List<@(domainObjView)> @(domainVar)s = @(domainObj)Logic.Create().select<@(domainObjView)>();
 
             return @(domainVar)s;
         }
@@ -39,32 +40,53 @@ namespace @(namespaceName).Controllers
             return @(domainVar);
         }
 
+        // GET api/<@(domainObj)Controller>/enum
+        [HttpGet("enum")]
+        public IEnumerable<EnumHelper> GetEnum()
+        {
+            //Console.WriteLine("Processing GET Enum");
+
+            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select<@(domainObj)>();
+
+            return @(domainVar)s.Select(@(domainVar) => new EnumHelper(@(domainVar).id, @(domainVar).getRwkString()));
+        }
+
         // POST api/<@(domainObj)Controller>
         [HttpPost]
-        public @(domainObj) Post([FromBody] @(domainObj) @(domainVar))
+        public @(domainObj)View Post([FromBody] @(domainObj)View @(domainVar)View)
         {
             //Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
             
-            // Process any JsonElement values to ensure proper type conversion
-            JsonHelper.ProcessJsonElements(@(domainVar));
+            JsonHelper.ProcessJsonElements(@(domainVar)View);
             
-            @(domainObj)Logic.Create().insert(@(domainVar)); 
+            // Process any JsonElement values to ensure proper type conversion
+            @(domainObj) @(domainVar) = new @(domainObj)(@(domainVar)View);
 
-            return @(domainVar);
+            
+            
+            @(domainObj)Logic.Create().put(@(domainVar)); 
+
+            @(domainVar)View.id = @(domainVar).id;
+
+            return @(domainVar)View;
         }
 
         // PUT api/<@(domainObj)Controller>/5
         [HttpPut("{id}")]
-        public @(domainObj) Put(long id, [FromBody] @(domainObj) @(domainVar))
+        public @(domainObj)View Put(long id, [FromBody] @(domainObj)View @(domainVar)View)
         {
             //Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
             
             // Process any JsonElement values to ensure proper type conversion
-            JsonHelper.ProcessJsonElements(@(domainVar));
+            JsonHelper.ProcessJsonElements(@(domainVar)View);
             
+            @(domainObj) @(domainVar) = new @(domainObj)(@(domainVar)View);
+
             @(domainObj)Logic.Create().update(id, @(domainVar));
 
-            return @(domainVar);
+            @(domainVar)View.id = @(domainVar).id;
+
+            return @(domainVar)View;
         }
 
         // DELETE api/<@(domainObj)Controller>/5
@@ -73,5 +95,50 @@ namespace @(namespaceName).Controllers
         {
             @(domainObj)Logic.Create().delete(id);
         }
+
+        // GET api/<@(domainObj)Controller>/5/history
+        [HttpGet("{id}/history")]
+        public IEnumerable<@(domainObj)History> GetHistory(long id)
+        {
+            //Console.WriteLine($"Processing GET History for ID={id}");
+
+            List<@(domainObj)History> historyList = @(domainObj)Logic.Create().history(id);
+
+            return historyList;
+        }
+
+@{
+    // Get all child relationships
+    var children = Model.Children;
+    
+    if (children.Count > 0)
+    {
+        foreach(var child in children)
+        {
+            var childObject = child.Object;
+            var childRole = child.Role;
+            var childLabel = child.Label;
+            var childDomainObj = childObject.DomainObj;
+            var childDomainVar = childObject.DomainVar;
+            var childDomainObjView = childDomainObj + "View";
+            
+            <text>
+        // GET api/<@(domainObj)Controller>/5/@(childDomainVar)_@(childRole)
+        [HttpGet("{id}/@(childDomainVar)_@(childRole)")]
+        public IEnumerable<@(childDomainObjView)> Get@(childDomainVar)_@(childRole)(long id)
+        {
+            //Console.WriteLine($"Processing GET @(childLabel) for @(domainObj) ID={id}");
+
+            List<@(childDomainObjView)> @(childDomainVar)s = @(domainObj)Logic.Create().children<@(childDomainObjView)>(id, "@(childDomainVar)-@(childRole)");
+
+            return @(childDomainVar)s;
+        }
+
+            </text>
+        }
+    }
+}
+
+        
     }
 }

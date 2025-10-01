@@ -34,6 +34,7 @@ namespace @Model.Name
                         {
                             while (rdr.Read())
                             {
+                                LogRowData(rdr);
                                 selectCallback(rdr);
                             }
                         }
@@ -53,6 +54,29 @@ namespace @Model.Name
         {
             string sql = substituteTemplate(filter, sqlTemplate);
             select(selectCallback, sql);
+        }
+
+        /// <summary>
+        /// Executes a SQL query and returns a List<T> where T derives from BaseObject
+        /// </summary>
+        /// <typeparam name="T">Type that derives from BaseObject</typeparam>
+        /// <param name="sql">The SQL query to execute</param>
+        /// <returns>List of T objects</returns>
+        public static List<T> select<T>(string sql) where T : BaseObject, new()
+        {
+            Logger.Sql($"Executing generic select sql: {sql}");
+
+            List<T> baseObjects = new List<T>();
+
+            void baseObjectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                T baseObject = new T();
+                DBPersist.autoAssign(rdr, baseObject);
+                baseObjects.Add(baseObject);
+            };
+
+            select(baseObjectCallback, sql);
+            return baseObjects;
         }
 
         static public long insert( BaseObject baseObject )
@@ -192,14 +216,14 @@ namespace @Model.Name
             StringBuilder vals = new StringBuilder("");
             var parameters = new Dictionary<string, object>();
 
-            // Use reflection to get all properties with LabelAttribute
+            // Use reflection to get all properties with ColumnInfoAttribute
             Type objectType = baseObject.GetType();
             PropertyInfo[] properties = objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             
             foreach (PropertyInfo property in properties)
             {
-                // Check if property has LabelAttribute
-                var labelAttribute = property.GetCustomAttribute<LabelAttribute>();
+                // Check if property has ColumnInfoAttribute
+                var labelAttribute = property.GetCustomAttribute<ColumnInfoAttribute>();
                 if (labelAttribute == null) continue;
                 
                 // Get the value directly from the underlying dictionary to preserve type information
@@ -321,27 +345,37 @@ namespace @Model.Name
 
         static public void put(BaseObject baseObject)
         {
-            string sql = "select * from " + _provider.FormatTableName("^(tableName)") + " where ^(expression)";
+            string sql = "select * from " + _provider.FormatTableName("^(schemaName).^(tableName)") + " where ^(expression)";
             int count = 0;
             StringBuilder expression = new StringBuilder();
+            bool hasId = false;
 
-            if (baseObject.getRwk().Count <= 0) throw new Exception(baseObject.GetType().Name + ".rwk list is empty. DBPersist.put(BaseObject) requires at least one attribute in the rwk list.");
-
-            exprSql(baseObject, baseObject.getRwk(), " and ", expression);
-
-            BaseObject filter = new BaseObject();
-            filter["tableName"] = baseObject.tableName;
-            filter["expression"] = expression.ToString();
-
-            SelectCallback scb = (rdr) =>
+            if (baseObject.ContainsKey("id"))
             {
-                count++;
-                baseObject["id"] = rdr["id"];
-            };
+                if(Convert.ToInt64(baseObject["id"]) != default(long)) hasId = true;
+            }
 
-            select(scb, sql, filter);
+            if(!hasId)
+            {
+                if (baseObject.getRwk().Count <= 0) throw new Exception(baseObject.GetType().Name + ".rwk list is empty. DBPersist.put(BaseObject) requires at least one attribute in the rwk list.");
 
-            if (count == 1)
+                exprSql(baseObject, baseObject.getRwk(), " and ", expression);
+
+                BaseObject filter = new BaseObject();
+                filter["schemaName"] = baseObject.schemaName;
+                filter["tableName"] = baseObject.tableBaseName;
+                filter["expression"] = expression.ToString();
+
+                SelectCallback scb = (rdr) =>
+                {
+                    count++;
+                    baseObject["id"] = rdr["id"];
+                };
+
+                select(scb, sql, filter);
+            }
+
+            if (count == 1 || hasId)
             {
                 update(baseObject);
             }
@@ -416,6 +450,21 @@ namespace @Model.Name
                 if (t.ContainsKey(k)) { t[k] = rdr.GetValue(i); }
                 else { t.Add(k, rdr.GetValue(i)); }
             }
+        }
+
+        private static void LogRowData(DbDataReader rdr)
+        {
+            if ((Logger.enabledLevels & Logger.Level.Data) == 0) return;
+            
+            object[] values = new object[rdr.FieldCount];
+            rdr.GetValues(values);
+            
+            var fieldData = new List<string>();
+            for (int i = 0; i < rdr.FieldCount; i++)
+            {
+                fieldData.Add($"{rdr.GetName(i)}={values[i]}");
+            }
+            Logger.Data($"Row data: {string.Join(";", fieldData)}");
         }
 
         protected static string substituteTemplate( BaseObject parameters, string sqlTemplate)
@@ -499,6 +548,69 @@ namespace @Model.Name
 
             string sql = query["sql_text"].ToString();
             select(callback, sql);
+        }
+
+        /// <summary>
+        /// Executes a query by name and returns a List<T> where T derives from BaseObject
+        /// </summary>
+        /// <typeparam name="T">Type that derives from BaseObject</typeparam>
+        /// <param name="queryName">The name of the query to execute</param>
+        /// <returns>List of T objects</returns>
+        public static List<T> ExecuteQueryByName<T>(string queryName) where T : BaseObject, new()
+        {
+            BaseObject query = GetQueryByName(queryName);
+            if (query == null)
+            {
+                throw new Exception($"Query '{queryName}' not found in core.sql table");
+            }
+
+            List<T> baseObjects = new List<T>();
+
+            void baseObjectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                T baseObject = new T();
+
+                DBPersist.autoAssign(rdr, baseObject);
+
+                baseObjects.Add(baseObject);
+            };
+
+            string sql = query["sql_text"].ToString();
+            select(baseObjectCallback, sql);
+
+            return baseObjects;
+        }
+
+        /// <summary>
+        /// Executes a query by name with template substitution and returns a List<T> where T derives from BaseObject
+        /// </summary>
+        /// <typeparam name="T">Type that derives from BaseObject</typeparam>
+        /// <param name="queryName">The name of the query to execute</param>
+        /// <param name="filter">BaseObject containing parameters for template substitution</param>
+        /// <returns>List of T objects</returns>
+        public static List<T> ExecuteQueryByName<T>(string queryName, BaseObject filter) where T : BaseObject, new()
+        {
+            BaseObject query = GetQueryByName(queryName);
+            if (query == null)
+            {
+                throw new Exception($"Query '{queryName}' not found in core.sql table");
+            }
+
+            List<T> baseObjects = new List<T>();
+
+            void baseObjectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                T baseObject = new T();
+
+                DBPersist.autoAssign(rdr, baseObject);
+
+                baseObjects.Add(baseObject);
+            };
+
+            string sqlTemplate = query["sql_text"].ToString();
+            select(baseObjectCallback, sqlTemplate, filter);
+
+            return baseObjects;
         }
 
         /// <summary>

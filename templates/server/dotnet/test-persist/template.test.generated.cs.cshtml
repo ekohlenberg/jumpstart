@@ -21,7 +21,7 @@ namespace @Model.Namespace
                     if (!string.IsNullOrEmpty(attr.FkObject))
                     {
                     <text>
-                    @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                    @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkVar");
                     </text>
                     }
                 }
@@ -41,7 +41,7 @@ namespace @Model.Namespace
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj)Logic insert: " + @(Model.DomainVar).ToString());
                 @(Model.DomainObj)Logic.Create().insert(@(Model.DomainVar));
-                BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar).id);
+                BaseTest.addLastId("@(Model.DomainVar)", @(Model.DomainVar).id);
             </text>
             }
         }
@@ -49,8 +49,9 @@ namespace @Model.Namespace
         public static void testUpdate()
         {
             long lastId = BaseTest.getLastId("@(Model.DomainVar)");
-            var @(Model.DomainVar) = @(Model.DomainObj)Logic.Create().get(lastId);
+            var @(Model.DomainVar)View  = @(Model.DomainObj)Logic.Create().get(lastId);
 
+            @(Model.DomainObj) @(Model.DomainVar) = new @(Model.DomainObj)(@(Model.DomainVar)View);
             @foreach (var attr in Model.Attributes)
             {
                 if (attr.IsGlobal()) continue;
@@ -60,7 +61,7 @@ namespace @Model.Namespace
                     if (!string.IsNullOrEmpty(attr.FkObject))
                     {
                         <text>
-                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkObject");
+                            @(Model.DomainVar).@attr.Name = BaseTest.getLastId("@attr.FkVar");
                         </text>
                     }
                 }

@@ -10,6 +10,7 @@ dotnet server templates-common,model,shared/dotnet/common/IDatabaseProvider.cs.c
 dotnet server templates-common,model,shared/dotnet/common/PostgreSQLProvider.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/SqlServerProvider.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/JsonHelper.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/DatabaseProviderFactory.cs.cshtml,./shared/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
@@ -21,11 +22,13 @@ dotnet server templates-logic,object,server/dotnet/logic/templateLogic.generated
 dotnet server templates-logic,model,server/dotnet/logic/BaseLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/Proxy.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/OpRoleMemberLogic.core.cs.cshtml,./server/logic,TRUE
+dotnet server templates-logic,model,server/dotnet/logic/NavMenuLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/EventServiceLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,object,server/dotnet/logic/templateLogic.user.cs.cshtml,./server/logic,FALSE
 dotnet server templates-logic,model,server/dotnet/logic/logic.csproj.cshtml,./server/logic,TRUE
 dotnet server templates-api,object,server/dotnet/api/template.api.generated.cs.cshtml,./server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/Program.cs.cshtml,./server/api,FALSE
+dotnet server templates-api,model,server/dotnet/api/NavMenu.api.core.cs.cshtml,./server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/appsettings.json.cshtml,./server/api,FALSE
 dotnet server templates-api,model,server/dotnet/api/appsettings.Development.json.cshtml,./server/api,FALSE
 dotnet server templates-api,model,server/dotnet/api/Properties/launchSettings.json.cshtml,./server/api/Properties,FALSE

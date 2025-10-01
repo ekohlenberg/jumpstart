@@ -107,8 +107,8 @@ namespace @(Model.Name)
 
             foreach (PropertyInfo property in properties)
             {
-                // Only process properties that have a LabelAttribute
-                var labelAttribute = property.GetCustomAttribute<LabelAttribute>();
+                // Only process properties that have a ColumnInfoAttribute
+                var labelAttribute = property.GetCustomAttribute<ColumnInfoAttribute>();
                 if (labelAttribute == null) continue;
 
                 if (baseObject.ContainsKey(property.Name))

@@ -33,37 +33,55 @@ namespace @namespaceName
             return proxy;
         }
 
-
-
         public  List<@(domainObj)> select()
         {
-            Console.WriteLine("Processing @(domainObj)Logic select List");
+            return select<@(domainObj)>();
+        }
 
-            List<@(domainObj)> @(domainVar)s = new List<@(domainObj)>();
+       
+    
+        public  List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new()
+        {
+            Console.WriteLine("Processing @(domainObj)Logic select<TBaseObject> List");
 
-            void @(domainVar)Callback(System.Data.Common.DbDataReader rdr)
-            {
-                @(domainObj) @(domainVar) = new @(domainObj)();
+            List<TBaseObject> @(domainVar)s = select<TBaseObject>("@(schemaName).@(tableName)-select");
 
-                DBPersist.autoAssign(rdr, @(domainVar));
+            
+            return @(domainVar)s;
+        }
 
-                @(domainVar)s.Add(@(domainVar));
-            };
+        public List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new()
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic select<TBaseObject> with query: {queryName}");
 
-            //DBPersist.select(@(domainVar)Callback, $"select * from @schemaName.@tableName");
-            DBPersist.ExecuteQueryByName("@(schemaName).@(tableName)-select", @(domainVar)Callback);
+            List<TBaseObject> @(domainVar)s = DBPersist.ExecuteQueryByName<TBaseObject>(queryName);
 
             return @(domainVar)s;
+        }
+
+         public  List<@(domainObj)History> history(long id)
+        {
+            List<@(domainObj)History> @(domainVar)History = DBPersist.ExecuteQueryByName<@(domainObj)History>("@(schemaName).@(tableName)-get-history", new BaseObject() { { "id", id } });
+
+            return @(domainVar)History;
+        }
+
+        public List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new()
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic children<TBaseObject> for ID={id}, childSuffix={childSuffix}");
+
+            string queryName = "@(schemaName).@(tableName)-children-" + childSuffix;
+            List<TBaseObject> children = DBPersist.ExecuteQueryByName<TBaseObject>(queryName, new BaseObject() { { "id", id } });
+
+            return children;
         }
 
         public  @(domainObj) get(long id)
         {
             Console.WriteLine($"Processing @(domainObj)Logic get ID={id}");
 
-            @(domainObj) @(domainVar) = new @(domainObj)();
-            @(domainVar).id = id;
-
-            DBPersist.get(@(domainVar));
+            @(domainObj) @(domainVar) = DBPersist.select<@(domainObj)>($"SELECT * FROM @(schemaName).@(tableName) WHERE id = {id}").FirstOrDefault();
+            
 
             return @(domainVar);
         }
@@ -75,6 +93,15 @@ namespace @namespaceName
             @(domainVar).is_active = 1;
 
             DBPersist.insert(@(domainVar));
+        }
+
+        public  void put(@(domainObj) @(domainVar))
+        {
+            Console.WriteLine($"Processing @(domainObj)Logic put: {@(domainVar)}");
+
+            @(domainVar).is_active = 1;
+
+            DBPersist.put(@(domainVar));
         }
 
         public  void update(long id, @(domainObj) @(domainVar))

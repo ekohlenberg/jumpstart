@@ -69,7 +69,9 @@ cd jumpstart
 ### 2. Build the Project
 
 ```bash
+cd jumpstart/src
 dotnet build
+
 ```
 
 ### 3. Generate an Application

@@ -1,0 +1,72 @@
+﻿@@inherits LayoutComponentBase
+@@inject NavigationManager NavigationManager
+@@using System.Net.Http;
+@@using Microsoft.Extensions.DependencyInjection;
+@@inject HttpClient Http
+@@inject IHttpClientFactory ClientFactory
+@@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
+<div class="page">
+    <div class="sidebar">
+        <div class="top-row ps-3 navbar navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">@Model.Name</a>
+            </div>
+        </div>
+        
+        
+        <NavMenuLayout SelectedParentId="@@selectedParentId" />
+    </div>
+
+    <main>
+        <!-- Parent Navigation Menu - Top Row -->
+        <div class="top-row px-4">
+            <nav class="nav nav-pills">
+                <button class="nav-link" @@onclick="@@(() => NavigationManager.NavigateTo("/"))">
+                    <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
+                </button>
+                @@if (navMenuList == null)
+                {
+                    <p><em>Loading menu...</em></p>
+                }
+                else
+                {
+                    @@foreach (var navMenu in navMenuList)
+                    {
+                        <div class="nav-item">
+                            <button class="nav-link @@(selectedParent == navMenu.name ? "active" : "")" @@onclick="@@(() => SelectParent(navMenu.name))">
+                                <span class="bi bi-folder-fill" aria-hidden="true"></span> @@navMenu.name
+                            </button>
+                        </div>
+                    }
+                }
+            </nav>
+            
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank" class="ms-auto">About</a>
+        </div>
+
+        <article class="content px-4">
+            @@Body
+        </article>
+    </main>
+</div>
+
+@@code {
+    private string? selectedParent = null;
+    private long? selectedParentId = null;
+    protected NavMenu[]? navMenuList;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+        navMenuList = await remoteClient.GetFromJsonAsync<NavMenu[]>("api/navmenu/byparent?parent_id=0&orderby=ordinal");
+    }
+    
+    private void SelectParent(string parent)
+    {
+        selectedParent = parent;
+        // Find the parent ID from the navMenuList
+        selectedParentId = navMenuList?.FirstOrDefault(n => n.name == parent)?.id;
+    }
+    
+    
+}

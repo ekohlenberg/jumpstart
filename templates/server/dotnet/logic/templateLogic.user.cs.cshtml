@@ -15,10 +15,15 @@ namespace @Model.Namespace
     {  
         // Generated methods
         List<@(domainObj)> select();
+        List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new();
+        List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new();
+        List<@(domainObj)History> history(long id);
         @(domainObj) get(long id);
         void insert(@(domainObj) @(domainVar));
         void update(long id, @(domainObj) @(domainVar));
+        void put(@(domainObj) @(domainVar));
         void delete( long id );
+        List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new();
         //string getDomainName();
         // Add user-defined methods here
     }

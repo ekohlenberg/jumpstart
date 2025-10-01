@@ -11,11 +11,11 @@ public class MetadataRecord {
     public string TABLE_SCHEMA {get;set;}
     public string TABLE_NAME {get;set;}
     public string TABLE_LABEL {get;set;}
-    public string PRIMARY_TABLE {get;set;}
+    public string NAV_MENU {get;set;}
     public string COLUMN_NAME {get;set;}
     public string COLUMN_LABEL {get;set;}
     public string FK_TYPE {get;set;}
-    public string FK_OBJECT {get;set;}
+    public string FK_TABLE {get;set;}
     public string TEST_DATA_SET {get;set;}
     public string ORDINAL_POSITION {get;set;}
     public string COLUMN_DEFAULT {get;set;}
@@ -61,7 +61,7 @@ public class CSVLoader
 
         }
 
-        
+        metaModel.Process();
         
     }
 
@@ -94,7 +94,7 @@ public class CSVLoader
 
         if (!schema.ObjectMap.TryGetValue(mr.TABLE_NAME, out metaObject))      
         {
-            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.PRIMARY_TABLE);;
+            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.NAV_MENU);
             schema.Objects.Add( metaObject );
             schema.ObjectMap[mr.TABLE_NAME] = metaObject;
         }
@@ -104,12 +104,18 @@ public class CSVLoader
             metaModel.Objects.Add(metaObject);
         }
 
-        if (metaObject.Primary == "1")
+        // Populate NavMenus dictionary
+        if (!string.IsNullOrEmpty(metaObject.NavMenu))
         {
-            if (!metaModel.PrimaryObjects.Any(obj => obj.Name == mr.TABLE_NAME))
+            if (!metaModel.NavMenus.ContainsKey(metaObject.NavMenu))
             {
-                metaModel.PrimaryObjects.Add(metaObject);
-            }   
+                metaModel.NavMenus[metaObject.NavMenu] = new List<MetaObject>();
+            }
+            
+            if (!metaModel.NavMenus[metaObject.NavMenu].Any(obj => obj.Name == mr.TABLE_NAME))
+            {
+                metaModel.NavMenus[metaObject.NavMenu].Add(metaObject);
+            }
         }
         metaObject.Model = metaModel;
         AddAttributes(metaObject, mr);
@@ -136,13 +142,15 @@ public class CSVLoader
                 Label = mr.COLUMN_LABEL,
                 RWK = mr.RWK,
 				IsNullable =((mr.IS_NULLABLE.Trim() == "1" || mr.IS_NULLABLE.Trim().ToLower() == "yes") ? true : false),
-                FkObject= mr.FK_OBJECT.ToLower(),
+                FkTable= mr.FK_TABLE.ToLower(),
+                FkObject= Utils.ConvertToPascalCase(mr.FK_TABLE.ToLower()),
+                FkVar= Utils.ConvertToPascalCase(mr.FK_TABLE.ToLower()).ToLower(),
                 FkType=mr.FK_TYPE,
                 TestDataSet=mr.TEST_DATA_SET
             };
             bool hasKey = TypeMapping.ConvertMap.ContainsKey(TypeMapping.GetBaseDataType(mr.DATA_TYPE));
 
-            Console.WriteLine($"{mr.TABLE_NAME} {mr.COLUMN_NAME} >{mr.DATA_TYPE}< {hasKey}");
+            Console.WriteLine($"{metaObject.TableName} {attribute.Name} {attribute.SqlDataType} {attribute.FkTable} {attribute.FkObject} {attribute.FkVar} {attribute.FkType} {hasKey}");
             metaObject.Attributes.Add( attribute );
         }
     }

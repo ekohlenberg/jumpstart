@@ -1,0 +1,157 @@
+-- =====================================
+-- Generate SELECT queries for child records
+-- =====================================
+@using System.Linq;
+@using System.Collections.Generic;
+@using jumpstart;
+
+@{
+	MetaObject metaObject = (MetaObject)Model;
+	
+	var domainObj = metaObject.DomainObj;
+	var tableName = metaObject.TableName;
+	var schemaName = metaObject.SchemaName;
+	
+	// Get all child relationships
+	var children = metaObject.Children;
+	
+	if (children.Count > 0)
+	{
+		<text>
+-- =====================================
+-- Child queries for @(domainObj) (@(schemaName).@(tableName))
+-- =====================================
+
+		</text>
+		
+		foreach(var child in children)
+		{
+			var childObject = child.Object;
+			var childRole = child.Role;
+			var childLabel = child.Label;
+			var childTableName = childObject.TableName;
+			var childSchemaName = childObject.SchemaName;
+			var childDomainObj = childObject.DomainObj;
+			
+			// Get all attributes for the child object
+			var childAttributes = childObject.Attributes;
+			
+			// Find foreign key relationships in the child object
+			var childForeignKeys = new List<MetaAttribute>();
+			foreach(var attr in childAttributes)
+			{
+				if (!string.IsNullOrEmpty(attr.FkObject))
+				{
+					childForeignKeys.Add(attr);
+				}
+			}
+			
+			// Build the SELECT clause for child table attributes (excluding foreign key columns)
+			var childSelectColumns = new List<string>();
+			foreach(var attr in childAttributes)
+			{
+				if (attr.Name != "id")
+				{
+					childSelectColumns.Add(childTableName + "." + attr.Name);
+				}
+			}
+			
+			// Build the SELECT clause for foreign key RWK columns with improved aliasing
+			var childFkSelectColumns = new List<string>();
+			var childJoinClauses = new List<string>();
+			var childFkTableNames = new List<string>();
+			
+			// Track used aliases to avoid conflicts
+			var childUsedAliases = new HashSet<string>();
+			
+			foreach(var fk in childForeignKeys)
+			{
+				var fkTable = fk.FkObject;
+				childFkTableNames.Add(fkTable);
+				
+				// Find the foreign key object
+				var fkObject = (MetaObject)null;
+				foreach(var obj in childObject.Model.Objects)
+				{
+					if (obj.TableName == fk.FkTable)
+					{
+						fkObject = obj;
+						break;
+					}
+				}
+				if (fkObject != null)
+				{
+					// Create unique alias based on foreign key column name
+					var aliasBase = fk.Name;
+					if (aliasBase.EndsWith("_id"))
+					{
+						aliasBase = aliasBase.Substring(0, aliasBase.Length - 3);
+					}
+					
+					// Ensure alias is unique
+					var alias = aliasBase;
+					var counter = 1;
+					while (childUsedAliases.Contains(alias))
+					{
+						alias = aliasBase + "_" + counter;
+						counter++;
+					}
+					childUsedAliases.Add(alias);
+					
+					// Get RWK columns from the foreign key table with improved aliasing
+					foreach(var fkAttr in fkObject.Attributes)
+					{
+						if (fkAttr.RWK == "1")
+						{
+							childFkSelectColumns.Add(alias + "." + fkAttr.Name + " AS " + alias + "_" + fkAttr.Name);
+						}
+					}
+					
+					// Build JOIN clause with unique alias
+					childJoinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + childTableName + "." + fk.Name + " = " + alias + ".id");
+				}
+			}
+			
+			<text>
+-- Child relationship: @(childLabel) (@(childRole))
+DECLARE @@sql_id BIGINT = NEXT VALUE FOR core.sql_identity;
+
+INSERT INTO core.sql (
+    id, 
+    name, 
+    sql_text, 
+    description, 
+	created_by,
+    last_updated, 
+    last_updated_by,
+	is_active,
+	version
+) VALUES (
+    @@sql_id,
+    '@(schemaName).@(tableName)-children-@(childDomainVar)-@(childRole)',
+    'SELECT 
+        @(childTableName).id@(childSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", childSelectColumns) : "")@(childFkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", childFkSelectColumns) : "")
+    FROM @(childSchemaName).@(childTableName)@(childJoinClauses.Count > 0 ? "\n    " + string.Join("\n    ", childJoinClauses) : "")
+    WHERE @(childTableName).@(childRole)_id = ^(id)
+    ORDER BY @(childTableName).id;',
+    'Select all @(childLabel) records for @(domainObj) with related @(string.Join(", ", childFkTableNames)) information',
+    SYSTEM_USER,
+	GETDATE(),
+    SYSTEM_USER,
+	1,
+	1
+);
+
+			</text>
+		}
+	}
+	else
+	{
+		<text>
+-- =====================================
+-- No child relationships found for @(domainObj) (@(schemaName).@(tableName))
+-- =====================================
+
+		</text>
+	}
+}

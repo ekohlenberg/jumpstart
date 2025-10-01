@@ -12,9 +12,42 @@ namespace @Model.Name
 
         public BaseObject( BaseObject t)
         {
-            foreach( string k in t.Keys)
+            if (t == null) return;
+
+            // Use reflection to copy properties with ColumnInfoAttribute
+            Type currentType = this.GetType();
+            Type sourceType = t.GetType();
+            
+            // Get all public properties with ColumnInfoAttribute from the current object
+            PropertyInfo[] properties = currentType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            
+            foreach (PropertyInfo property in properties)
             {
-                this[k] = t[k];
+                // Check if property has ColumnInfoAttribute
+                var labelAttribute = property.GetCustomAttribute<ColumnInfoAttribute>();
+                if (labelAttribute == null) continue;
+                
+                // Check if property has a setter
+                if (!property.CanWrite) continue;
+                
+                try
+                {
+                    // Try to get the same property from the source object
+                    PropertyInfo sourceProperty = sourceType.GetProperty(property.Name);
+                    if (sourceProperty != null && sourceProperty.CanRead)
+                    {
+                        // Get the value from the source object
+                        object value = sourceProperty.GetValue(t);
+                        
+                        // Set the value on the current object
+                        property.SetValue(this, value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log the error but continue with other properties
+                    Console.WriteLine($"Error copying property {property.Name}: {ex.Message}");
+                }
             }
         }
         protected Dictionary<string, object> _defaults = new Dictionary<string, object>();
@@ -22,20 +55,24 @@ namespace @Model.Name
         public string domainName {get;  set;}
         public string tableName { get;  set; }
         public string tableBaseName{ get;  set; }
+        public string schemaName { get;  set; }
         public string auditTableName { get;  set;}
         protected List<string> rwk = new List<string>();
 
         public List<string> getRwk() { return rwk;  }
-        public string getRwkString()
+        public string getRwkString(bool includeId = false)
         {
             List<object> rwkValues = new();
             foreach(string c in rwk)
 						{
+                            if(!includeId && c.EndsWith("_id")) continue;
 							rwkValues.Add( this[c] );
 						}
             return String.Join( " ", rwkValues);
         }
 
+        
+        
          // Override the indexer to keep dictionary & properties in sync
         public new object this[string key]
         {
