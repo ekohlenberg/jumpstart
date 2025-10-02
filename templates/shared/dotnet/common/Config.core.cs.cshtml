@@ -7,13 +7,47 @@ using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using System.Data.Common;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace @Model.Name
 {
+    public class DataSourceConfig
+    {
+        [JsonPropertyName("dbtype")]
+        public string DbType { get; set; }
+        
+        [JsonPropertyName("hostname")]
+        public string Hostname { get; set; }
+        
+        [JsonPropertyName("port")]
+        public string Port { get; set; }
+        
+        [JsonPropertyName("database")]
+        public string Database { get; set; }
+        
+        [JsonPropertyName("username")]
+        public string Username { get; set; }
+        
+        [JsonPropertyName("password")]
+        public string Password { get; set; }
+    }
+    
+    public class NamespaceConfig
+    {
+        [JsonPropertyName("namespace")]
+        public string Namespace { get; set; }
+        
+        [JsonPropertyName("datasources")]
+        public Dictionary<string, DataSourceConfig> DataSourceConfigs { get; set; }
+    }
+
     public class Config
     {
         static IConfiguration configBuilder = null;
         static Dictionary<string, string> _dbparams = null;
+        static NamespaceConfig _namespaceConfig = null;
+        static string _currentDataSource = "default";
 
         static IConfiguration getConfigBuilder()
         {
@@ -60,40 +94,116 @@ namespace @Model.Name
             return string.IsNullOrEmpty(result) ? defaultValue : result;
         }
 
+        static public void setDataSource(string dataSourceName)
+        {
+            _currentDataSource = dataSourceName;
+            // Clear the cache so it will be rebuilt with the new data source
+            _dbparams = null;
+        }
+
+        static public string getCurrentDataSource()
+        {
+            return _currentDataSource;
+        }
+
+        static private NamespaceConfig loadNamespaceConfig()
+        {
+            if (_namespaceConfig == null)
+            {
+                // Path to the .namespace.json file in the user's home directory
+                string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string jsonFilePath = Path.Combine(homeDirectory, ".@(Model.Name).json");
+                string legacyFilePath = Path.Combine(homeDirectory, ".@(Model.Name)");
+
+                // Check for JSON file first, fall back to legacy format
+                if (File.Exists(jsonFilePath))
+                {
+                    // Read and parse JSON file
+                    string jsonContent = File.ReadAllText(jsonFilePath);
+                    _namespaceConfig = JsonSerializer.Deserialize<NamespaceConfig>(jsonContent);
+                    
+                    if (_namespaceConfig == null || _namespaceConfig.DataSourceConfigs == null || _namespaceConfig.DataSourceConfigs.Count == 0)
+                    {
+                        throw new FormatException("The .@(Model.Name).json file is invalid or contains no data sources.");
+                    }
+                }
+                else if (File.Exists(legacyFilePath))
+                {
+                    // Parse legacy format for backward compatibility
+                    _namespaceConfig = parseLegacyFormat(legacyFilePath);
+                }
+                else
+                {
+                    throw new FileNotFoundException("Neither .@(Model.Name).json nor .@(Model.Name) file was found in the user's home directory.", jsonFilePath);
+                }
+            }
+            
+            return _namespaceConfig;
+        }
+
+        static private NamespaceConfig parseLegacyFormat(string filePath)
+        {
+            // Read the legacy file content
+            string fileContent = File.ReadAllText(filePath).Trim();
+
+            // Split the content by colon (:) to extract parameters
+            string[] parameters = fileContent.Split(':');
+            if (parameters.Length != 4 && parameters.Length != 6)
+            {
+                throw new FormatException("The .@(Model.Name) file must contain either 4 or 6 parameters separated by colons (:).\nFormat: dbtype:server:port:database[:username:password]");
+            }
+
+            // Create a NamespaceConfig with a single "default" data source
+            var config = new NamespaceConfig
+            {
+                Namespace = "@(Model.Name)",
+                DataSourceConfigs = new Dictionary<string, DataSourceConfig>
+                {
+                    ["default"] = new DataSourceConfig
+                    {
+                        DbType = parameters[0].ToLower().Trim(),
+                        Hostname = parameters[1].Trim(),
+                        Port = parameters[2].Trim(),
+                        Database = parameters[3].Trim(),
+                        Username = parameters.Length >= 5 ? parameters[4].Trim() : string.Empty,
+                        Password = parameters.Length >= 6 ? parameters[5].Trim() : string.Empty
+                    }
+                }
+            };
+
+            return config;
+        }
+
         static public string getDbConnection()
+        {
+            return getDbConnection(_currentDataSource);
+        }
+
+        static public string getDbConnection(string dataSourceName)
         {
             // Initialize cache if needed
             if (_dbparams == null)
             {
                 _dbparams = new Dictionary<string, string>();
                 
-                // Path to the .namespace file in the user's home directory
-                string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                string filePath = Path.Combine(homeDirectory, ".@(Model.Name)");
-
-                // Check if the file exists
-                if (!File.Exists(filePath))
+                // Load the namespace configuration
+                var config = loadNamespaceConfig();
+                
+                // Get the requested data source
+                if (!config.DataSourceConfigs.ContainsKey(dataSourceName))
                 {
-                    throw new FileNotFoundException("The .@(Model.Name) file was not found in the user's home directory.", filePath);
+                    throw new KeyNotFoundException($"Data source '{dataSourceName}' not found in configuration. Available data sources: {string.Join(", ", config.DataSourceConfigs.Keys)}");
                 }
-
-                // Read the file content
-                string fileContent = File.ReadAllText(filePath).Trim();
-
-                // Split the content by colon (:) to extract parameters
-                string[] parameters = fileContent.Split(':');
-                if (parameters.Length != 4 && parameters.Length != 6)
-                {
-                    throw new FormatException("The .@(Model.Name) file must contain either 4 or 6 parameters separated by colons (:).\nFormat: dbtype:server:port:database[:username:password]");
-                }
+                
+                var dataSource = config.DataSourceConfigs[dataSourceName];
 
                 // Populate the cache
-                _dbparams["dbType"] = parameters[0].ToLower().Trim();
-                _dbparams["server"] = parameters[1];
-                _dbparams["port"] = parameters[2];
-                _dbparams["database"] = parameters[3];
-                _dbparams["username"] = parameters.Length >= 5 ? parameters[4] : string.Empty;
-                _dbparams["password"] = parameters.Length >= 6 ? parameters[5] : string.Empty;
+                _dbparams["dbType"] = dataSource.DbType?.ToLower().Trim() ?? "postgresql";
+                _dbparams["server"] = dataSource.Hostname ?? "localhost";
+                _dbparams["port"] = dataSource.Port ?? "5432";
+                _dbparams["database"] = dataSource.Database ?? "";
+                _dbparams["username"] = dataSource.Username ?? "";
+                _dbparams["password"] = dataSource.Password ?? "";
             }
 
             // Get values from cache

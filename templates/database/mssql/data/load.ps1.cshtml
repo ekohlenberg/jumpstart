@@ -1,29 +1,66 @@
 # PowerShell script to load static data into the database
-# Reads server information from .namespace file in user's home directory
+# Reads server information from .namespace.json or .namespace file in user's home directory
 
-# Get the user's home directory and read the .namespace file
-$namespaceFile = Join-Path $env:USERPROFILE ".@(Model.Name)"
+# Get the user's home directory
+$jsonFile = Join-Path $env:USERPROFILE ".@(Model.Name).json"
+$legacyFile = Join-Path $env:USERPROFILE ".@(Model.Name)"
 
-if (-not (Test-Path $namespaceFile)) {
-    Write-Error "Namespace file not found at: $namespaceFile"
-    Write-Error "Please create a .namespace file in your home directory with format: dbtype:server:port:database"
+# Initialize variables with defaults
+$dbType = "sqlserver"
+$server = "localhost"
+$port = "1433"
+$database = "@(Model.Name)"
+$username = ""
+$password = ""
+
+# Try to read JSON format first
+if (Test-Path $jsonFile) {
+    Write-Host "Reading configuration from: $jsonFile"
+    $jsonContent = Get-Content $jsonFile -Raw | ConvertFrom-Json
+    
+    # Get the default datasource
+    if ($jsonContent.datasources.default) {
+        $defaultDs = $jsonContent.datasources.default
+        
+        if ($defaultDs.dbtype) { $dbType = $defaultDs.dbtype }
+        if ($defaultDs.hostname) { $server = $defaultDs.hostname }
+        if ($defaultDs.port) { $port = $defaultDs.port }
+        if ($defaultDs.database) { $database = $defaultDs.database }
+        if ($defaultDs.username) { $username = $defaultDs.username }
+        if ($defaultDs.password) { $password = $defaultDs.password }
+    }
+}
+# Fall back to legacy format
+elseif (Test-Path $legacyFile) {
+    Write-Host "Reading configuration from legacy file: $legacyFile"
+    $namespaceContent = Get-Content $legacyFile -Raw
+    $namespaceParts = $namespaceContent.Trim().Split(':')
+    
+    if ($namespaceParts.Count -lt 4) {
+        Write-Error "Invalid namespace file format. Expected: dbtype:server:port:database[:username:password]"
+        Write-Error "Found: $namespaceContent"
+        exit 1
+    }
+    
+    $dbType = $namespaceParts[0]
+    $server = $namespaceParts[1]
+    $port = $namespaceParts[2]
+    $database = $namespaceParts[3]
+    
+    if ($namespaceParts.Count -ge 5) {
+        $username = $namespaceParts[4]
+    }
+    if ($namespaceParts.Count -ge 6) {
+        $password = $namespaceParts[5]
+    }
+}
+else {
+    Write-Error "Configuration file not found. Looking for:"
+    Write-Error "  - $jsonFile"
+    Write-Error "  - $legacyFile"
+    Write-Error "Please create a .@(Model.Name).json file in your home directory"
     exit 1
 }
-
-# Read and parse the namespace file
-$namespaceContent = Get-Content $namespaceFile -Raw
-$namespaceParts = $namespaceContent.Trim().Split(':')
-
-if ($namespaceParts.Count -ne 4) {
-    Write-Error "Invalid namespace file format. Expected: dbtype:server:port:database"
-    Write-Error "Found: $namespaceContent"
-    exit 1
-}
-
-$dbType = $namespaceParts[0]
-$server = $namespaceParts[1]
-$port = $namespaceParts[2]
-$database = $namespaceParts[3]
 
 # Validate that this is for SQL Server
 if ($dbType -ne "mssql" -and $dbType -ne "sqlserver") {
@@ -39,6 +76,18 @@ if ($port -and $port -ne "1433") {
 
 Write-Host "Connecting to SQL Server: $connectionString"
 Write-Host "Database: $database"
+
+# Build sqlcmd authentication parameters
+$authParams = @()
+if ($username -and $password) {
+    Write-Host "Using SQL Server authentication with username: $username"
+    $authParams = @("-U", $username, "-P", $password)
+}
+else {
+    Write-Host "Using Windows authentication"
+    $authParams = @("-E")
+}
+
 Write-Host "Loading static data files..."
 
 # Load all data files
@@ -51,9 +100,16 @@ Write-Host "Loading static data files..."
     }
     <text>
 Write-Host "Loading: @sourceFile"
-sqlcmd -S $connectionString -d $database -E -i ".\@sourceFile"
+$sqlFile = ".\@sourceFile"
+if (-not (Test-Path $sqlFile)) {
+    Write-Warning "SQL file not found, skipping: $sqlFile"
+    continue
+}
+
+sqlcmd -S $connectionString -d $database @authParams -i "$sqlFile"
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to load: @sourceFile"
+    Write-Error "Failed to load: $sqlFile"
+    Write-Error "Check the SQL file for syntax errors and ensure the database connection is working."
     exit $LASTEXITCODE
 }
     </text>
