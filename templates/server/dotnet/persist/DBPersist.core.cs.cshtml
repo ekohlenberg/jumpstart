@@ -17,13 +17,13 @@ namespace @Model.Name
         
         public delegate void SelectCallback(DbDataReader rdr);
         
-        static public void select( SelectCallback selectCallback, string sql)
+        static public void select( SelectCallback selectCallback, string sql, string connectionName = "default")
         {
-            Logger.Sql($"Executing sql {sql}.");
+            Logger.Sql($"Executing sql {sql} on connection '{connectionName}'.");
             
             try
             {
-                string connectionStr = Config.getString("db.connection");
+                string connectionStr = Config.getDbConnection(connectionName);
 
                 using (DbConnection connection = _provider.CreateConnection(connectionStr))
                 {
@@ -43,17 +43,17 @@ namespace @Model.Name
             }
             catch (Exception ex)
             {
-                string m = $"Error executing select: {sql}";
+                string m = $"Error executing select: {sql} on connection '{connectionName}'";
 
                 Logger.Error( m, ex);
                 throw new Exception(m, ex);
             }
         }
 
-        static public void select( SelectCallback selectCallback, string sqlTemplate, BaseObject filter)
+        static public void select( SelectCallback selectCallback, string sqlTemplate, BaseObject filter, string connectionName = "default")
         {
             string sql = substituteTemplate(filter, sqlTemplate);
-            select(selectCallback, sql);
+            select(selectCallback, sql, connectionName);
         }
 
         /// <summary>
@@ -61,10 +61,11 @@ namespace @Model.Name
         /// </summary>
         /// <typeparam name="T">Type that derives from BaseObject</typeparam>
         /// <param name="sql">The SQL query to execute</param>
+        /// <param name="connectionName">The name of the connection to use</param>
         /// <returns>List of T objects</returns>
-        public static List<T> select<T>(string sql) where T : BaseObject, new()
+        public static List<T> select<T>(string sql, string connectionName = "default") where T : BaseObject, new()
         {
-            Logger.Sql($"Executing generic select sql: {sql}");
+            Logger.Sql($"Executing generic select sql: {sql} on connection '{connectionName}'");
 
             List<T> baseObjects = new List<T>();
 
@@ -75,14 +76,14 @@ namespace @Model.Name
                 baseObjects.Add(baseObject);
             };
 
-            select(baseObjectCallback, sql);
+            select(baseObjectCallback, sql, connectionName);
             return baseObjects;
         }
 
-        static public long insert( BaseObject baseObject )
+        static public long insert( BaseObject baseObject, string connectionName = "default" )
         {
-            long id = identity(baseObject);
-            int ver = version(baseObject);
+            long id = identity(baseObject, connectionName);
+            int ver = version(baseObject, connectionName);
 
             baseObject["id"] = id;
             baseObject["version"] = ver;
@@ -91,27 +92,27 @@ namespace @Model.Name
             baseObject["last_updated_by"] = Environment.UserName;
 
             var (sql, parameters) = insertSql(baseObject, baseObject.tableName);
-            execCmd(sql, parameters);
+            execCmd(sql, parameters, connectionName);
 
-            audit(baseObject);
+            audit(baseObject, connectionName);
 
             return id;
         }
 
-        static public long audit( BaseObject baseObject )
+        static public long audit( BaseObject baseObject, string connectionName = "default" )
         {
             // Create the appropriate History object using factory pattern
             BaseObject auditBaseObject = CreateHistoryObject(baseObject);
 
             string auditFKCol = baseObject.tableBaseName + "_id";
             auditBaseObject[auditFKCol] = baseObject["id"];
-            long id = identity(baseObject);
+            long id = identity(baseObject, connectionName);
             auditBaseObject["id"] = id;
 
             Console.WriteLine("Audit: " + auditBaseObject.ToString());
 
             var (sql, parameters) = insertSql(auditBaseObject, baseObject.auditTableName);
-            execCmd(sql, parameters);
+            execCmd(sql, parameters, connectionName);
 
             return id;
         }
@@ -160,31 +161,37 @@ namespace @Model.Name
             }
         }
         
-        static public void update(BaseObject baseObject)
+        static public void update(BaseObject baseObject, string connectionName = "default")
         {
-            baseObject["version"] = version(baseObject);
+            baseObject["version"] = version(baseObject, connectionName);
             baseObject["last_updated"] = DateTime.Now;
             baseObject["last_updated_by"] = Environment.UserName;
 
             string sql = updateSql(baseObject);
-            execCmd(sql);
+            execCmd(sql, connectionName);
 
-            audit(baseObject);
+            audit(baseObject, connectionName);
         }
 
-        public static void execCmd( BaseObject parameters, string sqlTemplate)
+        public static void execCmd( BaseObject parameters, string sqlTemplate, string connectionName = "default")
         {
             string sql = substituteTemplate(parameters, sqlTemplate);
-            execCmd(sql);
+            execCmd(sql, connectionName);
         }
         
-        public static void execCmd(string sql, Dictionary<string, object> parameters = null)
+        public static void execCmd(string sql, string connectionName = "default")
+        {
+            execCmd(sql, null, connectionName);
+        }
+        
+
+        public static void execCmd(string sql, Dictionary<string, object> parameters = null, string connectionName = "default")
         {
             try
             {
-                Logger.Sql($"Executing sql {sql}.");
+                Logger.Sql($"Executing sql {sql} on connection '{connectionName}'.");
 
-                string connectionStr = Config.getString("db.connection");
+                string connectionStr = Config.getDbConnection(connectionName);
 
                 using (DbConnection connection = _provider.CreateConnection(connectionStr))
                 {
@@ -205,7 +212,7 @@ namespace @Model.Name
             }
             catch(Exception x)
             {
-                Logger.Error(x.Message + ": " + sql);
+                Logger.Error(x.Message + ": " + sql + " on connection '" + connectionName + "'");
             }
         }
 
@@ -303,7 +310,7 @@ namespace @Model.Name
             }
         }
 
-        static public void get(BaseObject t)
+        static public void get(BaseObject t, string connectionName = "default")
         {
             string sql = getSql(t);
 
@@ -312,10 +319,10 @@ namespace @Model.Name
                 autoAssign(rdr, t);
             };
 
-            select(sc, sql);
+            select(sc, sql, connectionName);
         }
 
-        static public void put(BaseObject baseObject, string rwkCol)
+        static public void put(BaseObject baseObject, string rwkCol, string connectionName = "default")
         {
             string sql = "select * from " + _provider.FormatTableName("^(tableName)") + " where " + _provider.FormatColumnName("^(rwkCol)") + " = ^(rwkValue)";
             bool found = false;
@@ -331,19 +338,19 @@ namespace @Model.Name
                 baseObject["id"] = rdr["id"];
             };
 
-            select(scb, sql, filter);
+            select(scb, sql, filter, connectionName);
 
             if (found)
             {
-                update(baseObject);
+                update(baseObject, connectionName);
             }
             else
             {
-                insert(baseObject);
+                insert(baseObject, connectionName);
             }
         }
 
-        static public void put(BaseObject baseObject)
+        static public void put(BaseObject baseObject, string connectionName = "default")
         {
             string sql = "select * from " + _provider.FormatTableName("^(schemaName).^(tableName)") + " where ^(expression)";
             int count = 0;
@@ -372,16 +379,16 @@ namespace @Model.Name
                     baseObject["id"] = rdr["id"];
                 };
 
-                select(scb, sql, filter);
+                select(scb, sql, filter, connectionName);
             }
 
             if (count == 1 || hasId)
             {
-                update(baseObject);
+                update(baseObject, connectionName);
             }
             else if (count == 0)
             {
-                insert(baseObject);
+                insert(baseObject, connectionName);
             }
             else
             {
@@ -389,7 +396,7 @@ namespace @Model.Name
             }
         }
 
-        static long identity(BaseObject baseObject)
+        static long identity(BaseObject baseObject, string connectionName = "default")
         {
             long id = 0;
 
@@ -400,12 +407,12 @@ namespace @Model.Name
                 id = Convert.ToInt64(rdr[0]);
             };
 
-            select(scb, sql);
+            select(scb, sql, connectionName);
 
             return id;
         }
 
-        static int version(BaseObject baseObject)
+        static int version(BaseObject baseObject, string connectionName = "default")
         {
             int ver = 0;
             
@@ -425,7 +432,7 @@ namespace @Model.Name
                 ver = Convert.ToInt32(rdr[0]);
             };
 
-            select(scb, sql);
+            select(scb, sql, connectionName);
 
             return ver;
         }
@@ -487,8 +494,9 @@ namespace @Model.Name
         /// Retrieves a query by name from the core.query table with caching
         /// </summary>
         /// <param name="queryName">The name of the query to retrieve</param>
+        /// <param name="connectionName">The name of the connection to use</param>
         /// <returns>A BaseObject containing the query information, or null if not found</returns>
-        public static BaseObject GetQueryByName(string queryName)
+        public static BaseObject GetQueryByName(string queryName, string connectionName = "default")
         {
             // Check cache first
             if (_queryCache.ContainsKey(queryName))
@@ -500,9 +508,10 @@ namespace @Model.Name
             BaseObject query = new BaseObject();
             query["tableName"] = "core.sql";
             
-            string sql = "SELECT id, name, sql_text, description, created_by FROM " + 
-                        _provider.FormatTableName("core.sql") + 
-                        " WHERE " + _provider.FormatColumnName("name") + " = " + 
+            string sql = "SELECT s.id, s.name, s.sql_text, s.description, s.created_by, ds.name as data_source_name FROM " + 
+                        _provider.FormatTableName("core.sql") + " s " +
+                        "LEFT JOIN " + _provider.FormatTableName("core.data_source") + " ds ON s.data_source_id = ds.id " +
+                        "WHERE s." + _provider.FormatColumnName("name") + " = " + 
                         _provider.FormatValue(queryName);
 
             bool found = false;
@@ -514,9 +523,10 @@ namespace @Model.Name
                 query["sql_text"] = rdr["sql_text"];
                 query["description"] = rdr["description"];
                 query["created_by"] = rdr["created_by"];
+                query["data_source_name"] = rdr["data_source_name"];
             };
 
-            select(scb, sql);
+            select(scb, sql, connectionName);
 
             // Cache the result (even if null to avoid repeated database calls for missing queries)
             if (found)
@@ -538,16 +548,18 @@ namespace @Model.Name
         /// </summary>
         /// <param name="queryName">The name of the query to execute</param>
         /// <param name="callback">Callback function to process each row of results</param>
-        public static void ExecuteQueryByName(string queryName, SelectCallback callback)
+        /// <param name="connectionName">The name of the connection to use</param>
+        public static void ExecuteQueryByName(string queryName, SelectCallback callback, string connectionName = "default")
         {
-            BaseObject query = GetQueryByName(queryName);
+            BaseObject query = GetQueryByName(queryName, connectionName);
             if (query == null)
             {
                 throw new Exception($"Query '{queryName}' not found in core.sql table");
             }
 
             string sql = query["sql_text"].ToString();
-            select(callback, sql);
+            string dataSourceName = query["data_source_name"]?.ToString() ?? connectionName;
+            select(callback, sql, dataSourceName);
         }
 
         /// <summary>
@@ -555,10 +567,11 @@ namespace @Model.Name
         /// </summary>
         /// <typeparam name="T">Type that derives from BaseObject</typeparam>
         /// <param name="queryName">The name of the query to execute</param>
+        /// <param name="connectionName">The name of the connection to use</param>
         /// <returns>List of T objects</returns>
-        public static List<T> ExecuteQueryByName<T>(string queryName) where T : BaseObject, new()
+        public static List<T> ExecuteQueryByName<T>(string queryName, string connectionName = "default") where T : BaseObject, new()
         {
-            BaseObject query = GetQueryByName(queryName);
+            BaseObject query = GetQueryByName(queryName, connectionName);
             if (query == null)
             {
                 throw new Exception($"Query '{queryName}' not found in core.sql table");
@@ -576,7 +589,8 @@ namespace @Model.Name
             };
 
             string sql = query["sql_text"].ToString();
-            select(baseObjectCallback, sql);
+            string dataSourceName = query["data_source_name"]?.ToString() ?? connectionName;
+            select(baseObjectCallback, sql, dataSourceName);
 
             return baseObjects;
         }
@@ -587,10 +601,11 @@ namespace @Model.Name
         /// <typeparam name="T">Type that derives from BaseObject</typeparam>
         /// <param name="queryName">The name of the query to execute</param>
         /// <param name="filter">BaseObject containing parameters for template substitution</param>
+        /// <param name="connectionName">The name of the connection to use</param>
         /// <returns>List of T objects</returns>
-        public static List<T> ExecuteQueryByName<T>(string queryName, BaseObject filter) where T : BaseObject, new()
+        public static List<T> ExecuteQueryByName<T>(string queryName, BaseObject filter, string connectionName = "default") where T : BaseObject, new()
         {
-            BaseObject query = GetQueryByName(queryName);
+            BaseObject query = GetQueryByName(queryName, connectionName);
             if (query == null)
             {
                 throw new Exception($"Query '{queryName}' not found in core.sql table");
@@ -608,7 +623,8 @@ namespace @Model.Name
             };
 
             string sqlTemplate = query["sql_text"].ToString();
-            select(baseObjectCallback, sqlTemplate, filter);
+            string dataSourceName = query["data_source_name"]?.ToString() ?? connectionName;
+            select(baseObjectCallback, sqlTemplate, filter, dataSourceName);
 
             return baseObjects;
         }

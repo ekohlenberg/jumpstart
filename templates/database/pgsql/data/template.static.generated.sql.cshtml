@@ -1,3 +1,6 @@
+-- Insert default data source record
+insert into core.data_source (id, name) values ((SELECT nextval('core.data_source_identity')), 'default');
+
 @{
 	foreach( var metaObject in Model.Objects)
 	{
@@ -10,6 +13,7 @@
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'@metaObject.DomainObj', 'delete', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'@metaObject.DomainObj', 'history', 1, current_timestamp, current_user, current_user,1);
 		insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ( (SELECT nextval('sec.operation_identity')),'@metaObject.DomainObj', 'children', 1, current_timestamp, current_user, current_user,1);
+		
 		</text>
 
 	}

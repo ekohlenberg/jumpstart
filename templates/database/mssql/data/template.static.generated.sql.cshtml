@@ -1,3 +1,6 @@
+-- Insert default data source record
+INSERT INTO core.data_source (id, name) VALUES (NEXT VALUE FOR core.data_source_identity, 'default');
+
 DECLARE @@operation_id BIGINT;
 @{
 	foreach( var metaObject in Model.Objects)

@@ -123,7 +123,8 @@ INSERT INTO core.sql (
     last_updated, 
     last_updated_by,
     is_active,
-    version
+    version,
+    data_source_id
 ) VALUES (
      nextval('core.sql_identity'),
     '@(schemaName).@(tableName)-children-@(childDomainVar)-@(childRole)',
@@ -136,7 +137,8 @@ INSERT INTO core.sql (
     NOW(),
     CURRENT_USER,
     1,
-    1
+    1,
+    (SELECT id FROM core.data_source WHERE name = 'default')
 );
 
             </text>
