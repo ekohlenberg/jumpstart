@@ -508,9 +508,10 @@ namespace @Model.Name
             BaseObject query = new BaseObject();
             query["tableName"] = "core.sql";
             
-            string sql = "SELECT id, name, sql_text, description, created_by FROM " + 
-                        _provider.FormatTableName("core.sql") + 
-                        " WHERE " + _provider.FormatColumnName("name") + " = " + 
+            string sql = "SELECT s.id, s.name, s.sql_text, s.description, s.created_by, ds.name as data_source_name FROM " + 
+                        _provider.FormatTableName("core.sql") + " s " +
+                        "LEFT JOIN " + _provider.FormatTableName("core.data_source") + " ds ON s.data_source_id = ds.id " +
+                        "WHERE s." + _provider.FormatColumnName("name") + " = " + 
                         _provider.FormatValue(queryName);
 
             bool found = false;
@@ -522,6 +523,7 @@ namespace @Model.Name
                 query["sql_text"] = rdr["sql_text"];
                 query["description"] = rdr["description"];
                 query["created_by"] = rdr["created_by"];
+                query["data_source_name"] = rdr["data_source_name"];
             };
 
             select(scb, sql, connectionName);
@@ -556,7 +558,8 @@ namespace @Model.Name
             }
 
             string sql = query["sql_text"].ToString();
-            select(callback, sql, connectionName);
+            string dataSourceName = query["data_source_name"]?.ToString() ?? connectionName;
+            select(callback, sql, dataSourceName);
         }
 
         /// <summary>
@@ -586,7 +589,8 @@ namespace @Model.Name
             };
 
             string sql = query["sql_text"].ToString();
-            select(baseObjectCallback, sql, connectionName);
+            string dataSourceName = query["data_source_name"]?.ToString() ?? connectionName;
+            select(baseObjectCallback, sql, dataSourceName);
 
             return baseObjects;
         }
@@ -619,7 +623,8 @@ namespace @Model.Name
             };
 
             string sqlTemplate = query["sql_text"].ToString();
-            select(baseObjectCallback, sqlTemplate, filter, connectionName);
+            string dataSourceName = query["data_source_name"]?.ToString() ?? connectionName;
+            select(baseObjectCallback, sqlTemplate, filter, dataSourceName);
 
             return baseObjects;
         }
