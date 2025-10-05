@@ -78,14 +78,14 @@ Write-Host "Connecting to SQL Server: $connectionString"
 Write-Host "Database: $database"
 
 # Build sqlcmd authentication parameters
-$authParams = @()
+$authParams = @@()
 if ($username -and $password) {
     Write-Host "Using SQL Server authentication with username: $username"
-    $authParams = @("-U", $username, "-P", $password)
+    $authParams = @@("-U", $username, "-P", $password)
 }
 else {
     Write-Host "Using Windows authentication"
-    $authParams = @("-E")
+    $authParams = @@("-E")
 }
 
 Write-Host "Loading static data files..."
@@ -99,14 +99,14 @@ Write-Host "Loading static data files..."
         continue;
     }
     <text>
-Write-Host "Loading: @sourceFile"
-$sqlFile = ".\@sourceFile"
+Write-Host "Loading: @(sourceFile)"
+$sqlFile = ".\@(sourceFile)"
 if (-not (Test-Path $sqlFile)) {
     Write-Warning "SQL file not found, skipping: $sqlFile"
     continue
 }
 
-sqlcmd -S $connectionString -d $database @authParams -i "$sqlFile"
+sqlcmd -S $connectionString -d $database @@authParams -i "$sqlFile"
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to load: $sqlFile"
     Write-Error "Check the SQL file for syntax errors and ensure the database connection is working."
