@@ -1,5 +1,24 @@
 -- Insert default data source record
-INSERT INTO core.data_source (id, name) VALUES (NEXT VALUE FOR core.data_source_identity, 'default');
+
+INSERT INTO [core].[data_source]
+           ([id]
+           ,[name]
+           ,[is_active]
+           ,[created_by]
+           ,[last_updated]
+           ,[last_updated_by]
+           ,[version])
+     VALUES
+           (NEXT VALUE FOR core.data_source_identity, 
+		   'default',
+		   1,
+		   CURRENT_USER,
+		   getdate(),
+		   CURRENT_USER,
+		   1);
+
+
+
 
 DECLARE @@operation_id BIGINT;
 @{

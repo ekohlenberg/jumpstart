@@ -1,6 +1,8 @@
 -- =====================================
 -- Generate SELECT queries for child records
 -- =====================================
+DECLARE @@sql_id BIGINT;
+
 @using System.Linq;
 @using System.Collections.Generic;
 @using jumpstart;
@@ -32,6 +34,7 @@
 			var childTableName = childObject.TableName;
 			var childSchemaName = childObject.SchemaName;
 			var childDomainObj = childObject.DomainObj;
+			var childDomainVar = childObject.DomainVar;
 			
 			// Get all attributes for the child object
 			var childAttributes = childObject.Attributes;
@@ -114,7 +117,7 @@
 			
 			<text>
 -- Child relationship: @(childLabel) (@(childRole))
-DECLARE @@sql_id BIGINT = NEXT VALUE FOR core.sql_identity;
+select @@sql_id= NEXT VALUE FOR core.sql_identity;
 
 INSERT INTO core.sql (
     id, 
