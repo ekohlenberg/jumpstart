@@ -78,19 +78,19 @@ Write-Host "Connecting to SQL Server: $connectionString"
 Write-Host "Database: $database"
 
 # Build sqlcmd authentication parameters
-$authParams = @()
+$authParams = @@()
 if ($username -and $password) {
     Write-Host "Using SQL Server authentication with username: $username"
-    $authParams = @("-U", $username, "-P", $password)
+    $authParams = @@("-U", $username, "-P", $password)
 }
 else {
     Write-Host "Using Windows authentication"
-    $authParams = @("-E")
+    $authParams = @@("-E")
 }
 
 # Execute the database creation script
 Write-Host "Executing database creation script..."
-sqlcmd -S $connectionString @authParams -i ".\@(Model.Name + ".database.create.generated.sql")"
+sqlcmd -S $connectionString @@authParams -i ".\@(Model.Name + ".database.create.generated.sql")"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to execute database creation script"
@@ -107,10 +107,10 @@ if ($LASTEXITCODE -ne 0) {
     }
     else {
         <text>
-Write-Host "Executing: @sourceFile"
-sqlcmd -S $connectionString @authParams -i ".\@sourceFile"
+Write-Host "Executing: @(sourceFile)"
+sqlcmd -S $connectionString @@authParams -i ".\@(sourceFile)"
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to execute: @sourceFile"
+    Write-Error "Failed to execute: @(sourceFile)"
     exit $LASTEXITCODE
 }
         </text>
