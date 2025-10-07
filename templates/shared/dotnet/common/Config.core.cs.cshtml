@@ -106,7 +106,7 @@ namespace @Model.Name
             return _currentDataSource;
         }
 
-        static private NamespaceConfig loadNamespaceConfig()
+        static public NamespaceConfig LoadNamespaceConfig()
         {
             if (_namespaceConfig == null)
             {
@@ -187,7 +187,7 @@ namespace @Model.Name
                 _dbparams = new Dictionary<string, string>();
                 
                 // Load the namespace configuration
-                var config = loadNamespaceConfig();
+                var config = LoadNamespaceConfig();
                 
                 // Get the requested data source
                 if (!config.DataSourceConfigs.ContainsKey(dataSourceName))

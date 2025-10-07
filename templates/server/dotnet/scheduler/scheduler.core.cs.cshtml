@@ -1,0 +1,456 @@
+@{
+    string namespaceName = @Model.Namespace; 
+    string domainObj = @Model.DomainObj; 
+    string domainVar = @Model.DomainVar; 
+}
+
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using @(namespaceName);
+
+namespace @(namespaceName).Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SchedulerController : ControllerBase
+    {
+        // =====================================
+        // Job Management Operations
+        // =====================================
+
+        // POST api/<@(domainObj)Controller>/schedule
+        [HttpPost("schedule")]
+        public ActionResult<@(domainObj)> Schedule([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) SCHEDULE: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().schedule(@(domainVar));
+            return CreatedAtAction(nameof(Get), new { id = @(domainVar).id }, @(domainVar));
+        }
+
+        // POST api/<@(domainObj)Controller>/execute
+        [HttpPost("execute")]
+        public ActionResult<@(domainObj)> Execute([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) EXECUTE: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().execute(@(domainVar));
+            return Ok(@(domainVar));
+        }
+
+        // POST api/<@(domainObj)Controller>/cancel/{id}
+        [HttpPost("cancel/{id}")]
+        public ActionResult Cancel(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) CANCEL: ID={id}");
+            
+            @(domainObj)Logic.Create().cancel(id);
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/pause/{id}
+        [HttpPost("pause/{id}")]
+        public ActionResult Pause(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) PAUSE: ID={id}");
+            
+            @(domainObj)Logic.Create().pause(id);
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/resume/{id}
+        [HttpPost("resume/{id}")]
+        public ActionResult Resume(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) RESUME: ID={id}");
+            
+            @(domainObj)Logic.Create().resume(id);
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/retry/{id}
+        [HttpPost("retry/{id}")]
+        public ActionResult Retry(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) RETRY: ID={id}");
+            
+            @(domainObj)Logic.Create().retry(id);
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/abort/{id}
+        [HttpPost("abort/{id}")]
+        public ActionResult Abort(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) ABORT: ID={id}");
+            
+            @(domainObj)Logic.Create().abort(id);
+            return Ok();
+        }
+
+        // =====================================
+        // Job Status & Monitoring Operations
+        // =====================================
+
+        // GET api/<@(domainObj)Controller>/status/{id}
+        [HttpGet("status/{id}")]
+        public ActionResult<@(domainObj)> Status(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) STATUS: ID={id}");
+            
+            @(domainObj) @(domainVar) = @(domainObj)Logic.Create().status(id);
+            return Ok(@(domainVar));
+        }
+
+        // GET api/<@(domainObj)Controller>/list
+        [HttpGet("list")]
+        public ActionResult<IEnumerable<@(domainObj)>> List([FromQuery] string status = null, [FromQuery] string priority = null)
+        {
+            //Console.WriteLine($"Processing @(domainObj) LIST: status={status}, priority={priority}");
+            
+            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().list(status, priority);
+            return Ok(@(domainVar)s);
+        }
+
+        // GET api/<@(domainObj)Controller>/monitor/{id}
+        [HttpGet("monitor/{id}")]
+        public ActionResult<@(domainObj)> Monitor(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) MONITOR: ID={id}");
+            
+            @(domainObj) @(domainVar) = @(domainObj)Logic.Create().monitor(id);
+            return Ok(@(domainVar));
+        }
+
+        // GET api/<@(domainObj)Controller>/query
+        [HttpGet("query")]
+        public ActionResult<IEnumerable<@(domainObj)>> Query([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
+        {
+            //Console.WriteLine($"Processing @(domainObj) QUERY: startDate={startDate}, endDate={endDate}");
+            
+            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().query(startDate, endDate);
+            return Ok(@(domainVar)s);
+        }
+
+        // =====================================
+        // Resource Management Operations
+        // =====================================
+
+        // POST api/<@(domainObj)Controller>/allocate
+        [HttpPost("allocate")]
+        public ActionResult<@(domainObj)> Allocate([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) ALLOCATE: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().allocate(@(domainVar));
+            return Ok(@(domainVar));
+        }
+
+        // POST api/<@(domainObj)Controller>/deallocate/{id}
+        [HttpPost("deallocate/{id}")]
+        public ActionResult Deallocate(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) DEALLOCATE: ID={id}");
+            
+            @(domainObj)Logic.Create().deallocate(id);
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/balance
+        [HttpPost("balance")]
+        public ActionResult Balance()
+        {
+            //Console.WriteLine($"Processing @(domainObj) BALANCE");
+            
+            @(domainObj)Logic.Create().balance();
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/scale
+        [HttpPost("scale")]
+        public ActionResult Scale([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) SCALE: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().scale(@(domainVar));
+            return Ok();
+        }
+
+        // =====================================
+        // Dependency Management Operations
+        // =====================================
+
+        // POST api/<@(domainObj)Controller>/wait
+        [HttpPost("wait")]
+        public ActionResult<@(domainObj)> Wait([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) WAIT: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().wait(@(domainVar));
+            return Ok(@(domainVar));
+        }
+
+        // POST api/<@(domainObj)Controller>/trigger/{id}
+        [HttpPost("trigger/{id}")]
+        public ActionResult Trigger(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) TRIGGER: ID={id}");
+            
+            @(domainObj)Logic.Create().trigger(id);
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/chain
+        [HttpPost("chain")]
+        public ActionResult<IEnumerable<@(domainObj)>> Chain([FromBody] List<@(domainObj)> @(domainVar)s)
+        {
+            //Console.WriteLine($"Processing @(domainObj) CHAIN: {@(domainVar)s.Count} jobs");
+            
+            foreach(var @(domainVar) in @(domainVar)s)
+            {
+                JsonHelper.ProcessJsonElements(@(domainVar));
+            }
+            
+            List<@(domainObj)> chainedJobs = @(domainObj)Logic.Create().chain(@(domainVar)s);
+            return Ok(chainedJobs);
+        }
+
+        // POST api/<@(domainObj)Controller>/fork/{id}
+        [HttpPost("fork/{id}")]
+        public ActionResult<IEnumerable<@(domainObj)>> Fork(long id, [FromBody] List<@(domainObj)> @(domainVar)s)
+        {
+            //Console.WriteLine($"Processing @(domainObj) FORK: ID={id}, {@(domainVar)s.Count} sub-jobs");
+            
+            foreach(var @(domainVar) in @(domainVar)s)
+            {
+                JsonHelper.ProcessJsonElements(@(domainVar));
+            }
+            
+            List<@(domainObj)> forkedJobs = @(domainObj)Logic.Create().fork(id, @(domainVar)s);
+            return Ok(forkedJobs);
+        }
+
+        // POST api/<@(domainObj)Controller>/join/{id}
+        [HttpPost("join/{id}")]
+        public ActionResult<@(domainObj)> Join(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) JOIN: ID={id}");
+            
+            @(domainObj) @(domainVar) = @(domainObj)Logic.Create().join(id);
+            return Ok(@(domainVar));
+        }
+
+        // =====================================
+        // Recurring & Batch Operations
+        // =====================================
+
+        // POST api/<@(domainObj)Controller>/repeat
+        [HttpPost("repeat")]
+        public ActionResult<@(domainObj)> Repeat([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) REPEAT: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().repeat(@(domainVar));
+            return Ok(@(domainVar));
+        }
+
+        // POST api/<@(domainObj)Controller>/batch
+        [HttpPost("batch")]
+        public ActionResult<IEnumerable<@(domainObj)>> Batch([FromBody] List<@(domainObj)> @(domainVar)s)
+        {
+            //Console.WriteLine($"Processing @(domainObj) BATCH: {@(domainVar)s.Count} jobs");
+            
+            foreach(var @(domainVar) in @(domainVar)s)
+            {
+                JsonHelper.ProcessJsonElements(@(domainVar));
+            }
+            
+            List<@(domainObj)> batchedJobs = @(domainObj)Logic.Create().batch(@(domainVar)s);
+            return Ok(batchedJobs);
+        }
+
+        // POST api/<@(domainObj)Controller>/queue
+        [HttpPost("queue")]
+        public ActionResult<@(domainObj)> Queue([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) QUEUE: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().queue(@(domainVar));
+            return Ok(@(domainVar));
+        }
+
+        // POST api/<@(domainObj)Controller>/prioritize/{id}
+        [HttpPost("prioritize/{id}")]
+        public ActionResult Prioritize(long id, [FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) PRIORITIZE: ID={id}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().prioritize(id, @(domainVar));
+            return Ok();
+        }
+
+        // =====================================
+        // System Management Operations
+        // =====================================
+
+        // POST api/<@(domainObj)Controller>/register
+        [HttpPost("register")]
+        public ActionResult Register([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) REGISTER: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().register(@(domainVar));
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/unregister/{id}
+        [HttpPost("unregister/{id}")]
+        public ActionResult Unregister(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) UNREGISTER: ID={id}");
+            
+            @(domainObj)Logic.Create().unregister(id);
+            return Ok();
+        }
+
+        // GET api/<@(domainObj)Controller>/health
+        [HttpGet("health")]
+        public ActionResult Health()
+        {
+            //Console.WriteLine($"Processing @(domainObj) HEALTH");
+            
+            var healthStatus = @(domainObj)Logic.Create().health();
+            return Ok(healthStatus);
+        }
+
+        // POST api/<@(domainObj)Controller>/recover
+        [HttpPost("recover")]
+        public ActionResult Recover()
+        {
+            //Console.WriteLine($"Processing @(domainObj) RECOVER");
+            
+            @(domainObj)Logic.Create().recover();
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/migrate/{id}
+        [HttpPost("migrate/{id}")]
+        public ActionResult<@(domainObj)> Migrate(long id, [FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) MIGRATE: ID={id}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj) @(domainVar)Migrated = @(domainObj)Logic.Create().migrate(id, @(domainVar));
+            return Ok(@(domainVar)Migrated);
+        }
+
+        // =====================================
+        // Configuration Operations
+        // =====================================
+
+        // POST api/<@(domainObj)Controller>/configure
+        [HttpPost("configure")]
+        public ActionResult Configure([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) CONFIGURE: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().configure(@(domainVar));
+            return Ok();
+        }
+
+        // PUT api/<@(domainObj)Controller>/update/{id}
+        [HttpPut("update/{id}")]
+        public ActionResult Update(long id, [FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) UPDATE: ID={id}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            @(domainObj)Logic.Create().update(id, @(domainVar));
+            return Ok();
+        }
+
+        // POST api/<@(domainObj)Controller>/validate
+        [HttpPost("validate")]
+        public ActionResult Validate([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) VALIDATE: {@(domainVar)}");
+            
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            
+            var validationResult = @(domainObj)Logic.Create().validate(@(domainVar));
+            return Ok(validationResult);
+        }
+
+        // =====================================
+        // Standard CRUD Operations (for backward compatibility)
+        // =====================================
+
+        // GET: api/<@(domainObj)Controller>
+        [HttpGet]
+        public IEnumerable<@(domainObj)> Get()
+        {
+            //Console.WriteLine("Processing GET List");
+            List<@(domainObj)> @(domainVar)s = @(domainObj)Logic.Create().select();
+            return @(domainVar)s;
+        }
+
+        // GET api/<@(domainObj)Controller>/{id}
+        [HttpGet("{id}")]
+        public @(domainObj) Get(long id)
+        {
+            //Console.WriteLine($"Processing @(domainObj) GET ID={id}");
+            @(domainObj) @(domainVar) = @(domainObj)Logic.Create().get(id);
+            return @(domainVar);
+        }
+
+        // POST api/<@(domainObj)Controller>
+        [HttpPost]
+        public void Post([FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) POST: {@(domainVar)}");
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            @(domainObj)Logic.Create().insert(@(domainVar));
+        }
+
+        // PUT api/<@(domainObj)Controller>/{id}
+        [HttpPut("{id}")]
+        public void Put(long id, [FromBody] @(domainObj) @(domainVar))
+        {
+            //Console.WriteLine($"Processing @(domainObj) PUT: ID = {id}\n{@(domainVar)}");
+            JsonHelper.ProcessJsonElements(@(domainVar));
+            @(domainObj)Logic.Create().update(id, @(domainVar));
+        }
+
+        // DELETE api/<@(domainObj)Controller>/{id}
+        [HttpDelete("{id}")]
+        public void Delete(long id)
+        {
+            @(domainObj)Logic.Create().delete(id);
+        }
+    }
+}

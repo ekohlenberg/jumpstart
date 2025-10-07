@@ -12,7 +12,6 @@ namespace @Model.Name
 {
     public class DBPersist
     {
-        private static readonly IDatabaseProvider _provider = DatabaseProviderFactory.CreateProvider();
         private static readonly Dictionary<string, BaseObject> _queryCache = new Dictionary<string, BaseObject>();
         
         public delegate void SelectCallback(DbDataReader rdr);
@@ -23,12 +22,13 @@ namespace @Model.Name
             
             try
             {
+                IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
                 string connectionStr = Config.getDbConnection(connectionName);
 
-                using (DbConnection connection = _provider.CreateConnection(connectionStr))
+                using (DbConnection connection = provider.CreateConnection(connectionStr))
                 {
 
-                    using (DbCommand command = _provider.CreateCommand(sql, connection))
+                    using (DbCommand command = provider.CreateCommand(sql, connection))
                     {
                         using (DbDataReader rdr = command.ExecuteReader())
                         {
@@ -91,7 +91,7 @@ namespace @Model.Name
             baseObject["last_updated"] = DateTime.Now;
             baseObject["last_updated_by"] = Environment.UserName;
 
-            var (sql, parameters) = insertSql(baseObject, baseObject.tableName);
+            var (sql, parameters) = insertSql(baseObject, baseObject.tableName, connectionName);
             execCmd(sql, parameters, connectionName);
 
             audit(baseObject, connectionName);
@@ -111,7 +111,7 @@ namespace @Model.Name
 
             Console.WriteLine("Audit: " + auditBaseObject.ToString());
 
-            var (sql, parameters) = insertSql(auditBaseObject, baseObject.auditTableName);
+            var (sql, parameters) = insertSql(auditBaseObject, baseObject.auditTableName, connectionName);
             execCmd(sql, parameters, connectionName);
 
             return id;
@@ -167,7 +167,7 @@ namespace @Model.Name
             baseObject["last_updated"] = DateTime.Now;
             baseObject["last_updated_by"] = Environment.UserName;
 
-            string sql = updateSql(baseObject);
+            string sql = updateSql(baseObject, connectionName);
             execCmd(sql, connectionName);
 
             audit(baseObject, connectionName);
@@ -191,18 +191,19 @@ namespace @Model.Name
             {
                 Logger.Sql($"Executing sql {sql} on connection '{connectionName}'.");
 
+                IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
                 string connectionStr = Config.getDbConnection(connectionName);
 
-                using (DbConnection connection = _provider.CreateConnection(connectionStr))
+                using (DbConnection connection = provider.CreateConnection(connectionStr))
                 {
-                    using (DbCommand command = _provider.CreateCommand(sql, connection))
+                    using (DbCommand command = provider.CreateCommand(sql, connection))
                     {
                         // Add parameters if provided
                         if (parameters != null)
                         {
                             foreach (var param in parameters)
                             {
-                                _provider.AddParameterWithValue(command, param.Key, param.Value);
+                                provider.AddParameterWithValue(command, param.Key, param.Value);
                             }
                         }
                         
@@ -216,9 +217,11 @@ namespace @Model.Name
             }
         }
 
-        static (string sql, Dictionary<string, object> parameters) insertSql( BaseObject baseObject, string tableName )
+        static (string sql, Dictionary<string, object> parameters) insertSql( BaseObject baseObject, string tableName, string connectionName = "default" )
         {
-            StringBuilder sql = new StringBuilder("insert into " + _provider.FormatTableName(tableName) + " ");
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            
+            StringBuilder sql = new StringBuilder("insert into " + provider.FormatTableName(tableName) + " ");
             StringBuilder cols = new StringBuilder("");
             StringBuilder vals = new StringBuilder("");
             var parameters = new Dictionary<string, object>();
@@ -250,10 +253,10 @@ namespace @Model.Name
                     cols.Append(",");
                     vals.Append(",");
                 }
-                cols.Append(_provider.FormatColumnName(property.Name));
+                cols.Append(provider.FormatColumnName(property.Name));
                 
                 // Use parameterized query instead of direct value formatting
-                string paramName = _provider.FormatParameter(property.Name);
+                string paramName = provider.FormatParameter(property.Name);
                 vals.Append(paramName);
                 parameters[paramName] = value;
             }
@@ -267,16 +270,18 @@ namespace @Model.Name
             return (sql.ToString(), parameters);
         }
 
-        static string updateSql( BaseObject baseObject)
+        static string updateSql( BaseObject baseObject, string connectionName = "default")
         {
-            StringBuilder sql = new StringBuilder("update " + _provider.FormatTableName(baseObject.tableName) + " set ");
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            
+            StringBuilder sql = new StringBuilder("update " + provider.FormatTableName(baseObject.tableName) + " set ");
             StringBuilder expressions = new StringBuilder();
             StringBuilder where = new StringBuilder();
 
-            exprSql(baseObject, baseObject.Keys, ", ", expressions);
+            exprSql(baseObject, baseObject.Keys, ", ", expressions, connectionName);
 
             where.Append(" where id=");
-            where.Append(_provider.FormatValue(baseObject["id"]));
+            where.Append(provider.FormatValue(baseObject["id"]));
 
             sql.Append(expressions);
             sql.Append(where);
@@ -285,8 +290,10 @@ namespace @Model.Name
             return sql.ToString();
         }
 
-        private static void exprSql(BaseObject baseObject, IEnumerable<string> attrList, string sepToken, StringBuilder expressions)
+        private static void exprSql(BaseObject baseObject, IEnumerable<string> attrList, string sepToken, StringBuilder expressions, string connectionName = "default")
         {
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            
             foreach (string k in attrList)
             {
                 if (k != "id")
@@ -301,9 +308,9 @@ namespace @Model.Name
                         expressions.Append(sepToken);
                     }
                     string expr = string.Empty;
-                    expr += _provider.FormatColumnName(k);
+                    expr += provider.FormatColumnName(k);
                     expr += "=";
-                    expr += _provider.FormatValue(v);
+                    expr += provider.FormatValue(v);
 
                     expressions.Append(expr);
                 }
@@ -312,7 +319,7 @@ namespace @Model.Name
 
         static public void get(BaseObject t, string connectionName = "default")
         {
-            string sql = getSql(t);
+            string sql = getSql(t, connectionName);
 
             SelectCallback sc = (rdr) =>
             {
@@ -324,13 +331,15 @@ namespace @Model.Name
 
         static public void put(BaseObject baseObject, string rwkCol, string connectionName = "default")
         {
-            string sql = "select * from " + _provider.FormatTableName("^(tableName)") + " where " + _provider.FormatColumnName("^(rwkCol)") + " = ^(rwkValue)";
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            
+            string sql = "select * from " + provider.FormatTableName("^(tableName)") + " where " + provider.FormatColumnName("^(rwkCol)") + " = ^(rwkValue)";
             bool found = false;
 
             BaseObject filter = new BaseObject();
             filter["tableName"] = baseObject.tableName;
             filter["rwkCol"] = rwkCol;
-            filter["rwkValue"] = _provider.FormatValue(baseObject[rwkCol].ToString());
+            filter["rwkValue"] = provider.FormatValue(baseObject[rwkCol].ToString());
 
             SelectCallback scb = (rdr) =>
             {
@@ -352,7 +361,9 @@ namespace @Model.Name
 
         static public void put(BaseObject baseObject, string connectionName = "default")
         {
-            string sql = "select * from " + _provider.FormatTableName("^(schemaName).^(tableName)") + " where ^(expression)";
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            
+            string sql = "select * from " + provider.FormatTableName("^(schemaName).^(tableName)") + " where ^(expression)";
             int count = 0;
             StringBuilder expression = new StringBuilder();
             bool hasId = false;
@@ -366,7 +377,7 @@ namespace @Model.Name
             {
                 if (baseObject.getRwk().Count <= 0) throw new Exception(baseObject.GetType().Name + ".rwk list is empty. DBPersist.put(BaseObject) requires at least one attribute in the rwk list.");
 
-                exprSql(baseObject, baseObject.getRwk(), " and ", expression);
+                exprSql(baseObject, baseObject.getRwk(), " and ", expression, connectionName);
 
                 BaseObject filter = new BaseObject();
                 filter["schemaName"] = baseObject.schemaName;
@@ -398,9 +409,10 @@ namespace @Model.Name
 
         static long identity(BaseObject baseObject, string connectionName = "default")
         {
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
             long id = 0;
 
-            string sql = _provider.GetNextIdentitySql(baseObject.tableName);
+            string sql = provider.GetNextIdentitySql(baseObject.tableName);
 
             SelectCallback scb = (rdr) =>
             {
@@ -414,6 +426,7 @@ namespace @Model.Name
 
         static int version(BaseObject baseObject, string connectionName = "default")
         {
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
             int ver = 0;
             
             long id = 0;
@@ -425,7 +438,7 @@ namespace @Model.Name
                 }
             }
                 
-            string sql = _provider.GetVersionSql(baseObject.tableName, id);
+            string sql = provider.GetVersionSql(baseObject.tableName, id);
 
             SelectCallback scb = (rdr) =>
             {
@@ -437,14 +450,16 @@ namespace @Model.Name
             return ver;
         }
         
-        static string getSql( BaseObject t)
+        static string getSql( BaseObject t, string connectionName = "default")
         {
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            
             string sqlTemplate = "select * from ^(table) where id=^(id)";
 
             BaseObject p = new BaseObject();
 
             p["id"] = t["id"];
-            p["table"] = _provider.FormatTableName(t.tableName);
+            p["table"] = provider.FormatTableName(t.tableName);
 
             return substituteTemplate(p, sqlTemplate);
         }
@@ -505,14 +520,16 @@ namespace @Model.Name
                 return _queryCache[queryName];
             }
 
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            
             BaseObject query = new BaseObject();
             query["tableName"] = "core.sql";
             
             string sql = "SELECT s.id, s.name, s.sql_text, s.description, s.created_by, ds.name as data_source_name FROM " + 
-                        _provider.FormatTableName("core.sql") + " s " +
-                        "LEFT JOIN " + _provider.FormatTableName("core.data_source") + " ds ON s.data_source_id = ds.id " +
-                        "WHERE s." + _provider.FormatColumnName("name") + " = " + 
-                        _provider.FormatValue(queryName);
+                        provider.FormatTableName("core.sql") + " s " +
+                        "LEFT JOIN " + provider.FormatTableName("core.data_source") + " ds ON s.data_source_id = ds.id " +
+                        "WHERE s." + provider.FormatColumnName("name") + " = " + 
+                        provider.FormatValue(queryName);
 
             bool found = false;
             SelectCallback scb = (rdr) =>
