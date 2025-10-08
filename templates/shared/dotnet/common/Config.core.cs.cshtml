@@ -45,7 +45,6 @@ namespace @Model.Name
     public class Config
     {
         static IConfiguration configBuilder = null;
-        static Dictionary<string, string> _dbparams = null;
         static NamespaceConfig _namespaceConfig = null;
         static string _currentDataSource = "default";
 
@@ -60,24 +59,34 @@ namespace @Model.Name
 
             return configBuilder;
         }
+        
         static public string getString(string param)
         {
-            // Check if _dbparams is null or empty, populate it if needed
-            if (_dbparams == null || _dbparams.Count == 0)
-            {
-                getDbConnection();  // side effect: populates _dbparams
-            }
-
             string result = string.Empty;
 
-            // Check if the requested parameter is in the _dbparams cache
-            if (_dbparams != null && _dbparams.ContainsKey(param))
-            {
-                result = _dbparams[param];
-            }
-            else if (param == "db.connection")
+            if (param == "db.connection")
             {
                 result = getDbConnection();
+            }
+            else if (param == "dbType" || param == "server" || param == "port" || 
+                     param == "database" || param == "username" || param == "password")
+            {
+                // Get database parameter from current data source
+                var config = LoadNamespaceConfig();
+                if (config?.DataSourceConfigs != null && config.DataSourceConfigs.ContainsKey(_currentDataSource))
+                {
+                    var dataSource = config.DataSourceConfigs[_currentDataSource];
+                    result = param switch
+                    {
+                        "dbType" => dataSource.DbType?.ToLower().Trim() ?? "postgresql",
+                        "server" => dataSource.Hostname ?? "localhost",
+                        "port" => dataSource.Port ?? "5432",
+                        "database" => dataSource.Database ?? "",
+                        "username" => dataSource.Username ?? "",
+                        "password" => dataSource.Password ?? "",
+                        _ => string.Empty
+                    };
+                }
             }
             else
             {
@@ -97,8 +106,6 @@ namespace @Model.Name
         static public void setDataSource(string dataSourceName)
         {
             _currentDataSource = dataSourceName;
-            // Clear the cache so it will be rebuilt with the new data source
-            _dbparams = null;
         }
 
         static public string getCurrentDataSource()
@@ -106,7 +113,7 @@ namespace @Model.Name
             return _currentDataSource;
         }
 
-        static private NamespaceConfig loadNamespaceConfig()
+        static public NamespaceConfig LoadNamespaceConfig()
         {
             if (_namespaceConfig == null)
             {
@@ -181,38 +188,24 @@ namespace @Model.Name
 
         static public string getDbConnection(string dataSourceName)
         {
-            // Initialize cache if needed
-            if (_dbparams == null)
+            // Load the namespace configuration
+            var config = LoadNamespaceConfig();
+            
+            // Get the requested data source
+            if (!config.DataSourceConfigs.ContainsKey(dataSourceName))
             {
-                _dbparams = new Dictionary<string, string>();
-                
-                // Load the namespace configuration
-                var config = loadNamespaceConfig();
-                
-                // Get the requested data source
-                if (!config.DataSourceConfigs.ContainsKey(dataSourceName))
-                {
-                    throw new KeyNotFoundException($"Data source '{dataSourceName}' not found in configuration. Available data sources: {string.Join(", ", config.DataSourceConfigs.Keys)}");
-                }
-                
-                var dataSource = config.DataSourceConfigs[dataSourceName];
-
-                // Populate the cache
-                _dbparams["dbType"] = dataSource.DbType?.ToLower().Trim() ?? "postgresql";
-                _dbparams["server"] = dataSource.Hostname ?? "localhost";
-                _dbparams["port"] = dataSource.Port ?? "5432";
-                _dbparams["database"] = dataSource.Database ?? "";
-                _dbparams["username"] = dataSource.Username ?? "";
-                _dbparams["password"] = dataSource.Password ?? "";
+                throw new KeyNotFoundException($"Data source '{dataSourceName}' not found in configuration. Available data sources: {string.Join(", ", config.DataSourceConfigs.Keys)}");
             }
+            
+            var dataSource = config.DataSourceConfigs[dataSourceName];
 
-            // Get values from cache
-            string dbType = _dbparams["dbType"];
-            string server = _dbparams["server"];
-            string port = _dbparams["port"];
-            string database = _dbparams["database"];
-            string username = _dbparams["username"];
-            string password = _dbparams["password"];
+            // Get values directly from dataSource
+            string dbType = dataSource.DbType?.ToLower().Trim() ?? "postgresql";
+            string server = dataSource.Hostname ?? "localhost";
+            string port = dataSource.Port ?? "5432";
+            string database = dataSource.Database ?? "";
+            string username = dataSource.Username ?? "";
+            string password = dataSource.Password ?? "";
 
             // Create the connection string based on database type and whether username/password are provided
             string dbcon;
