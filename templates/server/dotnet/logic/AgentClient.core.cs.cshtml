@@ -1,0 +1,425 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+
+namespace @Model.Namespace
+{
+    /// <summary>
+    /// REST client for communicating with Agent services
+    /// </summary>
+    public class AgentClient : IDisposable
+    {
+        private readonly HttpClient _httpClient;
+        private readonly string _baseUrl;
+
+        public AgentClient(string baseUrl)
+        {
+            _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
+            _httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(_baseUrl),
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+        }
+
+        // =====================================
+        // Process Management Operations
+        // =====================================
+
+        /// <summary>
+        /// Start a new process
+        /// </summary>
+        public async Task<long> StartAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/start", executionId);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<long>();
+        }
+
+        /// <summary>
+        /// Stop a running process
+        /// </summary>
+        public async Task StopAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/stop/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Kill a process forcefully
+        /// </summary>
+        public async Task KillAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/kill/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Restart a process
+        /// </summary>
+        public async Task RestartAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/restart/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Pause a process
+        /// </summary>
+        public async Task PauseAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/pause/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Resume a paused process
+        /// </summary>
+        public async Task ResumeAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/resume/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        // =====================================
+        // Status & Reporting Operations
+        // =====================================
+
+        /// <summary>
+        /// Get status of a process
+        /// </summary>
+        public async Task<object?> GetStatusAsync(long executionId)
+        {
+            var response = await _httpClient.GetAsync($"/api/agent/status/{executionId}");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Send heartbeat
+        /// </summary>
+        public async Task HeartbeatAsync(object heartbeatData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/heartbeat", heartbeatData);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Send a report
+        /// </summary>
+        public async Task ReportAsync(object reportData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/report", reportData);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Send log entry
+        /// </summary>
+        public async Task LogAsync(object logData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/log", logData);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Send metrics
+        /// </summary>
+        public async Task MetricsAsync(object metricsData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/metrics", metricsData);
+            response.EnsureSuccessStatusCode();
+        }
+
+        // =====================================
+        // Resource Management Operations
+        // =====================================
+
+        /// <summary>
+        /// Register agent with scheduler
+        /// </summary>
+        public async Task<long> RegisterAsync(object registrationData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/register", registrationData);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<long>();
+        }
+
+        /// <summary>
+        /// Unregister agent
+        /// </summary>
+        public async Task UnregisterAsync(long agentId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/unregister/{agentId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Get agent capabilities
+        /// </summary>
+        public async Task<object?> GetCapabilitiesAsync()
+        {
+            var response = await _httpClient.GetAsync("/api/agent/capabilities");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Allocate resources
+        /// </summary>
+        public async Task<long> AllocateAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/allocate", executionId);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<long>();
+        }
+
+        /// <summary>
+        /// Release resources
+        /// </summary>
+        public async Task ReleaseAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/release/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        // =====================================
+        // Job Execution Operations
+        // =====================================
+
+        /// <summary>
+        /// Execute a job
+        /// </summary>
+        public async Task<long> ExecuteAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/execute", executionId);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<long>();
+        }
+
+        /// <summary>
+        /// Validate job requirements
+        /// </summary>
+        public async Task<object?> ValidateAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/validate", executionId);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Prepare for job execution
+        /// </summary>
+        public async Task<long> PrepareAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/prepare", executionId);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<long>();
+        }
+
+        /// <summary>
+        /// Clean up after job
+        /// </summary>
+        public async Task CleanupAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/cleanup/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Retry a failed job
+        /// </summary>
+        public async Task RetryAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/agent/retry/{executionId}", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        // =====================================
+        // Communication Operations
+        // =====================================
+
+        /// <summary>
+        /// Ping the agent
+        /// </summary>
+        public async Task<object?> PingAsync()
+        {
+            var response = await _httpClient.GetAsync("/api/agent/ping");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Acknowledge a command
+        /// </summary>
+        public async Task AcknowledgeAsync(long executionId)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/acknowledge", executionId);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Send notification
+        /// </summary>
+        public async Task NotifyAsync(object notificationData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/notify", notificationData);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Request resources or information
+        /// </summary>
+        public async Task<object?> RequestAsync(object requestData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/request", requestData);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        // =====================================
+        // System Operations
+        // =====================================
+
+        /// <summary>
+        /// Shutdown agent
+        /// </summary>
+        public async Task ShutdownAsync()
+        {
+            var response = await _httpClient.PostAsync("/api/agent/shutdown", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Reload agent configuration
+        /// </summary>
+        public async Task ReloadAsync()
+        {
+            var response = await _httpClient.PostAsync("/api/agent/reload", null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Update agent software
+        /// </summary>
+        public async Task UpdateAsync(object updateData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/update", updateData);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Run diagnostics
+        /// </summary>
+        public async Task<object?> DiagnoseAsync()
+        {
+            var response = await _httpClient.GetAsync("/api/agent/diagnose");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Get health status
+        /// </summary>
+        public async Task<object?> GetHealthAsync()
+        {
+            var response = await _httpClient.GetAsync("/api/agent/health");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        // =====================================
+        // Security Operations
+        // =====================================
+
+        /// <summary>
+        /// Authenticate agent
+        /// </summary>
+        public async Task<object?> AuthenticateAsync(object credentials)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/authenticate", credentials);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Authorize operation
+        /// </summary>
+        public async Task<object?> AuthorizeAsync(object authorizationData)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/authorize", authorizationData);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        // =====================================
+        // Standard Operations
+        // =====================================
+
+        /// <summary>
+        /// Get all executions
+        /// </summary>
+        public async Task<List<long>> GetExecutionsAsync()
+        {
+            var response = await _httpClient.GetAsync("/api/agent/executions");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<List<long>>();
+        }
+
+        /// <summary>
+        /// Get an execution by ID
+        /// </summary>
+        public async Task<object?> GetExecutionAsync(long executionId)
+        {
+            var response = await _httpClient.GetAsync($"/api/agent/execution/{executionId}");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Get agent information
+        /// </summary>
+        public async Task<object?> GetAgentInfoAsync()
+        {
+            var response = await _httpClient.GetAsync("/api/agent/info");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<object>();
+        }
+
+        /// <summary>
+        /// Create a new execution
+        /// </summary>
+        public async Task<long> CreateExecutionAsync(object executionDefinition)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/agent/execution", executionDefinition);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<long>();
+        }
+
+        /// <summary>
+        /// Update an execution
+        /// </summary>
+        public async Task UpdateExecutionAsync(long executionId, object executionData)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"/api/agent/execution/{executionId}", executionData);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Delete an execution
+        /// </summary>
+        public async Task DeleteExecutionAsync(long executionId)
+        {
+            var response = await _httpClient.DeleteAsync($"/api/agent/execution/{executionId}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
+        }
+    }
+}
+

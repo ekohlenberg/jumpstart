@@ -7,8 +7,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Access-Control-Allow-Origin",
@@ -21,6 +19,14 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Start dispatcher thread
+var dispatcherThread = new @(Model.Namespace).DispatcherThread();
+dispatcherThread.Start();
+
+// Start health monitor thread
+var healthMonitorThread = new @(Model.Namespace).HealthMonitorThread(TimeSpan.FromSeconds(30));
+healthMonitorThread.Start();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -35,5 +41,29 @@ app.UseCors("Access-Control-Allow-Origin");
 //app.UseAuthorization();
 
 app.MapControllers();
+
+// Graceful shutdown - complete pending jobs
+app.Lifetime.ApplicationStopping.Register(() =>
+{
+    Console.WriteLine("Application stopping - completing pending jobs...");
+    
+    // Stop health monitor
+    healthMonitorThread.Stop();
+    
+    // Stop accepting new jobs
+    @(Model.Namespace).DispatcherThread.Queue.CompleteAdding();
+    
+    // Wait for dispatcher thread to finish (with timeout)
+    if (!dispatcherThread.Join(TimeSpan.FromSeconds(30)))
+    {
+        Console.WriteLine("Warning: Dispatcher thread did not complete within timeout");
+    }
+    
+    // Wait for health monitor thread to finish (with timeout)
+    if (!healthMonitorThread.Join(TimeSpan.FromSeconds(5)))
+    {
+        Console.WriteLine("Warning: Health monitor thread did not complete within timeout");
+    }
+});
 
 app.Run();
