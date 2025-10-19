@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using @Model.Namespace;
 
 // Configuration for dynamic port binding
 const int StartPort = 5100;
@@ -7,6 +8,7 @@ const int EndPort = 5200;
 const int MaxRetries = 100;
 
 int boundPort = 0;
+IPAddress boundIP = IPAddress.Loopback;
 var builder = WebApplication.CreateBuilder(args);
 
 // Try to find an available port
@@ -20,11 +22,11 @@ for (int port = StartPort; port <= EndPort && port < StartPort + MaxRetries; por
         // Test if port is available by trying to bind
         using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
         {
-            socket.Bind(new IPEndPoint(IPAddress.Loopback, port));
+            socket.Bind(new IPEndPoint(boundIP, port));
         }
         
         boundPort = port;
-        Console.WriteLine($"Agent will bind to port: {boundPort}");
+        Console.WriteLine($"Agent will bind to IP: {boundIP}, Port: {boundPort}");
         break;
     }
     catch (SocketException)
@@ -82,7 +84,7 @@ var registrationTask = Task.Run(async () =>
         await Task.Delay(1000);
         
         // Call registration callback
-        await RegisterAgent(boundPort);
+        await RegisterAgent(boundIP, boundPort);
     }
     catch (Exception ex)
     {
@@ -93,59 +95,54 @@ var registrationTask = Task.Run(async () =>
 app.Run();
 
 // Registration callback function
-static async Task RegisterAgent(int port)
+static async Task RegisterAgent(IPAddress boundIP, int port)
 {
-    var hostname = Environment.MachineName;
-    var agentId = $"{hostname}:{port}";
+    // Get SessionInfo singleton and populate it with system information
+    var sessionInfo = SessionInfo.Instance;
+    Util.PopulateSessionInfo(sessionInfo);
+    
+    // Add agent-specific information to the session
+    sessionInfo.SetValue("AgentIPAddress", boundIP.ToString());
+    sessionInfo.SetValue("AgentPort", port.ToString());
+    sessionInfo.SetValue("AgentURL", $"http://{boundIP}:{port}");
+    
+    var computerName   = sessionInfo.GetValue("ComputerName", Environment.MachineName);
+    var agentId = $"{computerName}:{port}";
     
     Console.WriteLine($"==============================================");
     Console.WriteLine($"Agent Registration");
     Console.WriteLine($"==============================================");
     Console.WriteLine($"Agent ID: {agentId}");
-    Console.WriteLine($"Hostname: {hostname}");
+    Console.WriteLine($"Computer Name: {computerName}");
+    Console.WriteLine($"IP Address: {boundIP}");
     Console.WriteLine($"Port: {port}");
-    Console.WriteLine($"URL: http://localhost:{port}");
+    Console.WriteLine($"URL: http://{boundIP}:{port}");
+    Console.WriteLine($"User: {sessionInfo.GetValue("UserName", "Unknown")}");
+    Console.WriteLine($"Domain: {sessionInfo.GetValue("UserDomain", "Unknown")}");
     Console.WriteLine($"==============================================");
     
-    // TODO: Implement actual registration logic
-    // Examples:
-    // - Call scheduler API to register this agent
-    // - Store agent information in database
-    // - Update service discovery registry
-    // - Send heartbeat to scheduler
+
     
-    // Example registration call (uncomment and customize):
-    /*
-    try
-    {
-        using var httpClient = new HttpClient();
-        var registrationData = new
-        {
-            agentId = agentId,
-            hostname = hostname,
+    
+    var registrationData = new Agent        {
+            
+            hostname = computerName,
+            ip_address = sessionInfo.GetValue("AgentIPAddress"),
             port = port,
-            status = "online",
-            capabilities = new[] { "worker" },
-            registeredAt = DateTime.UtcNow
+            url = sessionInfo.GetValue("AgentURL"),
+            username = sessionInfo.GetValue("UserName"),
+            user_domain = sessionInfo.GetValue("UserDomain"),
+            os_name = sessionInfo.GetValue("OSName"),
+            os_version = sessionInfo.GetValue("OSVersion"),
+            architecture = sessionInfo.GetValue("Architecture"),
+            registered_at = DateTime.UtcNow,
+            agent_status_id = 1,
+            is_active = 1,
+            created_by = Environment.UserName,
+            
         };
+
+        AgentCoreLogic.Create().register(registrationData);
         
-        var schedulerUrl = "http://localhost:5000/api/scheduler/register";
-        var response = await httpClient.PostAsJsonAsync(schedulerUrl, registrationData);
-        
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine("Agent successfully registered with scheduler");
-        }
-        else
-        {
-            Console.WriteLine($"Failed to register agent: {response.StatusCode}");
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Registration error: {ex.Message}");
-    }
-    */
     
-    await Task.CompletedTask;
 }

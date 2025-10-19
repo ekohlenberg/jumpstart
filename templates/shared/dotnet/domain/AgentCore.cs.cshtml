@@ -1,0 +1,698 @@
+
+
+using System;
+using System.Reflection;
+using System.Collections.Generic;
+
+namespace @(Model.Namespace)
+{
+    [ClassInfo("Agent")]
+    public partial class AgentCore : BaseObject
+    {
+        public AgentCore(BaseObject baseObject) : base(baseObject)
+        {
+            Initialize();
+        }
+
+        public AgentCore()
+        {
+            Initialize();
+        }
+
+        protected override void Initialize()
+        {
+            // Default initializer
+            domainName = "Agent";
+            tableName = "core.agent";
+            schemaName = "core";
+            tableBaseName = "agent";
+            auditTableName = "history.core_agent";
+
+
+            rwk.Add("hostname");
+            
+            rwk.Add("ip_address");
+            
+            rwk.Add("port");
+            
+
+            _defaults["id"] = default(long);
+            
+            _defaults["hostname"] = default(string);
+            
+            _defaults["ip_address"] = default(string);
+            
+            _defaults["port"] = default(int);
+            
+            _defaults["username"] = default(int);
+            
+            _defaults["url"] = default(string);
+            
+            _defaults["computer_name"] = default(string);
+            
+            _defaults["user_domain"] = default(string);
+            
+            _defaults["os_name"] = default(string);
+            
+            _defaults["os_version"] = default(string);
+            
+            _defaults["architecture"] = default(string);
+            
+            _defaults["registered_at"] = default(DateTime);
+            
+            _defaults["agent_status_id"] = default(int);
+            
+            _defaults["is_active"] = default(int);
+            
+            _defaults["created_by"] = default(string);
+            
+            _defaults["last_updated"] = default(DateTime);
+            
+            _defaults["last_updated_by"] = default(string);
+            
+            _defaults["version"] = default(int);
+                    }
+
+
+            [ColumnInfo("Server ID", "", "", "", "")]
+            public long id
+            {
+                get
+                {
+                    long _id;
+
+                             _id = default(long);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("id"))
+                        {
+                        _id = Convert.ToInt64(this["id"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting id: {e.Message}");
+                        _id = default(long);
+                    }
+                    return _id;
+                }
+                set
+                {
+                   
+                    this["id"] = value;
+                }
+            }
+            
+            [ColumnInfo("Hostname", "", "", "", "")]
+            public string hostname
+            {
+                get
+                {
+                    string _hostname;
+
+                            _hostname = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("hostname"))
+                        {
+                        _hostname = Convert.ToString(this["hostname"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting hostname: {e.Message}");
+                        _hostname = default(string);
+                    }
+                    return _hostname;
+                }
+                set
+                {
+                   
+                    this["hostname"] = value;
+                }
+            }
+            
+            [ColumnInfo("Address", "", "", "", "")]
+            public string ip_address
+            {
+                get
+                {
+                    string _ip_address;
+
+                            _ip_address = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("ip_address"))
+                        {
+                        _ip_address = Convert.ToString(this["ip_address"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting ip_address: {e.Message}");
+                        _ip_address = default(string);
+                    }
+                    return _ip_address;
+                }
+                set
+                {
+                   
+                    this["ip_address"] = value;
+                }
+            }
+            
+            [ColumnInfo("Port", "", "", "", "")]
+            public int port
+            {
+                get
+                {
+                    int _port;
+
+                             _port = default(int);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("port"))
+                        {
+                        _port = Convert.ToInt32(this["port"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting port: {e.Message}");
+                        _port = default(int);
+                    }
+                    return _port;
+                }
+                set
+                {
+                   
+                    this["port"] = value;
+                }
+            }
+            
+            [ColumnInfo("Username", "", "", "", "")]
+            public int username
+            {
+                get
+                {
+                    int _username;
+
+                             _username = default(int);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("username"))
+                        {
+                        _username = Convert.ToInt32(this["username"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting username: {e.Message}");
+                        _username = default(int);
+                    }
+                    return _username;
+                }
+                set
+                {
+                   
+                    this["username"] = value;
+                }
+            }
+            
+            [ColumnInfo("URL", "", "", "", "")]
+            public string url
+            {
+                get
+                {
+                    string _url;
+
+                            _url = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("url"))
+                        {
+                        _url = Convert.ToString(this["url"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting url: {e.Message}");
+                        _url = default(string);
+                    }
+                    return _url;
+                }
+                set
+                {
+                   
+                    this["url"] = value;
+                }
+            }
+            
+            [ColumnInfo("Computer Name", "", "", "", "")]
+            public string computer_name
+            {
+                get
+                {
+                    string _computer_name;
+
+                            _computer_name = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("computer_name"))
+                        {
+                        _computer_name = Convert.ToString(this["computer_name"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting computer_name: {e.Message}");
+                        _computer_name = default(string);
+                    }
+                    return _computer_name;
+                }
+                set
+                {
+                   
+                    this["computer_name"] = value;
+                }
+            }
+            
+            [ColumnInfo("User Domani", "", "", "", "")]
+            public string user_domain
+            {
+                get
+                {
+                    string _user_domain;
+
+                            _user_domain = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("user_domain"))
+                        {
+                        _user_domain = Convert.ToString(this["user_domain"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting user_domain: {e.Message}");
+                        _user_domain = default(string);
+                    }
+                    return _user_domain;
+                }
+                set
+                {
+                   
+                    this["user_domain"] = value;
+                }
+            }
+            
+            [ColumnInfo("OS Name", "", "", "", "")]
+            public string os_name
+            {
+                get
+                {
+                    string _os_name;
+
+                            _os_name = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("os_name"))
+                        {
+                        _os_name = Convert.ToString(this["os_name"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting os_name: {e.Message}");
+                        _os_name = default(string);
+                    }
+                    return _os_name;
+                }
+                set
+                {
+                   
+                    this["os_name"] = value;
+                }
+            }
+            
+            [ColumnInfo("OS Version", "", "", "", "")]
+            public string os_version
+            {
+                get
+                {
+                    string _os_version;
+
+                            _os_version = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("os_version"))
+                        {
+                        _os_version = Convert.ToString(this["os_version"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting os_version: {e.Message}");
+                        _os_version = default(string);
+                    }
+                    return _os_version;
+                }
+                set
+                {
+                   
+                    this["os_version"] = value;
+                }
+            }
+            
+            [ColumnInfo("Architecture", "", "", "", "")]
+            public string architecture
+            {
+                get
+                {
+                    string _architecture;
+
+                            _architecture = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("architecture"))
+                        {
+                        _architecture = Convert.ToString(this["architecture"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting architecture: {e.Message}");
+                        _architecture = default(string);
+                    }
+                    return _architecture;
+                }
+                set
+                {
+                   
+                    this["architecture"] = value;
+                }
+            }
+            
+            [ColumnInfo("Registered At", "", "", "", "")]
+            public DateTime registered_at
+            {
+                get
+                {
+                    DateTime _registered_at;
+
+                             _registered_at = default(DateTime);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("registered_at"))
+                        {
+                        _registered_at = Convert.ToDateTime(this["registered_at"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting registered_at: {e.Message}");
+                        _registered_at = default(DateTime);
+                    }
+                    return _registered_at;
+                }
+                set
+                {
+                   
+                    this["registered_at"] = value;
+                }
+            }
+            
+            [ColumnInfo("Status", "AgentStatus", "enum", "agent_status", "agentstatus")]
+            public int agent_status_id
+            {
+                get
+                {
+                    int _agent_status_id;
+
+                             _agent_status_id = default(int);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("agent_status_id"))
+                        {
+                        _agent_status_id = Convert.ToInt32(this["agent_status_id"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting agent_status_id: {e.Message}");
+                        _agent_status_id = default(int);
+                    }
+                    return _agent_status_id;
+                }
+                set
+                {
+                   
+                    this["agent_status_id"] = value;
+                }
+            }
+            
+            [ColumnInfo("Active", "", "", "", "")]
+            public int is_active
+            {
+                get
+                {
+                    int _is_active;
+
+                             _is_active = default(int);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("is_active"))
+                        {
+                        _is_active = Convert.ToInt32(this["is_active"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting is_active: {e.Message}");
+                        _is_active = default(int);
+                    }
+                    return _is_active;
+                }
+                set
+                {
+                   
+                    this["is_active"] = value;
+                }
+            }
+            
+            [ColumnInfo("Created By", "", "", "", "")]
+            public string created_by
+            {
+                get
+                {
+                    string _created_by;
+
+                            _created_by = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("created_by"))
+                        {
+                        _created_by = Convert.ToString(this["created_by"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting created_by: {e.Message}");
+                        _created_by = default(string);
+                    }
+                    return _created_by;
+                }
+                set
+                {
+                   
+                    this["created_by"] = value;
+                }
+            }
+            
+            [ColumnInfo("Last Updated", "", "", "", "")]
+            public DateTime last_updated
+            {
+                get
+                {
+                    DateTime _last_updated;
+
+                             _last_updated = default(DateTime);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("last_updated"))
+                        {
+                        _last_updated = Convert.ToDateTime(this["last_updated"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting last_updated: {e.Message}");
+                        _last_updated = default(DateTime);
+                    }
+                    return _last_updated;
+                }
+                set
+                {
+                   
+                    this["last_updated"] = value;
+                }
+            }
+            
+            [ColumnInfo("Last Updated By", "", "", "", "")]
+            public string last_updated_by
+            {
+                get
+                {
+                    string _last_updated_by;
+
+                            _last_updated_by = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("last_updated_by"))
+                        {
+                        _last_updated_by = Convert.ToString(this["last_updated_by"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting last_updated_by: {e.Message}");
+                        _last_updated_by = default(string);
+                    }
+                    return _last_updated_by;
+                }
+                set
+                {
+                   
+                    this["last_updated_by"] = value;
+                }
+            }
+            
+            [ColumnInfo("Version", "", "", "", "")]
+            public int version
+            {
+                get
+                {
+                    int _version;
+
+                             _version = default(int);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("version"))
+                        {
+                        _version = Convert.ToInt32(this["version"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting version: {e.Message}");
+                        _version = default(int);
+                    }
+                    return _version;
+                }
+                set
+                {
+                   
+                    this["version"] = value;
+                }
+            }
+                }
+
+    public partial class AgentHistoryCore : AgentCore
+    {
+        protected override void Initialize()
+        {
+            // History object initializer - override table name and add foreign key
+            base.Initialize();
+            
+            domainName = "AgentHistory";
+            tableName = "history.core_agent";
+            tableBaseName = "core_agent";
+          
+
+            // Add the foreign key to the original object
+            rwk.Add("agent_id");
+            _defaults["agent_id"] = default(long);
+        }
+
+        // Foreign key property to the original object
+        [ColumnInfo("Agent ID")]
+        public long agent_id
+        {
+            get
+            {
+                long _agent_id = default(long);
+                
+                try
+                {
+                    if(this.ContainsKey("agent_id"))
+                    {
+                        _agent_id = Convert.ToInt64(this["agent_id"].ToString());
+                    }
+                }
+                catch(Exception)
+                {
+                    //Logger.Error($"Error getting agent_id: {e.Message}");
+                    _agent_id = default(long);
+                }
+                return _agent_id;
+            }
+            set
+            {
+                this["agent_id"] = value;
+            }
+        }
+    }
+
+    // View class that extends the base domain object with RWK columns from foreign key joins
+    public class AgentViewCore : AgentCore 
+    {
+
+            [ColumnInfo("Status", "", "", "", "")]
+            public string agent_status_name
+            {
+                get
+                {
+                    string _agent_status_name;
+
+                            _agent_status_name = string.Empty;
+                                                
+                    try
+                    {
+                        if(this.ContainsKey("agent_status_name"))
+                        {
+                        _agent_status_name = Convert.ToString(this["agent_status_name"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting agent_status_name: {e.Message}");
+                        _agent_status_name = default(string);
+                    }
+                    return _agent_status_name;
+                }
+                set
+                {
+                   
+                    this["agent_status_name"] = value;
+                }
+            }
+                }
+}

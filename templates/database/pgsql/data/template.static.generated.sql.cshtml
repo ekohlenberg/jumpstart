@@ -1,6 +1,71 @@
 -- Insert default data source record
 insert into core.data_source (id, name) values ((SELECT nextval('core.data_source_identity')), 'default');
 
+-- Insert agent status values
+insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Initializing');
+insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Online');
+insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Busy');
+insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Offline');
+
+-- Insert on_failure action values
+insert into core.on_failure (id, action) values ((SELECT nextval('core.on_failure_identity')), 'Stop');
+insert into core.on_failure (id, action) values ((SELECT nextval('core.on_failure_identity')), 'Continue');
+
+-- Insert AgentCoreLogic method operations
+-- Process Management Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'start', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'stop', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'kill', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'restart', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'pause', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'resume', 1, current_timestamp, current_user, current_user, 1);
+
+-- Status & Reporting Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'status', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'heartbeat', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'report', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'log', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'metrics', 1, current_timestamp, current_user, current_user, 1);
+
+-- Resource Management Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'register', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'unregister', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'capabilities', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'allocate', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'release', 1, current_timestamp, current_user, current_user, 1);
+
+-- Job Execution Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'execute', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'validate', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'prepare', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'cleanup', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'retry', 1, current_timestamp, current_user, current_user, 1);
+
+-- Communication Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'ping', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'acknowledge', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'notify', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'request', 1, current_timestamp, current_user, current_user, 1);
+
+-- System Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'shutdown', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'reload', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'update', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'diagnose', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'health', 1, current_timestamp, current_user, current_user, 1);
+
+-- Security Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'authenticate', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'authorize', 1, current_timestamp, current_user, current_user, 1);
+
+-- Standard Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'select', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'get', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'getAgentInfo', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'insert', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'update', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'delete', 1, current_timestamp, current_user, current_user, 1);
+
 @{
 	foreach( var metaObject in Model.Objects)
 	{

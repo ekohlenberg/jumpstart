@@ -12,9 +12,11 @@ dotnet server templates-common,model,shared/dotnet/common/SqlServerProvider.cs.c
 dotnet server templates-common,model,shared/dotnet/common/JsonHelper.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/DatabaseProviderFactory.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
 dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,./shared/domain,TRUE
+dotnet server templates-domain,model,shared/dotnet/domain/AgentCore.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/DBPersist.core.cs.cshtml,./server/persist,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/persist.csproj.cshtml,./server/persist,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/appsettings.json.cshtml,./server/persist,FALSE
@@ -25,7 +27,7 @@ dotnet server templates-logic,model,server/dotnet/logic/OpRoleMemberLogic.core.c
 dotnet server templates-logic,model,server/dotnet/logic/NavMenuLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/EventServiceLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/SchedulerLogic.core.cs.cshtml,./server/logic,TRUE
-dotnet server templates-logic,model,server/dotnet/logic/AgentLogic.core.cs.cshtml,./server/logic,TRUE
+dotnet server templates-logic,model,server/dotnet/logic/AgentCoreLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/DispatcherThread.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/HealthMonitorThread.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/SchedulerClient.core.cs.cshtml,./server/logic,TRUE
@@ -50,7 +52,7 @@ dotnet server templates-scheduler,model,server/dotnet/scheduler/Properties/launc
 dotnet server templates-scheduler,model,server/dotnet/scheduler/makefile.cshtml,./server/scheduler,TRUE
 dotnet server templates-scheduler,model,server/dotnet/scheduler/scheduler.csproj.cshtml,./server/scheduler,TRUE
 dotnet server templates-agent,model,server/dotnet/agent/agent.api.core.cs.cshtml,./server/agent,TRUE
-dotnet server templates-agent,model,server/dotnet/agent/Program.cs.cshtml,./server/agent,FALSE
+dotnet server templates-agent,model,server/dotnet/agent/Program.cs.cshtml,./server/agent,TRUE
 dotnet server templates-agent,model,server/dotnet/agent/appsettings.json.cshtml,./server/agent,FALSE
 dotnet server templates-agent,model,server/dotnet/agent/appsettings.Development.json.cshtml,./server/agent,FALSE
 dotnet server templates-agent,model,server/dotnet/agent/Properties/launchSettings.json.cshtml,./server/agent/Properties,FALSE

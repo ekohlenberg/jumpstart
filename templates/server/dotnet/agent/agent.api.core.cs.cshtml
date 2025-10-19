@@ -24,7 +24,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent START: {executionId}");
             
-            AgentLogic.Create().start(executionId);
+            AgentCoreLogic.Create().start(executionId);
             return Ok(executionId);
         }
 
@@ -34,7 +34,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent STOP: ID={executionId}");
             
-            AgentLogic.Create().stop(executionId);
+            AgentCoreLogic.Create().stop(executionId);
             return Ok();
         }
 
@@ -44,7 +44,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent KILL: ID={executionId}");
             
-            AgentLogic.Create().kill(executionId);
+            AgentCoreLogic.Create().kill(executionId);
             return Ok();
         }
 
@@ -54,7 +54,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent RESTART: ID={executionId}");
             
-            AgentLogic.Create().restart(executionId);
+            AgentCoreLogic.Create().restart(executionId);
             return Ok();
         }
 
@@ -64,7 +64,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent PAUSE: ID={executionId}");
             
-            AgentLogic.Create().pause(executionId);
+            AgentCoreLogic.Create().pause(executionId);
             return Ok();
         }
 
@@ -74,7 +74,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent RESUME: ID={executionId}");
             
-            AgentLogic.Create().resume(executionId);
+            AgentCoreLogic.Create().resume(executionId);
             return Ok();
         }
 
@@ -88,7 +88,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent STATUS: ID={executionId}");
             
-            var status = AgentLogic.Create().status(executionId);
+            var status = AgentCoreLogic.Create().status(executionId);
             return Ok(status);
         }
 
@@ -98,7 +98,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent HEARTBEAT");
             
-            AgentLogic.Create().heartbeat(heartbeatData);
+            AgentCoreLogic.Create().heartbeat(heartbeatData);
             return Ok();
         }
 
@@ -108,7 +108,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent REPORT");
             
-            AgentLogic.Create().report(reportData);
+            AgentCoreLogic.Create().report(reportData);
             return Ok();
         }
 
@@ -118,7 +118,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent LOG");
             
-            AgentLogic.Create().log(logData);
+            AgentCoreLogic.Create().log(logData);
             return Ok();
         }
 
@@ -128,7 +128,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent METRICS");
             
-            AgentLogic.Create().metrics(metricsData);
+            AgentCoreLogic.Create().metrics(metricsData);
             return Ok();
         }
 
@@ -136,33 +136,14 @@ namespace @(namespaceName).Controllers
         // Resource Management Operations
         // =====================================
 
-        // POST api/agent/register
-        [HttpPost("register")]
-        public ActionResult<long> Register([FromBody] object registrationData)
-        {
-            //Console.WriteLine($"Processing Agent REGISTER");
-            
-            long agentId = AgentLogic.Create().register(registrationData);
-            return CreatedAtAction(nameof(GetAgent), new { agentId = agentId }, agentId);
-        }
-
-        // POST api/agent/unregister/{agentId}
-        [HttpPost("unregister/{agentId}")]
-        public ActionResult Unregister(long agentId)
-        {
-            //Console.WriteLine($"Processing Agent UNREGISTER: ID={agentId}");
-            
-            AgentLogic.Create().unregister(agentId);
-            return Ok();
-        }
-
+       
         // GET api/agent/capabilities
         [HttpGet("capabilities")]
         public ActionResult<object> Capabilities()
         {
             //Console.WriteLine($"Processing Agent CAPABILITIES");
             
-            var capabilities = AgentLogic.Create().capabilities();
+            var capabilities = AgentCoreLogic.Create().capabilities();
             return Ok(capabilities);
         }
 
@@ -172,7 +153,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent ALLOCATE: {executionId}");
             
-            AgentLogic.Create().allocate(executionId);
+            AgentCoreLogic.Create().allocate(executionId);
             return Ok(executionId);
         }
 
@@ -182,7 +163,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent RELEASE: ID={executionId}");
             
-            AgentLogic.Create().release(executionId);
+            AgentCoreLogic.Create().release(executionId);
             return Ok();
         }
 
@@ -196,7 +177,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent EXECUTE: {executionId}");
             
-            AgentLogic.Create().execute(executionId);
+            AgentCoreLogic.Create().execute(executionId);
             return Ok(executionId);
         }
 
@@ -206,7 +187,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent VALIDATE: {executionId}");
             
-            var validationResult = AgentLogic.Create().validate(executionId);
+            var validationResult = AgentCoreLogic.Create().validate(executionId);
             return Ok(validationResult);
         }
 
@@ -216,7 +197,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent PREPARE: {executionId}");
             
-            AgentLogic.Create().prepare(executionId);
+            AgentCoreLogic.Create().prepare(executionId);
             return Ok(executionId);
         }
 
@@ -226,7 +207,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent CLEANUP: ID={executionId}");
             
-            AgentLogic.Create().cleanup(executionId);
+            AgentCoreLogic.Create().cleanup(executionId);
             return Ok();
         }
 
@@ -236,7 +217,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent RETRY: ID={executionId}");
             
-            AgentLogic.Create().retry(executionId);
+            AgentCoreLogic.Create().retry(executionId);
             return Ok();
         }
 
@@ -250,7 +231,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent PING");
             
-            var pingResponse = AgentLogic.Create().ping();
+            var pingResponse = AgentCoreLogic.Create().ping();
             return Ok(pingResponse);
         }
 
@@ -260,7 +241,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent ACKNOWLEDGE: {executionId}");
             
-            AgentLogic.Create().acknowledge(executionId);
+            AgentCoreLogic.Create().acknowledge(executionId);
             return Ok();
         }
 
@@ -270,7 +251,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent NOTIFY");
             
-            AgentLogic.Create().notify(notificationData);
+            AgentCoreLogic.Create().notify(notificationData);
             return Ok();
         }
 
@@ -280,7 +261,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent REQUEST");
             
-            var response = AgentLogic.Create().request(requestData);
+            var response = AgentCoreLogic.Create().request(requestData);
             return Ok(response);
         }
 
@@ -294,7 +275,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent SHUTDOWN");
             
-            AgentLogic.Create().shutdown();
+            AgentCoreLogic.Create().shutdown();
             return Ok();
         }
 
@@ -304,7 +285,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent RELOAD");
             
-            AgentLogic.Create().reload();
+            AgentCoreLogic.Create().reload();
             return Ok();
         }
 
@@ -314,7 +295,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent UPDATE");
             
-            AgentLogic.Create().update(updateData);
+            AgentCoreLogic.Create().update(updateData);
             return Ok();
         }
 
@@ -324,7 +305,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent DIAGNOSE");
             
-            var diagnostics = AgentLogic.Create().diagnose();
+            var diagnostics = AgentCoreLogic.Create().diagnose();
             return Ok(diagnostics);
         }
 
@@ -334,7 +315,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent HEALTH");
             
-            var healthStatus = AgentLogic.Create().health();
+            var healthStatus = AgentCoreLogic.Create().health();
             return Ok(healthStatus);
         }
 
@@ -348,7 +329,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent AUTHENTICATE");
             
-            var authResult = AgentLogic.Create().authenticate(credentials);
+            var authResult = AgentCoreLogic.Create().authenticate(credentials);
             return Ok(authResult);
         }
 
@@ -358,7 +339,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Agent AUTHORIZE");
             
-            var authResult = AgentLogic.Create().authorize(authorizationData);
+            var authResult = AgentCoreLogic.Create().authorize(authorizationData);
             return Ok(authResult);
         }
 
@@ -371,7 +352,7 @@ namespace @(namespaceName).Controllers
         public ActionResult<IEnumerable<long>> GetExecutions()
         {
             //Console.WriteLine("Processing GET Execution List");
-            List<long> executionIds = AgentLogic.Create().select();
+            List<long> executionIds = AgentCoreLogic.Create().select();
             return Ok(executionIds);
         }
 
@@ -380,7 +361,7 @@ namespace @(namespaceName).Controllers
         public ActionResult<object> GetExecution(long executionId)
         {
             //Console.WriteLine($"Processing Agent GET Execution ID={executionId}");
-            var execution = AgentLogic.Create().get(executionId);
+            var execution = AgentCoreLogic.Create().get(executionId);
             return Ok(execution);
         }
 
@@ -389,7 +370,7 @@ namespace @(namespaceName).Controllers
         public ActionResult<object> GetAgent()
         {
             //Console.WriteLine($"Processing Agent GET Info");
-            var agentInfo = AgentLogic.Create().getAgentInfo();
+            var agentInfo = AgentCoreLogic.Create().getAgentInfo();
             return Ok(agentInfo);
         }
 
@@ -398,7 +379,7 @@ namespace @(namespaceName).Controllers
         public ActionResult<long> CreateExecution([FromBody] object executionDefinition)
         {
             //Console.WriteLine($"Processing Agent POST: Create Execution");
-            long executionId = AgentLogic.Create().insert(executionDefinition);
+            long executionId = AgentCoreLogic.Create().insert(executionDefinition);
             return CreatedAtAction(nameof(GetExecution), new { executionId = executionId }, executionId);
         }
 
@@ -407,7 +388,7 @@ namespace @(namespaceName).Controllers
         public ActionResult UpdateExecution(long executionId, [FromBody] object executionData)
         {
             //Console.WriteLine($"Processing Agent PUT: Update Execution ID={executionId}");
-            AgentLogic.Create().update(executionId, executionData);
+            AgentCoreLogic.Create().update(executionId, executionData);
             return Ok();
         }
 
@@ -416,7 +397,7 @@ namespace @(namespaceName).Controllers
         public ActionResult DeleteExecution(long executionId)
         {
             //Console.WriteLine($"Processing Agent DELETE: Execution ID={executionId}");
-            AgentLogic.Create().delete(executionId);
+            AgentCoreLogic.Create().delete(executionId);
             return Ok();
         }
     }

@@ -9,7 +9,7 @@ namespace @Model.Namespace
     /// <summary>
     /// Interface for Agent logic operations
     /// </summary>
-    public interface IAgentLogic
+    public interface IAgentCoreLogic
     {
         // Process Management Operations
         void start(long executionId);
@@ -27,7 +27,7 @@ namespace @Model.Namespace
         void metrics(object metricsData);
 
         // Resource Management Operations
-        long register(object registrationData);
+        long register(Agent registrationData);
         void unregister(long agentId);
         object capabilities();
         void allocate(long executionId);
@@ -66,16 +66,16 @@ namespace @Model.Namespace
         void delete(long executionId);
     }
 
-    public partial class AgentLogic : IAgentLogic
+    public partial class AgentCoreLogic : IAgentCoreLogic
     {
-        public static IAgentLogic Create()
+        public static IAgentCoreLogic Create()
         {
-            var agentLogic = new AgentLogic();
+            var agentLogic = new AgentCoreLogic();
 
-            var proxy = DispatchProxy.Create<IAgentLogic, Proxy<IAgentLogic>>();
-            ((Proxy<IAgentLogic>)proxy).Initialize();
-            ((Proxy<IAgentLogic>)proxy).Target = agentLogic;
-            ((Proxy<IAgentLogic>)proxy).DomainObj = "Agent";
+            var proxy = DispatchProxy.Create<IAgentCoreLogic, Proxy<IAgentCoreLogic>>();
+            ((Proxy<IAgentCoreLogic>)proxy).Initialize();
+            ((Proxy<IAgentCoreLogic>)proxy).Target = agentLogic;
+            ((Proxy<IAgentCoreLogic>)proxy).DomainObj = "Agent";
 
             return proxy;
         }
@@ -86,7 +86,7 @@ namespace @Model.Namespace
 
         public void start(long executionId)
         {
-            Console.WriteLine($"AgentLogic: start - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: start - executionId={executionId}");
             // TODO: Implement start logic
             // - Load execution details from database
             // - Prepare execution environment
@@ -96,31 +96,31 @@ namespace @Model.Namespace
 
         public void stop(long executionId)
         {
-            Console.WriteLine($"AgentLogic: stop - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: stop - executionId={executionId}");
             // TODO: Implement stop logic
         }
 
         public void kill(long executionId)
         {
-            Console.WriteLine($"AgentLogic: kill - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: kill - executionId={executionId}");
             // TODO: Implement kill logic
         }
 
         public void restart(long executionId)
         {
-            Console.WriteLine($"AgentLogic: restart - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: restart - executionId={executionId}");
             // TODO: Implement restart logic
         }
 
         public void pause(long executionId)
         {
-            Console.WriteLine($"AgentLogic: pause - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: pause - executionId={executionId}");
             // TODO: Implement pause logic
         }
 
         public void resume(long executionId)
         {
-            Console.WriteLine($"AgentLogic: resume - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: resume - executionId={executionId}");
             // TODO: Implement resume logic
         }
 
@@ -130,14 +130,14 @@ namespace @Model.Namespace
 
         public object status(long executionId)
         {
-            Console.WriteLine($"AgentLogic: status - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: status - executionId={executionId}");
             // TODO: Implement status logic
             return new { executionId, status = "unknown" };
         }
 
         public void heartbeat(object heartbeatData)
         {
-            Console.WriteLine($"AgentLogic: heartbeat");
+            Console.WriteLine($"AgentCoreLogic: heartbeat");
             // TODO: Implement heartbeat logic
             // - Update agent last-seen timestamp
             // - Report current load/capacity
@@ -146,7 +146,7 @@ namespace @Model.Namespace
 
         public void report(object reportData)
         {
-            Console.WriteLine($"AgentLogic: report");
+            Console.WriteLine($"AgentCoreLogic: report");
             // TODO: Implement report logic
             // - Send execution reports to scheduler
             // - Update execution status
@@ -154,14 +154,14 @@ namespace @Model.Namespace
 
         public void log(object logData)
         {
-            Console.WriteLine($"AgentLogic: log");
+            Console.WriteLine($"AgentCoreLogic: log");
             // TODO: Implement log logic
             // - Send log entries to centralized logging
         }
 
         public void metrics(object metricsData)
         {
-            Console.WriteLine($"AgentLogic: metrics");
+            Console.WriteLine($"AgentCoreLogic: metrics");
             // TODO: Implement metrics logic
             // - Collect performance metrics
             // - Send to monitoring system
@@ -171,19 +171,16 @@ namespace @Model.Namespace
         // Resource Management Operations
         // =====================================
 
-        public long register(object registrationData)
+        public long register(Agent registrationData)
         {
-            Console.WriteLine($"AgentLogic: register");
-            // TODO: Implement register logic
-            // - Register agent with scheduler
-            // - Store agent metadata
-            // - Return agent ID
-            return 0;
+            Console.WriteLine($"AgentCoreLogic: register");
+            DBPersist.put(registrationData);
+            return registrationData.id;
         }
 
         public void unregister(long agentId)
         {
-            Console.WriteLine($"AgentLogic: unregister - agentId={agentId}");
+            Console.WriteLine($"AgentCoreLogic: unregister - agentId={agentId}");
             // TODO: Implement unregister logic
             // - Unregister from scheduler
             // - Clean up resources
@@ -191,7 +188,7 @@ namespace @Model.Namespace
 
         public object capabilities()
         {
-            Console.WriteLine($"AgentLogic: capabilities");
+            Console.WriteLine($"AgentCoreLogic: capabilities");
             // TODO: Implement capabilities logic
             // - Return agent capabilities (CPU, memory, etc.)
             return new { cpu = "unknown", memory = "unknown", capabilities = new List<string>() };
@@ -199,14 +196,14 @@ namespace @Model.Namespace
 
         public void allocate(long executionId)
         {
-            Console.WriteLine($"AgentLogic: allocate - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: allocate - executionId={executionId}");
             // TODO: Implement allocate logic
             // - Allocate resources for execution
         }
 
         public void release(long executionId)
         {
-            Console.WriteLine($"AgentLogic: release - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: release - executionId={executionId}");
             // TODO: Implement release logic
             // - Release resources after execution
         }
@@ -217,7 +214,7 @@ namespace @Model.Namespace
 
         public void execute(long executionId)
         {
-            Console.WriteLine($"AgentLogic: execute - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: execute - executionId={executionId}");
             // TODO: Implement execute logic
             // - Load execution details
             // - Execute the job
@@ -226,7 +223,7 @@ namespace @Model.Namespace
 
         public object validate(long executionId)
         {
-            Console.WriteLine($"AgentLogic: validate - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: validate - executionId={executionId}");
             // TODO: Implement validate logic
             // - Validate execution requirements
             // - Check resource availability
@@ -235,7 +232,7 @@ namespace @Model.Namespace
 
         public void prepare(long executionId)
         {
-            Console.WriteLine($"AgentLogic: prepare - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: prepare - executionId={executionId}");
             // TODO: Implement prepare logic
             // - Prepare environment for execution
             // - Download dependencies
@@ -244,7 +241,7 @@ namespace @Model.Namespace
 
         public void cleanup(long executionId)
         {
-            Console.WriteLine($"AgentLogic: cleanup - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: cleanup - executionId={executionId}");
             // TODO: Implement cleanup logic
             // - Clean up temporary files
             // - Release resources
@@ -252,7 +249,7 @@ namespace @Model.Namespace
 
         public void retry(long executionId)
         {
-            Console.WriteLine($"AgentLogic: retry - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: retry - executionId={executionId}");
             // TODO: Implement retry logic
             // - Retry failed execution
         }
@@ -263,28 +260,28 @@ namespace @Model.Namespace
 
         public object ping()
         {
-            Console.WriteLine($"AgentLogic: ping");
+            Console.WriteLine($"AgentCoreLogic: ping");
             // TODO: Implement ping logic
             return new { status = "alive", timestamp = DateTime.UtcNow };
         }
 
         public void acknowledge(long executionId)
         {
-            Console.WriteLine($"AgentLogic: acknowledge - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: acknowledge - executionId={executionId}");
             // TODO: Implement acknowledge logic
             // - Acknowledge receipt of execution request
         }
 
         public void notify(object notificationData)
         {
-            Console.WriteLine($"AgentLogic: notify");
+            Console.WriteLine($"AgentCoreLogic: notify");
             // TODO: Implement notify logic
             // - Send notification to scheduler or other systems
         }
 
         public object request(object requestData)
         {
-            Console.WriteLine($"AgentLogic: request");
+            Console.WriteLine($"AgentCoreLogic: request");
             // TODO: Implement request logic
             // - Request resources or information
             return new { status = "pending" };
@@ -296,7 +293,7 @@ namespace @Model.Namespace
 
         public void shutdown()
         {
-            Console.WriteLine($"AgentLogic: shutdown");
+            Console.WriteLine($"AgentCoreLogic: shutdown");
             // TODO: Implement shutdown logic
             // - Complete running executions
             // - Unregister from scheduler
@@ -305,7 +302,7 @@ namespace @Model.Namespace
 
         public void reload()
         {
-            Console.WriteLine($"AgentLogic: reload");
+            Console.WriteLine($"AgentCoreLogic: reload");
             // TODO: Implement reload logic
             // - Reload configuration
             // - Refresh capabilities
@@ -313,7 +310,7 @@ namespace @Model.Namespace
 
         public void update(object updateData)
         {
-            Console.WriteLine($"AgentLogic: update");
+            Console.WriteLine($"AgentCoreLogic: update");
             // TODO: Implement update logic
             // - Update agent software
             // - Apply configuration changes
@@ -321,7 +318,7 @@ namespace @Model.Namespace
 
         public object diagnose()
         {
-            Console.WriteLine($"AgentLogic: diagnose");
+            Console.WriteLine($"AgentCoreLogic: diagnose");
             // TODO: Implement diagnose logic
             // - Run system diagnostics
             // - Check health status
@@ -331,7 +328,7 @@ namespace @Model.Namespace
 
         public object health()
         {
-            Console.WriteLine($"AgentLogic: health");
+            Console.WriteLine($"AgentCoreLogic: health");
             // TODO: Implement health logic
             // - Check system health
             // - Return health status
@@ -344,7 +341,7 @@ namespace @Model.Namespace
 
         public object authenticate(object credentials)
         {
-            Console.WriteLine($"AgentLogic: authenticate");
+            Console.WriteLine($"AgentCoreLogic: authenticate");
             // TODO: Implement authenticate logic
             // - Verify agent credentials
             // - Generate authentication token
@@ -353,7 +350,7 @@ namespace @Model.Namespace
 
         public object authorize(object authorizationData)
         {
-            Console.WriteLine($"AgentLogic: authorize");
+            Console.WriteLine($"AgentCoreLogic: authorize");
             // TODO: Implement authorize logic
             // - Check authorization for operation
             return new { authorized = true };
@@ -365,7 +362,7 @@ namespace @Model.Namespace
 
         public List<long> select()
         {
-            Console.WriteLine("AgentLogic: select all executions");
+            Console.WriteLine("AgentCoreLogic: select all executions");
             // TODO: Implement select logic
             // - Get all execution IDs for this agent
             return new List<long>();
@@ -373,7 +370,7 @@ namespace @Model.Namespace
 
         public object get(long executionId)
         {
-            Console.WriteLine($"AgentLogic: get - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: get - executionId={executionId}");
             // TODO: Implement get logic
             // - Get execution details
             return new { executionId, status = "unknown" };
@@ -381,7 +378,7 @@ namespace @Model.Namespace
 
         public object getAgentInfo()
         {
-            Console.WriteLine($"AgentLogic: getAgentInfo");
+            Console.WriteLine($"AgentCoreLogic: getAgentInfo");
             // TODO: Implement getAgentInfo logic
             // - Return agent information (hostname, port, capabilities, status)
             return new 
@@ -394,7 +391,7 @@ namespace @Model.Namespace
 
         public long insert(object executionDefinition)
         {
-            Console.WriteLine($"AgentLogic: insert - create execution");
+            Console.WriteLine($"AgentCoreLogic: insert - create execution");
             // TODO: Implement insert logic
             // - Create new execution record
             // - Return execution ID
@@ -403,14 +400,14 @@ namespace @Model.Namespace
 
         public void update(long executionId, object executionData)
         {
-            Console.WriteLine($"AgentLogic: update - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: update - executionId={executionId}");
             // TODO: Implement update logic
             // - Update execution details
         }
 
         public void delete(long executionId)
         {
-            Console.WriteLine($"AgentLogic: delete - executionId={executionId}");
+            Console.WriteLine($"AgentCoreLogic: delete - executionId={executionId}");
             // TODO: Implement delete logic
             // - Delete execution record
         }
