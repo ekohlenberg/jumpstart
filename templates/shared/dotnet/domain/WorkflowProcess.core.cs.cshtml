@@ -1,0 +1,64 @@
+using System;
+using System.ComponentModel;
+
+namespace @Model.Namespace
+{
+    /// <summary>
+    /// Partial WorkflowProcess class containing enumerated types for on failure action values
+    /// </summary>
+    public partial class WorkflowProcess
+    {
+        /// <summary>
+        /// On failure action enumeration based on core.on_failure table values
+        /// </summary>
+        public enum OnFailureAction
+        {
+            /// <summary>
+            /// Stop execution on failure
+            /// </summary>
+            [Description("Stop")]
+            Stop = 1,
+
+            /// <summary>
+            /// Continue execution on failure
+            /// </summary>
+            [Description("Continue")]
+            Continue = 2
+        }
+
+        /// <summary>
+        /// Helper methods for working with on failure action enumeration
+        /// </summary>
+        public static class WorkflowProcessHelpers
+        {
+            /// <summary>
+            /// Gets the description attribute value for an OnFailureAction enum value
+            /// </summary>
+            /// <param name="action">The on failure action</param>
+            /// <returns>The description string</returns>
+            public static string GetOnFailureActionDescription(OnFailureAction action)
+            {
+                var field = action.GetType().GetField(action.ToString());
+                var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+                return attribute?.Description ?? action.ToString();
+            }
+
+            /// <summary>
+            /// Parses a string description to the corresponding OnFailureAction enum value
+            /// </summary>
+            /// <param name="description">The description string</param>
+            /// <returns>The corresponding OnFailureAction enum value</returns>
+            public static OnFailureAction ParseOnFailureAction(string description)
+            {
+                foreach (OnFailureAction action in Enum.GetValues(typeof(OnFailureAction)))
+                {
+                    if (GetOnFailureActionDescription(action).Equals(description, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return action;
+                    }
+                }
+                throw new ArgumentException($"Unknown on failure action description: {description}");
+            }
+        }
+    }
+}

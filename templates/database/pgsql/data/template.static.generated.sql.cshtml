@@ -2,14 +2,23 @@
 insert into core.data_source (id, name) values ((SELECT nextval('core.data_source_identity')), 'default');
 
 -- Insert agent status values
-insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Initializing');
-insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Online');
-insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Busy');
-insert into core.agent_status (id, name) values ((SELECT nextval('core.agent_status_identity')), 'Offline');
+insert into core.agent_status (id, name) values (1, 'Initializing');
+insert into core.agent_status (id, name) values (2, 'Online');
+insert into core.agent_status (id, name) values (3, 'Busy');
+insert into core.agent_status (id, name) values (4, 'Offline');
 
 -- Insert on_failure action values
-insert into core.on_failure (id, action) values ((SELECT nextval('core.on_failure_identity')), 'Stop');
-insert into core.on_failure (id, action) values ((SELECT nextval('core.on_failure_identity')), 'Continue');
+insert into core.on_failure (id, action) values (1, 'Stop');
+insert into core.on_failure (id, action) values (2, 'Continue');
+
+insert into core.exec_status (id, status) values (1, 'Dispatched');
+insert into core.exec_status (id, status) values (2, 'Executing');
+insert into core.exec_status (id, status) values (3, 'Completed');
+insert into core.exec_status (id, status) values (4, 'Failed');
+insert into core.exec_status (id, status) values (5, 'Cancelled');	
+insert into core.exec_status (id, status) values (6, 'Timeout');
+insert into core.exec_status (id, status) values (7, 'Interrupted');
+insert into core.exec_status (id, status) values (8, 'Suspended');
 
 -- Insert AgentCoreLogic method operations
 -- Process Management Operations

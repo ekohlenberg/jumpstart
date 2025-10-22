@@ -87,11 +87,28 @@ namespace @Model.Namespace
         public void start(long executionId)
         {
             Console.WriteLine($"AgentCoreLogic: start - executionId={executionId}");
-            // TODO: Implement start logic
-            // - Load execution details from database
-            // - Prepare execution environment
-            // - Start the process
-            // - Update execution status
+            Execution execution = new Execution();
+            execution.id = executionId;
+            DBPersist.get(execution, "default");
+            if (execution.exec_status_id != (long)Execution.ExecStatus.Dispatched)
+            {
+                throw new Exception("Execution is not dispatched");
+            }
+
+            WorkflowProcess workflowProcess = new WorkflowProcess();
+            workflowProcess.id = execution.workflow_process_id;
+            DBPersist.get(workflowProcess, "default");
+            
+            Process process = new Process();
+            process.id = workflowProcess.process_id;
+            DBPersist.get(process, "default");
+            
+            Script script = new Script();
+            script.id = process.script_id;
+            DBPersist.get(script, "default");
+            
+            ScriptHost scriptHost = new ScriptHost();
+            scriptHost.Invoke<Execution>(execution, script);
         }
 
         public void stop(long executionId)

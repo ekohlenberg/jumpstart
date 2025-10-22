@@ -1,0 +1,76 @@
+using System;
+using System.ComponentModel;
+
+namespace @Model.Namespace
+{
+    /// <summary>
+    /// Partial Agent class containing enumerated types for agent status values
+    /// </summary>
+    public partial class Agent
+    {
+        /// <summary>
+        /// Agent status enumeration based on core.agent_status table values
+        /// </summary>
+        public enum AgentStatus
+        {
+            /// <summary>
+            /// Agent is initializing
+            /// </summary>
+            [Description("Initializing")]
+            Initializing = 1,
+
+            /// <summary>
+            /// Agent is online and available
+            /// </summary>
+            [Description("Online")]
+            Online = 2,
+
+            /// <summary>
+            /// Agent is busy processing tasks
+            /// </summary>
+            [Description("Busy")]
+            Busy = 3,
+
+            /// <summary>
+            /// Agent is offline
+            /// </summary>
+            [Description("Offline")]
+            Offline = 4
+        }
+
+        /// <summary>
+        /// Helper methods for working with agent status enumeration
+        /// </summary>
+        public static class AgentHelpers
+        {
+            /// <summary>
+            /// Gets the description attribute value for an AgentStatus enum value
+            /// </summary>
+            /// <param name="status">The agent status</param>
+            /// <returns>The description string</returns>
+            public static string GetAgentStatusDescription(AgentStatus status)
+            {
+                var field = status.GetType().GetField(status.ToString());
+                var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+                return attribute?.Description ?? status.ToString();
+            }
+
+            /// <summary>
+            /// Parses a string description to the corresponding AgentStatus enum value
+            /// </summary>
+            /// <param name="description">The description string</param>
+            /// <returns>The corresponding AgentStatus enum value</returns>
+            public static AgentStatus ParseAgentStatus(string description)
+            {
+                foreach (AgentStatus status in Enum.GetValues(typeof(AgentStatus)))
+                {
+                    if (GetAgentStatusDescription(status).Equals(description, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return status;
+                    }
+                }
+                throw new ArgumentException($"Unknown agent status description: {description}");
+            }
+        }
+    }
+}

@@ -12,14 +12,19 @@ namespace @Model.Namespace
     public class AgentClient : IDisposable
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl;
+        private readonly Agent _agent;
 
-        public AgentClient(string baseUrl)
+        public AgentClient(Agent agent)
         {
-            _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
+            _agent = agent ?? throw new ArgumentNullException(nameof(agent));
+            if (string.IsNullOrEmpty(_agent.url))
+            {
+                throw new Exception("Agent URL is not set for agent " + _agent.id);
+            }
+
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri(_baseUrl),
+                BaseAddress = new Uri(agent.url),
                 Timeout = TimeSpan.FromSeconds(30)
             };
         }

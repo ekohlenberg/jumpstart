@@ -30,12 +30,12 @@ namespace @Model.Name
 				string source = s["source"].ToString();
 				string name = s["name"].ToString();
 
-				await ExecCode<T>(model, name, "@@{ try {" + source + "} catch( Exception e) {Model.EventException = e;}}");
+				await ExecuteScript<T>(model, name, "@@{ try {" + source + "} catch( Exception e) {Model.EventException = e;}}");
 			}
 
 		}
 
-		protected async Task ExecCode<T>(T model, string name, string script) 
+		protected async Task ExecuteScript<T>(T model, string name, string script) 
         {
             if (model == null)
             {
