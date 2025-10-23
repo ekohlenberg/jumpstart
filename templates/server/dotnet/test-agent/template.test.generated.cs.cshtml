@@ -24,7 +24,7 @@ namespace @Model.Namespace
                     DBPersist.autoAssign(rdr, agent);
                     agents.Add(agent.id, agent);
                    }
-                   DBPersist.select(AgentSelectCallback, "select * from core.agent where status = 'running'");
+                   DBPersist.select(AgentSelectCallback, $"select * from core.agent where agent_status_id = {(long)Agent.AgentStatus.Online}");
 
                    void ProcessSelectCallback(System.Data.Common.DbDataReader rdr)
                    {
@@ -42,7 +42,7 @@ namespace @Model.Namespace
                     }
                     DBPersist.select(WorkflowSelectCallback, "select * from core.workflow where name = 'test workflow'");
 
-                    foreach (Agent  agent in agents)
+                    foreach (Agent  agent in agents.Values)
                     {
                         int seq = 10;
                         foreach (Process process in processes)
@@ -51,7 +51,7 @@ namespace @Model.Namespace
                             workflowProcess.agent_id = agent.id;
                             workflowProcess.process_id = process.id;
                             workflowProcess.workflow_id = workflows[0].id;
-                            workflowProcess.sequence = seq;
+                            workflowProcess.seq = seq;
                             workflowProcess.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Continue;
                             seq+=10;
                             workflowProcesses.Add(workflowProcess);
@@ -80,15 +80,15 @@ namespace @Model.Namespace
                 execution.workflow_process_id = workflowProcess.id;
                 execution.start_time = DateTime.UtcNow;
                 execution.end_time = DateTime.UtcNow;
-                execution.exec_status_id = (long)Execution.ExecutionStatus.Dispatched;
-                execution.output_text = "";
-                execution.error_text = "";
-                execution.agent_id = workflowProcess.agent_id;
+                execution.exec_status_id = (long)Execution.ExecStatus.Dispatched;
+                execution.stdout = "";
+                execution.stderr = "";
+                
                 DBPersist.insert(execution);
 
                 agent = agents[workflowProcess.agent_id];
                 AgentClient agentClient = new AgentClient(agent);
-                await agentClient.start(execution.id);
+                await agentClient.StartAsync(execution.id);
             }
         }
 

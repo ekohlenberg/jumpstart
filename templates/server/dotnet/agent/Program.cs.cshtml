@@ -136,7 +136,7 @@ static async Task RegisterAgent(IPAddress boundIP, int port)
             os_version = sessionInfo.GetValue("OSVersion"),
             architecture = sessionInfo.GetValue("Architecture"),
             registered_at = DateTime.UtcNow,
-            agent_status_id = 1,
+            agent_status_id = (long)Agent.AgentStatus.Online,
             is_active = 1,
             created_by = Environment.UserName,
             
