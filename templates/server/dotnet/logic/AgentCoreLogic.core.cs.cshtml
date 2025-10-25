@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace @Model.Namespace
 {
@@ -68,6 +69,21 @@ namespace @Model.Namespace
 
     public partial class AgentCoreLogic : IAgentCoreLogic
     {
+        
+        // Singleton thread-safe queue for executing programs
+        private static readonly ConcurrentQueue<long> _executionQueue = new ConcurrentQueue<long>();
+        private static readonly object _queueLock = new object();
+        private static volatile bool _isProcessing = false;
+        
+        // Execution thread management
+        private static Thread _executionThread;
+        private static readonly object _threadLock = new object();
+        private static volatile bool _shouldStop = false;
+        
+        // Singleton Agent instance
+        private static Agent _thisAgent;
+        private static readonly object _agentLock = new object();
+
         public static IAgentCoreLogic Create()
         {
             var agentLogic = new AgentCoreLogic();
@@ -81,12 +97,256 @@ namespace @Model.Namespace
         }
 
         // =====================================
+        // Queue Management Methods
+        // =====================================
+
+        /// <summary>
+        /// Adds an execution ID to the queue for processing
+        /// </summary>
+        /// <param name="executionId">The execution ID to queue</param>
+        public static void EnqueueExecution(long executionId)
+        {
+            _executionQueue.Enqueue(executionId);
+            Console.WriteLine($"AgentCoreLogic: Enqueued execution {executionId}");
+        }
+
+        /// <summary>
+        /// Gets the current queue size
+        /// </summary>
+        /// <returns>Number of items in the queue</returns>
+        public static int GetQueueSize()
+        {
+            return _executionQueue.Count;
+        }
+
+        /// <summary>
+        /// Processes all queued executions
+        /// </summary>
+        public static async Task ProcessQueueAsync()
+        {
+            lock (_queueLock)
+            {
+                if (_isProcessing)
+                {
+                    Console.WriteLine("AgentCoreLogic: Queue is already being processed");
+                    return;
+                }
+                _isProcessing = true;
+            }
+
+            try
+            {
+                Console.WriteLine($"AgentCoreLogic: Starting to process {_executionQueue.Count} executions");
+                
+                while (_executionQueue.TryDequeue(out long executionId))
+                {
+                    try
+                    {
+                        var agentLogic = new AgentCoreLogic();
+                        agentLogic.ExecuteScript(executionId);
+                        Console.WriteLine($"AgentCoreLogic: Successfully processed execution {executionId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"AgentCoreLogic: Error processing execution {executionId}: {ex.Message}");
+                    }
+                }
+            }
+            finally
+            {
+                lock (_queueLock)
+                {
+                    _isProcessing = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears all queued executions
+        /// </summary>
+        public static void ClearQueue()
+        {
+            while (_executionQueue.TryDequeue(out _)) { }
+            Console.WriteLine("AgentCoreLogic: Queue cleared");
+        }
+
+        // =====================================
+        // Singleton Agent Management
+        // =====================================
+
+        /// <summary>
+        /// Gets the singleton Agent instance
+        /// </summary>
+        public static Agent thisAgent
+        {
+            get
+            {
+                if (_thisAgent == null)
+                {
+                    lock (_agentLock)
+                    {
+                        if (_thisAgent == null)
+                        {
+                            _thisAgent = new Agent();
+                            Console.WriteLine("AgentCoreLogic: Created singleton Agent instance");
+                        }
+                    }
+                }
+                return _thisAgent;
+            }
+        }
+
+        /// <summary>
+        /// Sets the singleton Agent instance
+        /// </summary>
+        /// <param name="agent">The Agent instance to set</param>
+        public static void SetThisAgent(Agent agent)
+        {
+            lock (_agentLock)
+            {
+                _thisAgent = agent;
+                Console.WriteLine($"AgentCoreLogic: Set singleton Agent instance (ID: {agent?.id})");
+            }
+        }
+
+        /// <summary>
+        /// Clears the singleton Agent instance
+        /// </summary>
+        public static void ClearThisAgent()
+        {
+            lock (_agentLock)
+            {
+                _thisAgent = null;
+                Console.WriteLine("AgentCoreLogic: Cleared singleton Agent instance");
+            }
+        }
+
+        /// <summary>
+        /// Updates the agent status in the database
+        /// </summary>
+        /// <param name="status">The new agent status</param>
+        private static void UpdateAgentStatus(Agent.AgentStatus status)
+        {
+            if (thisAgent != null)
+            {
+                thisAgent.agent_status_id = (long)status;
+                DBPersist.update(thisAgent, "default");
+                Console.WriteLine($"AgentCoreLogic: Set agent status to {status}");
+            }
+        }
+
+        /// <summary>
+        /// Starts the execution thread if it's not already running
+        /// </summary>
+        public static void StartExecutionThread()
+        {
+            lock (_threadLock)
+            {
+                if (_executionThread != null && _executionThread.IsAlive)
+                {
+                    Console.WriteLine("AgentCoreLogic: Execution thread is already running");
+                    return;
+                }
+
+                _shouldStop = false;
+                _executionThread = new Thread(ExecutionThreadCallback)
+                {
+                    Name = "AgentCoreLogic-ExecutionThread",
+                    IsBackground = false
+                };
+                _executionThread.Start();
+                Console.WriteLine("AgentCoreLogic: Execution thread started");
+            }
+        }
+
+        /// <summary>
+        /// Stops the execution thread gracefully
+        /// </summary>
+        public static void StopExecutionThread()
+        {
+            lock (_threadLock)
+            {
+                if (_executionThread == null || !_executionThread.IsAlive)
+                {
+                    Console.WriteLine("AgentCoreLogic: Execution thread is not running");
+                    return;
+                }
+
+                _shouldStop = true;
+                _executionThread.Join(TimeSpan.FromSeconds(30)); // Wait up to 30 seconds
+                
+                if (_executionThread.IsAlive)
+                {
+                    Console.WriteLine("AgentCoreLogic: Execution thread did not stop gracefully");
+                }
+                else
+                {
+                    Console.WriteLine("AgentCoreLogic: Execution thread stopped");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Thread callback that continuously processes the execution queue
+        /// </summary>
+        private static void ExecutionThreadCallback()
+        {
+            Console.WriteLine("AgentCoreLogic: Execution thread started processing");
+            
+            while (!_shouldStop)
+            {
+                try
+                {
+                    if (_executionQueue.TryDequeue(out long executionId))
+                    {
+                        Console.WriteLine($"AgentCoreLogic: Processing execution {executionId}");
+                        
+                        // Set agent status to Busy before execution
+                        UpdateAgentStatus(Agent.AgentStatus.Busy);
+                        
+                        try
+                        {
+                            // Create a new instance and execute the script (blocking)
+                            var agentLogic = new AgentCoreLogic();
+                            agentLogic.ExecuteScript(executionId);
+                            
+                            Console.WriteLine($"AgentCoreLogic: Completed execution {executionId}");
+                        }
+                        finally
+                        {
+                            // Set agent status back to Online after execution (success or failure)
+                            UpdateAgentStatus(Agent.AgentStatus.Online);
+                        }
+                    }
+                    else
+                    {
+                        // No items in queue, sleep briefly to avoid busy waiting
+                        Thread.Sleep(100);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"AgentCoreLogic: Error in execution thread: {ex.Message}");
+                    // Continue processing other executions even if one fails
+                }
+            }
+            
+            Console.WriteLine("AgentCoreLogic: Execution thread stopped");
+        }
+
+        // =====================================
         // Process Management Operations
         // =====================================
 
         public void start(long executionId)
         {
             Console.WriteLine($"AgentCoreLogic: start - executionId={executionId}");
+            EnqueueExecution(executionId);
+            StartExecutionThread();
+        }
+
+        protected void ExecuteScript(long executionId)
+        {
             Execution execution = new Execution();
             execution.id = executionId;
             DBPersist.get(execution, "default");
@@ -95,20 +355,39 @@ namespace @Model.Namespace
                 throw new Exception("Execution is not dispatched");
             }
 
-            WorkflowProcess workflowProcess = new WorkflowProcess();
-            workflowProcess.id = execution.workflow_process_id;
-            DBPersist.get(workflowProcess, "default");
-            
-            Process process = new Process();
-            process.id = workflowProcess.process_id;
-            DBPersist.get(process, "default");
-            
-            Script script = new Script();
-            script.id = process.script_id;
-            DBPersist.get(script, "default");
-            
-            ScriptHost scriptHost = new ScriptHost();
-            scriptHost.Invoke<Execution>(execution, script);
+            execution.exec_status_id = (long)Execution.ExecStatus.Running;
+            DBPersist.update(execution, "default");
+
+            try
+            {
+                WorkflowProcess workflowProcess = new WorkflowProcess();
+                workflowProcess.id = execution.workflow_process_id;
+                DBPersist.get(workflowProcess, "default");
+                
+                Process process = new Process();
+                process.id = workflowProcess.process_id;
+                DBPersist.get(process, "default");
+                
+                Script script = new Script();
+                script.id = process.script_id;
+                DBPersist.get(script, "default");
+                
+                ScriptHost scriptHost = new ScriptHost();
+                scriptHost.Invoke<Execution>(execution, script);
+            }
+            catch (Exception ex)
+            {
+                execution.exec_status_id = (long)Execution.ExecStatus.Failed;
+                execution.end_time = DateTime.UtcNow;
+                execution.stderr = ex.Message;
+                DBPersist.update(execution, "default");
+                throw;
+            }
+
+            execution.exec_status_id = (long)Execution.ExecStatus.Completed;
+            execution.end_time = DateTime.UtcNow;
+            execution.stdout = "Execution completed successfully";
+            DBPersist.update(execution, "default");
         }
 
         public void stop(long executionId)
@@ -192,6 +471,7 @@ namespace @Model.Namespace
         {
             Console.WriteLine($"AgentCoreLogic: register");
             DBPersist.put(registrationData);
+            SetThisAgent(registrationData);
             return registrationData.id;
         }
 

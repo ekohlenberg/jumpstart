@@ -164,7 +164,7 @@ namespace @Model.Name
         static public void update(BaseObject baseObject, string connectionName = "default")
         {
             baseObject["version"] = version(baseObject, connectionName);
-            baseObject["last_updated"] = DateTime.Now;
+            baseObject["last_updated"] = DateTime.UtcNow;
             baseObject["last_updated_by"] = Environment.UserName;
 
             string sql = updateSql(baseObject, connectionName);
