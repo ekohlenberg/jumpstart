@@ -1,37 +1,63 @@
-DECLARE @@script_id BIGINT, @@event_service_id BIGINT;
-
-SELECT @@script_id = NEXT VALUE FOR core.script_identity;
-INSERT INTO core.script(
+-- Insert test scripts
+INSERT INTO [core].[script](
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (@@script_id, 'all-object insert event', '@@using System; @@using System.IO; Console.WriteLine("all-object insert event");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+	VALUES (NEXT VALUE FOR core.script_identity, 'all-object insert event', '@@using System; @@using System.IO; Console.WriteLine("all-object insert event");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
-SELECT @@script_id = NEXT VALUE FOR core.script_identity;
-INSERT INTO core.script(
+INSERT INTO [core].[script](
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (@@script_id, 'all-object update event', '@@using System; @@using System.IO; Console.WriteLine("all-object update event");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+	VALUES (NEXT VALUE FOR core.script_identity, 'all-object update event', '@@using System; @@using System.IO; Console.WriteLine("all-object update event");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
-SELECT @@event_service_id = NEXT VALUE FOR core.event_service_identity;
+INSERT INTO [core].[script](
+	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (NEXT VALUE FOR core.script_identity, 'test hello-world script', '@@using System; @@using System.IO; Console.WriteLine("Hello, World!");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
+INSERT INTO [core].[script](
+	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (NEXT VALUE FOR core.script_identity, 'test long loop script', 
+    '@@using System; @@using System.Threading; @@using System.IO; for(int i = 0; i < 100; i++) { Console.WriteLine("Long loop"); Thread.Sleep(1000); }', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+
+INSERT INTO [core].[script](
+	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (NEXT VALUE FOR core.script_identity, 'test failure script', 
+    '@@using System; @@using System.IO; throw new Exception("Test failure");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+
+-- Insert process records for all test scripts
+INSERT INTO [core].[process](
+	id, name, script_id, is_active, created_by, last_updated, last_updated_by, version)
+SELECT 
+	NEXT VALUE FOR core.process_identity,
+	s.name,
+	s.id,
+	1,
+	SYSTEM_USER,
+	GETDATE(),
+	SYSTEM_USER,
+	1
+FROM [core].[script] s
+WHERE s.name LIKE 'test%';
+
+-- Insert workflow record for test workflow
+INSERT INTO [core].[workflow](
+	id, parent_workflow_id, name, description, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (NEXT VALUE FOR core.workflow_identity, null, 'test workflow', 'test workflow', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+
+-- Insert event services
 WITH all_object_insert_script AS (
     SELECT id
-    FROM core.script
+    FROM [core].[script]
     WHERE name = 'all-object insert event'
 )
-
-INSERT INTO core.event_service(
+INSERT INTO [core].[event_service](
 	id, event_type, objectname_filter, methodname_filter, script_id, is_active, created_by, last_updated, last_updated_by, version)
-SELECT @@event_service_id, 'pre', '%', 'insert', all_object_insert_script.id, 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1
+SELECT NEXT VALUE FOR core.event_service_identity, 'pre', '%', 'insert', all_object_insert_script.id, 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1
 FROM all_object_insert_script;
-
-SELECT @@event_service_id = NEXT VALUE FOR core.event_service_identity;
 
 WITH all_object_update_script AS (
     SELECT id
-    FROM core.script
+    FROM [core].[script]
     WHERE name = 'all-object update event'
 )
-
-INSERT INTO core.event_service(
+INSERT INTO [core].[event_service](
 	id, event_type, objectname_filter, methodname_filter, script_id, is_active, created_by, last_updated, last_updated_by, version)
-SELECT @@event_service_id, 'post', '%', 'update', all_object_update_script.id, 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1
+SELECT NEXT VALUE FOR core.event_service_identity, 'post', '%', 'update', all_object_update_script.id, 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1
 FROM all_object_update_script;
