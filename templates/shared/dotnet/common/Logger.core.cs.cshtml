@@ -397,16 +397,15 @@ namespace @Model.Name
             lock (Lock)
             {
                 string logMessage = FormatLogMessage(level, message, filePath, lineNumber, memberName);
+								ConsoleColor initialColor = Console.ForegroundColor;
     
                 if (level == "ERROR")
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                 }
-                else
-                {
-                    Console.ResetColor();
-                }
+
                 Console.WriteLine(logMessage);
+                Console.ForegroundColor = initialColor;
             }
         }
     }

@@ -109,7 +109,7 @@ namespace @Model.Name
             long id = identity(baseObject, connectionName);
             auditBaseObject["id"] = id;
 
-            Console.WriteLine("Audit: " + auditBaseObject.ToString());
+            Logger.Debug("Audit: " + auditBaseObject.ToString());
 
             var (sql, parameters) = insertSql(auditBaseObject, baseObject.auditTableName, connectionName);
             execCmd(sql, parameters, connectionName);

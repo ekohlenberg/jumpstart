@@ -39,7 +39,7 @@ namespace @Model.Namespace
             }
             @{
             <text>
-                Console.WriteLine("Testing @(Model.DomainObj)Logic insert: " + @(Model.DomainVar).ToString());
+                Logger.Info("Testing @(Model.DomainObj)Logic insert: " + @(Model.DomainVar).ToString());
                 @(Model.DomainObj)Logic.Create().insert(@(Model.DomainVar));
                 BaseTest.addLastId("@(Model.DomainVar)", @(Model.DomainVar).id);
             </text>
@@ -79,7 +79,7 @@ namespace @Model.Namespace
             }
             @{
             <text>
-                Console.WriteLine("Testing @(Model.DomainObj)Logic update: " + @(Model.DomainVar).ToString());
+                Logger.Info("Testing @(Model.DomainObj)Logic update: " + @(Model.DomainVar).ToString());
                 @(Model.DomainObj)Logic.Create().update(lastId, @(Model.DomainVar));
             </text>
             }
