@@ -276,16 +276,6 @@ namespace @(namespaceName).Controllers
         // System Management Operations
         // =====================================
 
-        // POST api/<SchedulerController>/register
-        [HttpPost("register")]
-        public ActionResult Register([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler REGISTER: {workflowId}");
-            
-            SchedulerLogic.Create().register(workflowId);
-            return Ok();
-        }
-
         // POST api/<SchedulerController>/unregister/{workflowId}
         [HttpPost("unregister/{workflowId}")]
         public ActionResult Unregister(long workflowId)

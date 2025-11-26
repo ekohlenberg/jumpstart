@@ -13,6 +13,9 @@ dotnet server templates-common,model,shared/dotnet/common/JsonHelper.cs.cshtml,.
 dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/DatabaseProviderFactory.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/Script.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/CSharpCompiler.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/IScript.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
 dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,./shared/domain,TRUE
@@ -29,7 +32,7 @@ dotnet server templates-logic,model,server/dotnet/logic/OpRoleMemberLogic.core.c
 dotnet server templates-logic,model,server/dotnet/logic/NavMenuLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/EventServiceLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/SchedulerLogic.core.cs.cshtml,./server/logic,TRUE
-dotnet server templates-logic,model,server/dotnet/logic/AgentCoreLogic.core.cs.cshtml,./server/logic,TRUE
+dotnet server templates-logic,model,server/dotnet/logic/AgentLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/DispatcherThread.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/HealthMonitorThread.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/SchedulerClient.core.cs.cshtml,./server/logic,TRUE
@@ -79,4 +82,8 @@ dotnet server templates-test-agent,model,server/dotnet/test-agent/template.test.
 dotnet server templates-test-agent,model,server/dotnet/test-agent/makefile.cshtml,./server/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/appsettings.json.cshtml,./server/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/test.csproj.cshtml,./server/test-agent,TRUE
+dotnet server templates-test-script,model,server/dotnet/test-script/Program.cs.cshtml,./server/test-script,TRUE
+dotnet server templates-test-script,model,server/dotnet/test-script/makefile.cshtml,./server/test-script,TRUE
+dotnet server templates-test-script,model,server/dotnet/test-script/appsettings.json.cshtml,./server/test-script,TRUE
+dotnet server templates-test-script,model,server/dotnet/test-script/test-script.csproj.cshtml,./server/test-script,TRUE
 dotnet server templates-server solution,model,server/dotnet/server.sln.cshtml,./server,TRUE

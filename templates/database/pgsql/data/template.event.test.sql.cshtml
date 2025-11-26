@@ -13,7 +13,7 @@ INSERT INTO core.script(
 INSERT INTO core.script(
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (nextval('core.script_identity'), 'test infinite loop script', 
-    '@@using System; @@using System.Threading; @@using System.IO; for(int i = 0; i < 100; i++) { Console.WriteLine("Long loop"); Thread.Sleep(1000); }', 1, current_user, current_timestamp, current_user, 1);
+    '@@using System; @@using System.Threading; @@using System.IO; for(int i = 0; i &lt; 30; i++) { Console.WriteLine($"Long loop: {i}"); Thread.Sleep(1000); }', 1, current_user, current_timestamp, current_user, 1);
 
 
 INSERT INTO core.script(

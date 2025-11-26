@@ -142,7 +142,7 @@ static async Task RegisterAgent(IPAddress boundIP, int port)
             
         };
 
-        AgentCoreLogic.Create().register(registrationData);
+        @(Model.Namespace).core.AgentLogic.Create().register(registrationData);
         
     
 }

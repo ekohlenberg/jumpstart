@@ -7,20 +7,26 @@ insert into core.agent_status (id, name) values (2, 'Online');
 insert into core.agent_status (id, name) values (3, 'Busy');
 insert into core.agent_status (id, name) values (4, 'Offline');
 
+-- Insert scheduler status values
+insert into core.scheduler_status (id, name) values (1, 'Initializing');
+insert into core.scheduler_status (id, name) values (2, 'Online');
+insert into core.scheduler_status (id, name) values (3, 'Busy');
+insert into core.scheduler_status (id, name) values (4, 'Offline');
+
 -- Insert on_failure action values
 insert into core.on_failure (id, action) values (1, 'Stop');
 insert into core.on_failure (id, action) values (2, 'Continue');
 
-insert into core.exec_status (id, status) values (1, 'Dispatched');
-insert into core.exec_status (id, status) values (2, 'Executing');
-insert into core.exec_status (id, status) values (3, 'Completed');
-insert into core.exec_status (id, status) values (4, 'Failed');
-insert into core.exec_status (id, status) values (5, 'Cancelled');	
-insert into core.exec_status (id, status) values (6, 'Timeout');
-insert into core.exec_status (id, status) values (7, 'Interrupted');
-insert into core.exec_status (id, status) values (8, 'Suspended');
+insert into core.exec_status (id, name) values (1, 'Dispatched');
+insert into core.exec_status (id, name) values (2, 'Executing');
+insert into core.exec_status (id, name) values (3, 'Completed');
+insert into core.exec_status (id, name) values (4, 'Failed');
+insert into core.exec_status (id, name) values (5, 'Cancelled');	
+insert into core.exec_status (id, name) values (6, 'Timeout');
+insert into core.exec_status (id, name) values (7, 'Interrupted');
+insert into core.exec_status (id, name) values (8, 'Suspended');
 
--- Insert AgentCoreLogic method operations
+-- Insert AgentLogic method operations
 -- Process Management Operations
 insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'start', 1, current_timestamp, current_user, current_user, 1);
 insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'stop', 1, current_timestamp, current_user, current_user, 1);

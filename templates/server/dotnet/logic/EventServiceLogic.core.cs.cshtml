@@ -6,33 +6,49 @@ namespace @Model.Namespace
 {
     
 
-    public class EventContext
+    public class EventContext : ScriptContext
     {
         public string EventType { get; private set;}
-        public string ObjectName { get; private set;}
-        public string MethodName{ get; private set;}
-        public object[] Args {get; private set;} 
-        public object? EventResult { get; private set;} = null;
-        public object? MethodResult{ get; private set;} = null;
-        public Exception? EventException{ get; set;} = null;
+				public string ObjectName {get; private set;}
+				public string MethodName {get; private set;} 
+				public object? MethodResult { get; private set;}
 
-        public EventContext(string eventType, string objectName, string methodName, object[] args)
+        public EventContext(string eventType, string objectName, string methodName, object[] args) 
         {
-            EventType = eventType;
-            ObjectName = objectName;
-            MethodName = methodName;
-            Args = args;
+		        Initialize (eventType,  objectName,  methodName, args);
         }
 
-        public EventContext(string eventType, string objectName, string methodName, object[] args, object methodResult)
+        public EventContext(string eventType, string objectName, string methodName, object[] args, object methodResult) 
         {
-            EventType = eventType;
-            ObjectName = objectName;
-            MethodName = methodName;
-            Args = args;
-            MethodResult = methodResult;
+				this.MethodResult = methodResult;
+
+		        Initialize (eventType,  objectName,  methodName, args);
         }
+
+        public void Initialize(string eventType, string objectName, string methodName, object[] args)
+				{
+                    Initialize();
+
+                    EventType = eventType;
+					ObjectName = objectName;
+					MethodName = methodName;
+
+                    Args.Add("eventtype", eventType);
+                    Args.Add("objectname", objectName);
+                    Args.Add("methodname", methodName);
+                    Args.Add("args", args);
+
+                    foreach (var a in args )
+                    {
+                        if (a is BaseObject) 
+                        {
+                            this.Transaction = a as BaseObject;
+                            break;
+                        }
+                    } 
+				}
     }
+
     public partial class EventServiceLogic
     {
 

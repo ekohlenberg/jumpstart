@@ -1,0 +1,190 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace defarge
+{
+   public class ScriptTest : core.Script
+   {
+        public ScriptTest(string name, string source) : base(new core.Script())
+        {
+            this.name = name;
+            this.source = source;
+        }
+   }
+
+    public class TestModel
+    {
+        public string msg = string.Empty;
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var compiler = new CSharpCompiler();
+            var context = new ScriptContext();
+            context.Initialize();
+            
+            Example1_SimpleScript(compiler, context);
+            Example2_LoopScript(compiler, context);
+            Example3_AdvancedScript(compiler, context);
+            Example4_ExceptionScript(compiler, context);
+            Example5_GenericCollection(compiler, context);
+        }
+
+        /// <summary>
+        /// Example 1: Simple script execution with complete class definition
+        /// </summary>
+        static void Example1_SimpleScript(CSharpCompiler compiler, ScriptContext context)
+        {
+            var example1 = @@"
+using System;
+using System.IO;
+using defarge;
+
+namespace Generated
+{
+    public class SimpleScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine(""Hello, World from compiled script!"");
+        }
+    }
+}";
+            compiler.CompileAndExecute(example1, context);
+        }
+
+        /// <summary>
+        /// Example 2: Script with loop
+        /// </summary>
+        static void Example2_LoopScript(CSharpCompiler compiler, ScriptContext context)
+        {
+            var scriptSource = @@"
+using System;
+using System.IO;
+using defarge;
+
+namespace Generated
+{
+    public class MyScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine(""Executing MyScript"");
+            for (int i = 0; i < 3; i++)
+            {
+                Console.WriteLine($""  Iteration {i}"");
+            }
+        }
+    }
+}";
+            
+            var script = compiler.CompileAndCreate(scriptSource);
+            script.Execute(context);
+        }
+
+        /// <summary>
+        /// Example 3: Script that uses external types with complete class definition
+        /// </summary>
+        static void Example3_AdvancedScript(CSharpCompiler compiler, ScriptContext context)
+        {
+            var advancedScript = @@"
+using System;
+using System.IO;
+using defarge;
+
+namespace Generated
+{
+    public class AdvancedScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            var model = new defarge.TestModel();
+            model.msg = ""Hello from script!"";
+            Console.WriteLine(model.msg);
+        }
+    }
+}";
+            var compiledScript = compiler.CompileAndCreate(advancedScript);
+            compiledScript.Execute(context);
+        }
+
+        /// <summary>
+        /// Example 4: Script that throws an exception
+        /// </summary>
+        static void Example4_ExceptionScript(CSharpCompiler compiler, ScriptContext context)
+        {
+            var exceptionScript = @@"
+using System;
+using System.IO;
+using defarge;
+
+namespace Generated
+{
+    public class ExceptionScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine(""About to throw an exception..."");
+            throw new Exception(""This is a test exception from a compiled script!"");
+        }
+    }
+}";
+            try
+            {
+                var exceptionCompiled = compiler.CompileAndCreate(exceptionScript);
+                exceptionCompiled.Execute(context);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Caught exception: {ex.Message}");
+                Console.WriteLine($"Exception type: {ex.GetType().FullName}");
+            }
+        }
+
+        /// <summary>
+        /// Example 5: Script that uses generic collections - demonstrates automatic reference resolution
+        /// </summary>
+        static void Example5_GenericCollection(CSharpCompiler compiler, ScriptContext context)
+        {
+            var collectionScript = @@"
+using System;
+using System.Collections.Generic;
+using defarge;
+
+namespace Generated
+{
+    public class GenericCollectionScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine(""Creating a List<string> and adding elements..."");
+            
+            var items = new List<string>();
+            items.Add(""First item"");
+            items.Add(""Second item"");
+            items.Add(""Third item"");
+            items.Add(""Fourth item"");
+            
+            Console.WriteLine($""Added {items.Count} items to the list"");
+            Console.WriteLine(""Iterating through the collection:"");
+            
+            foreach (var item in items)
+            {
+                Console.WriteLine($""  - {item}"");
+            }
+            
+            Console.WriteLine(""Collection iteration complete!"");
+        }
+    }
+}";
+            var compiledScript = compiler.CompileAndCreate(collectionScript);
+            compiledScript.Execute(context);
+        }
+    }
+}
+

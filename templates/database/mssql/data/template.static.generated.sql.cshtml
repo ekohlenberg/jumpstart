@@ -36,7 +36,7 @@ INSERT INTO [core].[exec_status] ([id], [status]) VALUES (6, 'Timeout');
 INSERT INTO [core].[exec_status] ([id], [status]) VALUES (7, 'Interrupted');
 INSERT INTO [core].[exec_status] ([id], [status]) VALUES (8, 'Suspended');
 
--- Insert AgentCoreLogic method operations
+-- Insert AgentLogic method operations
 -- Process Management Operations
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'start', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'stop', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
