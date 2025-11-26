@@ -16,12 +16,16 @@ dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cs
 dotnet server templates-common,model,shared/dotnet/common/Script.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/CSharpCompiler.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/IScript.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/IScriptProvider.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/PowerShellProvider.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/ScriptProviderFactory.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
 dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/Agent.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/WorkflowProcess.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/Execution.core.cs.cshtml,./shared/domain,TRUE
+dotnet server templates-domain,model,shared/dotnet/domain/Script.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/DBPersist.core.cs.cshtml,./server/persist,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/persist.csproj.cshtml,./server/persist,TRUE
 dotnet server templates-persist,model,server/dotnet/persist/appsettings.json.cshtml,./server/persist,FALSE

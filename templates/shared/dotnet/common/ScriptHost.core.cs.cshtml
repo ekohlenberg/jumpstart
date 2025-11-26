@@ -59,7 +59,7 @@ namespace @Model.Name
 
 				try 
                 {
-                    await ExecuteScript<T>(model, name, source);
+                    await ExecuteScript<T>(model, name, source, s);
                 }
                 catch (Exception e) 
                 {
@@ -71,9 +71,8 @@ namespace @Model.Name
             }
 		}
 
-		protected async Task ExecuteScript<T>(T model, string name, string script) where T : ScriptContext
+		protected async Task ExecuteScript<T>(T model, string name, string script, BaseObject scriptObject) where T : ScriptContext
         {
-            CSharpCompiler compiler = new CSharpCompiler();
             if (model == null)
             {
                 throw new Exception("Model cannot be null.");
@@ -87,14 +86,35 @@ namespace @Model.Name
             {
                 throw new Exception($"Script content cannot be null or empty.");
             }
-            Logger.Debug( "Executing the script >>" + script + "<<");
+            
+            // Get script_type_id from script object, default to 1 (CSharp) for backward compatibility
+            long scriptTypeId = 1; // Default to CSharp
+            if (scriptObject.ContainsKey("script_type_id") && scriptObject["script_type_id"] != null)
+            {
+                try
+                {
+                    scriptTypeId = Convert.ToInt64(scriptObject["script_type_id"]);
+                }
+                catch
+                {
+                    // If conversion fails, use default
+                    Logger.Warn($"Invalid script_type_id for script '{name}', defaulting to CSharp (1)");
+                }
+            }
+            
+            Logger.Debug($"Executing script '{name}' with type ID {scriptTypeId} >>" + script + "<<");
             
             try
             {
                 // Clear any previous exception if execution succeeded
                 model.ScriptException = null;
-               // string generatedCode = await razorEngine.CompileRenderStringAsync<T>(name, script, model);
-                compiler.CompileAndExecute(script, model);
+                
+                // Get the appropriate provider from factory
+                IScriptProvider provider = ScriptProviderFactory.CreateProvider(scriptTypeId);
+                
+                // Execute the script using the provider
+                provider.CompileAndExecute(script, model);
+                
                 if (model.retCode != null && model.retCode != 0)
                 {
                     throw new Exception("Script returned error code: " + model.retCode);
@@ -124,7 +144,7 @@ namespace @Model.Name
 				try 
                 {
                     // Execute synchronously by blocking on the async task
-                    ExecuteScript<T>(model, name, source).GetAwaiter().GetResult();
+                    ExecuteScript<T>(model, name, source, s).GetAwaiter().GetResult();
                 }
                 catch (Exception e) 
                 {

@@ -14,6 +14,7 @@
 ,core,script,Scripts,System,id,Script ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,script,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,script,,,source,Source Code,,,,3,NULL,0,NO,VARCHAR,nvarchar,4096,NULL,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,script,,,script_type_id,Script Type,enum,script_type,,4,1,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,event_service,Events,System,id,Event ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,event_service,,,event_type,Event Type,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,event_service,,,objectname_filter,Object Filter,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
@@ -108,3 +109,5 @@
 ,core,exec_status,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,scheduler_status,Scheduler Status,,id,Scheduler Status ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,scheduler_status,,,name,Status,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,script_type,Script Type,,id,Script Type ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,script_type,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL

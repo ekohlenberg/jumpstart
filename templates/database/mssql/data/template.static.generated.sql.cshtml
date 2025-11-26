@@ -36,6 +36,10 @@ INSERT INTO [core].[exec_status] ([id], [status]) VALUES (6, 'Timeout');
 INSERT INTO [core].[exec_status] ([id], [status]) VALUES (7, 'Interrupted');
 INSERT INTO [core].[exec_status] ([id], [status]) VALUES (8, 'Suspended');
 
+-- Insert script type values
+INSERT INTO [core].[script_type] ([id], [name]) VALUES (1, 'CSharp');
+INSERT INTO [core].[script_type] ([id], [name]) VALUES (2, 'PowerShell');
+
 -- Insert AgentLogic method operations
 -- Process Management Operations
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'start', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);

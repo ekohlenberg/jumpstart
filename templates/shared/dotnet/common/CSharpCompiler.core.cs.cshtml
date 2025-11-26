@@ -16,7 +16,7 @@ namespace @Model.Name
     /// The script author is responsible for providing complete, compilable C# code.
     /// Assembly references are automatically resolved based on the using directives in the source code.
     /// </summary>
-    public class CSharpCompiler
+    public class CSharpCompiler : IScriptProvider
     {
         private readonly List<MetadataReference> _references;
         private readonly Dictionary<string, Type> _compiledTypes;

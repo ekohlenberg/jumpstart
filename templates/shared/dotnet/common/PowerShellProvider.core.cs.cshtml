@@ -1,0 +1,135 @@
+using System;
+using System.Collections.Generic;
+using System.Management.Automation;
+using System.Management.Automation.Runspaces;
+using System.Collections.ObjectModel;
+using System.Text;
+
+namespace @Model.Name
+{
+    /// <summary>
+    /// PowerShell script provider that executes PowerShell scripts with access to .NET APIs
+    /// </summary>
+    public class PowerShellProvider : IScriptProvider
+    {
+        /// <summary>
+        /// Compiles and executes PowerShell script source code with the provided context
+        /// </summary>
+        /// <param name="sourceCode">The PowerShell script source code to execute</param>
+        /// <param name="context">The script execution context</param>
+        public void CompileAndExecute(string sourceCode, ScriptContext context)
+        {
+            if (string.IsNullOrEmpty(sourceCode))
+            {
+                throw new ArgumentException("PowerShell script source code cannot be null or empty.", nameof(sourceCode));
+            }
+
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            try
+            {
+                // Clear any previous exception
+                context.ScriptException = null;
+
+                // Create a runspace with access to .NET assemblies
+                var initialState = InitialSessionState.CreateDefault();
+                
+                // Add all currently loaded assemblies to the runspace
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try
+                    {
+                        if (!assembly.IsDynamic && !string.IsNullOrEmpty(assembly.Location))
+                        {
+                            // Add assembly using SessionStateAssemblyEntry
+                            initialState.Assemblies.Add(new SessionStateAssemblyEntry(assembly.FullName));
+                        }
+                    }
+                    catch
+                    {
+                        // Skip assemblies that can't be imported
+                    }
+                }
+
+                // Create runspace
+                using (var runspace = RunspaceFactory.CreateRunspace(initialState))
+                {
+                    runspace.Open();
+
+                    // Set the ScriptContext as a variable in the PowerShell session
+                    runspace.SessionStateProxy.SetVariable("ScriptContext", context);
+                    runspace.SessionStateProxy.SetVariable("Context", context);
+
+                    // Use PowerShell class for better error handling
+                    using (var powershell = PowerShell.Create())
+                    {
+                        powershell.Runspace = runspace;
+                        powershell.AddScript(sourceCode);
+
+                        // Execute the script and capture output/errors
+                        Collection<PSObject> results;
+                        try
+                        {
+                            results = powershell.Invoke();
+                        }
+                        catch (RuntimeException psEx)
+                        {
+                            // PowerShell terminating error
+                            throw new Exception($"PowerShell script execution failed: {psEx.Message}", psEx);
+                        }
+
+                        // Check for errors in the PowerShell streams
+                        var errors = powershell.Streams.Error;
+                        
+                        // Collect output
+                        var output = new StringBuilder();
+                        foreach (var result in results)
+                        {
+                            if (result != null)
+                            {
+                                output.AppendLine(result.ToString());
+                            }
+                        }
+
+                        // Check for errors
+                        if (errors != null && errors.Count > 0)
+                        {
+                            var errorMessages = new StringBuilder();
+                            foreach (var errorRecord in errors)
+                            {
+                                errorMessages.AppendLine(errorRecord.ToString());
+                                // If it's a terminating error, throw it
+                                if (errorRecord.Exception != null)
+                                {
+                                    throw new Exception($"PowerShell script execution error: {errorRecord.Exception.Message}", errorRecord.Exception);
+                                }
+                            }
+                            // If we have errors but no exceptions, still throw
+                            if (errorMessages.Length > 0)
+                            {
+                                throw new Exception($"PowerShell script execution errors: {errorMessages}");
+                            }
+                        }
+
+                        // Store output in context if available
+                        if (output.Length > 0)
+                        {
+                            context.ScriptResult = output.ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Capture the exception in the context
+                context.ScriptException = ex;
+                Logger.Error($"Exception thrown in PowerShell script: {ex.Message}", ex);
+                throw;
+            }
+        }
+    }
+}
+

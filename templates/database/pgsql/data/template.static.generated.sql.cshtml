@@ -26,6 +26,10 @@ insert into core.exec_status (id, name) values (6, 'Timeout');
 insert into core.exec_status (id, name) values (7, 'Interrupted');
 insert into core.exec_status (id, name) values (8, 'Suspended');
 
+-- Insert script type values
+insert into core.script_type (id, name) values (1, 'CSharp');
+insert into core.script_type (id, name) values (2, 'PowerShell');
+
 -- Insert AgentLogic method operations
 -- Process Management Operations
 insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'start', 1, current_timestamp, current_user, current_user, 1);

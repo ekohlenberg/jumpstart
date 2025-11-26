@@ -1,5 +1,5 @@
 INSERT INTO core.script(
-	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (nextval('core.script_identity'), 'all-object insert event', 
 'using System;
 using System.IO;
@@ -14,10 +14,10 @@ namespace Generated
             Console.WriteLine("all-object insert event");
         }
     }
-}', 1, current_user, current_timestamp, current_user, 1);
+}', 1, 1, current_user, current_timestamp, current_user, 1);
 
 INSERT INTO core.script(
-	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (nextval('core.script_identity'), 'all-object update event', 
 'using System;
 using System.IO;
@@ -32,10 +32,10 @@ namespace Generated
             Console.WriteLine("all-object update event");
         }
     }
-}', 1, current_user, current_timestamp, current_user, 1);
+}', 1, 1, current_user, current_timestamp, current_user, 1);
 
 INSERT INTO core.script(
-	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (nextval('core.script_identity'), 'test hello-world script', 
 'using System;
 using System.IO;
@@ -50,10 +50,10 @@ namespace Generated
             Console.WriteLine("Hello, World!");
         }
     }
-}', 1, current_user, current_timestamp, current_user, 1);
+}', 1, 1, current_user, current_timestamp, current_user, 1);
 
 INSERT INTO core.script(
-	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (nextval('core.script_identity'), 'test infinite loop script', 
 'using System;
 using System.Threading;
@@ -73,10 +73,10 @@ namespace Generated
             }
         }
     }
-}', 1, current_user, current_timestamp, current_user, 1);
+}', 1, 1, current_user, current_timestamp, current_user, 1);
 
 INSERT INTO core.script(
-	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (nextval('core.script_identity'), 'test failure script', 
 'using System;
 using System.IO;
@@ -91,7 +91,7 @@ namespace Generated
             throw new Exception("Test failure");
         }
     }
-}', 1, current_user, current_timestamp, current_user, 1);
+}', 1, 1, current_user, current_timestamp, current_user, 1);
 
 
 -- Insert process records for all test scripts
