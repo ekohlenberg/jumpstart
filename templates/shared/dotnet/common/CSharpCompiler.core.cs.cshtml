@@ -114,8 +114,15 @@ namespace @Model.Name
         /// <returns>Instance of the compiled script implementing IScript</returns>
         public IScript CompileAndCreate(string sourceCode)
         {
-            var compiledType = Compile(sourceCode);
-            return (IScript)Activator.CreateInstance(compiledType);
+            try
+            {
+                var compiledType = Compile(sourceCode);
+                return (IScript)Activator.CreateInstance(compiledType);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to create script instance: {ex.Message}", ex);
+            }
         }
 
         /// <summary>
@@ -125,8 +132,16 @@ namespace @Model.Name
         /// <param name="sourceCode">Complete C# source code that implements IScript</param>
         /// <param name="context">The script execution context</param>
         public void CompileAndExecute(string sourceCode, ScriptContext context)
-        {            var script = CompileAndCreate(sourceCode);
-            script.Execute(context);
+        {
+            try
+            {
+                var script = CompileAndCreate(sourceCode);
+                script.Execute(context);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error executing script: {ex.Message}", ex);
+            }
         }
 
         /// <summary>

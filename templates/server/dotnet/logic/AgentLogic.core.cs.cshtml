@@ -375,7 +375,20 @@ namespace @(Model.Namespace).core
                 ScriptHost scriptHost = new ScriptHost();
 
                 ScriptContext scriptContext = new ScriptContext(execution);
-                scriptHost.Invoke<ScriptContext>(scriptContext, script);
+                scriptContext.Initialize();
+                // Use InvokeSync instead of Invoke to ensure exceptions are properly caught
+                scriptHost.InvokeSync<ScriptContext>(scriptContext, script);
+                
+                // Check for script-level exceptions or error codes
+                if (scriptContext.ScriptException != null)
+                {
+                    throw new Exception($"Script execution failed: {scriptContext.ScriptException.Message}", scriptContext.ScriptException);
+                }
+                if (scriptContext.retCode != null && scriptContext.retCode != 0)
+                {
+                    throw new Exception($"Script returned error code: {scriptContext.retCode}");
+                }
+                
                 success = true;
             }
             catch (Exception ex)

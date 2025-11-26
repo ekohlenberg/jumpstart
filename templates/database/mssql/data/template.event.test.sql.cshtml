@@ -1,25 +1,98 @@
 -- Insert test scripts
 INSERT INTO [core].[script](
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (NEXT VALUE FOR core.script_identity, 'all-object insert event', '@@using System; @@using System.IO; Console.WriteLine("all-object insert event");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+	VALUES (NEXT VALUE FOR core.script_identity, 'all-object insert event', 
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class AllObjectInsertEventScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine("all-object insert event");
+        }
+    }
+}', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
 INSERT INTO [core].[script](
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (NEXT VALUE FOR core.script_identity, 'all-object update event', '@@using System; @@using System.IO; Console.WriteLine("all-object update event");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+	VALUES (NEXT VALUE FOR core.script_identity, 'all-object update event', 
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class AllObjectUpdateEventScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine("all-object update event");
+        }
+    }
+}', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
 INSERT INTO [core].[script](
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (NEXT VALUE FOR core.script_identity, 'test hello-world script', '@@using System; @@using System.IO; Console.WriteLine("Hello, World!");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+	VALUES (NEXT VALUE FOR core.script_identity, 'test hello-world script', 
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class HelloWorldScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
 INSERT INTO [core].[script](
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (NEXT VALUE FOR core.script_identity, 'test long loop script', 
-    '@@using System; @@using System.Threading; @@using System.IO; for(int i = 0; i < 100; i++) { Console.WriteLine("Long loop"); Thread.Sleep(1000); }', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+'using System;
+using System.Threading;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class LongLoopScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                Console.WriteLine($"Long loop: {i}");
+                Thread.Sleep(1000);
+            }
+        }
+    }
+}', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
 INSERT INTO [core].[script](
 	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
 	VALUES (NEXT VALUE FOR core.script_identity, 'test failure script', 
-    '@@using System; @@using System.IO; throw new Exception("Test failure");', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class FailureScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            throw new Exception("Test failure");
+        }
+    }
+}', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
 -- Insert process records for all test scripts
 INSERT INTO [core].[process](

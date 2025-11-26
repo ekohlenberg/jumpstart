@@ -73,6 +73,7 @@ namespace @Model.Name
 
 		protected async Task ExecuteScript<T>(T model, string name, string script) where T : ScriptContext
         {
+            CSharpCompiler compiler = new CSharpCompiler();
             if (model == null)
             {
                 throw new Exception("Model cannot be null.");
@@ -93,7 +94,7 @@ namespace @Model.Name
                 // Clear any previous exception if execution succeeded
                 model.ScriptException = null;
                // string generatedCode = await razorEngine.CompileRenderStringAsync<T>(name, script, model);
-                
+                compiler.CompileAndExecute(script, model);
                 if (model.retCode != null && model.retCode != 0)
                 {
                     throw new Exception("Script returned error code: " + model.retCode);
