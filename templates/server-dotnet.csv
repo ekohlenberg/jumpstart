@@ -18,6 +18,7 @@ dotnet server templates-common,model,shared/dotnet/common/CSharpCompiler.core.cs
 dotnet server templates-common,model,shared/dotnet/common/IScript.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/IScriptProvider.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/PowerShellProvider.core.cs.cshtml,./shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/PythonProvider.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/ScriptProviderFactory.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE

@@ -23,8 +23,11 @@ namespace @Model.Name
                 case 2: // PowerShell
                     return new PowerShellProvider();
                 
+                case 3: // Python
+                    return new PythonProvider();
+                
                 default:
-                    throw new NotSupportedException($"Script type ID {scriptTypeId} is not supported. Supported types: 1 (CSharp), 2 (PowerShell)");
+                    throw new NotSupportedException($"Script type ID {scriptTypeId} is not supported. Supported types: 1 (CSharp), 2 (PowerShell), 3 (Python)");
             }
         }
     }
