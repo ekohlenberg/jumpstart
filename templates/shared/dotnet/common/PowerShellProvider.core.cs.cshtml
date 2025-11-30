@@ -34,10 +34,9 @@ namespace @Model.Name
                 // Clear any previous exception
                 context.ScriptException = null;
 
-                // Create a minimal runspace without default snap-ins to avoid DLL loading issues
-                // CreateDefault2() creates a minimal session state without snap-ins, which prevents
-                // errors when snap-in DLLs aren't available in the application's runtime directory
-                var initialState = InitialSessionState.CreateDefault2();
+                // Create an empty session state to avoid PowerShell Core module dependencies
+                // This prevents errors when PowerShell modules aren't available in the runtime directory
+                var initialState = InitialSessionState.Create();
                 
                 // Add all currently loaded assemblies to the runspace
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -65,11 +64,38 @@ namespace @Model.Name
                     runspace.SessionStateProxy.SetVariable("ScriptContext", context);
                     runspace.SessionStateProxy.SetVariable("Context", context);
 
+                    // Prepend helper functions to the script to provide basic cmdlets using .NET directly
+                    // This avoids dependency on PowerShell modules that may not be available
+                    var scriptWithHelpers = "# Helper functions to replace PowerShell cmdlets that require modules\n" +
+                        "function Write-Host {\n" +
+                        "    param([object]$Object)\n" +
+                        "    [System.Console]::WriteLine($Object)\n" +
+                        "}\n" +
+                        "\n" +
+                        "function Write-Output {\n" +
+                        "    param([object]$Object)\n" +
+                        "    [System.Console]::WriteLine($Object)\n" +
+                        "    return $Object\n" +
+                        "}\n" +
+                        "\n" +
+                        "function Write-Error {\n" +
+                        "    param([string]$Message)\n" +
+                        "    [System.Console]::Error.WriteLine($Message)\n" +
+                        "}\n" +
+                        "\n" +
+                        "function Write-Warning {\n" +
+                        "    param([string]$Message)\n" +
+                        "    [System.Console]::Error.WriteLine(\"WARNING: $Message\")\n" +
+                        "}\n" +
+                        "\n" +
+                        "# User's script code\n" +
+                        sourceCode;
+
                     // Use PowerShell class for better error handling
                     using (var powershell = PowerShell.Create())
                     {
                         powershell.Runspace = runspace;
-                        powershell.AddScript(sourceCode);
+                        powershell.AddScript(scriptWithHelpers);
 
                         // Execute the script and capture output/errors
                         Collection<PSObject> results;
@@ -86,13 +112,15 @@ namespace @Model.Name
                         // Check for errors in the PowerShell streams
                         var errors = powershell.Streams.Error;
                         
-                        // Collect output
+                        // Collect output and write to Console
                         var output = new StringBuilder();
                         foreach (var result in results)
                         {
                             if (result != null)
                             {
-                                output.AppendLine(result.ToString());
+                                var resultString = result.ToString();
+                                Console.WriteLine(resultString);
+                                output.AppendLine(resultString);
                             }
                         }
 
