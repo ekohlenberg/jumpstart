@@ -34,8 +34,10 @@ namespace @Model.Name
                 // Clear any previous exception
                 context.ScriptException = null;
 
-                // Create a runspace with access to .NET assemblies
-                var initialState = InitialSessionState.CreateDefault();
+                // Create a minimal runspace without default snap-ins to avoid DLL loading issues
+                // CreateDefault2() creates a minimal session state without snap-ins, which prevents
+                // errors when snap-in DLLs aren't available in the application's runtime directory
+                var initialState = InitialSessionState.CreateDefault2();
                 
                 // Add all currently loaded assemblies to the runspace
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
