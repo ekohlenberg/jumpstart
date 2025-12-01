@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
+using @Model.Namespace;
 
 namespace @(Model.Namespace).core
 {
@@ -67,6 +70,11 @@ namespace @(Model.Namespace).core
     public partial class SchedulerLogic : ISchedulerLogic
     {
         private static Scheduler _thisScheduler;
+        private static readonly ConcurrentQueue<long> _workflowQueue = new ConcurrentQueue<long>();
+        private static readonly ManualResetEventSlim _queueEvent = new ManualResetEventSlim(false);
+        private static Thread _dispatcherThread;
+        private static bool _dispatcherRunning = false;
+        private static readonly object _dispatcherLock = new object();
 
         public static Scheduler ThisScheduler
         {
@@ -82,6 +90,67 @@ namespace @(Model.Namespace).core
         {
             _thisScheduler = scheduler;
             Console.WriteLine($"SchedulerLogic: Set singleton Scheduler instance (ID: {scheduler?.id})");
+            StartDispatcherThread();
+        }
+
+        /// <summary>
+        /// Starts the dispatcher thread if not already running
+        /// </summary>
+        private static void StartDispatcherThread()
+        {
+            lock (_dispatcherLock)
+            {
+                if (!_dispatcherRunning)
+                {
+                    _dispatcherRunning = true;
+                    _dispatcherThread = new Thread(DispatcherThreadProc)
+                    {
+                        Name = "SchedulerDispatcher",
+                        IsBackground = false
+                    };
+                    _dispatcherThread.Start();
+                    Console.WriteLine("SchedulerLogic: Dispatcher thread started");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Dispatcher thread procedure that processes workflows from the queue
+        /// </summary>
+        private static void DispatcherThreadProc()
+        {
+            Console.WriteLine("SchedulerLogic: Dispatcher thread started");
+            while (_dispatcherRunning)
+            {
+                try
+                {
+                    // Wait for workflow to be enqueued or timeout
+                    if (_queueEvent.Wait(TimeSpan.FromSeconds(1)))
+                    {
+                        _queueEvent.Reset();
+                    }
+
+                    // Process all workflows in the queue
+                    while (_workflowQueue.TryDequeue(out long workflowId))
+                    {
+                        try
+                        {
+                            Console.WriteLine($"SchedulerLogic: Processing workflow {workflowId}");
+                            ExecuteWorkflowInternal(workflowId);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error($"SchedulerLogic: Error processing workflow {workflowId}: {ex.Message}", ex);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"SchedulerLogic: Error in dispatcher thread: {ex.Message}", ex);
+                    Thread.Sleep(1000); // Wait before retrying
+                }
+            }
+            Console.WriteLine("SchedulerLogic: Dispatcher thread stopped");
         }
 
         /// <summary>
@@ -122,7 +191,191 @@ namespace @(Model.Namespace).core
         public void execute(long workflowId)
         {
             Console.WriteLine($"SchedulerLogic: execute - {workflowId}");
-            // TODO: Implement execute logic
+            
+            // Ensure dispatcher thread is running
+            StartDispatcherThread();
+            
+            // Enqueue workflow ID for processing
+            _workflowQueue.Enqueue(workflowId);
+            _queueEvent.Set();
+            
+            Console.WriteLine($"SchedulerLogic: Workflow {workflowId} enqueued for execution");
+        }
+
+        /// <summary>
+        /// Internal method that executes a workflow by building the execution tree and running workflow_process nodes
+        /// </summary>
+        /// <param name="workflowId">The workflow ID to execute</param>
+        private static void ExecuteWorkflowInternal(long workflowId)
+        {
+            try
+            {
+                // Load the workflow
+                Workflow workflow = new Workflow();
+                workflow.id = workflowId;
+                DBPersist.get(workflow, "default");
+                
+                if (workflow == null || workflow.id == 0)
+                {
+                    throw new Exception($"Workflow {workflowId} not found");
+                }
+
+                Console.WriteLine($"SchedulerLogic: Executing workflow {workflowId} - {workflow.name}");
+
+                // Build execution tree: collect all workflow_process nodes recursively
+                List<WorkflowProcess> allWorkflowProcesses = new List<WorkflowProcess>();
+                CollectWorkflowProcesses(workflowId, allWorkflowProcesses);
+
+                if (allWorkflowProcesses.Count == 0)
+                {
+                    Console.WriteLine($"SchedulerLogic: No workflow_process nodes found for workflow {workflowId}");
+                    return;
+                }
+
+                // Group by sequence and sort
+                var processesBySequence = allWorkflowProcesses
+                    .Where(wp => wp.seq.HasValue)
+                    .GroupBy(wp => wp.seq.Value)
+                    .OrderBy(g => g.Key)
+                    .ToList();
+
+                // Execute each sequence group
+                foreach (var sequenceGroup in processesBySequence)
+                {
+                    int seq = sequenceGroup.Key;
+                    var processes = sequenceGroup.ToList();
+                    
+                    Console.WriteLine($"SchedulerLogic: Executing sequence {seq} with {processes.Count} processes");
+
+                    // Execute all processes in this sequence concurrently
+                    List<Task> tasks = new List<Task>();
+                    foreach (var workflowProcess in processes)
+                    {
+                        tasks.Add(Task.Run(async () =>
+                        {
+                            try
+                            {
+                                await ExecuteWorkflowProcessAsync(workflowProcess);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Error($"SchedulerLogic: Error executing workflow_process {workflowProcess.id}: {ex.Message}", ex);
+                                
+                                // Handle failure based on on_failure_action_id
+                                if (workflowProcess.on_failure_action_id == (long)WorkflowProcess.OnFailureAction.Stop)
+                                {
+                                    throw; // Re-throw to stop execution
+                                }
+                                // Otherwise continue (OnFailureAction.Continue)
+                            }
+                        }));
+                    }
+
+                    // Wait for all processes in this sequence to complete
+                    Task.WaitAll(tasks.ToArray());
+                    
+                    Console.WriteLine($"SchedulerLogic: Sequence {seq} completed");
+                }
+
+                Console.WriteLine($"SchedulerLogic: Workflow {workflowId} execution completed");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"SchedulerLogic: Error executing workflow {workflowId}: {ex.Message}", ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Recursively collects all workflow_process nodes from a workflow and its child workflows
+        /// </summary>
+        /// <param name="workflowId">The workflow ID to collect from</param>
+        /// <param name="workflowProcesses">List to collect workflow_process nodes into</param>
+        private static void CollectWorkflowProcesses(long workflowId, List<WorkflowProcess> workflowProcesses)
+        {
+            // Get all workflow_process nodes for this workflow
+            List<WorkflowProcess> processes = new List<WorkflowProcess>();
+            void WorkflowProcessSelectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                var wp = new WorkflowProcess();
+                DBPersist.autoAssign(rdr, wp);
+                processes.Add(wp);
+            }
+            DBPersist.select(WorkflowProcessSelectCallback, 
+                $"SELECT * FROM core.workflow_process WHERE workflow_id = {workflowId}");
+
+            // Add leaf nodes (workflow_process) to the list
+            workflowProcesses.AddRange(processes);
+
+            // Get child workflows (recursive structure)
+            List<Workflow> childWorkflows = new List<Workflow>();
+            void WorkflowSelectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                var wf = new Workflow();
+                DBPersist.autoAssign(rdr, wf);
+                childWorkflows.Add(wf);
+            }
+            DBPersist.select(WorkflowSelectCallback, 
+                $"SELECT * FROM core.workflow WHERE parent_workflow_id = {workflowId}");
+
+            // Recursively collect from child workflows
+            foreach (var childWorkflow in childWorkflows)
+            {
+                CollectWorkflowProcesses(childWorkflow.id, workflowProcesses);
+            }
+        }
+
+        /// <summary>
+        /// Executes a single workflow_process by creating an Execution and invoking the agent
+        /// </summary>
+        /// <param name="workflowProcess">The workflow_process to execute</param>
+        private static async Task ExecuteWorkflowProcessAsync(WorkflowProcess workflowProcess)
+        {
+            try
+            {
+                Console.WriteLine($"SchedulerLogic: Executing workflow_process {workflowProcess.id}");
+
+                // Load process to get script_id
+                Process process = new Process();
+                process.id = workflowProcess.process_id;
+                DBPersist.get(process, "default");
+
+                if (process == null || process.id == 0)
+                {
+                    throw new Exception($"Process {workflowProcess.process_id} not found");
+                }
+
+                // Load agent
+                Agent agent = new Agent();
+                agent.id = workflowProcess.agent_id ?? 0;
+                DBPersist.get(agent, "default");
+
+                if (agent == null || agent.id == 0)
+                {
+                    throw new Exception($"Agent {workflowProcess.agent_id} not found");
+                }
+
+                // Create execution record
+                Execution execution = new Execution();
+                execution.workflow_process_id = workflowProcess.id;
+                execution.exec_status_id = (long)Execution.ExecStatus.Dispatched;
+                DBPersist.insert(execution, "default");
+
+                Console.WriteLine($"SchedulerLogic: Created execution {execution.id} for workflow_process {workflowProcess.id}");
+
+                // Invoke agent via AgentClient
+                using (var agentClient = new AgentClient(agent))
+                {
+                    // Use ExecuteAsync to send execution to agent
+                    long executionResult = await agentClient.ExecuteAsync(execution.id);
+                    Console.WriteLine($"SchedulerLogic: Agent {agent.id} accepted execution {execution.id}, result: {executionResult}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"SchedulerLogic: Error executing workflow_process {workflowProcess.id}: {ex.Message}", ex);
+                throw;
+            }
         }
 
         public void cancel(long workflowId)
