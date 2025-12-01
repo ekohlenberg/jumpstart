@@ -93,6 +93,48 @@ namespace Generated
     }
 }', 1, 1, current_user, current_timestamp, current_user, 1);
 
+-- PowerShell test scripts
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test powershell hello-world script', 
+'Write-Host ''Hello, World from PowerShell!''', 2, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test powershell loop script', 
+'Write-Host ''Executing PowerShell loop script''
+for ($i = 0; $i -lt 5; $i++) {
+    Write-Host "  Iteration $i"
+    Start-Sleep -Milliseconds 500
+}', 2, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test powershell exception script', 
+'Write-Host ''About to throw an exception...''
+throw ''Test exception from PowerShell script''', 2, 1, current_user, current_timestamp, current_user, 1);
+
+-- Python test scripts
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test python hello-world script', 
+'print(''Hello, World from Python!'')', 3, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test python loop script', 
+'print(''Executing Python loop script'')
+import time
+for i in range(5):
+    print(f"  Iteration {i}")
+    time.sleep(0.5)', 3, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test python exception script', 
+'print(''About to throw an exception...'')
+raise Exception(''Test exception from Python script'')', 3, 1, current_user, current_timestamp, current_user, 1);
+
 
 -- Insert process records for all test scripts
 INSERT INTO core.process(
