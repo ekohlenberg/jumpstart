@@ -233,9 +233,8 @@ namespace @(Model.Namespace).core
                 }
 
                 // Group by sequence and sort
-                var processesBySequence = allWorkflowProcesses
-                    .Where(wp => wp.seq.HasValue)
-                    .GroupBy(wp => wp.seq.Value)
+                var processesBySequence = allWorkflowProcesses          
+                    .GroupBy(wp => wp.seq)
                     .OrderBy(g => g.Key)
                     .ToList();
 
@@ -347,7 +346,7 @@ namespace @(Model.Namespace).core
 
                 // Load agent
                 Agent agent = new Agent();
-                agent.id = workflowProcess.agent_id ?? 0;
+                agent.id = workflowProcess.agent_id;
                 DBPersist.get(agent, "default");
 
                 if (agent == null || agent.id == 0)
