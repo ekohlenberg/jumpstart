@@ -6,6 +6,11 @@ namespace @Model.Name
 {
     public class PostgreSQLProvider : IDatabaseProvider
     {
+        public PostgreSQLProvider()
+        {
+            
+        }
+
         public DbConnection CreateConnection(string connectionString)
         {
             NpgsqlConnection connection =  new NpgsqlConnection(connectionString);
@@ -25,8 +30,7 @@ namespace @Model.Name
 
         public void AddParameterWithValue(DbCommand command, string parameterName, object value)
         {
-            var parameter = new NpgsqlParameter(parameterName, value);
-            command.Parameters.Add(parameter);
+            command.Parameters.Add(new NpgsqlParameter(parameterName, value));
         }
 
         public string GetNextIdentitySql(string tableName)

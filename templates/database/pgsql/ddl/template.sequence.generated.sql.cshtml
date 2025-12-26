@@ -1,2 +1,2 @@
-CREATE SEQUENCE @(Model.SchemaName + "." + Model.TableName)_identity AS BIGINT START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE @(Model.SchemaName + "." + Model.TableName)_identity AS BIGINT START WITH 1000 INCREMENT BY 1;
 GRANT USAGE, SELECT ON SEQUENCE @(Model.SchemaName + "." + Model.TableName)_identity TO @Model.Namespace;

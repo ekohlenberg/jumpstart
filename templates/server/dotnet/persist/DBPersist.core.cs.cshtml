@@ -88,7 +88,7 @@ namespace @Model.Name
             baseObject["id"] = id;
             baseObject["version"] = ver;
             baseObject["created_by"] = Environment.UserName;
-            baseObject["last_updated"] = DateTime.Now;
+            baseObject["last_updated"] = DateTime.UtcNow;
             baseObject["last_updated_by"] = Environment.UserName;
 
             var (sql, parameters) = insertSql(baseObject, baseObject.tableName, connectionName);
@@ -109,7 +109,7 @@ namespace @Model.Name
             long id = identity(baseObject, connectionName);
             auditBaseObject["id"] = id;
 
-            Console.WriteLine("Audit: " + auditBaseObject.ToString());
+            Logger.Debug("Audit: " + auditBaseObject.ToString());
 
             var (sql, parameters) = insertSql(auditBaseObject, baseObject.auditTableName, connectionName);
             execCmd(sql, parameters, connectionName);
@@ -164,7 +164,7 @@ namespace @Model.Name
         static public void update(BaseObject baseObject, string connectionName = "default")
         {
             baseObject["version"] = version(baseObject, connectionName);
-            baseObject["last_updated"] = DateTime.Now;
+            baseObject["last_updated"] = DateTime.UtcNow;
             baseObject["last_updated_by"] = Environment.UserName;
 
             string sql = updateSql(baseObject, connectionName);

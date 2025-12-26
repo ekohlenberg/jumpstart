@@ -1,0 +1,99 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using @Model.Namespace;
+
+namespace @Model.Namespace
+{
+    public partial class WorkflowProcessTest 
+    {
+        private static Dictionary<long, Agent> agents = new Dictionary<long, Agent>();
+        private static List<Process> processes = new List<Process>();
+        private static List<WorkflowProcess> workflowProcesses = new List<WorkflowProcess>();
+        private static List<Workflow> workflows = new List<Workflow>();
+
+            
+        public static async Task testInsertWorkflowProcess()
+        {
+            try
+            {
+                   DBPersist.execCmd("delete from core.workflow_process", "default");
+
+                   void AgentSelectCallback(System.Data.Common.DbDataReader rdr)
+                   {
+                    var agent = new Agent();
+                    DBPersist.autoAssign(rdr, agent);
+                    agents.Add(agent.id, agent);
+                   }
+                   DBPersist.select(AgentSelectCallback, $"select * from core.agent where agent_status_id = {(long)Agent.AgentStatus.Online}");
+
+                   void ProcessSelectCallback(System.Data.Common.DbDataReader rdr)
+                   {
+                    var process = new Process();
+                    DBPersist.autoAssign(rdr, process);
+                    processes.Add(process);
+                   }
+                   DBPersist.select(ProcessSelectCallback, "select * from core.process where script_id in (select id from core.script where name like 'test%')");
+
+                    void WorkflowSelectCallback(System.Data.Common.DbDataReader rdr)
+                    {
+                        var workflow = new Workflow();
+                        DBPersist.autoAssign(rdr, workflow);
+                        workflows.Add(workflow);
+                    }
+                    DBPersist.select(WorkflowSelectCallback, "select * from core.workflow where name = 'test workflow'");
+
+                    foreach (Agent  agent in agents.Values)
+                    {
+                        int seq = 10;
+                        foreach (Process process in processes)
+                        {
+                            var workflowProcess = new WorkflowProcess();
+                            workflowProcess.agent_id = agent.id;
+                            workflowProcess.process_id = process.id;
+                            workflowProcess.workflow_id = workflows[0].id;
+                            workflowProcess.seq = seq;
+                            workflowProcess.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Continue;
+                            seq+=10;
+                            workflowProcesses.Add(workflowProcess);
+                        }
+                    }
+
+                foreach (var workflowProcess in workflowProcesses)
+                {
+                    DBPersist.insert(workflowProcess);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error testing insert workflow process: {ex.Message}");
+                throw;
+            }
+        }
+
+        public static async Task testExecWorkflowProcess()
+        {
+            Execution execution = new Execution();
+            Agent agent = null;
+            foreach (var workflowProcess in workflowProcesses)
+            {
+                execution.workflow_process_id = workflowProcess.id;
+                execution.start_time = DateTime.UtcNow;
+                execution.end_time = DateTime.UtcNow;
+                execution.exec_status_id = (long)Execution.ExecStatus.Dispatched;
+                execution.stdout = "";
+                execution.stderr = "";
+                
+                DBPersist.insert(execution);
+
+                agent = agents[workflowProcess.agent_id];
+                AgentClient agentClient = new AgentClient(agent);
+                await agentClient.StartAsync(execution.id);
+            }
+        }
+
+        
+    }
+}

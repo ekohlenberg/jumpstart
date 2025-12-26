@@ -230,6 +230,17 @@ namespace @Model.Name
             }
         }
 
+        public static void Warn( string message,  [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "" )
+        {
+            Init();
+            if ((enabledLevels & Level.Warning) != 0)
+            {
+                Write("INFO", message, filePath, lineNumber, memberName );
+            }
+        }
+
         public static void Debug( string message,  [CallerFilePath] string filePath = "",
         [CallerLineNumber] int lineNumber = 0,
         [CallerMemberName] string memberName = "" )
@@ -397,16 +408,15 @@ namespace @Model.Name
             lock (Lock)
             {
                 string logMessage = FormatLogMessage(level, message, filePath, lineNumber, memberName);
+								ConsoleColor initialColor = Console.ForegroundColor;
     
                 if (level == "ERROR")
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                 }
-                else
-                {
-                    Console.ResetColor();
-                }
+
                 Console.WriteLine(logMessage);
+                Console.ForegroundColor = initialColor;
             }
         }
     }

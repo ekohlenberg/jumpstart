@@ -1,0 +1,76 @@
+using System;
+using System.ComponentModel;
+
+namespace @Model.Namespace
+{
+    /// <summary>
+    /// Partial Scheduler class containing enumerated types for scheduler status values
+    /// </summary>
+    public partial class Scheduler
+    {
+        /// <summary>
+        /// Scheduler status enumeration based on core.scheduler_status table values
+        /// </summary>
+        public enum SchedulerStatus
+        {
+            /// <summary>
+            /// Scheduler is initializing
+            /// </summary>
+            [Description("Initializing")]
+            Initializing = 1,
+
+            /// <summary>
+            /// Scheduler is online and available
+            /// </summary>
+            [Description("Online")]
+            Online = 2,
+
+            /// <summary>
+            /// Scheduler is busy processing tasks
+            /// </summary>
+            [Description("Busy")]
+            Busy = 3,
+
+            /// <summary>
+            /// Scheduler is offline
+            /// </summary>
+            [Description("Offline")]
+            Offline = 4
+        }
+
+        /// <summary>
+        /// Helper methods for working with scheduler status enumeration
+        /// </summary>
+        public static class SchedulerHelpers
+        {
+            /// <summary>
+            /// Gets the description attribute value for an SchedulerStatus enum value
+            /// </summary>
+            /// <param name="status">The scheduler status</param>
+            /// <returns>The description string</returns>
+            public static string GetSchedulerStatusDescription(SchedulerStatus status)
+            {
+                var field = status.GetType().GetField(status.ToString());
+                var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+                return attribute?.Description ?? status.ToString();
+            }
+
+            /// <summary>
+            /// Parses a string description to the corresponding AgentStatus enum value
+            /// </summary>
+            /// <param name="description">The description string</param>
+            /// <returns>The corresponding SchedulerStatus enum value</returns>
+            public static SchedulerStatus ParseSchedulerStatus(string description)
+            {
+                foreach (SchedulerStatus status in Enum.GetValues(typeof(SchedulerStatus)))
+                {
+                    if (GetSchedulerStatusDescription(status).Equals(description, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return status;
+                    }
+                }
+                throw new ArgumentException($"Unknown scheduler status description: {description}");
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+	"appsettings": {
+    "logwriters": "@(Model.Name).LogFileWriter,@(Model.Name).LogConsoleWriter",
+		"loglevel": "debug" ,
+		
+	}
+}
+

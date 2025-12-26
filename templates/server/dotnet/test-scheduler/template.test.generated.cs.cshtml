@@ -1,0 +1,316 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using @Model.Namespace;
+
+namespace @Model.Namespace
+{
+    public partial class SchedulerTest 
+    {
+        private static Dictionary<long, Agent> agents = new Dictionary<long, Agent>();
+        private static List<Process> processes = new List<Process>();
+        private static List<Workflow> workflows = new List<Workflow>();
+
+        /// <summary>
+        /// Delete all existing test workflows and workflow_process records
+        /// </summary>
+        public static async Task testDeleteExistingWorkflows()
+        {
+            try
+            {
+                Console.WriteLine("SchedulerTest: Deleting existing test workflows...");
+                DBPersist.execCmd("DELETE FROM core.workflow_process WHERE workflow_id IN (SELECT id FROM core.workflow WHERE name LIKE 'test-scheduler%')", "default");
+                DBPersist.execCmd("DELETE FROM core.workflow WHERE name LIKE 'test-scheduler%'", "default");
+                Console.WriteLine("SchedulerTest: Existing test workflows deleted");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SchedulerTest: Error deleting existing workflows: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Load agents and processes for use in test workflows
+        /// </summary>
+        private static void LoadAgentsAndProcesses()
+        {
+            agents.Clear();
+            processes.Clear();
+
+            void AgentSelectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                var agent = new Agent();
+                DBPersist.autoAssign(rdr, agent);
+                agents.Add(agent.id, agent);
+            }
+            DBPersist.select(AgentSelectCallback, $"SELECT * FROM core.agent WHERE agent_status_id = {(long)Agent.AgentStatus.Online}");
+
+            if (agents.Count == 0)
+            {
+                throw new Exception("No online agents found. Please ensure at least one agent is online.");
+            }
+
+            void ProcessSelectCallback(System.Data.Common.DbDataReader rdr)
+            {
+                var process = new Process();
+                DBPersist.autoAssign(rdr, process);
+                processes.Add(process);
+            }
+            DBPersist.select(ProcessSelectCallback, "SELECT * FROM core.process WHERE script_id IN (SELECT id FROM core.script WHERE name LIKE 'test%')");
+
+            if (processes.Count == 0)
+            {
+                throw new Exception("No test processes found. Please ensure test scripts exist.");
+            }
+
+            Console.WriteLine($"SchedulerTest: Loaded {agents.Count} agents and {processes.Count} processes");
+        }
+
+        /// <summary>
+        /// Test 1: Create and execute a simple 1 job workflow
+        /// </summary>
+        public static async Task testSingleJobWorkflow()
+        {
+            try
+            {
+                Console.WriteLine("\n=== Test 1: Single Job Workflow ===");
+                LoadAgentsAndProcesses();
+
+                // Create workflow
+                var workflow = new Workflow();
+                workflow.name = "test-scheduler-single-job";
+                workflow.description = "Single job workflow test";
+                workflow.is_active = 1;
+                DBPersist.insert(workflow, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
+
+                // Create single workflow_process
+                var workflowProcess = new WorkflowProcess();
+                workflowProcess.workflow_id = workflow.id;
+                workflowProcess.process_id = processes[0].id;
+                workflowProcess.agent_id = agents.Values.First().id;
+                workflowProcess.seq = 10;
+                workflowProcess.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(workflowProcess, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess.id} with sequence {workflowProcess.seq}");
+
+                // Execute workflow
+                var schedulerLogic = SchedulerCoreLogic.Create();
+                schedulerLogic.execute(workflow.id);
+                Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SchedulerTest: Error in testSingleJobWorkflow: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Test 2: Create and execute a 2 job workflow (sequential execution)
+        /// </summary>
+        public static async Task testTwoJobWorkflow()
+        {
+            try
+            {
+                Console.WriteLine("\n=== Test 2: Two Job Workflow (Sequential) ===");
+                LoadAgentsAndProcesses();
+
+                if (processes.Count < 2)
+                {
+                    throw new Exception("Need at least 2 processes for this test");
+                }
+
+                // Create workflow
+                var workflow = new Workflow();
+                workflow.name = "test-scheduler-two-job";
+                workflow.description = "Two job sequential workflow test";
+                workflow.is_active = 1;
+                DBPersist.insert(workflow, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
+
+                // Create first workflow_process (sequence 10)
+                var workflowProcess1 = new WorkflowProcess();
+                workflowProcess1.workflow_id = workflow.id;
+                workflowProcess1.process_id = processes[0].id;
+                workflowProcess1.agent_id = agents.Values.First().id;
+                workflowProcess1.seq = 10;
+                workflowProcess1.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(workflowProcess1, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess1.id} with sequence {workflowProcess1.seq}");
+
+                // Create second workflow_process (sequence 20)
+                var workflowProcess2 = new WorkflowProcess();
+                workflowProcess2.workflow_id = workflow.id;
+                workflowProcess2.process_id = processes[1].id;
+                workflowProcess2.agent_id = agents.Values.First().id;
+                workflowProcess2.seq = 20;
+                workflowProcess2.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(workflowProcess2, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess2.id} with sequence {workflowProcess2.seq}");
+
+                // Execute workflow
+                var schedulerLogic = SchedulerCoreLogic.Create();
+                schedulerLogic.execute(workflow.id);
+                Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SchedulerTest: Error in testTwoJobWorkflow: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Test 3: Create and execute a 4 job workflow with the two middle jobs running concurrently
+        /// Sequence: 10 (job 1), 20 (job 2 - concurrent), 20 (job 3 - concurrent), 30 (job 4)
+        /// </summary>
+        public static async Task testFourJobWorkflowWithConcurrency()
+        {
+            try
+            {
+                Console.WriteLine("\n=== Test 3: Four Job Workflow with Concurrency ===");
+                LoadAgentsAndProcesses();
+
+                if (processes.Count < 4)
+                {
+                    throw new Exception("Need at least 4 processes for this test");
+                }
+
+                // Create workflow
+                var workflow = new Workflow();
+                workflow.name = "test-scheduler-four-job-concurrent";
+                workflow.description = "Four job workflow with concurrent middle jobs test";
+                workflow.is_active = 1;
+                DBPersist.insert(workflow, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
+
+                // Create first workflow_process (sequence 10)
+                var workflowProcess1 = new WorkflowProcess();
+                workflowProcess1.workflow_id = workflow.id;
+                workflowProcess1.process_id = processes[0].id;
+                workflowProcess1.agent_id = agents.Values.First().id;
+                workflowProcess1.seq = 10;
+                workflowProcess1.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(workflowProcess1, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess1.id} with sequence {workflowProcess1.seq}");
+
+                // Create second workflow_process (sequence 20 - concurrent)
+                var workflowProcess2 = new WorkflowProcess();
+                workflowProcess2.workflow_id = workflow.id;
+                workflowProcess2.process_id = processes[1].id;
+                workflowProcess2.agent_id = agents.Values.First().id;
+                workflowProcess2.seq = 20;
+                workflowProcess2.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(workflowProcess2, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess2.id} with sequence {workflowProcess2.seq} (concurrent)");
+
+                // Create third workflow_process (sequence 20 - concurrent with process2)
+                var workflowProcess3 = new WorkflowProcess();
+                workflowProcess3.workflow_id = workflow.id;
+                workflowProcess3.process_id = processes[2].id;
+                workflowProcess3.agent_id = agents.Values.First().id;
+                workflowProcess3.seq = 20;
+                workflowProcess3.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(workflowProcess3, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess3.id} with sequence {workflowProcess3.seq} (concurrent)");
+
+                // Create fourth workflow_process (sequence 30)
+                var workflowProcess4 = new WorkflowProcess();
+                workflowProcess4.workflow_id = workflow.id;
+                workflowProcess4.process_id = processes[3].id;
+                workflowProcess4.agent_id = agents.Values.First().id;
+                workflowProcess4.seq = 30;
+                workflowProcess4.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(workflowProcess4, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess4.id} with sequence {workflowProcess4.seq}");
+
+                // Execute workflow
+                var schedulerLogic = SchedulerCoreLogic.Create();
+                schedulerLogic.execute(workflow.id);
+                Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SchedulerTest: Error in testFourJobWorkflowWithConcurrency: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Test 4: Create and execute a nested workflow (parent workflow with child workflows)
+        /// </summary>
+        public static async Task testNestedWorkflow()
+        {
+            try
+            {
+                Console.WriteLine("\n=== Test 4: Nested Workflow ===");
+                LoadAgentsAndProcesses();
+
+                if (processes.Count < 2)
+                {
+                    throw new Exception("Need at least 2 processes for this test");
+                }
+
+                // Create parent workflow
+                var parentWorkflow = new Workflow();
+                parentWorkflow.name = "test-scheduler-nested-parent";
+                parentWorkflow.description = "Parent workflow for nested test";
+                parentWorkflow.is_active = 1;
+                DBPersist.insert(parentWorkflow, "default");
+                Console.WriteLine($"SchedulerTest: Created parent workflow {parentWorkflow.id} - {parentWorkflow.name}");
+
+                // Create first child workflow
+                var childWorkflow1 = new Workflow();
+                childWorkflow1.name = "test-scheduler-nested-child1";
+                childWorkflow1.description = "First child workflow";
+                childWorkflow1.parent_workflow_id = parentWorkflow.id;
+                childWorkflow1.is_active = 1;
+                DBPersist.insert(childWorkflow1, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow1.id} - {childWorkflow1.name}");
+
+                // Create workflow_process for first child workflow
+                var childWorkflowProcess1 = new WorkflowProcess();
+                childWorkflowProcess1.workflow_id = childWorkflow1.id;
+                childWorkflowProcess1.process_id = processes[0].id;
+                childWorkflowProcess1.agent_id = agents.Values.First().id;
+                childWorkflowProcess1.seq = 10;
+                childWorkflowProcess1.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(childWorkflowProcess1, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {childWorkflowProcess1.id} for child workflow {childWorkflow1.id}");
+
+                // Create second child workflow
+                var childWorkflow2 = new Workflow();
+                childWorkflow2.name = "test-scheduler-nested-child2";
+                childWorkflow2.description = "Second child workflow";
+                childWorkflow2.parent_workflow_id = parentWorkflow.id;
+                childWorkflow2.is_active = 1;
+                DBPersist.insert(childWorkflow2, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} - {childWorkflow2.name}");
+
+                // Create workflow_process for second child workflow
+                var childWorkflowProcess2 = new WorkflowProcess();
+                childWorkflowProcess2.workflow_id = childWorkflow2.id;
+                childWorkflowProcess2.process_id = processes[1].id;
+                childWorkflowProcess2.agent_id = agents.Values.First().id;
+                childWorkflowProcess2.seq = 10;
+                childWorkflowProcess2.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
+                DBPersist.insert(childWorkflowProcess2, "default");
+                Console.WriteLine($"SchedulerTest: Created workflow_process {childWorkflowProcess2.id} for child workflow {childWorkflow2.id}");
+
+                // Execute parent workflow (should recursively execute child workflows)
+                var schedulerLogic = SchedulerCoreLogic.Create();
+                schedulerLogic.execute(parentWorkflow.id);
+                Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution (will execute child workflows)");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SchedulerTest: Error in testNestedWorkflow: {ex.Message}");
+                throw;
+            }
+        }
+    }
+}
+

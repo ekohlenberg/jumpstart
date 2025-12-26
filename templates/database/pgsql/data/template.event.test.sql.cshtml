@@ -1,10 +1,161 @@
 INSERT INTO core.script(
-	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (nextval('core.script_identity'), 'all-object insert event', '@@using System; @@using System.IO; Console.WriteLine("all-object insert event");', 1, current_user, current_timestamp, current_user, 1);
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'all-object insert event', 
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class AllObjectInsertEventScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine("all-object insert event");
+        }
+    }
+}', 1, 1, current_user, current_timestamp, current_user, 1);
 
 INSERT INTO core.script(
-	id, name, source, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (nextval('core.script_identity'), 'all-object update event', '@@using System; @@using System.IO; Console.WriteLine("all-object update event");', 1, current_user, current_timestamp, current_user, 1);
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'all-object update event', 
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class AllObjectUpdateEventScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine("all-object update event");
+        }
+    }
+}', 1, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test hello-world script', 
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class HelloWorldScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}', 1, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test infinite loop script', 
+'using System;
+using System.Threading;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class InfiniteLoopScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            for (int i = 0; i &lt; 30; i++)
+            {
+                Console.WriteLine($"Long loop: {i}");
+                Thread.Sleep(1000);
+            }
+        }
+    }
+}', 1, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test failure script', 
+'using System;
+using System.IO;
+using @Model.Name;
+
+namespace Generated
+{
+    public class FailureScript : IScript
+    {
+        public void Execute(ScriptContext context)
+        {
+            throw new Exception("Test failure");
+        }
+    }
+}', 1, 1, current_user, current_timestamp, current_user, 1);
+
+-- PowerShell test scripts
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test powershell hello-world script', 
+'Write-Host ''Hello, World from PowerShell!''', 2, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test powershell loop script', 
+'Write-Host ''Executing PowerShell loop script''
+for ($i = 0; $i -lt 5; $i++) {
+    Write-Host "  Iteration $i"
+    Start-Sleep -Milliseconds 500
+}', 2, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test powershell exception script', 
+'Write-Host ''About to throw an exception...''
+throw ''Test exception from PowerShell script''', 2, 1, current_user, current_timestamp, current_user, 1);
+
+-- Python test scripts
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test python hello-world script', 
+'print(''Hello, World from Python!'')', 3, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test python loop script', 
+'print(''Executing Python loop script'')
+import time
+for i in range(5):
+    print(f"  Iteration {i}")
+    time.sleep(0.5)', 3, 1, current_user, current_timestamp, current_user, 1);
+
+INSERT INTO core.script(
+	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.script_identity'), 'test python exception script', 
+'print(''About to throw an exception...'')
+raise Exception(''Test exception from Python script'')', 3, 1, current_user, current_timestamp, current_user, 1);
+
+
+-- Insert process records for all test scripts
+INSERT INTO core.process(
+	id, name, script_id, is_active, created_by, last_updated, last_updated_by, version)
+SELECT 
+	nextval('core.process_identity'),
+	s.name,
+	s.id,
+	1,
+	current_user,
+	current_timestamp,
+	current_user,
+	1
+FROM core.script s
+WHERE s.name LIKE 'test%';
+
+-- Insert workflow record for test workflow
+INSERT INTO core.workflow(
+	id, parent_workflow_id, name, description, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.workflow_identity'), null, 'test workflow', 'test workflow', 1, current_user, current_timestamp, current_user, 1);
+
 
 
 WITH all_object_insert_script AS (

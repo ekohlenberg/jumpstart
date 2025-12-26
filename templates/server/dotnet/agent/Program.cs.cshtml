@@ -1,13 +1,52 @@
+using System.Net;
+using System.Net.Sockets;
+using @Model.Namespace;
+
+// Configuration for dynamic port binding
+const int StartPort = 5100;
+const int EndPort = 5200;
+const int MaxRetries = 100;
+
+int boundPort = 0;
+IPAddress boundIP = IPAddress.Loopback;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Try to find an available port
+for (int port = StartPort; port <= EndPort && port < StartPort + MaxRetries; port++)
+{
+    try
+    {
+        // Configure Kestrel to listen on the specific port
+        builder.WebHost.UseUrls($"http://localhost:{port}");
+        
+        // Test if port is available by trying to bind
+        using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+        {
+            socket.Bind(new IPEndPoint(boundIP, port));
+        }
+        
+        boundPort = port;
+        Console.WriteLine($"Agent will bind to IP: {boundIP}, Port: {boundPort}");
+        break;
+    }
+    catch (SocketException)
+    {
+        // Port is in use, try next port
+        continue;
+    }
+}
 
+if (boundPort == 0)
+{
+    Console.WriteLine($"ERROR: Could not find available port in range {StartPort}-{EndPort}");
+    Environment.Exit(1);
+}
+
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 
 builder.Services.AddCors(options =>
 {
@@ -36,4 +75,74 @@ app.UseCors("Access-Control-Allow-Origin");
 
 app.MapControllers();
 
+// Register agent after successful binding
+var registrationTask = Task.Run(async () =>
+{
+    try
+    {
+        // Wait a moment for the server to fully start
+        await Task.Delay(1000);
+        
+        // Call registration callback
+        await RegisterAgent(boundIP, boundPort);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error during agent registration: {ex.Message}");
+    }
+});
+
 app.Run();
+
+// Registration callback function
+static async Task RegisterAgent(IPAddress boundIP, int port)
+{
+    // Get SessionInfo singleton and populate it with system information
+    var sessionInfo = SessionInfo.Instance;
+    Util.PopulateSessionInfo(sessionInfo);
+    
+    // Add agent-specific information to the session
+    sessionInfo.SetValue("AgentIPAddress", boundIP.ToString());
+    sessionInfo.SetValue("AgentPort", port.ToString());
+    sessionInfo.SetValue("AgentURL", $"http://{boundIP}:{port}");
+    
+    var computerName   = sessionInfo.GetValue("ComputerName", Environment.MachineName);
+    var agentId = $"{computerName}:{port}";
+    
+    Console.WriteLine($"==============================================");
+    Console.WriteLine($"Agent Registration");
+    Console.WriteLine($"==============================================");
+    Console.WriteLine($"Agent ID: {agentId}");
+    Console.WriteLine($"Computer Name: {computerName}");
+    Console.WriteLine($"IP Address: {boundIP}");
+    Console.WriteLine($"Port: {port}");
+    Console.WriteLine($"URL: http://{boundIP}:{port}");
+    Console.WriteLine($"User: {sessionInfo.GetValue("UserName", "Unknown")}");
+    Console.WriteLine($"Domain: {sessionInfo.GetValue("UserDomain", "Unknown")}");
+    Console.WriteLine($"==============================================");
+    
+
+    
+    
+    var registrationData = new Agent        {
+            
+            hostname = computerName,
+            ip_address = sessionInfo.GetValue("AgentIPAddress"),
+            port = port,
+            url = sessionInfo.GetValue("AgentURL"),
+            username = sessionInfo.GetValue("UserName"),
+            user_domain = sessionInfo.GetValue("UserDomain"),
+            os_name = sessionInfo.GetValue("OSName"),
+            os_version = sessionInfo.GetValue("OSVersion"),
+            architecture = sessionInfo.GetValue("Architecture"),
+            registered_at = DateTime.UtcNow,
+            agent_status_id = (long)Agent.AgentStatus.Online,
+            is_active = 1,
+            created_by = Environment.UserName,
+            
+        };
+
+        @(Model.Namespace).core.AgentLogic.Create().register(registrationData);
+        
+    
+}

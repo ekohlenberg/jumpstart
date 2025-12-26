@@ -14,7 +14,7 @@ namespace @Model.Name
 
     public class Proxy<T> : DispatchProxy 
     {   
-        public T? Target { get; set; }
+        public T? Target { get; set; } 
         public string DomainObj { get; set; }
         public List<Action<MethodInfo, object[]>> BeforeActions = new();
         public List<Action<MethodInfo, object, object[]>> AfterActions = new();
@@ -91,10 +91,9 @@ namespace @Model.Name
                 Logger.Info($"invoking pre event service for {DomainObj}.{method.Name}." /*with arguments: {string.Join(", ", args)}"*/);
 
                 EventContext ctx = new EventContext("post", DomainObj, method.Name, args);
-
                 EventServiceLogic.Invoke( ctx ); 
 
-                if (ctx.EventException != null) throw ctx.EventException;
+               if (ctx.ScriptException != null) throw new Exception( $"Error in pre {DomainObj}.{method.Name} event", ctx.ScriptException);
                 
             });
 
@@ -111,15 +110,12 @@ namespace @Model.Name
                 Logger.Info($"invoking post event service for or {DomainObj}.{method.Name}." /* with arguments: {string.Join(", ", args)}"*/);
 
                 EventContext ctx = new EventContext("post", DomainObj, method.Name, args, result);
-
                 EventServiceLogic.Invoke( ctx ); 
                
-               if (ctx.EventException != null) throw ctx.EventException;
+               if (ctx.ScriptException != null) throw new Exception( $"Error in post {DomainObj}.{method.Name} event", ctx.ScriptException);
             });
         }
-
-
-       
+      
 
     }
 
