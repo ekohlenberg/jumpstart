@@ -7,67 +7,35 @@ using System.Threading.Tasks;
 using System.Reflection;
 using @Model.Namespace;
 
-namespace @(Model.Namespace).core
+namespace @(Model.Namespace)
 {
     /// <summary>
     /// Interface for Scheduler logic operations
     /// </summary>
-    public interface ISchedulerLogic
+    public interface ISchedulerCoreLogic: ISchedulerLogic
     {
         // Job Management Operations
-        void schedule(long workflowId);
+       
         void execute(long workflowId);
         void cancel(long workflowId);
-        void pause(long workflowId);
-        void resume(long workflowId);
-        void retry(long workflowId);
         void abort(long workflowId);
 
         // Job Status & Monitoring Operations
         object status(long workflowId);
-        List<long> list(string status, string priority);
-        object monitor(long workflowId);
-        List<long> query(DateTime? startDate, DateTime? endDate);
+       
 
-        // Resource Management Operations
-        void allocate(long workflowId);
-        void deallocate(long workflowId);
-        void balance();
-        void scale(long workflowId);
-
-        // Dependency Management Operations
-        void wait(long workflowId);
-        void trigger(long workflowId);
-        List<long> chain(List<long> workflowIds);
-        List<long> fork(long workflowId, List<long> subWorkflowIds);
-        void join(long workflowId);
-
-        // Recurring & Batch Operations
-        void repeat(long workflowId);
-        List<long> batch(List<long> workflowIds);
-        void queue(long workflowId);
-        void prioritize(long workflowId, int priority);
+        
+     
 
         // System Management Operations
         long register(Scheduler scheduler);
         void unregister(long workflowId);
-        object health();
-        void recover();
-        void migrate(long workflowId, string targetAgent);
+       
 
-        // Configuration Operations
-        void configure(long workflowId);
-        void update(long workflowId, object updateData);
-        object validate(long workflowId);
-
-        // Standard Operations
-        List<long> select();
-        object get(long workflowId);
-        long insert(object workflowDefinition);
-        void delete(long workflowId);
+      
     }
 
-    public partial class SchedulerLogic : ISchedulerLogic
+    public partial class SchedulerCoreLogic : SchedulerLogic, ISchedulerCoreLogic
     {
         private static Scheduler _thisScheduler;
         private static readonly ConcurrentQueue<long> _workflowQueue = new ConcurrentQueue<long>();
@@ -75,6 +43,20 @@ namespace @(Model.Namespace).core
         private static Thread _dispatcherThread;
         private static bool _dispatcherRunning = false;
         private static readonly object _dispatcherLock = new object();
+
+
+        public static new ISchedulerCoreLogic Create()
+        {
+            var schedulerLogic = new SchedulerCoreLogic();
+
+            var proxy = DispatchProxy.Create<ISchedulerCoreLogic, Proxy<ISchedulerCoreLogic>>();
+            ((Proxy<ISchedulerCoreLogic>)proxy).Initialize();
+            ((Proxy<ISchedulerCoreLogic>)proxy).Target = schedulerLogic;
+            ((Proxy<ISchedulerCoreLogic>)proxy).DomainObj = "Scheduler";
+
+            return proxy;
+        }
+
 
         public static Scheduler ThisScheduler
         {
@@ -166,27 +148,10 @@ namespace @(Model.Namespace).core
             return scheduler.id;
         }
 
-        public static ISchedulerLogic Create()
-        {
-            var schedulerLogic = new SchedulerLogic();
-
-            var proxy = DispatchProxy.Create<ISchedulerLogic, Proxy<ISchedulerLogic>>();
-            ((Proxy<ISchedulerLogic>)proxy).Initialize();
-            ((Proxy<ISchedulerLogic>)proxy).Target = schedulerLogic;
-            ((Proxy<ISchedulerLogic>)proxy).DomainObj = "Scheduler";
-
-            return proxy;
-        }
-
+     
         // =====================================
         // Job Management Operations
         // =====================================
-
-        public void schedule(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: schedule - {workflowId}");
-            // TODO: Implement schedule logic
-        }
 
         public void execute(long workflowId)
         {
@@ -383,24 +348,6 @@ namespace @(Model.Namespace).core
             // TODO: Implement cancel logic
         }
 
-        public void pause(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: pause - ID={workflowId}");
-            // TODO: Implement pause logic
-        }
-
-        public void resume(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: resume - ID={workflowId}");
-            // TODO: Implement resume logic
-        }
-
-        public void retry(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: retry - ID={workflowId}");
-            // TODO: Implement retry logic
-        }
-
         public void abort(long workflowId)
         {
             Console.WriteLine($"SchedulerLogic: abort - ID={workflowId}");
@@ -418,204 +365,14 @@ namespace @(Model.Namespace).core
             return new { workflowId, status = "unknown" };
         }
 
-        public List<long> list(string status, string priority)
-        {
-            Console.WriteLine($"SchedulerLogic: list - status={status}, priority={priority}");
-            // TODO: Implement list logic
-            return new List<long>();
-        }
-
-        public object monitor(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: monitor - ID={workflowId}");
-            // TODO: Implement monitor logic
-            return new { workflowId, status = "unknown" };
-        }
-
-        public List<long> query(DateTime? startDate, DateTime? endDate)
-        {
-            Console.WriteLine($"SchedulerLogic: query - startDate={startDate}, endDate={endDate}");
-            // TODO: Implement query logic
-            return new List<long>();
-        }
-
-        // =====================================
-        // Resource Management Operations
-        // =====================================
-
-        public void allocate(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: allocate - workflowId={workflowId}");
-            // TODO: Implement allocate logic
-        }
-
-        public void deallocate(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: deallocate - ID={workflowId}");
-            // TODO: Implement deallocate logic
-        }
-
-        public void balance()
-        {
-            Console.WriteLine($"SchedulerLogic: balance");
-            // TODO: Implement balance logic
-        }
-
-        public void scale(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: scale - workflowId={workflowId}");
-            // TODO: Implement scale logic
-        }
-
-        // =====================================
-        // Dependency Management Operations
-        // =====================================
-
-        public void wait(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: wait - workflowId={workflowId}");
-            // TODO: Implement wait logic
-        }
-
-        public void trigger(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: trigger - ID={workflowId}");
-            // TODO: Implement trigger logic
-        }
-
-        public List<long> chain(List<long> workflowIds)
-        {
-            Console.WriteLine($"SchedulerLogic: chain - {workflowIds.Count} jobs");
-            // TODO: Implement chain logic
-            return workflowIds;
-        }
-
-        public List<long> fork(long workflowId, List<long> subWorkflowIds)
-        {
-            Console.WriteLine($"SchedulerLogic: fork - ID={workflowId}, {subWorkflowIds.Count} sub-jobs");
-            // TODO: Implement fork logic
-            return subWorkflowIds;
-        }
-
-        public void join(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: join - ID={workflowId}");
-            // TODO: Implement join logic
-        }
-
-        // =====================================
-        // Recurring & Batch Operations
-        // =====================================
-
-        public void repeat(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: repeat - workflowId={workflowId}");
-            // TODO: Implement repeat logic
-        }
-
-        public List<long> batch(List<long> workflowIds)
-        {
-            Console.WriteLine($"SchedulerLogic: batch - {workflowIds.Count} jobs");
-            // TODO: Implement batch logic
-            return workflowIds;
-        }
-
-        public void queue(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: queue - workflowId={workflowId}");
-            // TODO: Implement queue logic
-        }
-
-        public void prioritize(long workflowId, int priority)
-        {
-            Console.WriteLine($"SchedulerLogic: prioritize - ID={workflowId}, priority={priority}");
-            // TODO: Implement prioritize logic
-        }
-
         // =====================================
         // System Management Operations
         // =====================================
-
 
         public void unregister(long workflowId)
         {
             Console.WriteLine($"SchedulerLogic: unregister - ID={workflowId}");
             // TODO: Implement unregister logic
-        }
-
-        public object health()
-        {
-            Console.WriteLine($"SchedulerLogic: health");
-            // TODO: Implement health logic
-            return new { status = "healthy" };
-        }
-
-        public void recover()
-        {
-            Console.WriteLine($"SchedulerLogic: recover");
-            // TODO: Implement recover logic
-        }
-
-        public void migrate(long workflowId, string targetAgent)
-        {
-            Console.WriteLine($"SchedulerLogic: migrate - ID={workflowId}, targetAgent={targetAgent}");
-            // TODO: Implement migrate logic
-        }
-
-        // =====================================
-        // Configuration Operations
-        // =====================================
-
-        public void configure(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: configure - workflowId={workflowId}");
-            // TODO: Implement configure logic
-        }
-
-        public void update(long workflowId, object updateData)
-        {
-            Console.WriteLine($"SchedulerLogic: update - ID={workflowId}");
-            // TODO: Implement update logic
-        }
-
-        public object validate(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: validate - workflowId={workflowId}");
-            // TODO: Implement validate logic
-            return new { valid = true };
-        }
-
-        // =====================================
-        // Standard Operations
-        // =====================================
-
-        public List<long> select()
-        {
-            Console.WriteLine("SchedulerLogic: select all workflows");
-            // TODO: Implement select logic
-            return new List<long>();
-        }
-
-        public object get(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: get - ID={workflowId}");
-            // TODO: Implement get logic
-            return new { workflowId, status = "unknown" };
-        }
-
-        public long insert(object workflowDefinition)
-        {
-            Console.WriteLine($"SchedulerLogic: insert - create workflow");
-            // TODO: Implement insert logic
-            // - Create new workflow record
-            // - Return workflow ID
-            return 0;
-        }
-
-        public void delete(long workflowId)
-        {
-            Console.WriteLine($"SchedulerLogic: delete - ID={workflowId}");
-            // TODO: Implement delete logic
         }
     }
 }

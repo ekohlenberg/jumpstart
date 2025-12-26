@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using @(namespaceName);
 
 namespace @(namespaceName).Controllers
 {
@@ -18,23 +19,13 @@ namespace @(namespaceName).Controllers
         // Job Management Operations
         // =====================================
 
-        // POST api/<SchedulerController>/schedule
-        [HttpPost("schedule")]
-        public ActionResult<long> Schedule([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler SCHEDULE: {workflowId}");
-            
-            SchedulerLogic.Create().schedule(workflowId);
-            return CreatedAtAction(nameof(GetWorkflow), new { workflowId = workflowId }, workflowId);
-        }
-
         // POST api/<SchedulerController>/execute
         [HttpPost("execute")]
         public ActionResult<long> Execute([FromBody] long workflowId)
         {
             //Console.WriteLine($"Processing Scheduler EXECUTE: {workflowId}");
             
-            SchedulerLogic.Create().execute(workflowId);
+            SchedulerCoreLogic.Create().execute(workflowId);
             return Ok(workflowId);
         }
 
@@ -44,37 +35,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Scheduler CANCEL: ID={workflowId}");
             
-            SchedulerLogic.Create().cancel(workflowId);
-            return Ok();
-        }
-
-        // POST api/<SchedulerController>/pause/{id}
-        [HttpPost("pause/{id}")]
-        public ActionResult Pause(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler PAUSE: ID={workflowId}");
-            
-            SchedulerLogic.Create().pause(workflowId);
-            return Ok();
-        }
-
-        // POST api/<SchedulerController>/resume/{id}
-        [HttpPost("resume/{id}")]
-            public ActionResult Resume(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler RESUME: ID={workflowId}");
-            
-            SchedulerLogic.Create().resume(workflowId);
-            return Ok();
-        }
-
-        // POST api/<SchedulerController>/retry/{id}
-        [HttpPost("retry/{id}")]
-        public ActionResult Retry(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler RETRY: ID={workflowId}");
-            
-            SchedulerLogic.Create().retry(workflowId);
+            SchedulerCoreLogic.Create().cancel(workflowId);
             return Ok();
         }
 
@@ -84,7 +45,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Scheduler ABORT: ID={workflowId}");
             
-            SchedulerLogic.Create().abort(workflowId);
+            SchedulerCoreLogic.Create().abort(workflowId);
             return Ok();
         }
 
@@ -98,183 +59,23 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Scheduler STATUS: ID={workflowId}");
             
-            var status = SchedulerLogic.Create().status(workflowId);
+            var status = SchedulerCoreLogic.Create().status(workflowId);
             return Ok(status);
-        }
-
-        // GET api/<SchedulerController>/list
-        [HttpGet("list")]
-        public ActionResult<IEnumerable<long>> List([FromQuery] string status = null, [FromQuery] string priority = null)
-        {
-            //Console.WriteLine($"Processing Scheduler LIST: status={status}, priority={priority}");
-            
-            List<long> workflowIds = SchedulerLogic.Create().list(status, priority);
-            return Ok(workflowIds);
-        }
-
-        // GET api/<SchedulerController>/monitor/{workflowId}
-        [HttpGet("monitor/{workflowId}")]
-        public ActionResult<object> Monitor(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler MONITOR: ID={workflowId}");
-            
-            var monitorData = SchedulerLogic.Create().monitor(workflowId);
-            return Ok(monitorData);
-        }
-
-        // GET api/<SchedulerController>/query
-        [HttpGet("query")]
-        public ActionResult<IEnumerable<long>> Query([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
-        {
-            //Console.WriteLine($"Processing Scheduler QUERY: startDate={startDate}, endDate={endDate}");
-            
-            List<long> workflowIds = SchedulerLogic.Create().query(startDate, endDate);
-            return Ok(workflowIds);
-        }
-
-        // =====================================
-        // Resource Management Operations
-        // =====================================
-
-        // POST api/<SchedulerController>/allocate
-        [HttpPost("allocate")]
-        public ActionResult<long> Allocate([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler ALLOCATE: {workflowId}");
-            
-            SchedulerLogic.Create().allocate(workflowId);
-            return Ok(workflowId);
-        }
-
-        // POST api/<SchedulerController>/deallocate/{id}
-        [HttpPost("deallocate/{workflowId}")]
-        public ActionResult Deallocate(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler DEALLOCATE: ID={workflowId}");
-            
-            SchedulerLogic.Create().deallocate(workflowId);
-            return Ok();
-        }
-
-        // POST api/<SchedulerController>/balance
-        [HttpPost("balance")]
-        public ActionResult Balance()
-        {
-            //Console.WriteLine($"Processing Scheduler BALANCE");
-            
-            SchedulerLogic.Create().balance();
-            return Ok();
-        }
-
-        // POST api/<SchedulerController>/scale
-        [HttpPost("scale")]
-        public ActionResult Scale([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler SCALE: {workflowId}");
-            
-            SchedulerLogic.Create().scale(workflowId);
-            return Ok();
-        }
-
-        // =====================================
-        // Dependency Management Operations
-        // =====================================
-
-        // POST api/<SchedulerController>/wait
-        [HttpPost("wait")]
-        public ActionResult<long> Wait([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler WAIT: {workflowId}");
-            
-            SchedulerLogic.Create().wait(workflowId);
-            return Ok(workflowId);
-        }
-
-        // POST api/<SchedulerController>/trigger/{workflowId}
-        [HttpPost("trigger/{workflowId}")]
-        public ActionResult Trigger(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler TRIGGER: ID={workflowId}");
-            
-            SchedulerLogic.Create().trigger(workflowId);
-            return Ok();
-        }
-        // POST api/<SchedulerController>/chain
-        [HttpPost("chain")]
-        public ActionResult<IEnumerable<long>> Chain([FromBody] List<long> workflowIds)
-        {
-            //Console.WriteLine($"Processing Scheduler CHAIN: {workflowIds.Count} jobs");
-            
-            List<long> chainedJobs = SchedulerLogic.Create().chain(workflowIds);
-            return Ok(chainedJobs);
-        }
-
-        // POST api/<SchedulerController>/fork/{workflowId}
-        [HttpPost("fork/{workflowId}")]
-        public ActionResult<IEnumerable<long>> Fork(long workflowId, [FromBody] List<long> subWorkflowIds)
-        {
-            //Console.WriteLine($"Processing Scheduler FORK: ID={workflowId}, {subWorkflowIds.Count} sub-jobs");
-            
-            List<long> forkedJobs = SchedulerLogic.Create().fork(workflowId, subWorkflowIds);
-            return Ok(forkedJobs);
-        }
-
-        // POST api/<SchedulerController>/join/{workflowId}
-        [HttpPost("join/{workflowId}")]
-        public ActionResult<long> Join(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler JOIN: ID={workflowId}");
-            
-            SchedulerLogic.Create().join(workflowId);
-            return Ok(workflowId);
-        }
-        // =====================================
-        // Recurring & Batch Operations
-        // =====================================
-
-        // POST api/<SchedulerController>/repeat
-        [HttpPost("repeat")]
-        public ActionResult<long> Repeat([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler REPEAT: {workflowId}");
-            
-            SchedulerLogic.Create().repeat(workflowId);
-            return Ok(workflowId);
-        }
-
-        // POST api/<SchedulerController>/batch
-        [HttpPost("batch")]
-        public ActionResult<IEnumerable<long>> Batch([FromBody] List<long> workflowIds)
-        {
-            //Console.WriteLine($"Processing Scheduler BATCH: {workflowIds.Count} jobs");
-            
-            List<long> batchedJobs = SchedulerLogic.Create().batch(workflowIds);
-            return Ok(batchedJobs);
-        }
-
-        // POST api/<SchedulerController>/queue
-        [HttpPost("queue")]
-        public ActionResult<long> Queue([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler QUEUE: {workflowId}");
-            
-            SchedulerLogic.Create().queue(workflowId);
-            return Ok(workflowId);
-        }
-
-        // POST api/<SchedulerController>/prioritize/{workflowId}
-        [HttpPost("prioritize/{workflowId}")]
-        public ActionResult Prioritize(long workflowId, [FromBody] int priority)
-        {
-            //Console.WriteLine($"Processing Scheduler PRIORITIZE: ID={workflowId}");
-            
-            SchedulerLogic.Create().prioritize(workflowId, priority);
-            return Ok();
         }
 
         // =====================================
         // System Management Operations
         // =====================================
+
+        // POST api/<SchedulerController>/register
+        [HttpPost("register")]
+        public ActionResult<long> Register([FromBody] Scheduler scheduler)
+        {
+            //Console.WriteLine($"Processing Scheduler REGISTER: {scheduler}");
+            
+            long schedulerId = SchedulerCoreLogic.Create().register(scheduler);
+            return Ok(schedulerId);
+        }
 
         // POST api/<SchedulerController>/unregister/{workflowId}
         [HttpPost("unregister/{workflowId}")]
@@ -282,120 +83,7 @@ namespace @(namespaceName).Controllers
         {
             //Console.WriteLine($"Processing Scheduler UNREGISTER: ID={workflowId}");
             
-            SchedulerLogic.Create().unregister(workflowId);
-            return Ok();
-        }
-
-        // GET api/<SchedulerController>/health
-        [HttpGet("health")]
-        public ActionResult Health()
-        {
-            //Console.WriteLine($"Processing Scheduler HEALTH");
-            
-            var healthStatus = SchedulerLogic.Create().health();
-            return Ok(healthStatus);
-        }
-
-        // POST api/<SchedulerController>/recover
-        [HttpPost("recover")]
-        public ActionResult Recover()
-        {
-            //Console.WriteLine($"Processing Scheduler RECOVER");
-            
-            SchedulerLogic.Create().recover();
-            return Ok();
-        }
-
-        // POST api/<SchedulerController>/migrate/{workflowId}
-        [HttpPost("migrate/{workflowId}")]
-        public ActionResult<long> Migrate(long workflowId, [FromBody] string targetAgent)
-        {
-            //Console.WriteLine($"Processing Scheduler MIGRATE: ID={workflowId}");
-            
-            SchedulerLogic.Create().migrate(workflowId, targetAgent);
-            return Ok(workflowId);
-        }
-
-        // =====================================
-        // Configuration Operations
-        // =====================================
-
-        // POST api/<SchedulerController>/configure
-        [HttpPost("configure")]
-        public ActionResult Configure([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler CONFIGURE: {workflowId}");
-            
-            SchedulerLogic.Create().configure(workflowId);
-            return Ok();
-        }
-
-        // PUT api/<SchedulerController>/update/{workflowId}
-        [HttpPut("update/{workflowId}")]
-        public ActionResult Update(long workflowId, [FromBody] object updateData)
-        {
-            //Console.WriteLine($"Processing Scheduler UPDATE: ID={workflowId}");
-            
-            SchedulerLogic.Create().update(workflowId, updateData);
-            return Ok();
-        }
-
-        // POST api/<SchedulerController>/validate
-        [HttpPost("validate")]
-        public ActionResult Validate([FromBody] long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler VALIDATE: {workflowId}");
-            
-            var validationResult = SchedulerLogic.Create().validate(workflowId);
-            return Ok(validationResult);
-        }
-
-        // =====================================
-        // Standard Operations
-        // =====================================
-
-        // GET: api/scheduler/workflows
-        [HttpGet("workflows")]
-        public ActionResult<IEnumerable<long>> GetWorkflows()
-        {
-            //Console.WriteLine("Processing GET Workflow List");
-            List<long> workflowIds = SchedulerLogic.Create().select();
-            return Ok(workflowIds);
-        }
-
-        // GET api/scheduler/workflow/{workflowId}
-        [HttpGet("workflow/{workflowId}")]
-        public ActionResult<object> GetWorkflow(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler GET Workflow ID={workflowId}");
-            var workflow = SchedulerLogic.Create().get(workflowId);
-            return Ok(workflow);
-        }
-
-        // POST api/scheduler/workflow
-        [HttpPost("workflow")]
-        public ActionResult<long> CreateWorkflow([FromBody] object workflowDefinition)
-        {
-            //Console.WriteLine($"Processing Scheduler POST: Create Workflow");
-            long workflowId = SchedulerLogic.Create().insert(workflowDefinition);
-            return CreatedAtAction(nameof(GetWorkflow), new { workflowId = workflowId }, workflowId);
-        }
-
-        // PUT api/scheduler/workflow/{workflowId}
-        [HttpPut("workflow/{workflowId}")]
-        public ActionResult UpdateWorkflow(long workflowId, [FromBody] object workflowDefinition)
-        {
-            //Console.WriteLine($"Processing Scheduler PUT: Update Workflow ID={workflowId}");
-            SchedulerLogic.Create().update(workflowId, workflowDefinition);
-            return Ok();
-        }
-
-        // DELETE api/scheduler/workflow/{workflowId}
-        [HttpDelete("workflow/{workflowId}")]
-        public ActionResult DeleteWorkflow(long workflowId)
-        {
-            //Console.WriteLine($"Processing Scheduler DELETE: Workflow ID={workflowId}");
-            SchedulerLogic.Create().delete(workflowId);
+            SchedulerCoreLogic.Create().unregister(workflowId);
             return Ok();
         }
     }

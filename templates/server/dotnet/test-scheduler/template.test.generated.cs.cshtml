@@ -82,7 +82,7 @@ namespace @Model.Namespace
                 var workflow = new Workflow();
                 workflow.name = "test-scheduler-single-job";
                 workflow.description = "Single job workflow test";
-                workflow.is_active = true;
+                workflow.is_active = 1;
                 DBPersist.insert(workflow, "default");
                 Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
 
@@ -97,7 +97,7 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess.id} with sequence {workflowProcess.seq}");
 
                 // Execute workflow
-                var schedulerLogic = SchedulerLogic.Create();
+                var schedulerLogic = SchedulerCoreLogic.Create();
                 schedulerLogic.execute(workflow.id);
                 Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
             }
@@ -127,7 +127,7 @@ namespace @Model.Namespace
                 var workflow = new Workflow();
                 workflow.name = "test-scheduler-two-job";
                 workflow.description = "Two job sequential workflow test";
-                workflow.is_active = true;
+                workflow.is_active = 1;
                 DBPersist.insert(workflow, "default");
                 Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
 
@@ -152,7 +152,7 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess2.id} with sequence {workflowProcess2.seq}");
 
                 // Execute workflow
-                var schedulerLogic = SchedulerLogic.Create();
+                var schedulerLogic = SchedulerCoreLogic.Create();
                 schedulerLogic.execute(workflow.id);
                 Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
             }
@@ -183,7 +183,7 @@ namespace @Model.Namespace
                 var workflow = new Workflow();
                 workflow.name = "test-scheduler-four-job-concurrent";
                 workflow.description = "Four job workflow with concurrent middle jobs test";
-                workflow.is_active = true;
+                workflow.is_active = 1;
                 DBPersist.insert(workflow, "default");
                 Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
 
@@ -228,7 +228,7 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess4.id} with sequence {workflowProcess4.seq}");
 
                 // Execute workflow
-                var schedulerLogic = SchedulerLogic.Create();
+                var schedulerLogic = SchedulerCoreLogic.Create();
                 schedulerLogic.execute(workflow.id);
                 Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
             }
@@ -258,7 +258,7 @@ namespace @Model.Namespace
                 var parentWorkflow = new Workflow();
                 parentWorkflow.name = "test-scheduler-nested-parent";
                 parentWorkflow.description = "Parent workflow for nested test";
-                parentWorkflow.is_active = true;
+                parentWorkflow.is_active = 1;
                 DBPersist.insert(parentWorkflow, "default");
                 Console.WriteLine($"SchedulerTest: Created parent workflow {parentWorkflow.id} - {parentWorkflow.name}");
 
@@ -267,7 +267,7 @@ namespace @Model.Namespace
                 childWorkflow1.name = "test-scheduler-nested-child1";
                 childWorkflow1.description = "First child workflow";
                 childWorkflow1.parent_workflow_id = parentWorkflow.id;
-                childWorkflow1.is_active = true;
+                childWorkflow1.is_active = 1;
                 DBPersist.insert(childWorkflow1, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow1.id} - {childWorkflow1.name}");
 
@@ -286,7 +286,7 @@ namespace @Model.Namespace
                 childWorkflow2.name = "test-scheduler-nested-child2";
                 childWorkflow2.description = "Second child workflow";
                 childWorkflow2.parent_workflow_id = parentWorkflow.id;
-                childWorkflow2.is_active = true;
+                childWorkflow2.is_active = 1;
                 DBPersist.insert(childWorkflow2, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} - {childWorkflow2.name}");
 
@@ -301,7 +301,7 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created workflow_process {childWorkflowProcess2.id} for child workflow {childWorkflow2.id}");
 
                 // Execute parent workflow (should recursively execute child workflows)
-                var schedulerLogic = SchedulerLogic.Create();
+                var schedulerLogic = SchedulerCoreLogic.Create();
                 schedulerLogic.execute(parentWorkflow.id);
                 Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution (will execute child workflows)");
             }
