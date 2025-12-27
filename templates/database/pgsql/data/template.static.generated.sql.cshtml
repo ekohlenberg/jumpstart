@@ -86,6 +86,12 @@ insert into sec.operation (id, objectname, methodname, is_active, last_updated, 
 insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'update', 1, current_timestamp, current_user, current_user, 1);
 insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Agent', 'delete', 1, current_timestamp, current_user, current_user, 1);
 
+-- Scheduler Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Scheduler', 'execute', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Scheduler', 'validate', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Scheduler', 'configure', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values ((SELECT nextval('sec.operation_identity')), 'Scheduler', 'health', 1, current_timestamp, current_user, current_user, 1);
+
 @{
 	foreach( var metaObject in Model.Objects)
 	{
