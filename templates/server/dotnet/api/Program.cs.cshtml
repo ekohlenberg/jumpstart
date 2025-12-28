@@ -1,13 +1,59 @@
+using System.Net;
+using System.Net.Sockets;
+using @Model.Namespace;
+using @(Model.Namespace).Hubs;
+
+// Configuration for dynamic port binding
+const int StartPort = 5200;
+const int EndPort = 5300;
+const int MaxRetries = 100;
+
+int boundPort = 0;
+IPAddress boundIP = IPAddress.Loopback;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Try to find an available port
+for (int port = StartPort; port <= EndPort && port < StartPort + MaxRetries; port++)
+{
+    try
+    {
+        // Configure Kestrel to listen on the specific port
+        builder.WebHost.UseUrls($"http://localhost:{port}");
+        
+        // Test if port is available by trying to bind
+        using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+        {
+            socket.Bind(new IPEndPoint(boundIP, port));
+        }
+        
+        boundPort = port;
+        Console.WriteLine($"API Server will bind to IP: {boundIP}, Port: {boundPort}");
+        break;
+    }
+    catch (SocketException)
+    {
+        // Port is in use, try next port
+        continue;
+    }
+}
 
+if (boundPort == 0)
+{
+    Console.WriteLine($"ERROR: Could not find available port in range {StartPort}-{EndPort}");
+    Environment.Exit(1);
+}
+
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add SignalR services
+builder.Services.AddSignalR();
 
+// Register EventAggregator service
+builder.Services.AddSingleton<IEventAggregator, EventAggregator>();
 
 builder.Services.AddCors(options =>
 {
@@ -38,4 +84,88 @@ app.UseCors("AllowBlazorClient");
 
 app.MapControllers();
 
+// Map SignalR hub
+app.MapHub<NotificationHub>("/notificationHub");
+
+// Register API server after app is built but before it runs
+_ = Task.Run(async () =>
+{
+    try
+    {
+        // Wait a moment for the server to fully start
+        await Task.Delay(2000);
+        
+        // Call registration callback
+        await RegisterApiServer(boundIP, boundPort);
+    }
+    catch (Exception ex)
+    {
+        Exception? x = ex;
+        while(x != null)
+        {
+            Console.WriteLine($"Error during API server registration: {x.Message}");
+            Console.WriteLine($"Stack trace: {x.StackTrace}");
+            x = x.InnerException;
+        }
+    }
+});
+
 app.Run();
+
+// Registration callback function
+static async Task RegisterApiServer(IPAddress boundIP, int port)
+{
+    // Get SessionInfo singleton and populate it with system information
+    var sessionInfo = SessionInfo.Instance;
+    Util.PopulateSessionInfo(sessionInfo);
+    
+    // Add API server-specific information to the session
+    sessionInfo.SetValue("ApiServerIPAddress", boundIP.ToString());
+    sessionInfo.SetValue("ApiServerPort", port.ToString());
+    sessionInfo.SetValue("ApiServerURL", $"http://{boundIP}:{port}");
+    
+    // Set ServerNode keys that are used in registration
+    sessionInfo.SetValue("ServerNodeIPAddress", boundIP.ToString());
+    sessionInfo.SetValue("ServerNodeURL", $"http://{boundIP}:{port}");
+    
+    var computerName = sessionInfo.GetValue("ComputerName", Environment.MachineName);
+    var apiServerId = $"{computerName}:{port}";
+    
+    Console.WriteLine($"==============================================");
+    Console.WriteLine($"API Server Registration");
+    Console.WriteLine($"==============================================");
+    Console.WriteLine($"API Server ID: {apiServerId}");
+    Console.WriteLine($"Computer Name: {computerName}");
+    Console.WriteLine($"IP Address: {boundIP}");
+    Console.WriteLine($"Port: {port}");
+    Console.WriteLine($"URL: http://{boundIP}:{port}");
+    Console.WriteLine($"User: {sessionInfo.GetValue("UserName", "Unknown")}");
+    Console.WriteLine($"Domain: {sessionInfo.GetValue("UserDomain", "Unknown")}");
+    Console.WriteLine($"==============================================");
+    
+
+    
+    
+    var registrationData = new ServerNode        {
+            
+            hostname = computerName,
+            server_node_type_id = (long)ServerNode.ServerNodeType.ApiServer,
+            ip_address = sessionInfo.GetValue("ServerNodeIPAddress"),
+            port = port,
+            url = sessionInfo.GetValue("ServerNodeURL"),
+            username = sessionInfo.GetValue("UserName"),
+            user_domain = sessionInfo.GetValue("UserDomain"),
+            os_name = sessionInfo.GetValue("OSName"),
+            os_version = sessionInfo.GetValue("OSVersion"),
+            architecture = sessionInfo.GetValue("Architecture"),
+            registered_at = DateTime.UtcNow,
+            server_node_status_id = (long)ServerNode.ServerNodeStatus.Online,
+            is_active = 1,
+            created_by = Environment.UserName,
+            
+        };
+
+        ServerNodeLogic.Create().put(registrationData);
+        
+    
+}

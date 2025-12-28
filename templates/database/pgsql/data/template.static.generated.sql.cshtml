@@ -1,17 +1,18 @@
 -- Insert default data source record
 insert into core.data_source (id, name) values ((SELECT nextval('core.data_source_identity')), 'default');
 
--- Insert agent status values
-insert into core.agent_status (id, name) values (1, 'Initializing');
-insert into core.agent_status (id, name) values (2, 'Online');
-insert into core.agent_status (id, name) values (3, 'Busy');
-insert into core.agent_status (id, name) values (4, 'Offline');
+-- Insert server node type values
+insert into core.server_node_type (id, name) values (1, 'Agent');
+insert into core.server_node_type (id, name) values (2, 'Scheduler');
+insert into core.server_node_type (id, name) values (3, 'ApiServer');
 
--- Insert scheduler status values
-insert into core.scheduler_status (id, name) values (1, 'Initializing');
-insert into core.scheduler_status (id, name) values (2, 'Online');
-insert into core.scheduler_status (id, name) values (3, 'Busy');
-insert into core.scheduler_status (id, name) values (4, 'Offline');
+-- Insert server node status values
+insert into core.server_node_status (id, name) values (1, 'Initializing');
+insert into core.server_node_status (id, name) values (2, 'Online');
+insert into core.server_node_status (id, name) values (3, 'Busy');
+insert into core.server_node_status (id, name) values (4, 'Offline');
+
+
 
 -- Insert on_failure action values
 insert into core.on_failure (id, action) values (1, 'Stop');

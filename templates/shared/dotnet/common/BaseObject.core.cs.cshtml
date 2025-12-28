@@ -100,7 +100,9 @@ namespace @Model.Name
 
             foreach(string k in this.Keys)
             {
-                s += k + " = " + this[k].ToString() + "\n";
+                object v = this[k];
+                if(v == null) v = "null";
+                s += k + " = " + v.ToString() + "\n";
             }
 
             return this.GetType().Name + "{\n" + s + "\n}";

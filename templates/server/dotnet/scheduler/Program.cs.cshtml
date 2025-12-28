@@ -140,6 +140,10 @@ static async Task RegisterScheduler(IPAddress boundIP, int port)
     sessionInfo.SetValue("SchedulerPort", port.ToString());
     sessionInfo.SetValue("SchedulerURL", $"http://{boundIP}:{port}");
     
+    // Set ServerNode keys that are used in registration
+    sessionInfo.SetValue("ServerNodeIPAddress", boundIP.ToString());
+    sessionInfo.SetValue("ServerNodeURL", $"http://{boundIP}:{port}");
+    
     var computerName = sessionInfo.GetValue("ComputerName", Environment.MachineName);
     var schedulerId = $"{computerName}:{port}";
     
@@ -158,25 +162,26 @@ static async Task RegisterScheduler(IPAddress boundIP, int port)
 
     
     
-    var registrationData = new Scheduler        {
+    var registrationData = new ServerNode        {
             
             hostname = computerName,
-            ip_address = sessionInfo.GetValue("SchedulerIPAddress"),
+            server_node_type_id = (long)ServerNode.ServerNodeType.Scheduler,
+            ip_address = sessionInfo.GetValue("ServerNodeIPAddress"),
             port = port,
-            url = sessionInfo.GetValue("SchedulerURL"),
+            url = sessionInfo.GetValue("ServerNodeURL"),
             username = sessionInfo.GetValue("UserName"),
             user_domain = sessionInfo.GetValue("UserDomain"),
             os_name = sessionInfo.GetValue("OSName"),
             os_version = sessionInfo.GetValue("OSVersion"),
             architecture = sessionInfo.GetValue("Architecture"),
             registered_at = DateTime.UtcNow,
-            scheduler_status_id = (long)Scheduler.SchedulerStatus.Online,
+            server_node_status_id = (long)ServerNode.ServerNodeStatus.Online,
             is_active = 1,
             created_by = Environment.UserName,
             
         };
 
-        SchedulerCoreLogic.Create().register(registrationData);
+        ServerNodeLogic.Create().put(registrationData);
         
     
 }

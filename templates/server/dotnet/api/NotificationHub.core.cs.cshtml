@@ -1,0 +1,79 @@
+using Microsoft.AspNetCore.SignalR;
+using System;
+using System.Threading.Tasks;
+using @Model.Namespace;
+
+namespace @(Model.Namespace).Hubs
+{
+    /// <summary>
+    /// SignalR Hub for real-time property update notifications
+    /// Clients subscribe to domain object types to receive property updates
+    /// </summary>
+    public class NotificationHub : Hub
+    {
+        /// <summary>
+        /// Subscribe to receive updates for a specific domain object type
+        /// </summary>
+        /// <param name="domainObjectName">Domain object name (e.g., "Execution", "Workflow", "Agent")</param>
+        public async Task SubscribeToDomainObject(string domainObjectName)
+        {
+            if (string.IsNullOrWhiteSpace(domainObjectName))
+            {
+                await Clients.Caller.SendAsync("Error", "Domain object name cannot be empty");
+                return;
+            }
+
+            // Add connection to group for this domain object type
+            await Groups.AddToGroupAsync(Context.ConnectionId, domainObjectName);
+            
+            Logger.Info($"Client {Context.ConnectionId} subscribed to {domainObjectName}");
+            
+            await Clients.Caller.SendAsync("Subscribed", domainObjectName);
+        }
+
+        /// <summary>
+        /// Unsubscribe from updates for a specific domain object type
+        /// </summary>
+        /// <param name="domainObjectName">Domain object name to unsubscribe from</param>
+        public async Task UnsubscribeFromDomainObject(string domainObjectName)
+        {
+            if (string.IsNullOrWhiteSpace(domainObjectName))
+            {
+                return;
+            }
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, domainObjectName);
+            
+            Logger.Info($"Client {Context.ConnectionId} unsubscribed from {domainObjectName}");
+            
+            await Clients.Caller.SendAsync("Unsubscribed", domainObjectName);
+        }
+
+        /// <summary>
+        /// Called when a client connects
+        /// </summary>
+        public override async Task OnConnectedAsync()
+        {
+            Logger.Info($"Client connected: {Context.ConnectionId}");
+            await base.OnConnectedAsync();
+        }
+
+        /// <summary>
+        /// Called when a client disconnects
+        /// </summary>
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            if (exception != null)
+            {
+                Logger.Error($"Client disconnected with error: {exception.Message}", exception);
+            }
+            else
+            {
+                Logger.Info($"Client disconnected: {Context.ConnectionId}");
+            }
+            
+            await base.OnDisconnectedAsync(exception);
+        }
+    }
+}
+

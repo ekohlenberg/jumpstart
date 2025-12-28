@@ -1,0 +1,113 @@
+using Microsoft.AspNetCore.SignalR;
+using System;
+using System.Threading.Tasks;
+using @Model.Namespace;
+using @(Model.Namespace).Hubs;
+
+namespace @(Model.Namespace)
+{
+    /// <summary>
+    /// Interface for event aggregation service
+    /// </summary>
+    public interface IEventAggregator
+    {
+        /// <summary>
+        /// Publishes a property update event to all subscribed clients
+        /// </summary>
+        /// <param name="domainObjectName">Domain object name (e.g., "Execution", "Workflow", "Agent")</param>
+        /// <param name="instanceId">Instance ID of the domain object</param>
+        /// <param name="propertyName">Property name that was updated</param>
+        /// <param name="value">The new value of the property</param>
+        /// <param name="enumId">Optional enum ID for enumerated values</param>
+        Task PublishAsync(string domainObjectName, long instanceId, string propertyName, object value, long? enumId = null);
+    }
+
+    /// <summary>
+    /// Event aggregator service that routes property updates to SignalR clients
+    /// </summary>
+    public class EventAggregator : IEventAggregator
+    {
+        private readonly IHubContext<NotificationHub> _hubContext;
+
+        public EventAggregator(IHubContext<NotificationHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
+
+        /// <summary>
+        /// Publishes a property update event to all clients subscribed to the domain object type
+        /// </summary>
+        public async Task PublishAsync(string domainObjectName, long instanceId, string propertyName, object value, long? enumId = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(domainObjectName))
+                {
+                    throw new ArgumentException("Domain object name cannot be null or empty", nameof(domainObjectName));
+                }
+
+                if (string.IsNullOrWhiteSpace(propertyName))
+                {
+                    throw new ArgumentException("Property name cannot be null or empty", nameof(propertyName));
+                }
+
+                var message = new PropertyUpdateMessage
+                {
+                    DomainObjectName = domainObjectName,
+                    InstanceId = instanceId,
+                    PropertyName = propertyName,
+                    Value = value,
+                    EnumId = enumId,
+                    Timestamp = DateTime.UtcNow
+                };
+
+                // Broadcast to all clients in the domain object group
+                await _hubContext.Clients.Group(domainObjectName).SendAsync("PropertyUpdated", message);
+
+                Logger.Info($"Published property update: {domainObjectName}[{instanceId}].{propertyName} = {value} (EnumId: {enumId})");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error publishing event: {ex.Message}", ex);
+                throw;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Message structure for property update notifications
+    /// </summary>
+    public class PropertyUpdateMessage
+    {
+        /// <summary>
+        /// Domain object name (e.g., "Execution", "Workflow", "Agent")
+        /// </summary>
+        public string DomainObjectName { get; set; }
+
+        /// <summary>
+        /// Instance ID of the domain object
+        /// </summary>
+        public long InstanceId { get; set; }
+
+        /// <summary>
+        /// Property name that was updated
+        /// </summary>
+        public string PropertyName { get; set; }
+
+        /// <summary>
+        /// The new value of the property
+        /// </summary>
+        public object Value { get; set; }
+
+        /// <summary>
+        /// Optional enum ID for enumerated values
+        /// </summary>
+        public long? EnumId { get; set; }
+
+        /// <summary>
+        /// Timestamp when the update occurred
+        /// </summary>
+        public DateTime Timestamp { get; set; }
+    }
+}
+

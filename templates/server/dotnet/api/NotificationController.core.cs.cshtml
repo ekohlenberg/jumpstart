@@ -1,0 +1,89 @@
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
+using @Model.Namespace;
+
+namespace @(Model.Namespace).Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class NotificationController : ControllerBase
+    {
+        private readonly IEventAggregator _eventAggregator;
+
+        public NotificationController(IEventAggregator eventAggregator)
+        {
+            _eventAggregator = eventAggregator;
+        }
+
+        // POST api/Notification/publish
+        [HttpPost("publish")]
+        public async Task<ActionResult> Publish([FromBody] NotificationRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest("Notification request cannot be null");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.DomainObjectName))
+                {
+                    return BadRequest("DomainObjectName is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.PropertyName))
+                {
+                    return BadRequest("PropertyName is required");
+                }
+
+                await _eventAggregator.PublishAsync(
+                    request.DomainObjectName,
+                    request.InstanceId,
+                    request.PropertyName,
+                    request.Value,
+                    request.EnumId
+                );
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error publishing notification: {ex.Message}", ex);
+                return StatusCode(500, "Internal server error while publishing notification");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Request model for publishing property updates
+    /// </summary>
+    public class NotificationRequest
+    {
+        /// <summary>
+        /// Domain object name (e.g., "Execution", "Workflow", "Agent")
+        /// </summary>
+        public string DomainObjectName { get; set; }
+
+        /// <summary>
+        /// Instance ID of the domain object
+        /// </summary>
+        public long InstanceId { get; set; }
+
+        /// <summary>
+        /// Property name that was updated (e.g., "exec_status_id", "agent_status_id")
+        /// </summary>
+        public string PropertyName { get; set; }
+
+        /// <summary>
+        /// The new value of the property
+        /// </summary>
+        public object Value { get; set; }
+
+        /// <summary>
+        /// Optional enum ID for enumerated values
+        /// </summary>
+        public long? EnumId { get; set; }
+    }
+}
+
