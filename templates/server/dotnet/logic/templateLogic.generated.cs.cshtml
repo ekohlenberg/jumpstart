@@ -42,7 +42,7 @@ namespace @namespaceName
     
         public  List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new()
         {
-            Console.WriteLine("Processing @(domainObj)Logic select<TBaseObject> List");
+            Logger.Debug("Processing @(domainObj)Logic select<TBaseObject> List");
 
             List<TBaseObject> @(domainVar)s = select<TBaseObject>("@(schemaName).@(tableName)-select");
 
@@ -52,7 +52,7 @@ namespace @namespaceName
 
         public List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new()
         {
-            Console.WriteLine($"Processing @(domainObj)Logic select<TBaseObject> with query: {queryName}");
+            Logger.Debug($"Processing @(domainObj)Logic select<TBaseObject> with query: {queryName}");
 
             List<TBaseObject> @(domainVar)s = DBPersist.ExecuteQueryByName<TBaseObject>(queryName);
 
@@ -68,7 +68,7 @@ namespace @namespaceName
 
         public List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new()
         {
-            Console.WriteLine($"Processing @(domainObj)Logic children<TBaseObject> for ID={id}, childSuffix={childSuffix}");
+            Logger.Debug($"Processing @(domainObj)Logic children<TBaseObject> for ID={id}, childSuffix={childSuffix}");
 
             string queryName = "@(schemaName).@(tableName)-children-" + childSuffix;
             List<TBaseObject> children = DBPersist.ExecuteQueryByName<TBaseObject>(queryName, new BaseObject() { { "id", id } });
@@ -78,7 +78,7 @@ namespace @namespaceName
 
         public  @(domainObj) get(long id)
         {
-            Console.WriteLine($"Processing @(domainObj)Logic get ID={id}");
+            Logger.Debug($"Processing @(domainObj)Logic get ID={id}");
 
             @(domainObj) @(domainVar) = DBPersist.select<@(domainObj)>($"SELECT * FROM @(schemaName).@(tableName) WHERE id = {id}").FirstOrDefault();
             
@@ -88,7 +88,7 @@ namespace @namespaceName
 
         public  void insert(@(domainObj) @(domainVar))
         {
-            Console.WriteLine($"Processing @(domainObj)Logic insert: {@(domainVar)}");
+            Logger.Debug($"Processing @(domainObj)Logic insert: {@(domainVar)}");
 
             @(domainVar).is_active = 1;
 
@@ -97,7 +97,7 @@ namespace @namespaceName
 
         public  void put(@(domainObj) @(domainVar))
         {
-            Console.WriteLine($"Processing @(domainObj)Logic put: {@(domainVar)}");
+            Logger.Debug($"Processing @(domainObj)Logic put: {@(domainVar)}");
 
             @(domainVar).is_active = 1;
 
@@ -106,7 +106,7 @@ namespace @namespaceName
 
         public  void update(long id, @(domainObj) @(domainVar))
         {
-            Console.WriteLine($"Processing @(domainObj)Logic update: ID = {id}\n{@(domainVar)}");
+            Logger.Debug($"Processing @(domainObj)Logic update: ID = {id}\n{@(domainVar)}");
 
             @(domainVar).id = id;
             DBPersist.update(@(domainVar));
