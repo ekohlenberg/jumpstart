@@ -12,7 +12,7 @@ namespace @(Model.Namespace)
     /// <summary>
     /// Interface for Scheduler logic operations
     /// </summary>
-    public interface ISchedulerCoreLogic: ISchedulerLogic
+    public interface ISchedulerCoreLogic
     {
         // Job Management Operations
        
@@ -28,16 +28,16 @@ namespace @(Model.Namespace)
      
 
         // System Management Operations
-        long register(Scheduler scheduler);
-        void unregister(long workflowId);
+        long register(ServerNode serverNode);
+        void unregister(long serverNodeId);
        
 
       
     }
 
-    public partial class SchedulerCoreLogic : SchedulerLogic, ISchedulerCoreLogic
+    public partial class SchedulerCoreLogic : ISchedulerCoreLogic
     {
-        private static Scheduler _thisScheduler;
+        private static ServerNode _thisServerNode;
         private static readonly ConcurrentQueue<long> _workflowQueue = new ConcurrentQueue<long>();
         private static readonly ManualResetEventSlim _queueEvent = new ManualResetEventSlim(false);
         private static Thread _dispatcherThread;
@@ -58,20 +58,20 @@ namespace @(Model.Namespace)
         }
 
 
-        public static Scheduler ThisScheduler
+        public static ServerNode ThisServerNode
         {
-            get { return _thisScheduler; }
-            set { _thisScheduler = value; }
+            get { return _thisServerNode; }
+            set { _thisServerNode = value; }
         }
 
         /// <summary>
         /// Sets the singleton Scheduler instance
         /// </summary>
-        /// <param name="scheduler">The Scheduler instance to set</param>
-        public static void SetThisScheduler(Scheduler scheduler)
+        /// <param name="serverNode">The ServerNode instance to set</param>
+        public static void SetThisServerNode(ServerNode serverNode)
         {
-            _thisScheduler = scheduler;
-            Console.WriteLine($"SchedulerLogic: Set singleton Scheduler instance (ID: {scheduler?.id})");
+            _thisServerNode = serverNode;
+            Console.WriteLine($"SchedulerLogic: Set singleton Scheduler instance (ID: {serverNode?.id})");
             StartDispatcherThread();
         }
 
@@ -140,12 +140,12 @@ namespace @(Model.Namespace)
         /// </summary>
         /// <param name="scheduler">The scheduler to register</param>
         /// <returns>The scheduler ID</returns>
-        public long register(Scheduler scheduler)
+        public long register(ServerNode serverNode)
         {
-            Console.WriteLine($"SchedulerLogic: register - scheduler={scheduler}");
-            DBPersist.put(scheduler);
-            SetThisScheduler(scheduler);
-            return scheduler.id;
+            Console.WriteLine($"SchedulerLogic: register - serverNode={serverNode}");
+            DBPersist.put(serverNode);
+            SetThisServerNode(serverNode);
+            return serverNode.id;
         }
 
      
@@ -310,7 +310,7 @@ namespace @(Model.Namespace)
                 }
 
                 // Load agent
-                Agent agent = new Agent();
+                ServerNode agent = new ServerNode();
                 agent.id = workflowProcess.agent_id;
                 DBPersist.get(agent, "default");
 
@@ -325,14 +325,14 @@ namespace @(Model.Namespace)
                 execution.exec_status_id = (long)Execution.ExecStatus.Dispatched;
                 DBPersist.insert(execution, "default");
 
-                Console.WriteLine($"SchedulerLogic: Created execution {execution.id} for workflow_process {workflowProcess.id}");
+                Logger.Info($"SchedulerLogic: Created execution {execution.id} for workflow_process {workflowProcess.id}");
 
                 // Invoke agent via AgentClient
                 using (var agentClient = new AgentClient(agent))
                 {
                     // Use ExecuteAsync to send execution to agent
                     long executionResult = await agentClient.ExecuteAsync(execution.id);
-                    Console.WriteLine($"SchedulerLogic: Agent {agent.id} accepted execution {execution.id}, result: {executionResult}");
+                    Logger.Info($"SchedulerLogic: Agent {agent.id} accepted execution {execution.id}, result: {executionResult}");
                 }
             }
             catch (Exception ex)

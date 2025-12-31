@@ -13,7 +13,6 @@ namespace @(Model.Namespace).core
     public interface IAgentLogic
     {
         // Process Management Operations
-        void start(long executionId);
         void stop(long executionId);
         void kill(long executionId);
         void restart(long executionId);
@@ -28,8 +27,8 @@ namespace @(Model.Namespace).core
         void metrics(object metricsData);
 
         // Resource Management Operations
-        long register(Agent registrationData);
-        void unregister(long agentId);
+        long register(ServerNode registrationData);
+        void unregister(long serverNodeId);
         object capabilities();
         void allocate(long executionId);
         void release(long executionId);
@@ -81,10 +80,10 @@ namespace @(Model.Namespace).core
         private static Thread _executionThread;
         private static readonly object _threadLock = new object();
         private static volatile bool _shouldStop = false;
-        
+
         // Singleton Agent instance
-        private static Agent _thisAgent;
-        private static readonly object _agentLock = new object();
+        private static ServerNode _thisServerNode;
+        private static readonly object _serverNodeLock = new object();
 
         public static IAgentLogic Create()
         {
@@ -178,22 +177,22 @@ namespace @(Model.Namespace).core
         /// <summary>
         /// Gets the singleton Agent instance
         /// </summary>
-        public static Agent thisAgent
+        public static ServerNode thisServerNode
         {
             get
             {
-                if (_thisAgent == null)
+                if (_thisServerNode == null)
                 {
-                    lock (_agentLock)
+                    lock (_serverNodeLock)
                     {
-                        if (_thisAgent == null)
+                        if (_thisServerNode == null)
                         {
-                            _thisAgent = new Agent();
-                            Console.WriteLine("AgentLogic: Created singleton Agent instance");
+                            _thisServerNode = new ServerNode();
+                            Console.WriteLine("AgentLogic: Created singleton ServerNode instance");
                         }
                     }
                 }
-                return _thisAgent;
+                return _thisServerNode;
             }
         }
 
@@ -201,24 +200,24 @@ namespace @(Model.Namespace).core
         /// Sets the singleton Agent instance
         /// </summary>
         /// <param name="agent">The Agent instance to set</param>
-        public static void SetThisAgent(Agent agent)
+        public static void SetThisServerNode(ServerNode serverNode)
         {
-            lock (_agentLock)
+            lock (_serverNodeLock)
             {
-                _thisAgent = agent;
-                Console.WriteLine($"AgentLogic: Set singleton Agent instance (ID: {agent?.id})");
+                _thisServerNode = serverNode;
+                Console.WriteLine($"AgentLogic: Set singleton ServerNode instance (ID: {serverNode?.id})");
             }
         }
 
         /// <summary>
         /// Clears the singleton Agent instance
         /// </summary>
-        public static void ClearThisAgent()
+        public static void ClearThisServerNode()
         {
-            lock (_agentLock)
+            lock (_serverNodeLock)
             {
-                _thisAgent = null;
-                Console.WriteLine("AgentLogic: Cleared singleton Agent instance");
+                _thisServerNode = null;
+                Console.WriteLine("AgentLogic: Cleared singleton ServerNode instance");
             }
         }
 
@@ -226,13 +225,13 @@ namespace @(Model.Namespace).core
         /// Updates the agent status in the database
         /// </summary>
         /// <param name="status">The new agent status</param>
-        private static void UpdateAgentStatus(Agent.AgentStatus status)
+        private static void UpdateAgentStatus(ServerNode.ServerNodeStatus status)
         {
-            if (thisAgent != null)
+            if (thisServerNode != null)
             {
-                thisAgent.agent_status_id = (long)status;
-                DBPersist.update(thisAgent, "default");
-                Console.WriteLine($"AgentLogic: Set agent status to {status}");
+                thisServerNode.server_node_status_id = (long)status;
+                DBPersist.update(thisServerNode, "default");
+                Console.WriteLine($"AgentLogic: Set server node status to {status}");
             }
         }
 
@@ -303,7 +302,7 @@ namespace @(Model.Namespace).core
                         Console.WriteLine($"AgentLogic: Processing execution {executionId}");
                         
                         // Set agent status to Busy before execution
-                        UpdateAgentStatus(Agent.AgentStatus.Busy);
+                        UpdateAgentStatus(ServerNode.ServerNodeStatus.Busy);
                         
                         try
                         {
@@ -315,7 +314,7 @@ namespace @(Model.Namespace).core
                         finally
                         {
                             // Set agent status back to Online after execution (success or failure)
-                            UpdateAgentStatus(Agent.AgentStatus.Online);
+                            UpdateAgentStatus(ServerNode.ServerNodeStatus.Online);
                         }
                     }
                     else
@@ -337,13 +336,6 @@ namespace @(Model.Namespace).core
         // =====================================
         // Process Management Operations
         // =====================================
-
-        public void start(long executionId)
-        {
-            Console.WriteLine($"AgentLogic: start - executionId={executionId}");
-            EnqueueExecution(executionId);
-            StartExecutionThread();
-        }
 
         protected static void ExecuteScript(long executionId)
         {
@@ -415,31 +407,31 @@ namespace @(Model.Namespace).core
 
         public void stop(long executionId)
         {
-            Console.WriteLine($"AgentLogic: stop - executionId={executionId}");
+            Logger.Info($"AgentLogic: stop - executionId={executionId}");
             // TODO: Implement stop logic
         }
 
         public void kill(long executionId)
         {
-            Console.WriteLine($"AgentLogic: kill - executionId={executionId}");
+            Logger.Info($"AgentLogic: kill - executionId={executionId}");
             // TODO: Implement kill logic
         }
 
         public void restart(long executionId)
         {
-            Console.WriteLine($"AgentLogic: restart - executionId={executionId}");
+            Logger.Info($"AgentLogic: restart - executionId={executionId}");
             // TODO: Implement restart logic
         }
 
         public void pause(long executionId)
         {
-            Console.WriteLine($"AgentLogic: pause - executionId={executionId}");
+            Logger.Info($"AgentLogic: pause - executionId={executionId}");
             // TODO: Implement pause logic
         }
 
         public void resume(long executionId)
         {
-            Console.WriteLine($"AgentLogic: resume - executionId={executionId}");
+            Logger.Info($"AgentLogic: resume - executionId={executionId}");
             // TODO: Implement resume logic
         }
 
@@ -490,17 +482,17 @@ namespace @(Model.Namespace).core
         // Resource Management Operations
         // =====================================
 
-        public long register(Agent registrationData)
+        public long register(ServerNode registrationData)
         {
             Console.WriteLine($"AgentLogic: register");
             DBPersist.put(registrationData);
-            SetThisAgent(registrationData);
+            SetThisServerNode(registrationData);
             return registrationData.id;
         }
 
-        public void unregister(long agentId)
+        public void unregister(long serverNodeId)
         {
-            Console.WriteLine($"AgentLogic: unregister - agentId={agentId}");
+            Console.WriteLine($"AgentLogic: unregister - serverNodeId={serverNodeId}");
             // TODO: Implement unregister logic
             // - Unregister from scheduler
             // - Clean up resources
@@ -510,7 +502,7 @@ namespace @(Model.Namespace).core
         {
             Console.WriteLine($"AgentLogic: capabilities");
             // TODO: Implement capabilities logic
-            // - Return agent capabilities (CPU, memory, etc.)
+            // - Return server node capabilities (CPU, memory, etc.)
             return new { cpu = "unknown", memory = "unknown", capabilities = new List<string>() };
         }
 
@@ -535,10 +527,8 @@ namespace @(Model.Namespace).core
         public void execute(long executionId)
         {
             Console.WriteLine($"AgentLogic: execute - executionId={executionId}");
-            // TODO: Implement execute logic
-            // - Load execution details
-            // - Execute the job
-            // - Report results
+            EnqueueExecution(executionId);
+            StartExecutionThread();
         }
 
         public object validate(long executionId)
