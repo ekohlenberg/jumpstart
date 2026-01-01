@@ -23,8 +23,6 @@ dotnet server templates-common,model,shared/dotnet/common/ScriptProviderFactory.
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
 dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,./shared/domain,TRUE
-dotnet server templates-domain,model,shared/dotnet/domain/Agent.core.cs.cshtml,./shared/domain,TRUE
-dotnet server templates-domain,model,shared/dotnet/domain/Scheduler.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/WorkflowProcess.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/Execution.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/Script.core.cs.cshtml,./shared/domain,TRUE

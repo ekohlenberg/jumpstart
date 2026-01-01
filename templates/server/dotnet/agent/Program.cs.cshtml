@@ -78,6 +78,29 @@ app.UseCors("Access-Control-Allow-Origin");
 
 app.MapControllers();
 
+// Register shutdown handler to set server status to offline
+app.Lifetime.ApplicationStopping.Register(() =>
+{
+    try
+    {
+        Console.WriteLine("Agent: Application is shutting down, setting server status to Offline...");
+        var serverNode = @(Model.Namespace).core.AgentLogic.thisServerNode;
+        if (serverNode != null && serverNode.id > 0)
+        {
+            @(Model.Namespace).core.AgentLogic.Create().unregister(serverNode.id);
+            Console.WriteLine("Agent: Server node unregistered, status updated to Offline");
+        }
+        else
+        {
+            Console.WriteLine("Agent: Server node not registered, skipping status update");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error setting server status to Offline during shutdown: {ex.Message}");
+    }
+});
+
 // Register agent after successful binding
 var registrationTask = Task.Run(async () =>
 {
@@ -150,7 +173,7 @@ static async Task RegisterAgent(IPAddress boundIP, int port)
             
         };
 
-        ServerNodeLogic.Create().put(registrationData);
+        @(Model.Namespace).core.AgentLogic.Create().register(registrationData);
         
     
 }

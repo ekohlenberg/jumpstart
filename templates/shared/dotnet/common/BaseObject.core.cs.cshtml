@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Text.Json;
 
 namespace @Model.Name
 {
@@ -96,16 +97,20 @@ namespace @Model.Name
        
         public override string ToString()
         {
-            string s = string.Empty;
-
-            foreach(string k in this.Keys)
+            try
             {
-                object v = this[k];
-                if(v == null) v = "null";
-                s += k + " = " + v.ToString() + "\n";
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                };
+                
+                return JsonSerializer.Serialize(this, options);
             }
-
-            return this.GetType().Name + "{\n" + s + "\n}";
+            catch (Exception ex)
+            {
+                // Fallback to simple format if serialization fails
+                return $"{this.GetType().Name}(Serialization error: {ex.Message})";
+            }
         }
 
         protected virtual void Initialize()

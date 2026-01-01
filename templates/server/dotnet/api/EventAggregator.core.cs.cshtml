@@ -12,14 +12,12 @@ namespace @(Model.Namespace)
     public interface IEventAggregator
     {
         /// <summary>
-        /// Publishes a property update event to all subscribed clients
+        /// Publishes an object update event to all subscribed clients
         /// </summary>
         /// <param name="domainObjectName">Domain object name (e.g., "Execution", "Workflow", "Agent")</param>
         /// <param name="instanceId">Instance ID of the domain object</param>
-        /// <param name="propertyName">Property name that was updated</param>
-        /// <param name="value">The new value of the property</param>
-        /// <param name="enumId">Optional enum ID for enumerated values</param>
-        Task PublishAsync(string domainObjectName, long instanceId, string propertyName, object value, long? enumId = null);
+        /// <param name="jsonData">JSON string representation of the entire updated BaseObject</param>
+        Task PublishAsync(string domainObjectName, long instanceId, string jsonData);
     }
 
     /// <summary>
@@ -35,9 +33,9 @@ namespace @(Model.Namespace)
         }
 
         /// <summary>
-        /// Publishes a property update event to all clients subscribed to the domain object type
+        /// Publishes an object update event to all clients subscribed to the domain object type
         /// </summary>
-        public async Task PublishAsync(string domainObjectName, long instanceId, string propertyName, object value, long? enumId = null)
+        public async Task PublishAsync(string domainObjectName, long instanceId, string jsonData)
         {
             try
             {
@@ -46,25 +44,23 @@ namespace @(Model.Namespace)
                     throw new ArgumentException("Domain object name cannot be null or empty", nameof(domainObjectName));
                 }
 
-                if (string.IsNullOrWhiteSpace(propertyName))
+                if (string.IsNullOrWhiteSpace(jsonData))
                 {
-                    throw new ArgumentException("Property name cannot be null or empty", nameof(propertyName));
+                    throw new ArgumentException("JSON data cannot be null or empty", nameof(jsonData));
                 }
 
                 var message = new PropertyUpdateMessage
                 {
                     DomainObjectName = domainObjectName,
                     InstanceId = instanceId,
-                    PropertyName = propertyName,
-                    Value = value,
-                    EnumId = enumId,
+                    JsonData = jsonData,
                     Timestamp = DateTime.UtcNow
                 };
 
                 // Broadcast to all clients in the domain object group
                 await _hubContext.Clients.Group(domainObjectName).SendAsync("PropertyUpdated", message);
 
-                Logger.Info($"Published property update: {domainObjectName}[{instanceId}].{propertyName} = {value} (EnumId: {enumId})");
+                Logger.Info($"Published object update: {domainObjectName}[{instanceId}]");
             }
             catch (Exception ex)
             {
@@ -75,7 +71,7 @@ namespace @(Model.Namespace)
     }
 
     /// <summary>
-    /// Message structure for property update notifications
+    /// Message structure for object update notifications
     /// </summary>
     public class PropertyUpdateMessage
     {
@@ -90,19 +86,9 @@ namespace @(Model.Namespace)
         public long InstanceId { get; set; }
 
         /// <summary>
-        /// Property name that was updated
+        /// JSON string representation of the entire updated BaseObject
         /// </summary>
-        public string PropertyName { get; set; }
-
-        /// <summary>
-        /// The new value of the property
-        /// </summary>
-        public object Value { get; set; }
-
-        /// <summary>
-        /// Optional enum ID for enumerated values
-        /// </summary>
-        public long? EnumId { get; set; }
+        public string JsonData { get; set; }
 
         /// <summary>
         /// Timestamp when the update occurred
