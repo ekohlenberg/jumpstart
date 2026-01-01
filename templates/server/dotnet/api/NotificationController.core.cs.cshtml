@@ -22,21 +22,30 @@ namespace @(Model.Namespace).Controllers
         {
             try
             {
+                Logger.Debug($"NotificationController.Publish: Received notification request");
+                
                 if (request == null)
                 {
+                    Logger.Debug("NotificationController.Publish: Request is null");
                     return BadRequest("Notification request cannot be null");
                 }
 
+                Logger.Debug($"NotificationController.Publish: DomainObjectName={request.DomainObjectName}, InstanceId={request.InstanceId}, PropertyName={request.PropertyName}");
+
                 if (string.IsNullOrWhiteSpace(request.DomainObjectName))
                 {
+                    Logger.Debug("NotificationController.Publish: DomainObjectName is null or whitespace");
                     return BadRequest("DomainObjectName is required");
                 }
 
                 if (string.IsNullOrWhiteSpace(request.PropertyName))
                 {
+                    Logger.Debug("NotificationController.Publish: PropertyName is null or whitespace");
                     return BadRequest("PropertyName is required");
                 }
 
+                Logger.Debug($"NotificationController.Publish: Publishing event for {request.DomainObjectName}[{request.InstanceId}].{request.PropertyName}");
+                
                 await _eventAggregator.PublishAsync(
                     request.DomainObjectName,
                     request.InstanceId,
@@ -45,6 +54,7 @@ namespace @(Model.Namespace).Controllers
                     request.EnumId
                 );
 
+                Logger.Debug($"NotificationController.Publish: Successfully published notification for {request.DomainObjectName}[{request.InstanceId}].{request.PropertyName}");
                 return Ok();
             }
             catch (Exception ex)

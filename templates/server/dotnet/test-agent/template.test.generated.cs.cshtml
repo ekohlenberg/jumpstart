@@ -8,7 +8,7 @@ namespace @Model.Namespace
 {
     public partial class WorkflowProcessTest 
     {
-        private static Dictionary<long, Agent> agents = new Dictionary<long, Agent>();
+        private static Dictionary<long, ServerNode> agents = new Dictionary<long, ServerNode>();
         private static List<Process> processes = new List<Process>();
         private static List<WorkflowProcess> workflowProcesses = new List<WorkflowProcess>();
         private static List<Workflow> workflows = new List<Workflow>();
@@ -22,11 +22,11 @@ namespace @Model.Namespace
 
                    void AgentSelectCallback(System.Data.Common.DbDataReader rdr)
                    {
-                    var agent = new Agent();
+                    var agent = new ServerNode();
                     DBPersist.autoAssign(rdr, agent);
                     agents.Add(agent.id, agent);
                    }
-                   DBPersist.select(AgentSelectCallback, $"select * from core.agent where agent_status_id = {(long)Agent.AgentStatus.Online}");
+                   DBPersist.select(AgentSelectCallback, $"select * from core.server_node where server_node_type_id = {(long)ServerNode.ServerNodeType.Agent} and server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online}");
 
                    void ProcessSelectCallback(System.Data.Common.DbDataReader rdr)
                    {
@@ -44,7 +44,7 @@ namespace @Model.Namespace
                     }
                     DBPersist.select(WorkflowSelectCallback, "select * from core.workflow where name = 'test workflow'");
 
-                    foreach (Agent  agent in agents.Values)
+                    foreach (ServerNode  agent in agents.Values)
                     {
                         int seq = 10;
                         foreach (Process process in processes)
@@ -76,7 +76,7 @@ namespace @Model.Namespace
         public static async Task testExecWorkflowProcess()
         {
             Execution execution = new Execution();
-            Agent agent = null;
+            ServerNode agent = null;
             foreach (var workflowProcess in workflowProcesses)
             {
                 execution.workflow_process_id = workflowProcess.id;
@@ -90,7 +90,7 @@ namespace @Model.Namespace
 
                 agent = agents[workflowProcess.agent_id];
                 AgentClient agentClient = new AgentClient(agent);
-                await agentClient.StartAsync(execution.id);
+                await agentClient.ExecuteAsync(execution.id);
             }
         }
 

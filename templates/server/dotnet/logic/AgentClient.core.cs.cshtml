@@ -12,19 +12,19 @@ namespace @Model.Namespace
     public class AgentClient : IDisposable
     {
         private readonly HttpClient _httpClient;
-        private readonly Agent _agent;
+        private readonly ServerNode _serverNode;
 
-        public AgentClient(Agent agent)
+        public AgentClient(ServerNode serverNode)
         {
-            _agent = agent ?? throw new ArgumentNullException(nameof(agent));
-            if (string.IsNullOrEmpty(_agent.url))
+            _serverNode = serverNode ?? throw new ArgumentNullException(nameof(serverNode));
+            if (string.IsNullOrEmpty(_serverNode.url))
             {
-                throw new Exception("Agent URL is not set for agent " + _agent.id);
+                throw new Exception("Agent URL is not set for server node " + _serverNode.id);
             }
 
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri(agent.url),
+                BaseAddress = new Uri(_serverNode.url),
                 Timeout = TimeSpan.FromSeconds(30)
             };
         }
@@ -33,15 +33,6 @@ namespace @Model.Namespace
         // Process Management Operations
         // =====================================
 
-        /// <summary>
-        /// Start a new process
-        /// </summary>
-        public async Task<long> StartAsync(long executionId)
-        {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/start", executionId);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<long>();
-        }
 
         /// <summary>
         /// Stop a running process
