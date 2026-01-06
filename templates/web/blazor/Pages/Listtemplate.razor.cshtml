@@ -38,6 +38,7 @@ else
     protected  @(Model.DomainObj)View[]? @(Model.DomainVar)List;
     private HubConnection? _hubConnection;
     private string _domainObjectName = "@(Model.DomainObj)";
+    private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +54,7 @@ else
 
         // Initialize SignalR connection for real-time updates
         await InitializeSignalRConnection();
+        await InitEnumData();
     }
 
     private async Task InitializeSignalRConnection()
@@ -93,43 +95,84 @@ else
         }
     }
 
+    private async Task InitEnumData()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+        @{
+            foreach (var enumAttribute in Model.EnumAttributes)
+            {
+                var enumObjectDomainVar = enumAttribute.EnumAttribute.FkObject.ToLower();
+                var enumIdColumn = enumAttribute.idColumn;
+           
+            <text>
+                var enum@(enumIdColumn)Result = await remoteClient.GetFromJsonAsync&lt;List&lt;EnumHelper&gt;&gt;($"api/@((enumObjectDomainVar).ToLower())/enum");
+                if (enum@(enumIdColumn)Result != null)
+                {
+                    enumData["@(enumIdColumn)"] = enum@(enumIdColumn)Result.ToDictionary(e => e.id, e => e.rwkString);
+                }
+             </text>
+                
+            }
+        }
+    }
+
     private async Task HandlePropertyUpdate(PropertyUpdateMessage message)
     {
         try
         {
-            // Deserialize the updated object from JSON
-            var options = new JsonSerializerOptions
+            if (@(Model.DomainVar)List == null)
             {
-                PropertyNameCaseInsensitive = true
-            };
+                return;
+            }
+
+            // Find the item in the list by ID
+            var index = Array.FindIndex(@(Model.DomainVar)List, item => item.id == message.InstanceId);
             
-            var updatedObject = JsonSerializer.Deserialize<@(Model.DomainObj)View>(message.JsonData, options);
-            
-            if (updatedObject != null && @(Model.DomainVar)List != null)
+            if (index >= 0)
             {
-                // Find the item in the list by ID
-                var index = Array.FindIndex(@(Model.DomainVar)List, item => item.id == message.InstanceId);
-                
-                if (index >= 0)
-                {
-                    // Update existing item
+                // Fetch the updated item from the API to ensure we have the complete View object
+                // with all computed properties and enum display values properly populated
+                var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+                var updatedObject = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View>($"api/@(Model.DomainVar)/{message.InstanceId}");
+                if (updatedObject != null)
+                { 
+                @{
+                    foreach( var enumAttribute in Model.EnumAttributes)
+                    {
+                        <text>
+                        updatedObject.@(enumAttribute.nameColumn) = enumData["@(enumAttribute.idColumn)"][updatedObject.@(enumAttribute.idColumn)];
+                        </text>
+                    }
+                }
+
+               
+                    // Update existing item with the fetched object (enum display values are already set by the API)
                     @(Model.DomainVar)List[index] = updatedObject;
-                    Console.WriteLine($"ListTemplate: Updated {_domainObjectName}[{message.InstanceId}] in list");
+                    Console.WriteLine($"ListTemplate: Updated {_domainObjectName}[{message.InstanceId}] in list from API");
+                    
+                    // Notify UI to update
+                    await InvokeAsync(StateHasChanged);
                 }
-                else
-                {
-                    // Item not found, might be a new item - reload the list
-                    Console.WriteLine($"ListTemplate: {_domainObjectName}[{message.InstanceId}] not found in list, reloading...");
-                    await ReloadList();
-                }
-                
-                // Notify UI to update
-                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                // Item not found, might be a new item - reload the list
+                Console.WriteLine($"ListTemplate: {_domainObjectName}[{message.InstanceId}] not found in list, reloading...");
+                await ReloadList();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"ListTemplate: Error handling property update: {ex.Message}");
+            // On error, fall back to reloading the entire list
+            try
+            {
+                await ReloadList();
+            }
+            catch (Exception reloadEx)
+            {
+                Console.WriteLine($"ListTemplate: Error reloading list: {reloadEx.Message}");
+            }
         }
     }
 

@@ -61,7 +61,7 @@ public class CSVLoader
 
         }
 
-        metaModel.Process();
+        
         
     }
 
