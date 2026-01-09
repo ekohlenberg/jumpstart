@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using System.Reflection;
 using @Model.Namespace;
 
-namespace @(Model.Namespace)
+namespace @(Model.Namespace).core
 {
     /// <summary>
     /// Interface for Scheduler logic operations
     /// </summary>
-    public interface ISchedulerCoreLogic
+    public interface ISchedulerLogic
     {
         // Job Management Operations
        
@@ -35,7 +35,7 @@ namespace @(Model.Namespace)
       
     }
 
-    public partial class SchedulerCoreLogic : ISchedulerCoreLogic
+    public partial class SchedulerLogic : ISchedulerLogic
     {
         private static ServerNode _thisServerNode;
         private static readonly ConcurrentQueue<long> _workflowQueue = new ConcurrentQueue<long>();
@@ -45,14 +45,14 @@ namespace @(Model.Namespace)
         private static readonly object _dispatcherLock = new object();
 
 
-        public static new ISchedulerCoreLogic Create()
+        public static new ISchedulerLogic Create()
         {
-            var schedulerLogic = new SchedulerCoreLogic();
+            var schedulerLogic = new SchedulerLogic();
 
-            var proxy = DispatchProxy.Create<ISchedulerCoreLogic, Proxy<ISchedulerCoreLogic>>();
-            ((Proxy<ISchedulerCoreLogic>)proxy).Initialize();
-            ((Proxy<ISchedulerCoreLogic>)proxy).Target = schedulerLogic;
-            ((Proxy<ISchedulerCoreLogic>)proxy).DomainObj = "Scheduler";
+            var proxy = DispatchProxy.Create<ISchedulerLogic, Proxy<ISchedulerLogic>>();
+            ((Proxy<ISchedulerLogic>)proxy).Initialize();
+            ((Proxy<ISchedulerLogic>)proxy).Target = schedulerLogic;
+            ((Proxy<ISchedulerLogic>)proxy).DomainObj = "Scheduler";
 
             return proxy;
         }
@@ -143,9 +143,44 @@ namespace @(Model.Namespace)
         public long register(ServerNode serverNode)
         {
             Console.WriteLine($"SchedulerLogic: register - serverNode={serverNode}");
-            DBPersist.put(serverNode);
+            ServerNodeLogic.Create().put(serverNode);
             SetThisServerNode(serverNode);
             return serverNode.id;
+        }
+
+        /// <summary>
+        /// Sets the server node status to offline (typically called during shutdown or unregister)
+        /// </summary>
+        /// <param name="serverNodeId">The server node ID to update</param>
+        public static void SetStatusOffline(long serverNodeId)
+        {
+            try
+            {
+                if (serverNodeId <= 0)
+                {
+                    Logger.Warn($"SchedulerLogic.SetStatusOffline: Invalid server node ID: {serverNodeId}");
+                    return;
+                }
+
+                ServerNode serverNode = new ServerNode();
+                serverNode.id = serverNodeId;
+                DBPersist.get(serverNode, "default");
+                
+                if (serverNode != null && serverNode.id > 0)
+                {
+                    serverNode.server_node_status_id = (long)ServerNode.ServerNodeStatus.Offline;
+                    ServerNodeLogic.Create().update(serverNode.id, serverNode);
+                    Logger.Info($"SchedulerLogic.SetStatusOffline: Set server node {serverNodeId} status to Offline");
+                }
+                else
+                {
+                    Logger.Warn($"SchedulerLogic.SetStatusOffline: Server node {serverNodeId} not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"SchedulerLogic.SetStatusOffline: Error setting status to Offline for server node {serverNodeId}: {ex.Message}", ex);
+            }
         }
 
      
@@ -369,10 +404,10 @@ namespace @(Model.Namespace)
         // System Management Operations
         // =====================================
 
-        public void unregister(long workflowId)
+        public void unregister(long serverNodeId)
         {
-            Console.WriteLine($"SchedulerLogic: unregister - ID={workflowId}");
-            // TODO: Implement unregister logic
+            Logger.Debug($"SchedulerLogic: unregister - serverNodeId={serverNodeId}");
+            SetStatusOffline(serverNodeId);
         }
     }
 }
