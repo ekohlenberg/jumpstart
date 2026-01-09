@@ -230,8 +230,47 @@ namespace @(Model.Namespace).core
             if (thisServerNode != null)
             {
                 thisServerNode.server_node_status_id = (long)status;
-                DBPersist.update(thisServerNode, "default");
-                Console.WriteLine($"AgentLogic: Set server node status to {status}");
+                ServerNodeLogic.Create().update(thisServerNode.id, thisServerNode);
+                Logger.Debug($"AgentLogic.UpdateAgentStatus: Set server node status to {status}");
+            }
+            else
+            {
+                Logger.Error("AgentLogic.UpdateAgentStatus: Server node is null");
+            }
+        }
+
+        /// <summary>
+        /// Sets the server node status to offline (typically called during shutdown)
+        /// </summary>
+        /// <param name="serverNodeId">The server node ID to update</param>
+        public static void SetStatusOffline(long serverNodeId)
+        {
+            try
+            {
+                if (serverNodeId <= 0)
+                {
+                    Logger.Warn($"AgentLogic.SetStatusOffline: Invalid server node ID: {serverNodeId}");
+                    return;
+                }
+
+                ServerNode serverNode = new ServerNode();
+                serverNode.id = serverNodeId;
+                DBPersist.get(serverNode, "default");
+                
+                if (serverNode != null && serverNode.id > 0)
+                {
+                    serverNode.server_node_status_id = (long)ServerNode.ServerNodeStatus.Offline;
+                    ServerNodeLogic.Create().update(serverNode.id, serverNode);
+                    Logger.Info($"AgentLogic.SetStatusOffline: Set server node {serverNodeId} status to Offline");
+                }
+                else
+                {
+                    Logger.Warn($"AgentLogic.SetStatusOffline: Server node {serverNodeId} not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"AgentLogic.SetStatusOffline: Error setting status to Offline for server node {serverNodeId}: {ex.Message}", ex);
             }
         }
 
@@ -485,17 +524,16 @@ namespace @(Model.Namespace).core
         public long register(ServerNode registrationData)
         {
             Console.WriteLine($"AgentLogic: register");
-            DBPersist.put(registrationData);
+            ServerNodeLogic.Create().put(registrationData);
             SetThisServerNode(registrationData);
             return registrationData.id;
         }
 
         public void unregister(long serverNodeId)
         {
-            Console.WriteLine($"AgentLogic: unregister - serverNodeId={serverNodeId}");
-            // TODO: Implement unregister logic
-            // - Unregister from scheduler
-            // - Clean up resources
+            Logger.Debug($"AgentLogic: unregister - serverNodeId={serverNodeId}");
+            SetStatusOffline(serverNodeId);
+            
         }
 
         public object capabilities()

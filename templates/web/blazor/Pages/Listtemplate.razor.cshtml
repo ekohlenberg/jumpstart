@@ -1,14 +1,12 @@
 ﻿@@page "/@(Model.DomainVar)"
-@@using System.Net.Http;
-@@using Microsoft.Extensions.DependencyInjection;
-@@using System.Reflection;
+@@using System.Collections.Generic;
+@@using @(Model.Namespace).Components;
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
+@@implements IAsyncDisposable
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
 @using jumpstart;
-@@using System.Collections.Generic;
-@@using @(Model.Namespace).Components;
 
 
 <PageTitle>@(Model.Label)</PageTitle>
@@ -38,6 +36,9 @@ else
 
 @@code {
     protected  @(Model.DomainObj)View[]? @(Model.DomainVar)List;
+    private HubConnection? _hubConnection;
+    private string _domainObjectName = "@(Model.DomainObj)";
+    private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,6 +50,143 @@ else
         if (@(Model.DomainVar)List != null && @(Model.DomainVar)List.Length > 0)
         {
             Console.WriteLine($"ListTemplate: First item type: {@(Model.DomainVar)List[0].GetType().Name}");
+        }
+
+        // Initialize SignalR connection for real-time updates
+        await InitializeSignalRConnection();
+        await InitEnumData();
+    }
+
+    private async Task InitializeSignalRConnection()
+    {
+        try
+        {
+            // Create hub connection to the notification hub (API server)
+            var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+            var baseAddress = remoteClient.BaseAddress?.ToString() ?? "http://localhost:5200";
+            var hubUrl = $"{baseAddress.TrimEnd('/')}/notificationHub";
+            
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(hubUrl)
+                .Build();
+
+            // Handle PropertyUpdated messages
+            _hubConnection.On<PropertyUpdateMessage>("PropertyUpdated", async (message) =>
+            {
+                Console.WriteLine($"ListTemplate: Received update notification for {message.DomainObjectName}[{message.InstanceId}]");
+                
+                if (message.DomainObjectName == _domainObjectName)
+                {
+                    await HandlePropertyUpdate(message);
+                }
+            });
+
+            // Start the connection
+            await _hubConnection.StartAsync();
+            Console.WriteLine($"ListTemplate: SignalR connection started");
+
+            // Subscribe to domain object updates
+            await _hubConnection.InvokeAsync("SubscribeToDomainObject", _domainObjectName);
+            Console.WriteLine($"ListTemplate: Subscribed to {_domainObjectName} updates");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ListTemplate: Error initializing SignalR connection: {ex.Message}");
+        }
+    }
+
+    private async Task InitEnumData()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+        @{
+            foreach (var enumAttribute in Model.EnumAttributes)
+            {
+                var enumObjectDomainVar = enumAttribute.EnumAttribute.FkObject.ToLower();
+                var enumIdColumn = enumAttribute.idColumn;
+           
+            <text>
+                var enum@(enumIdColumn)Result = await remoteClient.GetFromJsonAsync&lt;List&lt;EnumHelper&gt;&gt;($"api/@((enumObjectDomainVar).ToLower())/enum");
+                if (enum@(enumIdColumn)Result != null)
+                {
+                    enumData["@(enumIdColumn)"] = enum@(enumIdColumn)Result.ToDictionary(e => e.id, e => e.rwkString);
+                }
+             </text>
+                
+            }
+        }
+    }
+
+    private async Task HandlePropertyUpdate(PropertyUpdateMessage message)
+    {
+        try
+        {
+            if (@(Model.DomainVar)List == null)
+            {
+                return;
+            }
+
+            // Find the item in the list by ID
+            var index = Array.FindIndex(@(Model.DomainVar)List, item => item.id == message.InstanceId);
+            
+            if (index >= 0)
+            {
+                // Fetch the updated item from the API to ensure we have the complete View object
+                // with all computed properties and enum display values properly populated
+                var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+                var updatedObject = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View>($"api/@(Model.DomainVar)/{message.InstanceId}");
+                if (updatedObject != null)
+                { 
+                @{
+                    foreach( var enumAttribute in Model.EnumAttributes)
+                    {
+                        <text>
+                        updatedObject.@(enumAttribute.nameColumn) = enumData["@(enumAttribute.idColumn)"][updatedObject.@(enumAttribute.idColumn)];
+                        </text>
+                    }
+                }
+
+               
+                    // Update existing item with the fetched object (enum display values are already set by the API)
+                    @(Model.DomainVar)List[index] = updatedObject;
+                    Console.WriteLine($"ListTemplate: Updated {_domainObjectName}[{message.InstanceId}] in list from API");
+                    
+                    // Notify UI to update
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            else
+            {
+                // Item not found, might be a new item - reload the list
+                Console.WriteLine($"ListTemplate: {_domainObjectName}[{message.InstanceId}] not found in list, reloading...");
+                await ReloadList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ListTemplate: Error handling property update: {ex.Message}");
+            // On error, fall back to reloading the entire list
+            try
+            {
+                await ReloadList();
+            }
+            catch (Exception reloadEx)
+            {
+                Console.WriteLine($"ListTemplate: Error reloading list: {reloadEx.Message}");
+            }
+        }
+    }
+
+    private async Task ReloadList()
+    {
+        try
+        {
+            var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+            @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View[]>("api/@(Model.DomainVar)");
+            Console.WriteLine($"ListTemplate: Reloaded {@(Model.DomainVar)List?.Length ?? 0} @(Model.DomainVar) records");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ListTemplate: Error reloading list: {ex.Message}");
         }
     }
 
@@ -63,4 +201,34 @@ else
         Navigation.NavigateTo($"edit-@(Model.DomainVar)/{@(Model.DomainVar).id}");
     }
 
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            try
+            {
+                // Unsubscribe from domain object updates
+                await _hubConnection.InvokeAsync("UnsubscribeFromDomainObject", _domainObjectName);
+                Console.WriteLine($"ListTemplate: Unsubscribed from {_domainObjectName} updates");
+                
+                // Stop the connection
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
+                Console.WriteLine($"ListTemplate: SignalR connection disposed");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ListTemplate: Error disposing SignalR connection: {ex.Message}");
+            }
+        }
+    }
+
+    // Message structure for property update notifications (matches server-side PropertyUpdateMessage)
+    private class PropertyUpdateMessage
+    {
+        public string DomainObjectName { get; set; } = string.Empty;
+        public long InstanceId { get; set; }
+        public string JsonData { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+    }
 }

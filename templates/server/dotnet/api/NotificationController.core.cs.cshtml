@@ -30,7 +30,7 @@ namespace @(Model.Namespace).Controllers
                     return BadRequest("Notification request cannot be null");
                 }
 
-                Logger.Debug($"NotificationController.Publish: DomainObjectName={request.DomainObjectName}, InstanceId={request.InstanceId}, PropertyName={request.PropertyName}");
+                Logger.Debug($"NotificationController.Publish: DomainObjectName={request.DomainObjectName}, InstanceId={request.InstanceId}");
 
                 if (string.IsNullOrWhiteSpace(request.DomainObjectName))
                 {
@@ -38,23 +38,22 @@ namespace @(Model.Namespace).Controllers
                     return BadRequest("DomainObjectName is required");
                 }
 
-                if (string.IsNullOrWhiteSpace(request.PropertyName))
+                if (string.IsNullOrWhiteSpace(request.JsonData))
                 {
-                    Logger.Debug("NotificationController.Publish: PropertyName is null or whitespace");
-                    return BadRequest("PropertyName is required");
+                    Logger.Debug("NotificationController.Publish: JsonData is null or whitespace");
+                    return BadRequest("JsonData is required");
                 }
 
-                Logger.Debug($"NotificationController.Publish: Publishing event for {request.DomainObjectName}[{request.InstanceId}].{request.PropertyName}");
+                Logger.Debug($"NotificationController.Publish: Publishing event for {request.DomainObjectName}[{request.InstanceId}]");
                 
                 await _eventAggregator.PublishAsync(
                     request.DomainObjectName,
                     request.InstanceId,
-                    request.PropertyName,
-                    request.Value,
-                    request.EnumId
+                    request.JsonData
                 );
 
-                Logger.Debug($"NotificationController.Publish: Successfully published notification for {request.DomainObjectName}[{request.InstanceId}].{request.PropertyName}");
+                Logger.Debug($"NotificationController.Publish: Successfully published notification for {request.DomainObjectName}[{request.InstanceId}]");
+                Logger.Debug($"JsonData={request.JsonData}");
                 return Ok();
             }
             catch (Exception ex)
@@ -66,7 +65,7 @@ namespace @(Model.Namespace).Controllers
     }
 
     /// <summary>
-    /// Request model for publishing property updates
+    /// Request model for publishing object updates
     /// </summary>
     public class NotificationRequest
     {
@@ -81,19 +80,9 @@ namespace @(Model.Namespace).Controllers
         public long InstanceId { get; set; }
 
         /// <summary>
-        /// Property name that was updated (e.g., "exec_status_id", "agent_status_id")
+        /// JSON string representation of the entire updated BaseObject
         /// </summary>
-        public string PropertyName { get; set; }
-
-        /// <summary>
-        /// The new value of the property
-        /// </summary>
-        public object Value { get; set; }
-
-        /// <summary>
-        /// Optional enum ID for enumerated values
-        /// </summary>
-        public long? EnumId { get; set; }
+        public string JsonData { get; set; }
     }
 }
 

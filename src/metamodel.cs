@@ -203,6 +203,17 @@ namespace jumpstart {
         }
     }
 
+public class EnumRelationship 
+{   public string idColumn {get;set;}
+    public string nameColumn {get;set;}
+    public MetaAttribute EnumAttribute {get;set;}
+    public EnumRelationship(string idColumn, string nameColumn, MetaAttribute enumAttribute)
+    {
+        this.idColumn = idColumn;
+        this.nameColumn = nameColumn;
+        this.EnumAttribute = enumAttribute;
+    }
+}   
     public class MetaBaseElement
     {
         public string Name{get;set;}
@@ -293,6 +304,7 @@ namespace jumpstart {
         
         public List<MetaAttribute> Attributes { get; private set; } = new();
         public List<ChildRelationship> Children { get; private set; } = new();
+        public List<EnumRelationship> EnumAttributes { get; private set; } = new();
 
         public List<MetaAttribute> UserAttributes {
             get 
@@ -376,6 +388,49 @@ namespace jumpstart {
                         if (!alreadyExists)
                         {
                             parentObject.Children.Add(new ChildRelationship(role, label, this));
+                        }
+                    }
+                }
+            }
+        }
+
+        public void ProcessEnumObjects(IEnumerable<MetaObject> allObjects)
+        {
+            foreach (var attribute in Attributes)
+            {
+               
+
+                // Check if this attribute is an enum foreign key
+                if (!string.IsNullOrEmpty(attribute.FkType) && 
+                    attribute.FkType.ToLower() == "enum" && 
+                    !string.IsNullOrEmpty(attribute.FkTable) )
+                {
+                    
+                    // Find the enum object by table name
+                    var enumObject = allObjects.FirstOrDefault(mo => mo.TableName == attribute.FkTable);
+
+                    
+                    if (enumObject != null)
+                    {
+                        // Get alias from attribute name (remove "_id" suffix if present)
+                        string aliasBase = attribute.Name;
+                        if (aliasBase.EndsWith("_id"))
+                        {
+                            aliasBase = aliasBase.Substring(0, aliasBase.Length - 3);
+                        }
+                        string alias = aliasBase;
+                        
+                        // Find the first RWK attribute from the enum object to construct the name column
+                        var rwkAttribute = enumObject.Attributes.FirstOrDefault(attr => attr.RWK == "1");
+                        
+                        if (rwkAttribute != null)
+                        {
+                            // Construct name column following the same pattern as fkAttrName: alias + "_" + rwkAttribute.Name
+                            string nameColumn = alias + "_" + rwkAttribute.Name;
+                            if (!nameColumn.ToLower().EndsWith("_id") )
+                            {
+                                EnumAttributes.Add(new EnumRelationship(attribute.Name, nameColumn, attribute));
+                            }
                         }
                     }
                 }
@@ -481,6 +536,7 @@ namespace jumpstart {
            foreach(var obj in Objects)
            {
                 obj.ProcessChildren(Objects);
+                obj.ProcessEnumObjects(Objects);
            }
            
         }   

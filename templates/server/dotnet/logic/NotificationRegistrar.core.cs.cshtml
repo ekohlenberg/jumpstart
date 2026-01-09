@@ -86,12 +86,11 @@ namespace @(Model.Namespace)
                 return; // No instance ID available
             }
 
-            // For now, we'll publish a notification for the method being called
-            // In a more sophisticated implementation, we could track property changes
-            // by comparing before/after states or using property change events
+            // Get JSON representation of the entire BaseObject using ToString()
+            string jsonData = baseObject.ToString();
             
-            // Publish notification to all API servers
-            await PublishNotificationToAll(domainObjectName, instanceId, method.Name, result: baseObject);
+            // Publish notification to all API servers with the entire object as JSON
+            await PublishNotificationToAll(domainObjectName, instanceId, jsonData);
         }
 
         /// <summary>
@@ -204,8 +203,7 @@ namespace @(Model.Namespace)
         /// <summary>
         /// Publishes a notification to all API servers
         /// </summary>
-        private static async Task PublishNotificationToAll(string domainObjectName, long instanceId, 
-            string propertyName, object value = null, long? enumId = null, object result = null)
+        private static async Task PublishNotificationToAll(string domainObjectName, long instanceId, string jsonData)
         {
             // Get all API server URLs
             List<string> apiServerUrls = await GetApiServerUrls();
@@ -221,9 +219,7 @@ namespace @(Model.Namespace)
             {
                 DomainObjectName = domainObjectName,
                 InstanceId = instanceId,
-                PropertyName = propertyName,
-                Value = value ?? result,
-                EnumId = enumId
+                JsonData = jsonData
             };
 
             // Serialize to JSON once (reuse for all servers)
@@ -233,7 +229,7 @@ namespace @(Model.Namespace)
             List<Task> publishTasks = new List<Task>();
             foreach (string apiServerUrl in apiServerUrls)
             {
-                publishTasks.Add(PublishNotification(apiServerUrl, json, domainObjectName, instanceId, propertyName));
+                publishTasks.Add(PublishNotification(apiServerUrl, json, domainObjectName, instanceId));
             }
 
             // Wait for all publish operations to complete (don't throw on individual failures)
@@ -244,7 +240,7 @@ namespace @(Model.Namespace)
         /// Publishes a notification to a single API server
         /// </summary>
         private static async Task PublishNotification(string apiServerUrl, string json, 
-            string domainObjectName, long instanceId, string propertyName)
+            string domainObjectName, long instanceId)
         {
             try
             {
@@ -262,7 +258,7 @@ namespace @(Model.Namespace)
                 }
                 else
                 {
-                    Logger.Debug($"NotificationRegistrar: Published notification for {domainObjectName}[{instanceId}].{propertyName} to {apiServerUrl}");
+                    Logger.Debug($"NotificationRegistrar: Published notification for {domainObjectName}[{instanceId}] to {apiServerUrl}");
                 }
             }
             catch (Exception ex)

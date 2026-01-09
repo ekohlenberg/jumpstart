@@ -59,6 +59,8 @@ namespace jumpstart {
                 GlobalCSVLoader gloader = new GlobalCSVLoader();
                 gloader.Load( "global.csv", metaModel);
 
+                metaModel.Process();
+                
                 // Instantiate the code generator
                 Generator g = new Generator(metaModel);
 
