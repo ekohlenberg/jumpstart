@@ -1,5 +1,134 @@
+@using System.Linq;
+@using System.Collections.Generic;
+@using jumpstart;
 
-create table @Model.SchemaName.@Model.TableName (
+@{
+    var metaObject = (MetaObject)Model;
+    
+    if (metaObject.IsView)
+    {
+        // Generate CREATE VIEW for view objects
+        // ProcessView() has already synthesized MetaAttributes and built ViewRelationships
+        
+        if (metaObject.ViewRelationships.Count == 0)
+        {
+            // Views must have at least one foreign key - skip generation if none found
+        }
+        else
+        {
+            var selectColumns = new List<string>();
+            var joinClauses = new List<string>();
+            
+            // Get the first ViewRelationship as anchor table
+            var firstRelationship = metaObject.ViewRelationships[0];
+            var firstAlias = firstRelationship.TableAlias;
+            
+            // Add id column from first FK table (pseudo column)
+            selectColumns.Add(firstAlias + ".id AS id");
+            
+            // Work queue for processing ViewRelationships (avoids recursion)
+            var workQueue = new List<ViewRelationship>();
+            
+            // Add all ViewRelationships to work queue
+            foreach(var relationship in metaObject.ViewRelationships)
+            {
+                workQueue.Add(relationship);
+            }
+            
+            // Process work queue to add RWK attributes to SELECT clause
+            var workIndex = 0;
+            while (workIndex < workQueue.Count)
+            {
+                var relationship = workQueue[workIndex];
+                workIndex++;
+                
+                // Add RWK attributes from this relationship
+                foreach(var attr in relationship.RwkAttributes)
+                {
+                    // Extract original column name: synthesized name is "columnPrefix_originalName"
+                    // So originalName = synthesizedName.Substring(columnPrefix.Length + 1)
+                    var originalColumnName = attr.Name.Substring(relationship.ColumnPrefix.Length + 1);
+                    var selectExpr = attr.TableAlias + "." + originalColumnName + " AS " + attr.Name;
+                    selectColumns.Add(selectExpr);
+                }
+                
+                // Add nested relationships to work queue
+                foreach(var nested in relationship.NestedRelationships)
+                {
+                    workQueue.Add(nested);
+                }
+            }
+            
+            // Build JOIN clauses for nested relationships of first FK
+            workQueue.Clear();
+            workIndex = 0;
+            workQueue.Add(firstRelationship);
+            
+            while (workIndex < workQueue.Count)
+            {
+                var relationship = workQueue[workIndex];
+                workIndex++;
+                var parentAlias = relationship == firstRelationship ? firstAlias : relationship.TableAlias;
+                
+                // Build JOIN for nested relationships
+                foreach(var nested in relationship.NestedRelationships)
+                {
+                    // Join condition: parentAlias.FkAttribute.Name = nested.TableAlias.id
+                    var joinCondition = parentAlias + "." + nested.FkAttribute.Name + " = " + nested.TableAlias + ".id";
+                    joinClauses.Add("LEFT OUTER JOIN " + nested.FkObject.SchemaName + "." + nested.FkObject.TableName + " " + nested.TableAlias + " ON " + joinCondition);
+                    
+                    // Add to work queue for processing
+                    workQueue.Add(nested);
+                }
+            }
+            
+            // Process remaining FK tables with LEFT OUTER JOIN
+            for (int i = 1; i < metaObject.ViewRelationships.Count; i++)
+            {
+                var relationship = metaObject.ViewRelationships[i];
+                
+                // Build JOIN clause - join on: firstAlias.{fkAttributeName} = alias.id
+                var joinCondition = firstAlias + "." + relationship.FkAttribute.Name + " = " + relationship.TableAlias + ".id";
+                joinClauses.Add("LEFT OUTER JOIN " + relationship.FkObject.SchemaName + "." + relationship.FkObject.TableName + " " + relationship.TableAlias + " ON " + joinCondition);
+                
+                // Build JOIN clauses for nested relationships using work queue
+                workQueue.Clear();
+                workIndex = 0;
+                workQueue.Add(relationship);
+                
+                while (workIndex < workQueue.Count)
+                {
+                    var rel = workQueue[workIndex];
+                    workIndex++;
+                    var parentAlias = rel == relationship ? relationship.TableAlias : rel.TableAlias;
+                    
+                    // Build JOIN for nested relationships
+                    foreach(var nested in rel.NestedRelationships)
+                    {
+                        // Join condition: parentAlias.FkAttribute.Name = nested.TableAlias.id
+                        var nestedJoinCondition = parentAlias + "." + nested.FkAttribute.Name + " = " + nested.TableAlias + ".id";
+                        joinClauses.Add("LEFT OUTER JOIN " + nested.FkObject.SchemaName + "." + nested.FkObject.TableName + " " + nested.TableAlias + " ON " + nestedJoinCondition);
+                        
+                        // Add to work queue for processing
+                        workQueue.Add(nested);
+                    }
+                }
+            }
+            
+            // Generate CREATE VIEW statement
+            <text>
+CREATE VIEW @(metaObject.SchemaName).@(metaObject.TableName) AS
+SELECT 
+    @(string.Join(",\n    ", selectColumns))
+FROM @(firstRelationship.FkObject.SchemaName).@(firstRelationship.FkObject.TableName) @(firstAlias)@(joinClauses.Count > 0 ? "\n" + string.Join("\n", joinClauses) : "");
+</text>
+        }
+    }
+    else
+    {
+        // Generate CREATE TABLE for regular tables
+        <text>
+CREATE TABLE @(Model.SchemaName).@(Model.TableName) (
 @for (int i = 0; i < Model.Attributes.Count; i++) {
     var column = Model.Attributes[i];
     var pk = "";
@@ -36,3 +165,6 @@ column.Name + " " + column.SqlDataType + len + " " + pk + nullable + comma + @"
         
     }
 );
+</text>
+    }
+}

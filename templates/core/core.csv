@@ -55,18 +55,18 @@
 ,core,schedule_workflow,,,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,schedule_workflow,,,schedule_id,,map,schedule,,2,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,schedule_workflow,,,workflow_id,,map,workflow,,3,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow,Workflow,System,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,parent_workflow_id,,parent,workflow,,2,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,name,,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,workflow,,,description,,,,,4,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,workflow_process,,,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow_process,Workflow,System,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow_process,,,workflow_id,,map,workflow,,2,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow_process,,,process_id,,map,process,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow_process,,,agent_id,,map,server,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow_process,,,seq,Sequence,,,,4,NULL,0,YES,INTEGER,int,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow_process,,,on_failure_action_id,,enum,on_failure,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,server_node,Server Node,System,id,Server Node ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,server_node,,,server_node_type_id,Server Node Type,enum,server_node_type,,2,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,server_node,,,server_node_type_id,Server Node Type,enum,server_node_type,,2,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,server_node,,,hostname,Hostname,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,server_node,,,ip_address,Address,,,,4,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,server_node,,,port,Port,,,,5,NULL,1,YES,INTEGER,int,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
@@ -102,3 +102,7 @@
 ,core,script_type,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,server_node_type,Server Node Type,,id,Server Node Type ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,server_node_type,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,workflow_view,Running,System,id,ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow_view,,,workflow_id,Workflow,parent,workflow,,2,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow_view,,,workflow_process_id,Process,parent,workflow_process,,3,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow_view,,,execution_id,Execution,parent,execution,,4,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
