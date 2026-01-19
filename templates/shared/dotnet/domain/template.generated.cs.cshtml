@@ -1,4 +1,6 @@
 @{
+    
+    
     string namespaceName = @Model.Namespace;
     string className = @Model.DomainObj; 
     string schemaName = @Model.SchemaName; 
@@ -42,17 +44,13 @@ namespace @namespaceName
             rwk.Add("@attr.Name");
             </text>
                 }
-    
-                
             }
 
             @foreach (var attr in Model.Attributes)
-            {
-                
+            {        
             <text>
             _defaults["@attr.Name"] = default(@attr.DotNetType);
-            </text>
-                
+            </text>  
             }
         }
 
@@ -150,6 +148,9 @@ namespace @namespaceName
         }
     }
 
+    @if (!Model.IsView)
+    {
+        <text>
     // View class that extends the base domain object with RWK columns from foreign key joins
     public class @(Model.DomainObj)View : @(Model.DomainObj)
     {
@@ -252,5 +253,7 @@ namespace @namespaceName
                 }
             }
         }
+    }
+        </text>
     }
 }

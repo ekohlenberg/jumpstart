@@ -13,14 +13,14 @@ namespace @(Model.Namespace).core
     public interface IAgentLogic
     {
         // Process Management Operations
-        void stop(long executionId);
-        void kill(long executionId);
-        void restart(long executionId);
-        void pause(long executionId);
-        void resume(long executionId);
+        void stop(long workflowId);
+        void kill(long workflowId);
+        void restart(long workflowId);
+        void pause(long workflowId);
+        void resume(long workflowId);
 
         // Status & Reporting Operations
-        object status(long executionId);
+        object status(long workflowId);
         void heartbeat(object heartbeatData);
         void report(object reportData);
         void log(object logData);
@@ -30,19 +30,19 @@ namespace @(Model.Namespace).core
         long register(ServerNode registrationData);
         void unregister(long serverNodeId);
         object capabilities();
-        void allocate(long executionId);
-        void release(long executionId);
+        void allocate(long workflowId);
+        void release(long workflowId);
 
         // Job Execution Operations
-        void execute(long executionId);
-        object validate(long executionId);
-        void prepare(long executionId);
-        void cleanup(long executionId);
-        void retry(long executionId);
+        void execute(long workflowId);
+        object validate(long workflowId);
+        void prepare(long workflowId);
+        void cleanup(long workflowId);
+        void retry(long workflowId);
 
         // Communication Operations
         object ping();
-        void acknowledge(long executionId);
+        void acknowledge(long workflowId);
         void notify(object notificationData);
         object request(object requestData);
 
@@ -59,11 +59,11 @@ namespace @(Model.Namespace).core
 
         // Standard Operations
         List<long> select();
-        object get(long executionId);
+        object get(long workflowId);
         object getAgentInfo();
-        long insert(object executionDefinition);
-        void update(long executionId, object executionData);
-        void delete(long executionId);
+        long insert(object workflowDefinition);
+        void update(long workflowId, object workflowData);
+        void delete(long workflowId);
 
 
     }
@@ -71,8 +71,8 @@ namespace @(Model.Namespace).core
     public partial class AgentLogic : IAgentLogic
     {
         
-        // Singleton thread-safe queue for executing programs
-        private static readonly ConcurrentQueue<long> _executionQueue = new ConcurrentQueue<long>();
+        // Singleton thread-safe queue for executing workflows
+        private static readonly ConcurrentQueue<long> _workflowQueue = new ConcurrentQueue<long>();
         private static readonly object _queueLock = new object();
         private static volatile bool _isProcessing = false;
         
@@ -102,13 +102,13 @@ namespace @(Model.Namespace).core
         // =====================================
 
         /// <summary>
-        /// Adds an execution ID to the queue for processing
+        /// Adds a workflow ID to the queue for processing
         /// </summary>
-        /// <param name="executionId">The execution ID to queue</param>
-        public static void EnqueueExecution(long executionId)
+        /// <param name="workflowId">The workflow ID to queue</param>
+        public static void EnqueueWorkflow(long workflowId)
         {
-            _executionQueue.Enqueue(executionId);
-            Console.WriteLine($"AgentLogic: Enqueued execution {executionId}");
+            _workflowQueue.Enqueue(workflowId);
+            Console.WriteLine($"AgentLogic: Enqueued workflow {workflowId}");
         }
 
         /// <summary>
@@ -117,11 +117,11 @@ namespace @(Model.Namespace).core
         /// <returns>Number of items in the queue</returns>
         public static int GetQueueSize()
         {
-            return _executionQueue.Count;
+            return _workflowQueue.Count;
         }
 
         /// <summary>
-        /// Processes all queued executions
+        /// Processes all queued workflows
         /// </summary>
         public static async Task ProcessQueueAsync()
         {
@@ -137,18 +137,18 @@ namespace @(Model.Namespace).core
 
             try
             {
-                Console.WriteLine($"AgentLogic: Starting to process {_executionQueue.Count} executions");
+                Console.WriteLine($"AgentLogic: Starting to process {_workflowQueue.Count} workflows");
                 
-                while (_executionQueue.TryDequeue(out long executionId))
+                while (_workflowQueue.TryDequeue(out long workflowId))
                 {
                     try
                     {
-                        AgentLogic.ExecuteScript(executionId);
-                        Console.WriteLine($"AgentLogic: Successfully processed execution {executionId}");
+                        AgentLogic.ExecuteWorkflow(workflowId);
+                        Console.WriteLine($"AgentLogic: Successfully processed workflow {workflowId}");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"AgentLogic: Error processing execution {executionId}: {ex.Message}");
+                        Console.WriteLine($"AgentLogic: Error processing workflow {workflowId}: {ex.Message}");
                     }
                 }
             }
@@ -162,11 +162,11 @@ namespace @(Model.Namespace).core
         }
 
         /// <summary>
-        /// Clears all queued executions
+        /// Clears all queued workflows
         /// </summary>
         public static void ClearQueue()
         {
-            while (_executionQueue.TryDequeue(out _)) { }
+            while (_workflowQueue.TryDequeue(out _)) { }
             Console.WriteLine("AgentLogic: Queue cleared");
         }
 
@@ -326,7 +326,7 @@ namespace @(Model.Namespace).core
         }
 
         /// <summary>
-        /// Thread callback that continuously processes the execution queue
+        /// Thread callback that continuously processes the workflow queue
         /// </summary>
         private static void ExecutionThreadCallback()
         {
@@ -336,9 +336,9 @@ namespace @(Model.Namespace).core
             {
                 try
                 {
-                    if (_executionQueue.TryDequeue(out long executionId))
+                    if (_workflowQueue.TryDequeue(out long workflowId))
                     {
-                        Console.WriteLine($"AgentLogic: Processing execution {executionId}");
+                        Console.WriteLine($"AgentLogic: Processing workflow {workflowId}");
                         
                         // Set agent status to Busy before execution
                         UpdateAgentStatus(ServerNode.ServerNodeStatus.Busy);
@@ -346,9 +346,9 @@ namespace @(Model.Namespace).core
                         try
                         {
                             // Create a new instance and execute the script (blocking)
-                            AgentLogic.ExecuteScript(executionId);
+                            AgentLogic.ExecuteWorkflow(workflowId);
                             
-                            Console.WriteLine($"AgentLogic: Completed execution {executionId}");
+                            Console.WriteLine($"AgentLogic: Completed workflow {workflowId}");
                         }
                         finally
                         {
@@ -365,7 +365,7 @@ namespace @(Model.Namespace).core
                 catch (Exception ex)
                 {
                     Console.WriteLine($"AgentLogic: Error in execution thread: {ex.Message}");
-                    // Continue processing other executions even if one fails
+                    // Continue processing other workflows even if one fails
                 }
             }
             
@@ -376,101 +376,104 @@ namespace @(Model.Namespace).core
         // Process Management Operations
         // =====================================
 
-        protected static void ExecuteScript(long executionId)
+        protected static void ExecuteWorkflow(long workflowId)
         {
-            Execution execution = new Execution();
-            execution.id = executionId;
-            DBPersist.get(execution, "default");
-            if (execution.exec_status_id != (long)Execution.ExecStatus.Dispatched)
+            IWorkflowLogic workflowLogic = WorkflowLogic.Create();
+            Workflow workflow = workflowLogic.get(workflowId);
+            if (workflow == null || workflow.id == 0)
             {
-                throw new Exception("Execution is not dispatched");
+                throw new Exception("Workflow not found");
             }
 
-            execution.exec_status_id = (long)Execution.ExecStatus.Running;
-            DBPersist.update(execution, "default");
-            bool success = false;
-            try
+            if (workflow.workflow_type_id != (long)Workflow.WorkflowType.Process)
             {
-                WorkflowProcess workflowProcess = new WorkflowProcess();
-                workflowProcess.id = execution.workflow_process_id;
-                DBPersist.get(workflowProcess, "default");
-                
-                Process process = new Process();
-                process.id = workflowProcess.process_id;
-                DBPersist.get(process, "default");
-                
-                Script script = new Script();
-                script.id = process.script_id;
-                DBPersist.get(script, "default");
-                
-                ScriptHost scriptHost = new ScriptHost();
+                throw new Exception("Workflow is not a process");
+            }
 
-                ScriptContext scriptContext = new ScriptContext(execution);
-                scriptContext.Initialize();
-                // Use InvokeSync instead of Invoke to ensure exceptions are properly caught
-                scriptHost.InvokeSync<ScriptContext>(scriptContext, script);
-                
-                // Check for script-level exceptions or error codes
-                if (scriptContext.ScriptException != null)
-                {
-                    throw new Exception($"Script execution failed: {scriptContext.ScriptException.Message}", scriptContext.ScriptException);
-                }
-                if (scriptContext.retCode != null && scriptContext.retCode != 0)
-                {
-                    throw new Exception($"Script returned error code: {scriptContext.retCode}");
-                }
-                
-                success = true;
-            }
-            catch (Exception ex)
+            IProcessLogic processLogic = ProcessLogic.Create();
+            Process process = processLogic.get(workflow.process_id);
+            if (process == null || process.id == 0)
             {
-                success = false;
-                execution.exec_status_id = (long)Execution.ExecStatus.Failed;
-                execution.end_time = DateTime.UtcNow;
-                execution.stderr = ex.Message + Environment.NewLine + ex.StackTrace;
-                DBPersist.update(execution, "default");
-              
+                throw new Exception("Process not found");
             }
-            finally 
+
+            if (process.script_id == 0)
             {
-                if (success)
-                {
-                    execution.exec_status_id = (long)Execution.ExecStatus.Completed;
-                    execution.end_time = DateTime.UtcNow;
-                    execution.stdout = "Execution completed successfully";
-                    execution.stderr = "";
-                    DBPersist.update(execution, "default");
-                }
-            }            
+                throw new Exception("Process has no script");
+            }
+
+            workflow.exec_status_id = (long)Execution.ExecStatus.Executing;
+            workflowLogic.update(workflow.id, workflow);
+
+            IScriptLogic scriptLogic = ScriptLogic.Create();
+            Script script = scriptLogic.get(process.script_id);
+            if (script == null || script.id == 0)
+            {
+                workflow.exec_status_id = (long)Execution.ExecStatus.Failed;
+                workflowLogic.update(workflow.id, workflow);
+                throw new Exception("Script not found");
+            }
+            
+            ScriptHost scriptHost = new ScriptHost();
+
+            ScriptContext scriptContext = new ScriptContext(workflow);
+            scriptContext.Initialize();
+            // Use InvokeSync instead of Invoke to ensure exceptions are properly caught
+            scriptHost.InvokeSync<ScriptContext>(scriptContext, script);
+            
+            
+            Exception scriptException = null;
+            Execution.ExecStatus execStatus = Execution.ExecStatus.Completed;
+
+            // Check for script-level exceptions or error codes
+            if (scriptContext.ScriptException != null)
+            {
+                scriptException = new Exception($"Script execution failed: {scriptContext.ScriptException.Message}", scriptContext.ScriptException);
+                execStatus = Execution.ExecStatus.Failed;
+            }
+            if (scriptContext.retCode != null && scriptContext.retCode != 0)
+            {
+                scriptException = new Exception($"Script returned error code: {scriptContext.retCode}");
+                execStatus = Execution.ExecStatus.Failed;
+            }
+
+            workflow.exec_status_id = (long)execStatus;
+            workflowLogic.update(workflow.id, workflow);
+
+            if(scriptException != null)
+            {
+                throw scriptException;
+            }
         }
+    
 
-        public void stop(long executionId)
+        public void stop(long workflowId)
         {
-            Logger.Info($"AgentLogic: stop - executionId={executionId}");
+            Logger.Info($"AgentLogic: stop - workflowId={workflowId}");
             // TODO: Implement stop logic
         }
 
-        public void kill(long executionId)
+        public void kill(long workflowId)
         {
-            Logger.Info($"AgentLogic: kill - executionId={executionId}");
+            Logger.Info($"AgentLogic: kill - workflowId={workflowId}");
             // TODO: Implement kill logic
         }
 
-        public void restart(long executionId)
+        public void restart(long workflowId)
         {
-            Logger.Info($"AgentLogic: restart - executionId={executionId}");
+            Logger.Info($"AgentLogic: restart - workflowId={workflowId}");
             // TODO: Implement restart logic
         }
 
-        public void pause(long executionId)
+        public void pause(long workflowId)
         {
-            Logger.Info($"AgentLogic: pause - executionId={executionId}");
+            Logger.Info($"AgentLogic: pause - workflowId={workflowId}");
             // TODO: Implement pause logic
         }
 
-        public void resume(long executionId)
+        public void resume(long workflowId)
         {
-            Logger.Info($"AgentLogic: resume - executionId={executionId}");
+            Logger.Info($"AgentLogic: resume - workflowId={workflowId}");
             // TODO: Implement resume logic
         }
 
@@ -478,11 +481,11 @@ namespace @(Model.Namespace).core
         // Status & Reporting Operations
         // =====================================
 
-        public object status(long executionId)
+        public object status(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: status - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: status - workflowId={workflowId}");
             // TODO: Implement status logic
-            return new { executionId, status = "unknown" };
+            return new { workflowId, status = "unknown" };
         }
 
         public void heartbeat(object heartbeatData)
@@ -544,62 +547,62 @@ namespace @(Model.Namespace).core
             return new { cpu = "unknown", memory = "unknown", capabilities = new List<string>() };
         }
 
-        public void allocate(long executionId)
+        public void allocate(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: allocate - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: allocate - workflowId={workflowId}");
             // TODO: Implement allocate logic
-            // - Allocate resources for execution
+            // - Allocate resources for workflow
         }
 
-        public void release(long executionId)
+        public void release(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: release - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: release - workflowId={workflowId}");
             // TODO: Implement release logic
-            // - Release resources after execution
+            // - Release resources after workflow
         }
 
         // =====================================
         // Job Execution Operations
         // =====================================
 
-        public void execute(long executionId)
+        public void execute(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: execute - executionId={executionId}");
-            EnqueueExecution(executionId);
+            Console.WriteLine($"AgentLogic: execute - workflowId={workflowId}");
+            EnqueueWorkflow(workflowId);
             StartExecutionThread();
         }
 
-        public object validate(long executionId)
+        public object validate(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: validate - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: validate - workflowId={workflowId}");
             // TODO: Implement validate logic
-            // - Validate execution requirements
+            // - Validate workflow requirements
             // - Check resource availability
             return new { valid = true };
         }
 
-        public void prepare(long executionId)
+        public void prepare(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: prepare - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: prepare - workflowId={workflowId}");
             // TODO: Implement prepare logic
-            // - Prepare environment for execution
+            // - Prepare environment for workflow
             // - Download dependencies
             // - Set up working directory
         }
 
-        public void cleanup(long executionId)
+        public void cleanup(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: cleanup - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: cleanup - workflowId={workflowId}");
             // TODO: Implement cleanup logic
             // - Clean up temporary files
             // - Release resources
         }
 
-        public void retry(long executionId)
+        public void retry(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: retry - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: retry - workflowId={workflowId}");
             // TODO: Implement retry logic
-            // - Retry failed execution
+            // - Retry failed workflow
         }
 
         // =====================================
@@ -613,11 +616,11 @@ namespace @(Model.Namespace).core
             return new { status = "alive", timestamp = DateTime.UtcNow };
         }
 
-        public void acknowledge(long executionId)
+        public void acknowledge(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: acknowledge - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: acknowledge - workflowId={workflowId}");
             // TODO: Implement acknowledge logic
-            // - Acknowledge receipt of execution request
+            // - Acknowledge receipt of workflow request
         }
 
         public void notify(object notificationData)
@@ -710,18 +713,18 @@ namespace @(Model.Namespace).core
 
         public List<long> select()
         {
-            Console.WriteLine("AgentLogic: select all executions");
+            Console.WriteLine("AgentLogic: select all workflows");
             // TODO: Implement select logic
-            // - Get all execution IDs for this agent
+            // - Get all workflow IDs for this agent
             return new List<long>();
         }
 
-        public object get(long executionId)
+        public object get(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: get - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: get - workflowId={workflowId}");
             // TODO: Implement get logic
-            // - Get execution details
-            return new { executionId, status = "unknown" };
+            // - Get workflow details
+            return new { workflowId, status = "unknown" };
         }
 
         public object getAgentInfo()
@@ -737,27 +740,27 @@ namespace @(Model.Namespace).core
             };
         }
 
-        public long insert(object executionDefinition)
+        public long insert(object workflowDefinition)
         {
-            Console.WriteLine($"AgentLogic: insert - create execution");
+            Console.WriteLine($"AgentLogic: insert - create workflow");
             // TODO: Implement insert logic
-            // - Create new execution record
-            // - Return execution ID
+            // - Create new workflow record
+            // - Return workflow ID
             return 0;
         }
 
-        public void update(long executionId, object executionData)
+        public void update(long workflowId, object workflowData)
         {
-            Console.WriteLine($"AgentLogic: update - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: update - workflowId={workflowId}");
             // TODO: Implement update logic
-            // - Update execution details
+            // - Update workflow details
         }
 
-        public void delete(long executionId)
+        public void delete(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: delete - executionId={executionId}");
+            Console.WriteLine($"AgentLogic: delete - workflowId={workflowId}");
             // TODO: Implement delete logic
-            // - Delete execution record
+            // - Delete workflow record
         }
     }
 }

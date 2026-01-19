@@ -12,20 +12,24 @@ insert into core.server_node_status (id, name) values (2, 'Online');
 insert into core.server_node_status (id, name) values (3, 'Busy');
 insert into core.server_node_status (id, name) values (4, 'Offline');
 
-
+-- Insert server node type values
+insert into core.workflow_type (id, name) values (1, 'Workflow');
+insert into core.workflow_type (id, name) values (2, 'Process');
 
 -- Insert on_failure action values
 insert into core.on_failure (id, action) values (1, 'Stop');
 insert into core.on_failure (id, action) values (2, 'Continue');
 
-insert into core.exec_status (id, name) values (1, 'Dispatched');
-insert into core.exec_status (id, name) values (2, 'Executing');
-insert into core.exec_status (id, name) values (3, 'Completed');
-insert into core.exec_status (id, name) values (4, 'Failed');
-insert into core.exec_status (id, name) values (5, 'Cancelled');	
-insert into core.exec_status (id, name) values (6, 'Timeout');
-insert into core.exec_status (id, name) values (7, 'Interrupted');
-insert into core.exec_status (id, name) values (8, 'Suspended');
+
+insert into core.exec_status (id, name) values (1, '');
+insert into core.exec_status (id, name) values (2, 'Dispatched');
+insert into core.exec_status (id, name) values (3, 'Executing');
+insert into core.exec_status (id, name) values (4, 'Completed');
+insert into core.exec_status (id, name) values (5, 'Failed');
+insert into core.exec_status (id, name) values (6, 'Cancelled');	
+insert into core.exec_status (id, name) values (7, 'Timeout');
+insert into core.exec_status (id, name) values (8, 'Interrupted');
+insert into core.exec_status (id, name) values (9, 'Suspended');
 
 -- Insert script type values
 insert into core.script_type (id, name) values (1, 'CSharp');

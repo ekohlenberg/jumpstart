@@ -2,7 +2,7 @@
     string namespaceName = @Model.Namespace; 
     string domainObj = @Model.DomainObj; 
     string domainVar = @Model.DomainVar; 
-    string domainObjView = domainObj+"View"; 
+    string domainObjView = @Model.DomainObjView; 
 }
 
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +40,9 @@ namespace @(namespaceName).Controllers
             return @(domainVar);
         }
 
+        @if (!Model.IsView)
+        {
+            <text>
         // GET api/<@(domainObj)Controller>/enum
         [HttpGet("enum")]
         public IEnumerable<EnumHelper> GetEnum()
@@ -50,7 +53,12 @@ namespace @(namespaceName).Controllers
 
             return @(domainVar)s.Select(@(domainVar) => new EnumHelper(@(domainVar).id, @(domainVar).getRwkString()));
         }
+            </text>
+        }
 
+        @if (!Model.IsView)
+        {
+            <text>
         // POST api/<@(domainObj)Controller>
         [HttpPost]
         public @(domainObj)View Post([FromBody] @(domainObj)View @(domainVar)View)
@@ -95,7 +103,12 @@ namespace @(namespaceName).Controllers
         {
             @(domainObj)Logic.Create().delete(id);
         }
+            </text>
+        }
 
+        @if (!Model.IsView)
+        {
+            <text>
         // GET api/<@(domainObj)Controller>/5/history
         [HttpGet("{id}/history")]
         public IEnumerable<@(domainObj)History> GetHistory(long id)
@@ -106,8 +119,11 @@ namespace @(namespaceName).Controllers
 
             return historyList;
         }
+            </text>
+        }
 
-@{
+@if (!Model.IsView)
+{
     // Get all child relationships
     var children = Model.Children;
     

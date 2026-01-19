@@ -87,9 +87,19 @@
             {
                 var relationship = metaObject.ViewRelationships[i];
                 
-                // Build JOIN clause - join on: firstAlias.{fkAttributeName} = alias.id
-                var joinCondition = firstAlias + "." + relationship.FkAttribute.Name + " = " + relationship.TableAlias + ".id";
-                joinClauses.Add("LEFT OUTER JOIN " + relationship.FkObject.SchemaName + "." + relationship.FkObject.TableName + " " + relationship.TableAlias + " ON " + joinCondition);
+                // Find the FK column in the joined table that references the anchor table
+                // The FK column in the joined table follows the pattern: <anchorTableName>_id
+                var anchorTableName = firstRelationship.FkObject.TableName;
+                var fkColumnInJoinedTable = relationship.FkObject.Attributes.FirstOrDefault(attr => 
+                    !string.IsNullOrEmpty(attr.FkTable) && attr.FkTable == anchorTableName);
+                
+                if (fkColumnInJoinedTable != null)
+                {
+                    // Build JOIN clause - join on: joinedTableAlias.{fkColumn} = anchorTableAlias.id
+                    // The FK column exists in the joined table and references the anchor table
+                    var joinCondition = relationship.TableAlias + "." + fkColumnInJoinedTable.Name + " = " + firstAlias + ".id";
+                    joinClauses.Add("LEFT OUTER JOIN " + relationship.FkObject.SchemaName + "." + relationship.FkObject.TableName + " " + relationship.TableAlias + " ON " + joinCondition);
+                }
                 
                 // Build JOIN clauses for nested relationships using work queue
                 workQueue.Clear();

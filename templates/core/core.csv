@@ -36,35 +36,35 @@
 ,sec,op_role_member,Operation Role Members,,id,Member ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,sec,op_role_member,,,principal_id,Username,map,principal,,2,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,sec,op_role_member,,,op_role_id,Role,map,op_role,,3,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,execution,Execution Log,System,id,Execution ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,execution,,,token,Token,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,execution,,,workflow_process_id,Process,rwk,process,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,execution,,,start_time,Start Time,,,,4,NULL,1,NO,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,execution,,,end_time,End Time,,,,5,NULL,1,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,execution,,,exec_status_id,Status,,,,6,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,execution,,,stdout,Stdout,,,,7,NULL,0,YES,VARCHAR,nvarchar,4096,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,execution,,,stderr,Stderr,,,,8,NULL,0,YES,VARCHAR,nvarchar,4096,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,exec_log,Execution Log,System,id,Execution ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,exec_log,,,token,Token,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,exec_log,,,workflow_id,Process,parent,workflow,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,exec_log,,,start_time,Start Time,,,,4,NULL,1,NO,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,exec_log,,,end_time,End Time,,,,5,NULL,1,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,exec_log,,,exec_status_id,Status,,,,6,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,exec_log,,,stdout,Stdout,,,,7,NULL,0,YES,VARCHAR,nvarchar,4096,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,exec_log,,,stderr,Stderr,,,,8,NULL,0,YES,VARCHAR,nvarchar,4096,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,process,Process,System,id,Process ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,process,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,process,,,script_id,Script,rwk,script,,3,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,process,,,script_id,Script,,script,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,schedule,Schedule,System,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,schedule,,,name,Hostname,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,schedule,,,cron_expression,,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,schedule,,,next_run_time,,,,,3,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,schedule,,,last_run_time,,,,,4,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,schedule,,,status,,,,,5,NULL,0,YES,VARCHAR,nvarchar,50,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,schedule_workflow,,,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,schedule_workflow,,,schedule_id,,map,schedule,,2,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,schedule_workflow,,,workflow_id,,map,workflow,,3,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow,,,parent_workflow_id,,parent,workflow,,2,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow,,,name,,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,workflow,,,description,,,,,4,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,workflow_process,Workflow,System,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_process,,,workflow_id,,map,workflow,,2,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_process,,,process_id,,map,process,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_process,,,agent_id,,map,server,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_process,,,seq,Sequence,,,,4,NULL,0,YES,INTEGER,int,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_process,,,on_failure_action_id,,enum,on_failure,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,workflow_type_id,Wrofklow Type,enum,server_node_type,,2,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,parent_id,Parent,parent,workflow,,2,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,name,Name,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
+,core,workflow,,,process_id,Process,enum,process,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,exec_status_id,Status,enum,exec_status,,13,NULL,0,YES,BIGINT,bigint,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,start_time,Start Time,,,,4,NULL,1,NO,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,end_time,End Time,,,,5,NULL,1,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,schedule_id,Schedule,enum,schedule,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,server_node_id,Agent,enum,server_node,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,seq,Sequence,,,,4,NULL,0,YES,INTEGER,int,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,on_failure_action_id,,enum,on_failure,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,server_node,Server Node,System,id,Server Node ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,server_node,,,server_node_type_id,Server Node Type,enum,server_node_type,,2,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,server_node,,,hostname,Hostname,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
@@ -102,7 +102,5 @@
 ,core,script_type,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
 ,core,server_node_type,Server Node Type,,id,Server Node Type ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,server_node_type,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,workflow_view,Running,System,id,ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_view,,,workflow_id,Workflow,parent,workflow,,2,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_view,,,workflow_process_id,Process,parent,workflow_process,,3,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow_view,,,execution_id,Execution,parent,execution,,4,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow_type,Workflow Type,,id,Workflow Type ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow_type,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL

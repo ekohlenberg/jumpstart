@@ -47,7 +47,10 @@ public class GlobalCSVLoader
 
                         foreach(MetaObject metaObject in metaModel.Objects)
                         {
-                            AddAttributes(metaObject, a);
+                            if (!metaObject.IsView)
+                            {
+                                AddAttributes(metaObject, a);
+                            }
                         }
 
                         AddGlobalAttribute( metaModel, a);

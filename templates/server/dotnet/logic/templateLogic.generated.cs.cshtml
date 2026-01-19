@@ -59,12 +59,16 @@ namespace @namespaceName
             return @(domainVar)s;
         }
 
+        @if (!Model.IsView)
+        {
+            <text>
          public  List<@(domainObj)History> history(long id)
         {
             List<@(domainObj)History> @(domainVar)History = DBPersist.ExecuteQueryByName<@(domainObj)History>("@(schemaName).@(tableName)-get-history", new BaseObject() { { "id", id } });
 
             return @(domainVar)History;
         }
+        
 
         public List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new()
         {
@@ -75,7 +79,8 @@ namespace @namespaceName
 
             return children;
         }
-
+    </text>
+        }
         public  @(domainObj) get(long id)
         {
             Logger.Debug($"Processing @(domainObj)Logic get ID={id}");
@@ -86,6 +91,9 @@ namespace @namespaceName
             return @(domainVar);
         }
 
+        @if (!Model.IsView)
+        {
+            <text>
         public  void insert(@(domainObj) @(domainVar))
         {
             Logger.Debug($"Processing @(domainObj)Logic insert: {@(domainVar)}");
@@ -117,6 +125,8 @@ namespace @namespaceName
             @(domainObj) @(domainVar) = get(id);
             @(domainVar).is_active = 0;
             DBPersist.update(@(domainVar));
+        }
+            </text>
         }
     }
 }
