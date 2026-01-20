@@ -153,8 +153,8 @@ WHERE s.name LIKE 'test%';
 
 -- Insert workflow record for test workflow
 INSERT INTO core.workflow(
-	id, parent_id, name, description, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (nextval('core.workflow_identity'), null, 'test workflow', 'test workflow', 1, current_user, current_timestamp, current_user, 1);
+	id, parent_id, name, is_active, created_by, last_updated, last_updated_by, version)
+	VALUES (nextval('core.workflow_identity'), null, 'test workflow', 1, current_user, current_timestamp, current_user, 1);
 
 
 

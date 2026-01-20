@@ -50,13 +50,13 @@ namespace @Model.Namespace
 
                     foreach (ServerNode  agent in agents.Values)
                     {
-                        agents.Add(agent.id, agent);
                         int seq = 10;
                         foreach (Process process in processes)
                         {
                             Script script = ScriptLogic.Create().get(process.script_id);
                             var workflow = new Workflow();
                             workflow.name = $"test {script.name} {seq}";
+                            workflow.workflow_type_id = (long)Workflow.WorkflowType.Process;
                             workflow.is_active = 1;
                             workflow.server_node_id = agent.id;
                             workflow.process_id = process.id;
@@ -92,6 +92,7 @@ namespace @Model.Namespace
             {
                 try
                 {
+                    if (workflow.workflow_type_id != (long)Workflow.WorkflowType.Process) continue;
                     agent = agents[workflow.server_node_id];    
                     
                     AgentClient agentClient = new AgentClient(agent);

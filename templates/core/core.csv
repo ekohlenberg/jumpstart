@@ -53,15 +53,15 @@
 ,core,schedule,,,next_run_time,,,,,3,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,schedule,,,last_run_time,,,,,4,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,schedule,,,status,,,,,5,NULL,0,YES,VARCHAR,nvarchar,50,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,workflow,,,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow,,,workflow_type_id,Wrofklow Type,enum,server_node_type,,2,NULL,1,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,Workflow,System,id,,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,workflow_type_id,Workflow Type,enum,workflow_type,,2,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,parent_id,Parent,parent,workflow,,2,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,name,Name,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL
-,core,workflow,,,process_id,Process,enum,process,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,process_id,Process,enum,process,,3,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,exec_status_id,Status,enum,exec_status,,13,NULL,0,YES,BIGINT,bigint,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow,,,start_time,Start Time,,,,4,NULL,1,NO,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow,,,end_time,End Time,,,,5,NULL,1,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
-,core,workflow,,,schedule_id,Schedule,enum,schedule,,3,NULL,1,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,start_time,Start Time,,,,4,NULL,0,NO,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,end_time,End Time,,,,5,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+,core,workflow,,,schedule_id,Schedule,enum,schedule,,3,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,server_node_id,Agent,enum,server_node,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,seq,Sequence,,,,4,NULL,0,YES,INTEGER,int,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
 ,core,workflow,,,on_failure_action_id,,enum,on_failure,,5,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
