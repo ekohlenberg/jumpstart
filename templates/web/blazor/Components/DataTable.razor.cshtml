@@ -26,25 +26,41 @@
             {
                 @@foreach (var item in Data)
                 {
-                    <tr>
-                        @@foreach (var property in GetDisplayProperties())
-                        {
-                            <td>@@GetPropertyValueSafely(item, property)</td>
-                        }
-                        @@if (ShowActions)
-                        {
-                            <td>
-                                @@if (OnEdit.HasDelegate)
-                                {
-                                    <button class="btn btn-primary btn-sm" @@onclick="@@(() => OnEdit.InvokeAsync(item))">Edit</button>
-                                }
-                                @@if (OnDelete.HasDelegate)
-                                {
-                                    <button class="btn btn-danger btn-sm ms-1" @@onclick="@@(() => OnDelete.InvokeAsync(item))">Delete</button>
-                                }
-                            </td>
-                        }
-                    </tr>
+                    @@if (item == null)
+                    {
+                        <tr>
+                            @@foreach (var property in GetDisplayProperties())
+                            {
+                                <td></td>
+                            }
+                            @@if (ShowActions)
+                            {
+                                <td></td>
+                            }
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            @@foreach (var property in GetDisplayProperties())
+                            {
+                                <td>@@GetPropertyValueSafely(item, property)</td>
+                            }
+                            @@if (ShowActions)
+                            {
+                                <td>
+                                    @@if (OnEdit.HasDelegate)
+                                    {
+                                        <button class="btn btn-primary btn-sm" @@onclick="@@(() => OnEdit.InvokeAsync(item))">Edit</button>
+                                    }
+                                    @@if (OnDelete.HasDelegate)
+                                    {
+                                        <button class="btn btn-danger btn-sm ms-1" @@onclick="@@(() => OnDelete.InvokeAsync(item))">Delete</button>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
                 }
             }
             else if (Data == null)
@@ -138,13 +154,32 @@
     {
         try
         {
+            if (obj == null)
+            {
+                return string.Empty;
+            }
+            
             var value = property.GetValue(obj);
-            return value?.ToString() ?? string.Empty;
+            
+            if (value == null)
+            {
+                return string.Empty;
+            }
+            
+            var stringValue = value.ToString();
+            
+            // Check if ToString() returns "{}" (empty object representation)
+            if (stringValue == "{}")
+            {
+                return string.Empty;
+            }
+            
+            return stringValue;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"DataTable: Error getting property {property.Name}: {ex.Message}");
-            return $"[Error: {ex.Message}]";
+            return string.Empty;
         }
     }
 }
