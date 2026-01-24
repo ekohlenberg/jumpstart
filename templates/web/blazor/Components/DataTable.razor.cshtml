@@ -166,6 +166,14 @@
                 return string.Empty;
             }
             
+            // Check for DateTime.MinValue (null date representation)
+            if (value is DateTime dateValue && dateValue == DateTime.MinValue)
+            {
+                return string.Empty;
+            }
+            
+            
+            
             var stringValue = value.ToString();
             
             // Check if ToString() returns "{}" (empty object representation)

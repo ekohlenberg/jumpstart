@@ -84,7 +84,7 @@ dotnet server templates-test-api,model,server/dotnet/test-api/Program.cs.cshtml,
 dotnet server templates-test-api,model,server/dotnet/test-api/makefile.cshtml,./test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/appsettings.json.cshtml,./test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/test.csproj.cshtml,./test/test-api,TRUE
-dotnet server templates-test-agent,model,server/dotnet/test-agent/Program.cs.cshtml,./test/test-agent,FALSE
+dotnet server templates-test-agent,model,server/dotnet/test-agent/Program.cs.cshtml,./test/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/template.test.generated.cs.cshtml,./test/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/makefile.cshtml,./test/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/appsettings.json.cshtml,./test/test-agent,TRUE

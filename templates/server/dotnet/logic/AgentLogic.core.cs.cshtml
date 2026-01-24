@@ -402,42 +402,51 @@ namespace @(Model.Namespace).core
                 throw new Exception("Process has no script");
             }
 
-            workflow.exec_status_id = (long)Execution.ExecStatus.Executing;
+            Execution.ExecStatus execStatus = Execution.ExecStatus.Executing;
+            workflow.exec_status_id = (long)execStatus;
+            workflow.last_start_time = DateTime.UtcNow;
+            workflow.last_end_time = DateTime.MinValue;
             workflowLogic.update(workflow.id, workflow);
 
             IScriptLogic scriptLogic = ScriptLogic.Create();
             Script script = scriptLogic.get(process.script_id);
+            Exception scriptException = null;
             if (script == null || script.id == 0)
             {
                 workflow.exec_status_id = (long)Execution.ExecStatus.Failed;
                 workflowLogic.update(workflow.id, workflow);
                 throw new Exception("Script not found");
             }
-            
-            ScriptHost scriptHost = new ScriptHost();
-
-            ScriptContext scriptContext = new ScriptContext(workflow);
-            scriptContext.Initialize();
-            // Use InvokeSync instead of Invoke to ensure exceptions are properly caught
-            scriptHost.InvokeSync<ScriptContext>(scriptContext, script);
-            
-            
-            Exception scriptException = null;
-            Execution.ExecStatus execStatus = Execution.ExecStatus.Completed;
-
-            // Check for script-level exceptions or error codes
-            if (scriptContext.ScriptException != null)
+            try 
             {
-                scriptException = new Exception($"Script execution failed: {scriptContext.ScriptException.Message}", scriptContext.ScriptException);
+                ScriptHost scriptHost = new ScriptHost();
+
+                ScriptContext scriptContext = new ScriptContext(workflow);
+                scriptContext.Initialize();
+                // Use InvokeSync instead of Invoke to ensure exceptions are properly caught
+                scriptHost.InvokeSync<ScriptContext>(scriptContext, script);
+                
+                execStatus = Execution.ExecStatus.Completed;
+
+                // Check for script-level exceptions or error codes
+                if (scriptContext.ScriptException != null)
+                {
+                    scriptException = new Exception($"Script execution failed: {scriptContext.ScriptException.Message}", scriptContext.ScriptException);
+                    execStatus = Execution.ExecStatus.Failed;
+                }
+                if (scriptContext.retCode != null && scriptContext.retCode != 0)
+                {
+                    scriptException = new Exception($"Script returned error code: {scriptContext.retCode}");
+                    execStatus = Execution.ExecStatus.Failed;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"AgentLogic: Error in ExecuteWorkflow: {ex.Message}", ex);
                 execStatus = Execution.ExecStatus.Failed;
             }
-            if (scriptContext.retCode != null && scriptContext.retCode != 0)
-            {
-                scriptException = new Exception($"Script returned error code: {scriptContext.retCode}");
-                execStatus = Execution.ExecStatus.Failed;
-            }
-
             workflow.exec_status_id = (long)execStatus;
+            workflow.last_end_time = DateTime.UtcNow;
             workflowLogic.update(workflow.id, workflow);
 
             if(scriptException != null)
