@@ -140,6 +140,7 @@ else
                     foreach( var enumAttribute in Model.EnumAttributes)
                     {
                         <text>
+                        if (enumData.ContainsKey("@(enumAttribute.idColumn)") && enumData["@(enumAttribute.idColumn)"].ContainsKey(updatedObject.@(enumAttribute.idColumn)))
                         updatedObject.@(enumAttribute.nameColumn) = enumData["@(enumAttribute.idColumn)"][updatedObject.@(enumAttribute.idColumn)];
                         </text>
                     }
