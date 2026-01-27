@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace @Model.Namespace
@@ -10,9 +11,15 @@ namespace @Model.Namespace
         {
             try
             {
-
+                if (args.Any(a => a == "--init"))
+                {
+                    await WorkflowTest.testInsertWorkflows();
+                }
+                else
+                {
+                    await WorkflowTest.selectTestWorkflows();
+                }
                 
-                await WorkflowTest.testInsertWorkflows();
                 await WorkflowTest.testExecWorkflows();
             }
             catch( Exception ex)

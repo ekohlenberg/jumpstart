@@ -329,6 +329,14 @@ namespace @Model.Name
             select(sc, sql, connectionName);
         }
 
+        static public T get<T>(long id, string connectionName = "default") where T : BaseObject, new()
+        {
+            T t = new T();
+            t["id"] = id;
+            get(t, connectionName);
+            return t;
+        }
+
         static public void put(BaseObject baseObject, string rwkCol, string connectionName = "default")
         {
             IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);

@@ -85,6 +85,32 @@ namespace @Model.Namespace
             }
         }
 
+        public static async Task selectTestWorkflows()
+        {
+            try
+            {
+                agents.Clear();
+                Console.WriteLine("WorkflowProcessTest: Selecting workflows...");
+                workflows = DBPersist.select<Workflow>($"select * from core.workflow where name like 'test%' and workflow_type_id = {(long)Workflow.WorkflowType.Process} order by seq");
+                Console.WriteLine($"WorkflowProcessTest: Selected {workflows.Count} workflows");
+
+                foreach (var workflow in workflows)
+                {
+                    if (!agents.ContainsKey(workflow.server_node_id))
+                    {
+                        ServerNode agent = DBPersist.get<ServerNode>(workflow.server_node_id);
+                        agents.Add(agent.id, agent);
+                    }
+                }
+            }
+        
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error testing select workflows: {ex.Message}");
+                throw;
+            }
+        }
+    
         public static async Task testExecWorkflows()
         {
             ServerNode agent = null;
