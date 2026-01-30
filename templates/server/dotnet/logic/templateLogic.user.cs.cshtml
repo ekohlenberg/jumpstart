@@ -19,17 +19,16 @@ namespace @Model.Namespace
         List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new();
         @(domainObj) get(long id);
        
-        @if (!Model.IsView)
-        {
-            <text>
+
         List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new();
         List<@(domainObj)History> history(long id);
         void insert(@(domainObj) @(domainVar));
         void update(long id, @(domainObj) @(domainVar));
         void put(@(domainObj) @(domainVar));
         void delete( long id );
-            </text>
-        }
+        @(domainObj)View view(long id);
+        
+        
    
         // Add user-defined methods here
     }

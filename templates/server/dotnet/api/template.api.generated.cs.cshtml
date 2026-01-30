@@ -18,7 +18,10 @@ namespace @(namespaceName).Controllers
     [ApiController]
     public partial class @(domainObj)Controller : ControllerBase
     {
-        // GET: api/<@(domainObj)Controller>
+        /// <summary>
+        /// Retrieves all domain objects as a list of view objects.
+        /// </summary>
+        /// <returns>An enumerable collection of <see cref="@(domainObjView)"/> representing all domain objects.</returns>
         [HttpGet]
         public IEnumerable<@(domainObjView)> Get()
         {
@@ -29,7 +32,11 @@ namespace @(namespaceName).Controllers
             return @(domainVar)s;
         }
 
-        // GET api/<@(domainObj)Controller>/5
+        /// <summary>
+        /// Retrieves a single domain object by id.
+        /// </summary>
+        /// <param name="id">The id of the domain object to retrieve.</param>
+        /// <returns>The <see cref="@(domainObj)"/> instance with the specified id, or null if not found.</returns>
         [HttpGet("{id}")]
         public @(domainObj) Get(long id)
         {
@@ -40,10 +47,27 @@ namespace @(namespaceName).Controllers
             return @(domainVar);
         }
 
-        @if (!Model.IsView)
+        /// <summary>
+        /// Retrieves a view representation of a domain object by id.
+        /// </summary>
+        /// <param name="id">The id of the domain object to retrieve the view for.</param>
+        /// <returns>A <see cref="@(domainObj)View"/> instance, or null if not found.</returns>
+        [HttpGet("view/{id}")]
+        public @(domainObj)View View(long id)
         {
-            <text>
-        // GET api/<@(domainObj)Controller>/enum
+            //Console.WriteLine($"Processing @(domainObj) View ID={id}");
+
+            @(domainObj)View @(domainVar)View = @(domainObj)Logic.Create().view(id);
+
+            return @(domainVar)View;
+        }
+
+     
+
+        /// <summary>
+        /// Retrieves all domain objects as enum helper objects containing id and display string.
+        /// </summary>
+        /// <returns>An enumerable collection of <see cref="EnumHelper"/> objects for enumeration purposes.</returns>
         [HttpGet("enum")]
         public IEnumerable<EnumHelper> GetEnum()
         {
@@ -53,13 +77,14 @@ namespace @(namespaceName).Controllers
 
             return @(domainVar)s.Select(@(domainVar) => new EnumHelper(@(domainVar).id, @(domainVar).getRwkString()));
         }
-            </text>
-        }
+       
 
-        @if (!Model.IsView)
-        {
-            <text>
-        // POST api/<@(domainObj)Controller>
+      
+        /// <summary>
+        /// Creates a new domain object from the provided view object.
+        /// </summary>
+        /// <param name="@(domainVar)View">The view object containing the data for the new domain object.</param>
+        /// <returns>The created <see cref="@(domainObj)View"/> with the assigned id.</returns>
         [HttpPost]
         public @(domainObj)View Post([FromBody] @(domainObj)View @(domainVar)View)
         {
@@ -79,7 +104,12 @@ namespace @(namespaceName).Controllers
             return @(domainVar)View;
         }
 
-        // PUT api/<@(domainObj)Controller>/5
+        /// <summary>
+        /// Updates an existing domain object by id.
+        /// </summary>
+        /// <param name="id">The id of the domain object to update.</param>
+        /// <param name="@(domainVar)View">The view object containing the updated data.</param>
+        /// <returns>The updated <see cref="@(domainObj)View"/>.</returns>
         [HttpPut("{id}")]
         public @(domainObj)View Put(long id, [FromBody] @(domainObj)View @(domainVar)View)
         {
@@ -97,19 +127,21 @@ namespace @(namespaceName).Controllers
             return @(domainVar)View;
         }
 
-        // DELETE api/<@(domainObj)Controller>/5
+        /// <summary>
+        /// Deletes a domain object by id (soft delete).
+        /// </summary>
+        /// <param name="id">The id of the domain object to delete.</param>
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
             @(domainObj)Logic.Create().delete(id);
         }
-            </text>
-        }
-
-        @if (!Model.IsView)
-        {
-            <text>
-        // GET api/<@(domainObj)Controller>/5/history
+         
+        /// <summary>
+        /// Retrieves the history records for a domain object by id.
+        /// </summary>
+        /// <param name="id">The id of the domain object to retrieve history for.</param>
+        /// <returns>An enumerable collection of <see cref="@(domainObj)History"/> entries.</returns>
         [HttpGet("{id}/history")]
         public IEnumerable<@(domainObj)History> GetHistory(long id)
         {
@@ -119,11 +151,9 @@ namespace @(namespaceName).Controllers
 
             return historyList;
         }
-            </text>
-        }
+            
 
-@if (!Model.IsView)
-{
+@{
     // Get all child relationships
     var children = Model.Children;
     
@@ -138,8 +168,8 @@ namespace @(namespaceName).Controllers
             var childDomainVar = childObject.DomainVar;
             var childDomainObjView = childDomainObj + "View";
             
-            <text>
-        // GET api/<@(domainObj)Controller>/5/@(childDomainVar)_@(childRole)
+        <text>
+       // Retrieves child records for a given domain object id and child role.
         [HttpGet("{id}/@(childDomainVar)_@(childRole)")]
         public IEnumerable<@(childDomainObjView)> Get@(childDomainVar)_@(childRole)(long id)
         {
@@ -149,12 +179,11 @@ namespace @(namespaceName).Controllers
 
             return @(childDomainVar)s;
         }
-
-            </text>
+        </text>
         }
+       
     }
+       
 }
-
-        
     }
 }
