@@ -35,7 +35,7 @@ namespace @(Model.Namespace).core
       
     }
 
-    public partial class SchedulerLogic : ISchedulerLogic
+    public partial class SchedulerLogic : BaseLogic, ISchedulerLogic
     {
         private static ServerNode _thisServerNode;
         private static readonly ConcurrentQueue<long> _workflowQueue = new ConcurrentQueue<long>();
@@ -53,7 +53,7 @@ namespace @(Model.Namespace).core
             ((Proxy<ISchedulerLogic>)proxy).Initialize();
             ((Proxy<ISchedulerLogic>)proxy).Target = schedulerLogic;
             ((Proxy<ISchedulerLogic>)proxy).DomainObj = "Scheduler";
-
+            
             return proxy;
         }
 

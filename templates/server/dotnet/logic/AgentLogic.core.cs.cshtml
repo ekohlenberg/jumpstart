@@ -378,7 +378,8 @@ namespace @(Model.Namespace).core
 
         protected static void ExecuteWorkflow(long workflowId)
         {
-            IWorkflowLogic workflowLogic = WorkflowLogic.Create();
+            IWorkflowLogic workflowLogic = WorkflowCoreLogic.Create();
+
             Workflow workflow = workflowLogic.get(workflowId);
             if (workflow == null || workflow.id == 0)
             {

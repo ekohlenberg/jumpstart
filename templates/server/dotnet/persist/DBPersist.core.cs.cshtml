@@ -173,6 +173,18 @@ namespace @Model.Name
             audit(baseObject, connectionName);
         }
 
+        static public void update( BaseObject baseObject, BaseObject filter, string connectionName = "default")
+        {
+            baseObject["version"] = version(baseObject, connectionName);
+            baseObject["last_updated"] = DateTime.UtcNow;
+            baseObject["last_updated_by"] = Environment.UserName;
+
+            string sql = updateSql(baseObject, filter, connectionName);
+            execCmd(sql, connectionName);
+
+            audit(baseObject, connectionName);
+        }
+
         public static void execCmd( BaseObject parameters, string sqlTemplate, string connectionName = "default")
         {
             string sql = substituteTemplate(parameters, sqlTemplate);
@@ -270,7 +282,17 @@ namespace @Model.Name
             return (sql.ToString(), parameters);
         }
 
-        static string updateSql( BaseObject baseObject, string connectionName = "default")
+    static string updateSql( BaseObject baseObject, string connectionName = "default")
+        {
+            BaseObject filter = new BaseObject();
+            filter["id"] = baseObject["id"];
+
+            string sql = updateSql(baseObject, filter, connectionName);
+            
+            return sql.ToString();
+        }
+
+     static string updateSql( BaseObject baseObject, BaseObject filter, string connectionName = "default")
         {
             IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
             
@@ -279,31 +301,31 @@ namespace @Model.Name
             StringBuilder where = new StringBuilder();
 
             exprSql(baseObject, baseObject.Keys, ", ", expressions, connectionName);
-
-            where.Append(" where id=");
-            where.Append(provider.FormatValue(baseObject["id"]));
+            exprSql(filter, filter.Keys, " and ", where, connectionName);
 
             sql.Append(expressions);
+            sql.Append(" where ");
             sql.Append(where);
             sql.Append(";");
 
             return sql.ToString();
         }
 
-        private static void exprSql(BaseObject baseObject, IEnumerable<string> attrList, string sepToken, StringBuilder expressions, string connectionName = "default")
+        private static void exprSql(BaseObject baseObject, IEnumerable<string> attrList, string sepToken, StringBuilder expressions,  string connectionName = "default")
         {
             IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            bool first = true;
             
             foreach (string k in attrList)
             {
-                if (k != "id")
-                {
+                //if (k != "id" )
+                //{
                     object v = baseObject[k];
                     if (v == null) continue;
                     if (v == DBNull.Value) continue;
                     if (string.IsNullOrEmpty(v.ToString())) continue;
 
-                    if (expressions.Length > 0)
+                    if (!first)
                     {
                         expressions.Append(sepToken);
                     }
@@ -313,7 +335,8 @@ namespace @Model.Name
                     expr += provider.FormatValue(v);
 
                     expressions.Append(expr);
-                }
+                    first = false;
+                //}
             }
         }
 

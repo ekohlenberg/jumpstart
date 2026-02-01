@@ -11,32 +11,15 @@ using System;
 
 namespace @Model.Namespace
 {
-    public interface I@(Model.DomainObj)Logic
-    {  
-        // Generated methods
-        List<@(domainObj)> select();
-        List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new();
-        List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new();
-        @(domainObj) get(long id);
-       
-
-        List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new();
-        List<@(domainObj)History> history(long id);
-        void insert(@(domainObj) @(domainVar));
-        void update(long id, @(domainObj) @(domainVar));
-        void put(@(domainObj) @(domainVar));
-        void delete( long id );
-        @(domainObj)View view(long id);
-        
-        
    
-        // Add user-defined methods here
+    public interface I@(Model.DomainObj)UserLogic
+    {
+        // User-defined methods
     }
 
-
-    public partial class @(Model.DomainObj)Logic
+    public class @(Model.DomainObj)UserLogic : @(Model.DomainObj)Logic, I@(Model.DomainObj)UserLogic
     {
-        protected @(Model.DomainObj)Logic()
+        protected @(Model.DomainObj)UserLogic()
         {
            
         }
