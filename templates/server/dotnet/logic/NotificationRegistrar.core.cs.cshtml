@@ -28,6 +28,7 @@ namespace @(Model.Namespace)
         {
             ProxyAction.AddAfterAction((domainObj, method, result, args) =>
             {
+                
                 // Fire-and-forget async operation to avoid blocking
                 _ = Task.Run(async () =>
                 {
@@ -67,6 +68,21 @@ namespace @(Model.Namespace)
         /// </summary>
         private static async Task PublishPropertyUpdates(string domainObj, BaseObject baseObject, MethodInfo method, object[] args)
         {
+            // Only handle insert/update operations. If this callback is for another method,
+            // skip publishing notifications.
+            if (method == null)
+            {
+                return;
+            }
+
+            string methodName = method.Name ?? string.Empty;
+            if (!methodName.StartsWith("Insert", StringComparison.OrdinalIgnoreCase)
+                && !methodName.StartsWith("Update", StringComparison.OrdinalIgnoreCase))
+            {
+                // Not an insert or update method - nothing to publish
+                return;
+            }
+
             // Use the domainObj parameter passed from the callback, or fallback to extraction
             string domainObjectName = domainObj;
             if (string.IsNullOrEmpty(domainObjectName))

@@ -39,11 +39,6 @@ else
     private HubConnection? _hubConnection;
     private string _domainObjectName = "@(Model.DomainObj)";
     private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
-    
-    // Concurrency control for list updates
-    private readonly SemaphoreSlim _listLock = new SemaphoreSlim(1, 1);
-    private readonly Queue<PropertyUpdateMessage> _updateQueue = new Queue<PropertyUpdateMessage>();
-    private CancellationTokenSource? _processorCts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,57 +55,6 @@ else
         // Initialize SignalR connection for real-time updates
         await InitializeSignalRConnection();
         await InitEnumData();
-        
-        // Start the background queue processor
-        _processorCts = new CancellationTokenSource();
-        _ = ProcessQueueAsync(_processorCts.Token);
-    }
-
-    private async Task ProcessQueueAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                PropertyUpdateMessage? message = null;
-                
-                // Dequeue one message at a time
-                lock (_updateQueue)
-                {
-                    if (_updateQueue.Count > 0)
-                    {
-                        message = _updateQueue.Dequeue();
-                    }
-                }
-                
-                if (message != null)
-                {
-                    // Acquire lock and process the update serially
-                    await _listLock.WaitAsync(cancellationToken);
-                    try
-                    {
-                        await HandlePropertyUpdate(message);
-                    }
-                    finally
-                    {
-                        _listLock.Release();
-                    }
-                }
-                else
-                {
-                    // No messages, wait a bit before checking again
-                    await Task.Delay(50, cancellationToken);
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            Console.WriteLine($"ListTemplate: Queue processor cancelled");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"ListTemplate: Error in queue processor: {ex.Message}");
-        }
     }
 
     private async Task InitializeSignalRConnection()
@@ -133,12 +77,7 @@ else
                 
                 if (message.DomainObjectName == _domainObjectName)
                 {
-                    // Enqueue the message instead of processing immediately
-                    lock (_updateQueue)
-                    {
-                        _updateQueue.Enqueue(message);
-                    }
-                    Console.WriteLine($"ListTemplate: Queued update for {_domainObjectName}[{message.InstanceId}], queue length: {_updateQueue.Count}");
+                    await HandlePropertyUpdate(message);
                 }
             });
 
@@ -181,31 +120,22 @@ else
     {
         try
         {
-            Console.WriteLine($"[HandlePropertyUpdate START] Processing update for {_domainObjectName}[{message.InstanceId}]");
-            
             if (@(Model.DomainVar)List == null)
             {
-                Console.WriteLine($"[HandlePropertyUpdate] ERROR: List is null, returning");
                 return;
             }
 
-            Console.WriteLine($"[HandlePropertyUpdate] Current list state BEFORE update: Length={@(Model.DomainVar)List.Length}, IDs=[{string.Join(", ", @(Model.DomainVar)List.Select(x => x.id))}]");
-
             // Find the item in the list by ID
             var index = Array.FindIndex(@(Model.DomainVar)List, item => item.id == message.InstanceId);
-            Console.WriteLine($"[HandlePropertyUpdate] Found item at index: {index}");
             
             if (index >= 0)
             {
                 // Fetch the updated item from the API to ensure we have the complete View object
                 // with all computed properties and enum display values properly populated
                 var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-                Console.WriteLine($"[HandlePropertyUpdate] Fetching updated object from API: api/@(Model.DomainVar)/view/{message.InstanceId}");
                 var updatedObject = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View>($"api/@(Model.DomainVar)/view/{message.InstanceId}");
-                
                 if (updatedObject != null)
                 { 
-                    Console.WriteLine($"[HandlePropertyUpdate] API returned object with id={updatedObject.id}");
                 @{
                     foreach( var enumAttribute in Model.EnumAttributes)
                     {
@@ -217,85 +147,48 @@ else
                 }
 
                
-                    // Update existing item with the fetched object under lock (enum display values are already set by the API)
+                    // Update existing item with the fetched object (enum display values are already set by the API)
                     @(Model.DomainVar)List[index] = updatedObject;
-                    Console.WriteLine($"[HandlePropertyUpdate] Updated list[{index}] with object id={updatedObject.id}");
-                    Console.WriteLine($"[HandlePropertyUpdate] List state AFTER update: Length={@(Model.DomainVar)List.Length}, IDs=[{string.Join(", ", @(Model.DomainVar)List.Select(x => x.id))}]");
+                    Console.WriteLine($"ListTemplate: Updated {_domainObjectName}[{message.InstanceId}] in list from API");
                     
                     // Notify UI to update
-                    Console.WriteLine($"[HandlePropertyUpdate] Calling StateHasChanged");
                     await InvokeAsync(StateHasChanged);
-                    Console.WriteLine($"[HandlePropertyUpdate] StateHasChanged completed");
-                }
-                else
-                {
-                    Console.WriteLine($"[HandlePropertyUpdate] ERROR: API returned null for id={message.InstanceId}");
                 }
             }
             else
             {
                 // Item not found, might be a new item - reload the list
-                Console.WriteLine($"[HandlePropertyUpdate] Item not found at any index, triggering full reload");
+                Console.WriteLine($"ListTemplate: {_domainObjectName}[{message.InstanceId}] not found in list, reloading...");
                 await ReloadList();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[HandlePropertyUpdate] EXCEPTION: {ex.GetType().Name}: {ex.Message}");
-            Console.WriteLine($"[HandlePropertyUpdate] StackTrace: {ex.StackTrace}");
+            Console.WriteLine($"ListTemplate: Error handling property update: {ex.Message}");
             // On error, fall back to reloading the entire list
             try
             {
-                Console.WriteLine($"[HandlePropertyUpdate] Attempting ReloadList due to exception");
                 await ReloadList();
             }
             catch (Exception reloadEx)
             {
-                Console.WriteLine($"[HandlePropertyUpdate] ReloadList also failed: {reloadEx.Message}");
+                Console.WriteLine($"ListTemplate: Error reloading list: {reloadEx.Message}");
             }
         }
-        Console.WriteLine($"[HandlePropertyUpdate END]");
     }
 
     private async Task ReloadList()
     {
         try
         {
-            Console.WriteLine($"[ReloadList START] Reloading full list for {_domainObjectName}");
-            
-            if (@(Model.DomainVar)List != null)
-            {
-                Console.WriteLine($"[ReloadList] Current list state BEFORE reload: Length={@(Model.DomainVar)List.Length}, IDs=[{string.Join(", ", @(Model.DomainVar)List.Select(x => x.id))}]");
-            }
-            else
-            {
-                Console.WriteLine($"[ReloadList] Current list is null");
-            }
-            
             var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-            Console.WriteLine($"[ReloadList] Fetching from api/@(Model.DomainVar)");
-            var newList = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View[]>("api/@(Model.DomainVar)");
-            
-            Console.WriteLine($"[ReloadList] API returned list with {newList?.Length ?? 0} items");
-            if (newList != null && newList.Length > 0)
-            {
-                Console.WriteLine($"[ReloadList] New list IDs=[{string.Join(", ", newList.Select(x => x.id))}]");
-            }
-            
-            @(Model.DomainVar)List = newList;
-            Console.WriteLine($"[ReloadList] List assigned, Length={@(Model.DomainVar)List?.Length ?? 0}");
-            Console.WriteLine($"[ReloadList] List state AFTER reload: Length={@(Model.DomainVar)List?.Length ?? 0}, IDs=[{string.Join(", ", @(Model.DomainVar)List?.Select(x => x.id) ?? new long[0])}]");
-            
-            Console.WriteLine($"[ReloadList] Calling StateHasChanged");
-            await InvokeAsync(StateHasChanged);
-            Console.WriteLine($"[ReloadList] StateHasChanged completed");
+            @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View[]>("api/@(Model.DomainVar)");
+            Console.WriteLine($"ListTemplate: Reloaded {@(Model.DomainVar)List?.Length ?? 0} @(Model.DomainVar) records");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ReloadList] EXCEPTION: {ex.GetType().Name}: {ex.Message}");
-            Console.WriteLine($"[ReloadList] StackTrace: {ex.StackTrace}");
+            Console.WriteLine($"ListTemplate: Error reloading list: {ex.Message}");
         }
-        Console.WriteLine($"[ReloadList END]");
     }
 
     async Task OnAdd@(Model.DomainObj)()
@@ -311,13 +204,6 @@ else
 
     public async ValueTask DisposeAsync()
     {
-        // Stop the queue processor
-        if (_processorCts is not null)
-        {
-            _processorCts.Cancel();
-            _processorCts.Dispose();
-        }
-        
         if (_hubConnection is not null)
         {
             try
@@ -336,8 +222,6 @@ else
                 Console.WriteLine($"ListTemplate: Error disposing SignalR connection: {ex.Message}");
             }
         }
-        
-        _listLock.Dispose();
     }
 
     // Message structure for property update notifications (matches server-side PropertyUpdateMessage)
