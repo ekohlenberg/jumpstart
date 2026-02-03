@@ -1,26 +1,45 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using @Model.Namespace;
+using @(Model.Namespace).core;
 
 namespace @Model.Namespace
 {
     public partial class SchedulerTest 
     {
-        private static Dictionary<long, Agent> agents = new Dictionary<long, Agent>();
+        private static ServerNode schedulerNode;
+        private static Dictionary<long, ServerNode> agents = new Dictionary<long, ServerNode>();
         private static List<Process> processes = new List<Process>();
         private static List<Workflow> workflows = new List<Workflow>();
+       
+       /// <summary>
+        /// Gets the singleton Scheduler instance
+        /// </summary>
+        /// <returns>The ServerNode instance of the scheduler</returns>
+        public static void InitSchedulerNode()
+        {
+             schedulerNode = null;
+
+            void SchedulerSelectCallback(System.Data.Common.DbDataReader rdr)
+                   {
+                    schedulerNode = new ServerNode()   ;
+                    DBPersist.autoAssign(rdr, schedulerNode);
+                   }
+            DBPersist.select(SchedulerSelectCallback, $"select * from core.server_node where server_node_type_id = {(long)ServerNode.ServerNodeType.Scheduler} and server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online}");
+
+       }
 
         /// <summary>
-        /// Delete all existing test workflows and workflow_process records
+        /// Delete all existing test workflows
         /// </summary>
         public static async Task testDeleteExistingWorkflows()
         {
             try
             {
                 Console.WriteLine("SchedulerTest: Deleting existing test workflows...");
-                DBPersist.execCmd("DELETE FROM core.workflow_process WHERE workflow_id IN (SELECT id FROM core.workflow WHERE name LIKE 'test-scheduler%')", "default");
                 DBPersist.execCmd("DELETE FROM core.workflow WHERE name LIKE 'test-scheduler%'", "default");
                 Console.WriteLine("SchedulerTest: Existing test workflows deleted");
             }
@@ -41,11 +60,11 @@ namespace @Model.Namespace
 
             void AgentSelectCallback(System.Data.Common.DbDataReader rdr)
             {
-                var agent = new Agent();
+                var agent = new ServerNode();
                 DBPersist.autoAssign(rdr, agent);
                 agents.Add(agent.id, agent);
             }
-            DBPersist.select(AgentSelectCallback, $"SELECT * FROM core.agent WHERE agent_status_id = {(long)Agent.AgentStatus.Online}");
+            DBPersist.select(AgentSelectCallback, $"SELECT * FROM core.server_node WHERE server_node_type_id = {(long)ServerNode.ServerNodeType.Agent} and server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online}");
 
             if (agents.Count == 0)
             {
@@ -66,6 +85,13 @@ namespace @Model.Namespace
             }
 
             Console.WriteLine($"SchedulerTest: Loaded {agents.Count} agents and {processes.Count} processes");
+
+            InitSchedulerNode();
+
+            if (schedulerNode == null)
+            {
+                throw new Exception("Scheduler node not found. Please ensure the scheduler is configured correctly.");  
+            }
         }
 
         /// <summary>
@@ -78,28 +104,31 @@ namespace @Model.Namespace
                 Console.WriteLine("\n=== Test 1: Single Job Workflow ===");
                 LoadAgentsAndProcesses();
 
-                // Create workflow
-                var workflow = new Workflow();
-                workflow.name = "test-scheduler-single-job";
-                workflow.description = "Single job workflow test";
-                workflow.is_active = 1;
-                DBPersist.insert(workflow, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
+                // Create parent workflow folder
+                var parentWorkflow = new Workflow();
+                parentWorkflow.name = "test-scheduler-single-job";
+                parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
+                parentWorkflow.is_active = 1;
+                DBPersist.insert(parentWorkflow, "default");
+                Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
 
-                // Create single workflow_process
-                var workflowProcess = new WorkflowProcess();
-                workflowProcess.workflow_id = workflow.id;
-                workflowProcess.process_id = processes[0].id;
-                workflowProcess.agent_id = agents.Values.First().id;
-                workflowProcess.seq = 10;
-                workflowProcess.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(workflowProcess, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess.id} with sequence {workflowProcess.seq}");
+                // Create single child workflow (Process type)
+                var childWorkflow = new Workflow();
+                childWorkflow.name = "test-scheduler-single-job-process";
+                childWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childWorkflow.parent_id = parentWorkflow.id;
+                childWorkflow.process_id = processes[0].id;
+                childWorkflow.server_node_id = agents.Values.First().id;
+                childWorkflow.seq = 10;
+                childWorkflow.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childWorkflow.is_active = 1;
+                DBPersist.insert(childWorkflow, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow.id} with sequence {childWorkflow.seq}");
 
-                // Execute workflow
-                var schedulerLogic = SchedulerCoreLogic.Create();
-                schedulerLogic.execute(workflow.id);
-                Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
+                // Execute parent workflow
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
+                Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution");
             }
             catch (Exception ex)
             {
@@ -123,38 +152,44 @@ namespace @Model.Namespace
                     throw new Exception("Need at least 2 processes for this test");
                 }
 
-                // Create workflow
-                var workflow = new Workflow();
-                workflow.name = "test-scheduler-two-job";
-                workflow.description = "Two job sequential workflow test";
-                workflow.is_active = 1;
-                DBPersist.insert(workflow, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
+                // Create parent workflow folder
+                var parentWorkflow = new Workflow();
+                parentWorkflow.name = "test-scheduler-two-job";
+                parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
+                parentWorkflow.is_active = 1;
+                DBPersist.insert(parentWorkflow, "default");
+                Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
 
-                // Create first workflow_process (sequence 10)
-                var workflowProcess1 = new WorkflowProcess();
-                workflowProcess1.workflow_id = workflow.id;
-                workflowProcess1.process_id = processes[0].id;
-                workflowProcess1.agent_id = agents.Values.First().id;
-                workflowProcess1.seq = 10;
-                workflowProcess1.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(workflowProcess1, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess1.id} with sequence {workflowProcess1.seq}");
+                // Create first child workflow (Process type, sequence 10)
+                var childWorkflow1 = new Workflow();
+                childWorkflow1.name = "test-scheduler-two-job-process1";
+                childWorkflow1.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childWorkflow1.parent_id = parentWorkflow.id;
+                childWorkflow1.process_id = processes[0].id;
+                childWorkflow1.server_node_id = agents.Values.First().id;
+                childWorkflow1.seq = 10;
+                childWorkflow1.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childWorkflow1.is_active = 1;
+                DBPersist.insert(childWorkflow1, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow1.id} with sequence {childWorkflow1.seq}");
 
-                // Create second workflow_process (sequence 20)
-                var workflowProcess2 = new WorkflowProcess();
-                workflowProcess2.workflow_id = workflow.id;
-                workflowProcess2.process_id = processes[1].id;
-                workflowProcess2.agent_id = agents.Values.First().id;
-                workflowProcess2.seq = 20;
-                workflowProcess2.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(workflowProcess2, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess2.id} with sequence {workflowProcess2.seq}");
+                // Create second child workflow (Process type, sequence 20)
+                var childWorkflow2 = new Workflow();
+                childWorkflow2.name = "test-scheduler-two-job-process2";
+                childWorkflow2.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childWorkflow2.parent_id = parentWorkflow.id;
+                childWorkflow2.process_id = processes[1].id;
+                childWorkflow2.server_node_id = agents.Values.First().id;
+                childWorkflow2.seq = 20;
+                childWorkflow2.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childWorkflow2.is_active = 1;
+                DBPersist.insert(childWorkflow2, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} with sequence {childWorkflow2.seq}");
 
-                // Execute workflow
-                var schedulerLogic = SchedulerCoreLogic.Create();
-                schedulerLogic.execute(workflow.id);
-                Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
+                // Execute parent workflow
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
+                Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution");
             }
             catch (Exception ex)
             {
@@ -179,58 +214,70 @@ namespace @Model.Namespace
                     throw new Exception("Need at least 4 processes for this test");
                 }
 
-                // Create workflow
-                var workflow = new Workflow();
-                workflow.name = "test-scheduler-four-job-concurrent";
-                workflow.description = "Four job workflow with concurrent middle jobs test";
-                workflow.is_active = 1;
-                DBPersist.insert(workflow, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow {workflow.id} - {workflow.name}");
+                // Create parent workflow folder
+                var parentWorkflow = new Workflow();
+                parentWorkflow.name = "test-scheduler-four-job-concurrent";
+                parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
+                parentWorkflow.is_active = 1;
+                DBPersist.insert(parentWorkflow, "default");
+                Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
 
-                // Create first workflow_process (sequence 10)
-                var workflowProcess1 = new WorkflowProcess();
-                workflowProcess1.workflow_id = workflow.id;
-                workflowProcess1.process_id = processes[0].id;
-                workflowProcess1.agent_id = agents.Values.First().id;
-                workflowProcess1.seq = 10;
-                workflowProcess1.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(workflowProcess1, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess1.id} with sequence {workflowProcess1.seq}");
+                // Create first child workflow (Process type, sequence 10)
+                var childWorkflow1 = new Workflow();
+                childWorkflow1.name = "test-scheduler-four-job-process1";
+                childWorkflow1.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childWorkflow1.parent_id = parentWorkflow.id;
+                childWorkflow1.process_id = processes[0].id;
+                childWorkflow1.server_node_id = agents.Values.First().id;
+                childWorkflow1.seq = 10;
+                childWorkflow1.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childWorkflow1.is_active = 1;
+                DBPersist.insert(childWorkflow1, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow1.id} with sequence {childWorkflow1.seq}");
 
-                // Create second workflow_process (sequence 20 - concurrent)
-                var workflowProcess2 = new WorkflowProcess();
-                workflowProcess2.workflow_id = workflow.id;
-                workflowProcess2.process_id = processes[1].id;
-                workflowProcess2.agent_id = agents.Values.First().id;
-                workflowProcess2.seq = 20;
-                workflowProcess2.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(workflowProcess2, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess2.id} with sequence {workflowProcess2.seq} (concurrent)");
+                // Create second child workflow (Process type, sequence 20 - concurrent)
+                var childWorkflow2 = new Workflow();
+                childWorkflow2.name = "test-scheduler-four-job-process2";
+                childWorkflow2.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childWorkflow2.parent_id = parentWorkflow.id;
+                childWorkflow2.process_id = processes[1].id;
+                childWorkflow2.server_node_id = agents.Values.First().id;
+                childWorkflow2.seq = 20;
+                childWorkflow2.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childWorkflow2.is_active = 1;
+                DBPersist.insert(childWorkflow2, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} with sequence {childWorkflow2.seq} (concurrent)");
 
-                // Create third workflow_process (sequence 20 - concurrent with process2)
-                var workflowProcess3 = new WorkflowProcess();
-                workflowProcess3.workflow_id = workflow.id;
-                workflowProcess3.process_id = processes[2].id;
-                workflowProcess3.agent_id = agents.Values.First().id;
-                workflowProcess3.seq = 20;
-                workflowProcess3.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(workflowProcess3, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess3.id} with sequence {workflowProcess3.seq} (concurrent)");
+                // Create third child workflow (Process type, sequence 20 - concurrent with process2)
+                var childWorkflow3 = new Workflow();
+                childWorkflow3.name = "test-scheduler-four-job-process3";
+                childWorkflow3.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childWorkflow3.parent_id = parentWorkflow.id;
+                childWorkflow3.process_id = processes[2].id;
+                childWorkflow3.server_node_id = agents.Values.First().id;
+                childWorkflow3.seq = 20;
+                childWorkflow3.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childWorkflow3.is_active = 1;
+                DBPersist.insert(childWorkflow3, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow3.id} with sequence {childWorkflow3.seq} (concurrent)");
 
-                // Create fourth workflow_process (sequence 30)
-                var workflowProcess4 = new WorkflowProcess();
-                workflowProcess4.workflow_id = workflow.id;
-                workflowProcess4.process_id = processes[3].id;
-                workflowProcess4.agent_id = agents.Values.First().id;
-                workflowProcess4.seq = 30;
-                workflowProcess4.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(workflowProcess4, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {workflowProcess4.id} with sequence {workflowProcess4.seq}");
+                // Create fourth child workflow (Process type, sequence 30)
+                var childWorkflow4 = new Workflow();
+                childWorkflow4.name = "test-scheduler-four-job-process4";
+                childWorkflow4.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childWorkflow4.parent_id = parentWorkflow.id;
+                childWorkflow4.process_id = processes[3].id;
+                childWorkflow4.server_node_id = agents.Values.First().id;
+                childWorkflow4.seq = 30;
+                childWorkflow4.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childWorkflow4.is_active = 1;
+                DBPersist.insert(childWorkflow4, "default");
+                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow4.id} with sequence {childWorkflow4.seq}");
 
-                // Execute workflow
-                var schedulerLogic = SchedulerCoreLogic.Create();
-                schedulerLogic.execute(workflow.id);
-                Console.WriteLine($"SchedulerTest: Workflow {workflow.id} queued for execution");
+                // Execute parent workflow
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
+                Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution");
             }
             catch (Exception ex)
             {
@@ -240,7 +287,7 @@ namespace @Model.Namespace
         }
 
         /// <summary>
-        /// Test 4: Create and execute a nested workflow (parent workflow with child workflows)
+        /// Test 4: Create and execute a nested workflow (parent folder with child folder workflows)
         /// </summary>
         public static async Task testNestedWorkflow()
         {
@@ -254,56 +301,62 @@ namespace @Model.Namespace
                     throw new Exception("Need at least 2 processes for this test");
                 }
 
-                // Create parent workflow
+                // Create parent workflow folder
                 var parentWorkflow = new Workflow();
                 parentWorkflow.name = "test-scheduler-nested-parent";
-                parentWorkflow.description = "Parent workflow for nested test";
+                parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
                 parentWorkflow.is_active = 1;
                 DBPersist.insert(parentWorkflow, "default");
-                Console.WriteLine($"SchedulerTest: Created parent workflow {parentWorkflow.id} - {parentWorkflow.name}");
+                Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
 
-                // Create first child workflow
-                var childWorkflow1 = new Workflow();
-                childWorkflow1.name = "test-scheduler-nested-child1";
-                childWorkflow1.description = "First child workflow";
-                childWorkflow1.parent_workflow_id = parentWorkflow.id;
-                childWorkflow1.is_active = 1;
-                DBPersist.insert(childWorkflow1, "default");
-                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow1.id} - {childWorkflow1.name}");
+                // Create first child workflow folder
+                var childFolder1 = new Workflow();
+                childFolder1.name = "test-scheduler-nested-child-folder1";
+                childFolder1.workflow_type_id = (long)Workflow.WorkflowType.Folder;
+                childFolder1.parent_id = parentWorkflow.id;
+                childFolder1.is_active = 1;
+                DBPersist.insert(childFolder1, "default");
+                Console.WriteLine($"SchedulerTest: Created child folder {childFolder1.id} - {childFolder1.name}");
 
-                // Create workflow_process for first child workflow
-                var childWorkflowProcess1 = new WorkflowProcess();
-                childWorkflowProcess1.workflow_id = childWorkflow1.id;
-                childWorkflowProcess1.process_id = processes[0].id;
-                childWorkflowProcess1.agent_id = agents.Values.First().id;
-                childWorkflowProcess1.seq = 10;
-                childWorkflowProcess1.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(childWorkflowProcess1, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {childWorkflowProcess1.id} for child workflow {childWorkflow1.id}");
+                // Create process workflow for first child folder
+                var childProcess1 = new Workflow();
+                childProcess1.name = "test-scheduler-nested-child-process1";
+                childProcess1.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childProcess1.parent_id = childFolder1.id;
+                childProcess1.process_id = processes[0].id;
+                childProcess1.server_node_id = agents.Values.First().id;
+                childProcess1.seq = 10;
+                childProcess1.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childProcess1.is_active = 1;
+                DBPersist.insert(childProcess1, "default");
+                Console.WriteLine($"SchedulerTest: Created child process {childProcess1.id} for child folder {childFolder1.id}");
 
-                // Create second child workflow
-                var childWorkflow2 = new Workflow();
-                childWorkflow2.name = "test-scheduler-nested-child2";
-                childWorkflow2.description = "Second child workflow";
-                childWorkflow2.parent_workflow_id = parentWorkflow.id;
-                childWorkflow2.is_active = 1;
-                DBPersist.insert(childWorkflow2, "default");
-                Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} - {childWorkflow2.name}");
+                // Create second child workflow folder
+                var childFolder2 = new Workflow();
+                childFolder2.name = "test-scheduler-nested-child-folder2";
+                childFolder2.workflow_type_id = (long)Workflow.WorkflowType.Folder;
+                childFolder2.parent_id = parentWorkflow.id;
+                childFolder2.is_active = 1;
+                DBPersist.insert(childFolder2, "default");
+                Console.WriteLine($"SchedulerTest: Created child folder {childFolder2.id} - {childFolder2.name}");
 
-                // Create workflow_process for second child workflow
-                var childWorkflowProcess2 = new WorkflowProcess();
-                childWorkflowProcess2.workflow_id = childWorkflow2.id;
-                childWorkflowProcess2.process_id = processes[1].id;
-                childWorkflowProcess2.agent_id = agents.Values.First().id;
-                childWorkflowProcess2.seq = 10;
-                childWorkflowProcess2.on_failure_action_id = (long)WorkflowProcess.OnFailureAction.Stop;
-                DBPersist.insert(childWorkflowProcess2, "default");
-                Console.WriteLine($"SchedulerTest: Created workflow_process {childWorkflowProcess2.id} for child workflow {childWorkflow2.id}");
+                // Create process workflow for second child folder
+                var childProcess2 = new Workflow();
+                childProcess2.name = "test-scheduler-nested-child-process2";
+                childProcess2.workflow_type_id = (long)Workflow.WorkflowType.Process;
+                childProcess2.parent_id = childFolder2.id;
+                childProcess2.process_id = processes[1].id;
+                childProcess2.server_node_id = agents.Values.First().id;
+                childProcess2.seq = 10;
+                childProcess2.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
+                childProcess2.is_active = 1;
+                DBPersist.insert(childProcess2, "default");
+                Console.WriteLine($"SchedulerTest: Created child process {childProcess2.id} for child folder {childFolder2.id}");
 
-                // Execute parent workflow (should recursively execute child workflows)
-                var schedulerLogic = SchedulerCoreLogic.Create();
-                schedulerLogic.execute(parentWorkflow.id);
-                Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution (will execute child workflows)");
+                // Execute parent workflow (should recursively execute child folders and their processes)
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
+                Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution (will recursively execute child folders and processes)");
             }
             catch (Exception ex)
             {

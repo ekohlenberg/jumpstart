@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Text.Json;
 using jumpstart;
 
 namespace jumpstart {
@@ -12,14 +13,14 @@ namespace jumpstart {
         {
 
             
-            string modelPath = "./test.csv";
-            string templDefName = string.Empty;
-
+            string modelPath = string.Empty;
+            List<string> templDefNames = new List<string>();
+            string homePath = string.Empty;
             try
             {
-
                 if (args.Length == 2)
                 {
+                    // Command line arguments provided
                     modelPath = args[0];
 
                     if (!File.Exists(modelPath))
@@ -28,18 +29,72 @@ namespace jumpstart {
                         return 1; // File not found error
                     }
 
-                    templDefName = args[1];
+                    templDefNames.Add(args[1]);
+                }
+                else if (args.Length == 0)
+                {
+                    // No command line arguments - look for JSON file in user's home directory
+                    homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    string jsonPath = Path.Combine(homePath, ".jumpstart.json");
+                    
+                    if (!File.Exists(jsonPath))
+                    {
+                        Console.WriteLine($"Error: No command line arguments provided and JSON file '{jsonPath}' not found.");
+                        Console.WriteLine("Usage: jumpstart <model.csv> <template-definition>");
+                        Console.WriteLine("   OR: Create a ~/.jumpstart.json file with modelpath and templatedefs");
+                        return 2; // Usage error
+                    }
 
+                    // Read and deserialize JSON file
+                    string jsonContent = File.ReadAllText(jsonPath);
+                    var jumpStartParams = JsonSerializer.Deserialize<JumpStartParams>(jsonContent);
+                    
+                    if (jumpStartParams == null)
+                    {
+                        Console.WriteLine($"Error: Failed to deserialize JSON file '{jsonPath}'");
+                        return 2; // Usage error
+                    }
 
+                    // Expand tilde in modelpath
+                    modelPath = jumpStartParams.modelpath;
+                    if (modelPath.StartsWith("~/") || modelPath.StartsWith("~"))
+                    {
+                        if (string.IsNullOrEmpty(homePath))
+                        {
+                            homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                        }
+                        modelPath = Path.Combine(homePath, modelPath.Substring(2));
+                    }
+
+                    // Convert to absolute path if relative
+                    if (!Path.IsPathRooted(modelPath))
+                    {
+                        modelPath = Path.GetFullPath(modelPath);
+                    }
+
+                    if (!File.Exists(modelPath))
+                    {
+                        Console.WriteLine($"Error: File not found at path {modelPath}");
+                        return 1; // File not found error
+                    }
+
+                    templDefNames = jumpStartParams.templatedefs ?? new List<string>();
+                    
+                    if (templDefNames.Count == 0)
+                    {
+                        Console.WriteLine("Error: No template definitions specified in JSON file");
+                        return 2; // Usage error
+                    }
                 }
                 else 
                 {
                     Console.WriteLine("Usage: jumpstart <model.csv> <template-definition>");
+                    Console.WriteLine("   OR: Create a ~/.jumpstart.json file with modelpath and templatedefs");
                     return 2; // Usage error
                 }
 
 
-                Console.WriteLine($"Using model path {modelPath} with template definition {templDefName}.");
+                Console.WriteLine($"Using model path {modelPath} with template definition(s): {string.Join(", ", templDefNames)}.");
            
                 // infer the namespace based on the model filename
                 string _namespace = Path.GetFileNameWithoutExtension(modelPath);
@@ -64,8 +119,11 @@ namespace jumpstart {
                 // Instantiate the code generator
                 Generator g = new Generator(metaModel);
 
-                // Load the template definition
-                g.AddTemplates( TemplateDefLoader.Load( templDefName) ) ;
+                // Load all template definitions
+                foreach(var templDefName in templDefNames)
+                {
+                    g.AddTemplates( TemplateDefLoader.Load( templDefName) ) ;
+                }
 
                 // go!
                 await g.Generate();

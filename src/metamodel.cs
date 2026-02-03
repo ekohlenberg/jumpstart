@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.Arm;
 using Microsoft.AspNetCore.Authentication;
@@ -213,6 +214,26 @@ public class EnumRelationship
         this.nameColumn = nameColumn;
         this.EnumAttribute = enumAttribute;
     }
+}
+
+public class ViewRelationship
+{
+    public MetaAttribute FkAttribute { get; set; }  // The FK attribute from the view
+    public MetaObject FkObject { get; set; }  // The referenced object
+    public string TableAlias { get; set; }  // The alias for this table in the JOIN
+    public string ColumnPrefix { get; set; }  // Prefix for column names (base FK name)
+    public List<ViewRelationship> NestedRelationships { get; set; }  // For recursive FK traversal
+    public List<MetaAttribute> RwkAttributes { get; set; }  // RWK attributes from this FK object
+    
+    public ViewRelationship(MetaAttribute fkAttribute, MetaObject fkObject, string tableAlias, string columnPrefix)
+    {
+        FkAttribute = fkAttribute;
+        FkObject = fkObject;
+        TableAlias = tableAlias;
+        ColumnPrefix = columnPrefix;
+        NestedRelationships = new List<ViewRelationship>();
+        RwkAttributes = new List<MetaAttribute>();
+    }
 }   
     public class MetaBaseElement
     {
@@ -275,6 +296,9 @@ public class EnumRelationship
         public bool IsGlobal() { return _IsGlobal;}
         public void SetGlobal() { _IsGlobal = true;}
 
+        // Table alias for view relationships (used when this attribute is part of a view)
+        public string TableAlias { get; set; }
+
         public override string ToString()
         {
             return $"Name: {Name}\nDataType: {SqlDataType}\nLength: {Length}\nLabel: {Label}\nRWK: {RWK}\n";
@@ -287,6 +311,8 @@ public class EnumRelationship
         private List<MetaAttribute> _globalAttributes = null;
         public string Namespace {get; private set;}
         public string DomainObj { get; private set; }
+        public bool IsView {get { return TableName.ToLower().EndsWith("_view"); }}
+        public string DomainObjView { get { if (IsView) return DomainObj; else return DomainObj + "View"; }}
 
         public string DomainConst {
             get {
@@ -305,6 +331,7 @@ public class EnumRelationship
         public List<MetaAttribute> Attributes { get; private set; } = new();
         public List<ChildRelationship> Children { get; private set; } = new();
         public List<EnumRelationship> EnumAttributes { get; private set; } = new();
+        public List<ViewRelationship> ViewRelationships { get; private set; } = new();
 
         public List<MetaAttribute> UserAttributes {
             get 
@@ -437,6 +464,257 @@ public class EnumRelationship
             }
         }
 
+        /// <summary>
+        /// Processes view objects by recursively traversing foreign keys and synthesizing MetaAttributes
+        /// for RWK columns. Creates both a flattened Attributes list and a hierarchical ViewRelationships
+        /// structure to drive LEFT OUTER JOIN logic.
+        /// </summary>
+        /// <param name="allObjects">Collection of all MetaObjects to search for FK references</param>
+        public void ProcessView(IEnumerable<MetaObject> allObjects)
+        {
+            // Only process if this is a view
+            if (!IsView)
+            {
+                return;
+            }
+
+            Console.WriteLine($"ProcessView: Processing view '{TableName}'");
+            
+            // Get all foreign key attributes (excluding id)
+            var foreignKeys = Attributes.Where(attr => !string.IsNullOrEmpty(attr.FkTable) && attr.Name != "id").ToList();
+            
+            // Console.WriteLine($"ProcessView: Found {foreignKeys.Count} foreign key(s)");
+            // foreach(var fk in foreignKeys)
+            // {
+            //     Console.WriteLine($"  FK: {fk.Name} -> {fk.FkTable}");
+            // }
+            
+            if (foreignKeys.Count == 0)
+            {
+                // Console.WriteLine($"ProcessView: No foreign keys found for view '{TableName}', skipping");
+                return; // Views must have at least one FK
+            }
+
+            var usedAliases = new HashSet<string>();
+
+            // Helper method to recursively process RWK attributes from an FK object
+            // originalViewTableName: Used to detect self-referential FKs and prevent infinite recursion
+            void ProcessRwkAttributes(MetaObject fkObject, string columnPrefix, string tableAlias, ViewRelationship parentRelationship, HashSet<string> aliases, string originalViewTableName)
+            {
+                // Console.WriteLine($"  ProcessRwkAttributes: Processing FK object '{fkObject.TableName}' with prefix '{columnPrefix}', alias '{tableAlias}'");
+                foreach (var attr in fkObject.Attributes)
+                {
+                    if (attr.RWK == "1")
+                    {
+                        // Check if this RWK attribute is itself a foreign key
+                        if (!string.IsNullOrEmpty(attr.FkTable))
+                        {
+                            // Console.WriteLine($"    RWK attribute '{attr.Name}' is a nested FK -> {attr.FkTable}");
+                            
+                            // Check for self-referential FK (FK points back to the FK object we're currently processing)
+                            // This prevents infinite recursion when a table has an FK to itself (e.g., parent_id)
+                            bool isSelfReferential = attr.FkTable == fkObject.TableName;
+                            
+                            if (isSelfReferential)
+                            {
+                                // Console.WriteLine($"      DETECTED self-referential FK: '{attr.Name}' -> '{attr.FkTable}' (same as current FK object '{fkObject.TableName}')");
+                                // Console.WriteLine($"      Skipping recursion to prevent infinite loop - only processing one level");
+                                
+                                // For self-referential FKs, we don't recurse but still create a synthesized attribute
+                                // representing the FK itself (e.g., parent_id as a column)
+                                // Note: The RWK attribute IS the FK, so we still want to include it
+                                var columnName = columnPrefix + "_" + attr.Name;
+                                var synthesizedAttr = new MetaAttribute
+                                {
+                                    Name = columnName,
+                                    SqlDataType = attr.SqlDataType,
+                                    MSSQLDataType = attr.MSSQLDataType,
+                                    DotNetType = attr.DotNetType,
+                                    ConvertMethod = attr.ConvertMethod,
+                                    InputType = attr.InputType,
+                                    Length = attr.Length,
+                                    Label = columnPrefix + " " + (attr.Label ?? attr.Name),
+                                    RWK = attr.RWK,
+                                    FkType = attr.FkType,
+                                    FkTable = attr.FkTable,
+                                    FkObject = attr.FkObject,
+                                    FkVar = attr.FkVar,
+                                    IsNullable = attr.IsNullable,
+                                    TestDataSet = attr.TestDataSet,
+                                    TableAlias = tableAlias  // Store the alias for JOIN generation
+                                };
+                                
+                                // Add to flattened attributes list
+                                Attributes.Add(synthesizedAttr);
+                                
+                                // Add to parent relationship's RWK attributes
+                                parentRelationship.RwkAttributes.Add(synthesizedAttr);
+                                
+                                // Console.WriteLine($"      Created synthesized attribute for self-ref FK: '{columnName}' (alias='{tableAlias}', original='{attr.Name}')");
+                            }
+                            else
+                            {
+                                // Find the nested FK object
+                                var nestedFkObject = allObjects.FirstOrDefault(obj => obj.TableName == attr.FkTable);
+                                if (nestedFkObject != null)
+                                {
+                                    // Create alias for nested FK table
+                                    var nestedAliasBase = attr.Name;
+                                    if (nestedAliasBase.EndsWith("_id"))
+                                    {
+                                        nestedAliasBase = nestedAliasBase.Substring(0, nestedAliasBase.Length - 3);
+                                    }
+                                    var nestedAlias = nestedAliasBase;
+                                    var counter = 1;
+                                    while (aliases.Contains(nestedAlias))
+                                    {
+                                        nestedAlias = nestedAliasBase + "_" + counter;
+                                        counter++;
+                                    }
+                                    aliases.Add(nestedAlias);
+
+                                    // Create nested relationship
+                                    var nestedPrefix = columnPrefix + "_" + nestedAliasBase;
+                                    var nestedRelationship = new ViewRelationship(attr, nestedFkObject, nestedAlias, nestedPrefix);
+                                    parentRelationship.NestedRelationships.Add(nestedRelationship);
+                                    
+                                    // Console.WriteLine($"      Created nested ViewRelationship: alias='{nestedAlias}', prefix='{nestedPrefix}', table='{nestedFkObject.TableName}'");
+
+                                    // Recursively process nested FK (pass originalViewTableName to detect cycles)
+                                    ProcessRwkAttributes(nestedFkObject, nestedPrefix, nestedAlias, nestedRelationship, aliases, originalViewTableName);
+                                }
+                                else
+                                {
+                                    // Console.WriteLine($"      WARNING: Nested FK object '{attr.FkTable}' not found");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // This RWK is not a FK, create a synthesized MetaAttribute
+                            var columnName = columnPrefix + "_" + attr.Name;
+                            var synthesizedAttr = new MetaAttribute
+                            {
+                                Name = columnName,
+                                SqlDataType = attr.SqlDataType,
+                                MSSQLDataType = attr.MSSQLDataType,
+                                DotNetType = attr.DotNetType,
+                                ConvertMethod = attr.ConvertMethod,
+                                InputType = attr.InputType,
+                                Length = attr.Length,
+                                Label = columnPrefix + " " + (attr.Label ?? attr.Name),
+                                RWK = attr.RWK,
+                                FkType = attr.FkType,
+                                FkTable = attr.FkTable,
+                                FkObject = attr.FkObject,
+                                FkVar = attr.FkVar,
+                                IsNullable = attr.IsNullable,
+                                TestDataSet = attr.TestDataSet,
+                                TableAlias = tableAlias  // Store the alias for JOIN generation
+                            };
+                            
+                            // Add to flattened attributes list
+                            Attributes.Add(synthesizedAttr);
+                            
+                            // Add to parent relationship's RWK attributes
+                            parentRelationship.RwkAttributes.Add(synthesizedAttr);
+                            
+                            // Console.WriteLine($"    Created synthesized attribute: '{columnName}' (alias='{tableAlias}', original='{attr.Name}')");
+                        }
+                    }
+                }
+            }
+
+            // Process first FK table as anchor
+            var firstFk = foreignKeys[0];
+            var firstFkObject = allObjects.FirstOrDefault(obj => obj.TableName == firstFk.FkTable);
+            int counter = 0;
+            
+            // Console.WriteLine($"ProcessView: Processing first FK '{firstFk.Name}' -> '{firstFk.FkTable}'");
+            
+            if (firstFkObject != null)
+            {
+                // Create alias for first FK table
+                var firstAliasBase = firstFk.Name;
+                if (firstAliasBase.EndsWith("_id"))
+                {
+                    firstAliasBase = firstAliasBase.Substring(0, firstAliasBase.Length - 3);
+                }
+                var firstAlias = firstAliasBase;
+                while (usedAliases.Contains(firstAlias))
+                {
+                    firstAlias = firstAliasBase + "_" + counter;
+                    counter++;
+                }
+                usedAliases.Add(firstAlias);
+
+                // Create ViewRelationship for first FK
+                var firstRelationship = new ViewRelationship(firstFk, firstFkObject, firstAlias, firstAliasBase);
+                ViewRelationships.Add(firstRelationship);
+                
+                // Console.WriteLine($"  Created first ViewRelationship: alias='{firstAlias}', prefix='{firstAliasBase}', table='{firstFkObject.TableName}'");
+
+                // Process RWK attributes from first FK (pass TableName to detect self-referential FKs)
+                ProcessRwkAttributes(firstFkObject, firstAliasBase, firstAlias, firstRelationship, usedAliases, TableName);
+            }
+            else
+            {
+                // Console.WriteLine($"  WARNING: First FK object '{firstFk.FkTable}' not found");
+            }
+
+            
+            // Process remaining FK tables
+            for (int i = 1; i < foreignKeys.Count; i++)
+            {
+                var fk = foreignKeys[i];
+                var fkObject = allObjects.FirstOrDefault(obj => obj.TableName == fk.FkTable);
+                
+                // Console.WriteLine($"ProcessView: Processing additional FK {i+1}/{foreignKeys.Count}: '{fk.Name}' -> '{fk.FkTable}'");
+                
+                if (fkObject != null)
+                {
+                    // Create alias for this FK table
+                    var aliasBase = fk.Name;
+                    if (aliasBase.EndsWith("_id"))
+                    {
+                        aliasBase = aliasBase.Substring(0, aliasBase.Length - 3);
+                    }
+                    var alias = aliasBase;
+                    counter = 1;
+                    while (usedAliases.Contains(alias))
+                    {
+                        alias = aliasBase + "_" + counter;
+                        counter++;
+                    }
+                    usedAliases.Add(alias);
+
+                    // Create ViewRelationship for this FK
+                    var relationship = new ViewRelationship(fk, fkObject, alias, aliasBase);
+                    ViewRelationships.Add(relationship);
+                    
+                    // Console.WriteLine($"  Created ViewRelationship: alias='{alias}', prefix='{aliasBase}', table='{fkObject.TableName}'");
+
+                    // Process RWK attributes from this FK (pass TableName to detect self-referential FKs)
+                    ProcessRwkAttributes(fkObject, aliasBase, alias, relationship, usedAliases, TableName);
+                }
+                else
+                {
+                    // Console.WriteLine($"  WARNING: FK object '{fk.FkTable}' not found");
+                }
+            }
+            
+            // Summary logging
+            // Console.WriteLine($"ProcessView: Completed processing view '{TableName}'");
+            // Console.WriteLine($"  Total ViewRelationships: {ViewRelationships.Count}");
+            // Console.WriteLine($"  Total synthesized attributes: {Attributes.Count(attr => !string.IsNullOrEmpty(attr.TableAlias))}");
+            
+            // Log ViewRelationships structure
+            // foreach(var relationship in ViewRelationships)
+            // {
+            //     Console.WriteLine($"  ViewRelationship: FK='{relationship.FkAttribute.Name}', alias='{relationship.TableAlias}', prefix='{relationship.ColumnPrefix}', RWK attrs={relationship.RwkAttributes.Count}, nested={relationship.NestedRelationships.Count}");
+            // }
+        }
+
        
     }
 
@@ -537,6 +815,7 @@ public class EnumRelationship
            {
                 obj.ProcessChildren(Objects);
                 obj.ProcessEnumObjects(Objects);
+                obj.ProcessView(Objects);
            }
            
         }   

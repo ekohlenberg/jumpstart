@@ -1,4 +1,6 @@
 @{
+    
+    
     string namespaceName = @Model.Namespace;
     string className = @Model.DomainObj; 
     string schemaName = @Model.SchemaName; 
@@ -42,17 +44,13 @@ namespace @namespaceName
             rwk.Add("@attr.Name");
             </text>
                 }
-    
-                
             }
 
             @foreach (var attr in Model.Attributes)
-            {
-                
+            {        
             <text>
             _defaults["@attr.Name"] = default(@attr.DotNetType);
-            </text>
-                
+            </text>  
             }
         }
 
@@ -150,6 +148,9 @@ namespace @namespaceName
         }
     }
 
+    @if (!Model.IsView)
+    {
+        <text>
     // View class that extends the base domain object with RWK columns from foreign key joins
     public class @(Model.DomainObj)View : @(Model.DomainObj)
     {
@@ -199,20 +200,21 @@ namespace @namespaceName
                     usedAliases.Add(alias);
                     string aliasLabel = !string.IsNullOrEmpty(alias)  ? char.ToUpper(alias[0]) + alias.Substring(1)  : alias;
                     // Add RWK columns from the foreign key table
-                    foreach(var fkAttr in fkObject.Attributes)
+                    foreach(var fkObjectAttr in fkObject.Attributes)
                     {
-                        if (fkAttr.RWK == "1")
+                        if (fkObjectAttr.RWK == "1")
                         {
-                            string fkAttrName = alias + "_" + fkAttr.Name;
+                            string fkAttrName = alias + "_" + fkObjectAttr.Name;
+                            string fkAttrLabel = fk.Label + (fkObjectAttr.Name.ToLower().StartsWith("name") ? "" : " " + fkObjectAttr.Label);
                              <text>
-            [ColumnInfo("@fk.Label", "@fkAttr.FkObject", "@fkAttr.FkType", "@fkAttr.FkTable", "@fkAttr.FkVar")]
-            public @fkAttr.DotNetType @fkAttrName
+            [ColumnInfo("@(fkAttrLabel)", "@fkObjectAttr.FkObject", "@fkObjectAttr.FkType", "@fkObjectAttr.FkTable", "@fkObjectAttr.FkVar")]
+            public @fkObjectAttr.DotNetType @fkAttrName
             {
                 get
                 {
-                    @fkAttr.DotNetType _@fkAttrName;
+                    @fkObjectAttr.DotNetType _@fkAttrName;
                     @{
-                        if (fkAttr.DotNetType == "string")
+                        if (fkObjectAttr.DotNetType == "string")
                         {
                             <text>
                             _@fkAttrName = string.Empty;
@@ -221,7 +223,7 @@ namespace @namespaceName
                         else
                         {
                             <text>
-                             _@fkAttrName = default(@fkAttr.DotNetType);
+                             _@fkAttrName = default(@fkObjectAttr.DotNetType);
                              </text>
                         }
                     }
@@ -230,13 +232,13 @@ namespace @namespaceName
                     {
                         if(this.ContainsKey("@fkAttrName"))
                         {
-                        _@fkAttrName = Convert.@(fkAttr.ConvertMethod)(this["@fkAttrName"].ToString());
+                        _@fkAttrName = Convert.@(fkObjectAttr.ConvertMethod)(this["@fkAttrName"].ToString());
                         }
                     }
                     catch(Exception )
                     {
                         //Logger.Error($"Error getting @fkAttrName: {e.Message}");
-                        _@fkAttrName = default(@fkAttr.DotNetType);
+                        _@fkAttrName = default(@fkObjectAttr.DotNetType);
                     }
                     return _@fkAttrName;
                 }
@@ -247,10 +249,12 @@ namespace @namespaceName
                 }
             }
             </text>
-                        }
-                    }
+                        } // if RWK
+                    } // foreach fkObjectAttr
                 }
             }
         }
+    }
+        </text>
     }
 }

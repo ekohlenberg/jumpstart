@@ -14,52 +14,58 @@ namespace @Model.Namespace
         public enum ExecStatus
         {
             /// <summary>
+            /// Idle / no execution is currently running
+            /// </summary>
+            [Description("Idle")]
+            Idle = 1,
+
+            /// <summary>
             /// Execution has been dispatched
             /// </summary>
             [Description("Dispatched")]
-            Dispatched = 1,
+            Dispatched = 2,
 
             /// <summary>
-            /// Execution is currently running
+            /// Execution is currently executing
             /// </summary>
-            [Description("Running")]
-            Running = 2,
+            [Description("Executing")]
+            Executing = 3,
 
             /// <summary>
             /// Execution completed successfully
             /// </summary>
             [Description("Completed")]
-            Completed = 3,
+            Completed = 4,
 
             /// <summary>
             /// Execution failed
             /// </summary>
             [Description("Failed")]
-            Failed = 4,
+            Failed = 5,
 
             /// <summary>
             /// Execution was cancelled
             /// </summary>
             [Description("Cancelled")]
-            Cancelled = 5,
+            Cancelled = 6,
 
             /// <summary>
             /// Execution timed out
             /// </summary>
             [Description("Timeout")]
-            Timeout = 6,
+            Timeout = 7,
 
             /// <summary>
             /// Execution was interrupted
             /// </summary>
             [Description("Interrupted")]
-            Interrupted = 7,
+            Interrupted = 8,
 
             /// <summary>
             /// Execution is suspended
             /// </summary>
             [Description("Suspended")]
-            Suspended = 8
+            Suspended = 9
         }
 
         /// <summary>

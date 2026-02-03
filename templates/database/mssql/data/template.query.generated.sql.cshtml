@@ -85,12 +85,12 @@
 			usedAliases.Add(alias);
 			
 			// Get RWK columns from the foreign key table with improved aliasing
-			foreach(var fkAttr in fkObject.Attributes)
+			foreach(var fkObjectAttr in fkObject.Attributes)
 			{
-				if (fkAttr.RWK == "1")
+				if (fkObjectAttr.RWK == "1")
 				{
 					// Use the unique alias for the column reference
-					fkSelectColumns.Add(alias + "." + fkAttr.Name + " AS " + alias + "_" + fkAttr.Name);
+					fkSelectColumns.Add(alias + "." + fkObjectAttr.Name + " AS " + alias + "_" + fkObjectAttr.Name);
 				}
 			}
 			

@@ -13,7 +13,6 @@ dotnet server templates-common,model,shared/dotnet/common/JsonHelper.cs.cshtml,.
 dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/DatabaseProviderFactory.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cshtml,./shared/common,TRUE
-dotnet server templates-common,model,shared/dotnet/common/Script.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/CSharpCompiler.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/IScript.core.cs.cshtml,./shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/IScriptProvider.core.cs.cshtml,./shared/common,TRUE
@@ -23,7 +22,7 @@ dotnet server templates-common,model,shared/dotnet/common/ScriptProviderFactory.
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
 dotnet server templates-domain,model,shared/dotnet/domain/domain.csproj.cshtml,./shared/domain,TRUE
-dotnet server templates-domain,model,shared/dotnet/domain/WorkflowProcess.core.cs.cshtml,./shared/domain,TRUE
+dotnet server templates-domain,model,shared/dotnet/domain/Workflow.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/Execution.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/Script.core.cs.cshtml,./shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/ServerNode.core.cs.cshtml,./shared/domain,TRUE
@@ -42,7 +41,7 @@ dotnet server templates-logic,model,server/dotnet/logic/DispatcherThread.core.cs
 dotnet server templates-logic,model,server/dotnet/logic/HealthMonitorThread.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/SchedulerClient.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/AgentClient.core.cs.cshtml,./server/logic,TRUE
-dotnet server templates-logic,model,server/dotnet/logic/WorkflowExecutive.core.cs.cshtml,./server/logic,TRUE
+dotnet server templates-logic,model,server/dotnet/logic/WorkflowLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/NotificationRegistrar.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,object,server/dotnet/logic/templateLogic.user.cs.cshtml,./server/logic,FALSE
 dotnet server templates-logic,model,server/dotnet/logic/logic.csproj.cshtml,./server/logic,TRUE
@@ -85,7 +84,7 @@ dotnet server templates-test-api,model,server/dotnet/test-api/Program.cs.cshtml,
 dotnet server templates-test-api,model,server/dotnet/test-api/makefile.cshtml,./test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/appsettings.json.cshtml,./test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/test.csproj.cshtml,./test/test-api,TRUE
-dotnet server templates-test-agent,model,server/dotnet/test-agent/Program.cs.cshtml,./test/test-agent,FALSE
+dotnet server templates-test-agent,model,server/dotnet/test-agent/Program.cs.cshtml,./test/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/template.test.generated.cs.cshtml,./test/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/makefile.cshtml,./test/test-agent,TRUE
 dotnet server templates-test-agent,model,server/dotnet/test-agent/appsettings.json.cshtml,./test/test-agent,TRUE

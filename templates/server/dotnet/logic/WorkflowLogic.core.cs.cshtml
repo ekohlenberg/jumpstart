@@ -1,0 +1,136 @@
+
+@{
+    string namespaceName = @Model.Namespace; 
+
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Reflection;
+
+
+namespace @Model.Namespace
+{
+   
+
+    public class WorkflowCoreLogic : WorkflowUserLogic
+    {
+        // Delegate type for execution status handlers
+        public delegate void ExecutionStatusHandler(Workflow workflow);
+
+        // Static dictionary mapping execution status id to handler delegates
+        private static readonly Dictionary<long, ExecutionStatusHandler> _executionStatusHandlers = new Dictionary<long, ExecutionStatusHandler>
+        {
+            { (long) Execution.ExecStatus.Executing, workflow => new WorkflowCoreLogic().OnExecuting(workflow) },
+            { (long) Execution.ExecStatus.Completed, workflow => new WorkflowCoreLogic().OnCompleted(workflow) },
+            { (long) Execution.ExecStatus.Cancelled, workflow => new WorkflowCoreLogic().OnFailed(workflow) },
+            { (long) Execution.ExecStatus.Timeout, workflow => new WorkflowCoreLogic().OnFailed(workflow) },
+            { (long) Execution.ExecStatus.Interrupted, workflow => new WorkflowCoreLogic().OnFailed(workflow) },
+            { (long) Execution.ExecStatus.Suspended, workflow => new WorkflowCoreLogic().OnFailed(workflow) },
+            { (long) Execution.ExecStatus.Failed, workflow => new WorkflowCoreLogic().OnFailed(workflow) }
+        };
+
+        public WorkflowCoreLogic()
+        {
+           
+        }
+
+         /// <summary>
+        /// Creates and initializes a proxy instance of the logic implementation for the domain object.
+        /// </summary>
+        /// <returns>An initialized proxy implementing <see cref="IWorkflowLogic"/>.</returns>
+        public static new IWorkflowLogic Create()
+        {
+            var workflowCoreLogic = new WorkflowCoreLogic();
+
+            var proxy = DispatchProxy.Create<IWorkflowLogic, Proxy<IWorkflowLogic>>();
+            ((Proxy<IWorkflowLogic>)proxy).Initialize();
+            ((Proxy<IWorkflowLogic>)proxy).Target = workflowCoreLogic ;
+            ((Proxy<IWorkflowLogic>)proxy).DomainObj = "Workflow";
+
+            return proxy;
+        }
+
+        override public void update(long workflowId, Workflow workflow)
+        {
+            // Core logic for updating a workflow
+            base.update(workflowId, workflow);
+            InvokeExecutionStatusHandler(workflow.exec_status_id, workflow);
+        }
+
+        /// <summary>
+        /// Invokes the execution status handler for the given status and workflow.
+        /// </summary>
+        /// <param name="executionStatusId">The execution status id (1=Executing, 2=Completed, 3=Failed).</param>
+        /// <param name="workflow">The workflow object to pass to the handler.</param>
+        public void InvokeExecutionStatusHandler(long executionStatusId, Workflow workflow)
+        {
+            if (_executionStatusHandlers.ContainsKey(executionStatusId))
+            {
+                _executionStatusHandlers[executionStatusId].Invoke(workflow);
+            }
+        }
+
+        /// <summary>
+        /// Handles workflow execution started status.
+        /// </summary>
+        /// <param name="workflow">The workflow being executed.</param>
+        public virtual void OnExecuting(Workflow workflow)
+        {
+            ExecLog execLog = new ExecLog();
+            ExecLog filter = new ExecLog();
+            filter.workflow_id = workflow.id;
+            filter.is_active = 1;
+
+            
+            execLog.is_active = 0;
+
+            DBPersist.update(execLog, filter);
+
+            execLog.workflow_id = workflow.id;
+            execLog.start_time = workflow.last_start_time;
+            execLog.end_time = DateTime.MinValue;
+            execLog.exec_status_id = workflow.exec_status_id;
+            execLog.is_active = 1;
+            DBPersist.insert(execLog);
+        }
+
+        /// <summary>
+        /// Handles workflow execution completed status.
+        /// </summary>
+        /// <param name="workflow">The completed workflow.</param>
+        public virtual void OnCompleted(Workflow workflow)
+        {
+            OnCompletedOrFailed(workflow);
+        }
+
+        /// <summary>
+        /// Handles workflow execution failed status.
+        /// </summary>
+        /// <param name="workflow">The failed workflow.</param>
+        public virtual void OnFailed(Workflow workflow)
+        {
+            OnCompletedOrFailed(workflow);
+        }
+        
+        public virtual void OnCompletedOrFailed(Workflow workflow)
+        {
+            ExecLog execLog = new ExecLog();
+            ExecLog filter = new ExecLog();
+            filter.workflow_id = workflow.id;
+            filter.is_active = 1;
+
+            
+            execLog.is_active = 1;
+            execLog.workflow_id = workflow.id;
+            execLog.start_time = workflow.last_start_time;
+            execLog.end_time = workflow.last_end_time;
+            execLog.exec_status_id = workflow.exec_status_id;
+
+            DBPersist.update(execLog, filter);
+
+        }
+    }
+}
+

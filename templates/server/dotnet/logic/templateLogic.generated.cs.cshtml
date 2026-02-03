@@ -16,11 +16,33 @@ using @namespaceName;
 namespace @namespaceName
 {
 
+    public interface I@(Model.DomainObj)Logic 
+    {
+        // Generated methods
+        List<@(domainObj)> select();
+        List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new();
+        List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new();
+        @(domainObj) get(long id);
+       
 
-    public partial class @(domainObj)Logic : I@(domainObj)Logic
+        List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new();
+        List<@(domainObj)History> history(long id);
+        void insert(@(domainObj) @(domainVar));
+        void update(long id, @(domainObj) @(domainVar));
+        void put(@(domainObj) @(domainVar));
+        void delete( long id );
+        @(domainObj)View view(long id);
+        
+    
+    }
+
+    public partial class @(domainObj)Logic : BaseLogic, I@(domainObj)Logic
     {
 
-
+        /// <summary>
+        /// Creates and initializes a proxy instance of the logic implementation for the domain object.
+        /// </summary>
+        /// <returns>An initialized proxy implementing <see cref="I@(domainObj)Logic"/>.</returns>
         public static I@(domainObj)Logic Create()
         {
             var @(domainVar) = new @(domainObj)Logic();
@@ -33,14 +55,23 @@ namespace @namespaceName
             return proxy;
         }
 
-        public  List<@(domainObj)> select()
+        /// <summary>
+        /// Selects all domain objects using the default return type of the domain object.
+        /// </summary>
+        /// <returns>List of <see cref="@(domainObj)"/> instances.</returns>
+        public virtual List<@(domainObj)> select()
         {
             return select<@(domainObj)>();
         }
 
        
     
-        public  List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new()
+        /// <summary>
+        /// Selects all domain objects and maps them to the specified base object type.
+        /// </summary>
+        /// <typeparam name="TBaseObject">The type to which the results will be mapped. Must inherit from <see cref="BaseObject"/> and have a parameterless constructor.</typeparam>
+        /// <returns>List of <typeparamref name="TBaseObject"/> instances.</returns>
+        public virtual List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new()
         {
             Logger.Debug("Processing @(domainObj)Logic select<TBaseObject> List");
 
@@ -50,7 +81,13 @@ namespace @namespaceName
             return @(domainVar)s;
         }
 
-        public List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new()
+        /// <summary>
+        /// Selects domain objects using a named query and maps them to the specified base object type.
+        /// </summary>
+        /// <typeparam name="TBaseObject">The type to which the results will be mapped. Must inherit from <see cref="BaseObject"/> and have a parameterless constructor.</typeparam>
+        /// <param name="queryName">The named query to execute.</param>
+        /// <returns>List of <typeparamref name="TBaseObject"/> instances.</returns>
+        public virtual List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new()
         {
             Logger.Debug($"Processing @(domainObj)Logic select<TBaseObject> with query: {queryName}");
 
@@ -59,14 +96,29 @@ namespace @namespaceName
             return @(domainVar)s;
         }
 
-         public  List<@(domainObj)History> history(long id)
+       
+        
+        /// <summary>
+        /// Retrieves the history records for a domain object by id.
+        /// </summary>
+        /// <param name="id">The id of the domain object to retrieve history for.</param>
+        /// <returns>List of <see cref="@(domainObj)History"/> entries associated with the given id.</returns>
+        public virtual List<@(domainObj)History> history(long id)
         {
             List<@(domainObj)History> @(domainVar)History = DBPersist.ExecuteQueryByName<@(domainObj)History>("@(schemaName).@(tableName)-get-history", new BaseObject() { { "id", id } });
 
             return @(domainVar)History;
         }
+        
 
-        public List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new()
+        /// <summary>
+        /// Retrieves child records for a given domain object id and child suffix.
+        /// </summary>
+        /// <typeparam name="TBaseObject">The type to map child records to.</typeparam>
+        /// <param name="id">The parent object's id.</param>
+        /// <param name="childSuffix">The suffix identifying which child query to run.</param>
+        /// <returns>List of child records mapped to <typeparamref name="TBaseObject"/>.</returns>
+        public virtual List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new()
         {
             Logger.Debug($"Processing @(domainObj)Logic children<TBaseObject> for ID={id}, childSuffix={childSuffix}");
 
@@ -75,8 +127,13 @@ namespace @namespaceName
 
             return children;
         }
-
-        public  @(domainObj) get(long id)
+        
+        /// <summary>
+        /// Retrieves a single domain object by id.
+        /// </summary>
+        /// <param name="id">The id of the domain object to retrieve.</param>
+        /// <returns>An instance of <see cref="@(domainObj)"/> if found; otherwise <c>null</c>.</returns>
+        public virtual @(domainObj) get(long id)
         {
             Logger.Debug($"Processing @(domainObj)Logic get ID={id}");
 
@@ -86,7 +143,26 @@ namespace @namespaceName
             return @(domainVar);
         }
 
-        public  void insert(@(domainObj) @(domainVar))
+        /// <summary>
+        /// Retrieves a view representation of the domain object by id.  A view instance contains dereferenced fields from related domain objects.
+        /// </summary>
+        /// <param name="id">The id of the domain object to retrieve the view for.</param>
+        /// <returns>A view instance for the domain object, or <c>null</c> if not found.</returns>
+        public virtual @(domainObj)View view(long id) 
+        {
+            Logger.Debug($"Processing @(domainObj)Logic view<TBaseObject> ID={id}");
+
+            string queryName = "@(schemaName).@(tableName)-get";
+            List<@(domainObj)View> @(domainObj)View = DBPersist.ExecuteQueryByName<@(domainObj)View>(queryName, new BaseObject() { { "id", id } });
+            
+
+            return @(domainObj)View.FirstOrDefault();
+        }
+        /// <summary>
+        /// Inserts a new domain object into persistence.
+        /// </summary>
+        /// <param name="@(domainVar)">The domain object instance to insert.</param>
+        public virtual void insert(@(domainObj) @(domainVar))
         {
             Logger.Debug($"Processing @(domainObj)Logic insert: {@(domainVar)}");
 
@@ -95,7 +171,11 @@ namespace @namespaceName
             DBPersist.insert(@(domainVar));
         }
 
-        public  void put(@(domainObj) @(domainVar))
+        /// <summary>
+        /// Inserts or updates (put) the domain object in persistence.
+        /// </summary>
+        /// <param name="@(domainVar)">The domain object instance to put.</param>
+        public virtual void put(@(domainObj) @(domainVar))
         {
             Logger.Debug($"Processing @(domainObj)Logic put: {@(domainVar)}");
 
@@ -104,7 +184,12 @@ namespace @namespaceName
             DBPersist.put(@(domainVar));
         }
 
-        public  void update(long id, @(domainObj) @(domainVar))
+        /// <summary>
+        /// Updates an existing domain object by id using the provided instance.
+        /// </summary>
+        /// <param name="id">The id of the domain object to update.</param>
+        /// <param name="@(domainVar)">The updated domain object instance.</param>
+        public virtual void update(long id, @(domainObj) @(domainVar))
         {
             Logger.Debug($"Processing @(domainObj)Logic update: ID = {id}\n{@(domainVar)}");
 
@@ -112,11 +197,16 @@ namespace @namespaceName
             DBPersist.update(@(domainVar));
         }
 
-        public  void delete(long id)
+        /// <summary>
+        /// Soft-deletes a domain object by setting its <c>is_active</c> flag to 0.
+        /// </summary>
+        /// <param name="id">The id of the domain object to delete.</param>
+        public virtual void delete(long id)
         {
             @(domainObj) @(domainVar) = get(id);
             @(domainVar).is_active = 0;
             DBPersist.update(@(domainVar));
         }
+        
     }
 }

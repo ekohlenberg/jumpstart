@@ -133,14 +133,15 @@ else
                 // Fetch the updated item from the API to ensure we have the complete View object
                 // with all computed properties and enum display values properly populated
                 var remoteClient = ClientFactory.CreateClient("RemoteAPI");
-                var updatedObject = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View>($"api/@(Model.DomainVar)/{message.InstanceId}");
+                var updatedObject = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View>($"api/@(Model.DomainVar)/view/{message.InstanceId}");
                 if (updatedObject != null)
                 { 
                 @{
                     foreach( var enumAttribute in Model.EnumAttributes)
                     {
                         <text>
-                        updatedObject.@(enumAttribute.nameColumn) = enumData["@(enumAttribute.idColumn)"][updatedObject.@(enumAttribute.idColumn)];
+                        //if (enumData.ContainsKey("@(enumAttribute.idColumn)") && enumData["@(enumAttribute.idColumn)"].ContainsKey(updatedObject.@(enumAttribute.idColumn)))
+                        //updatedObject.@(enumAttribute.nameColumn) = enumData["@(enumAttribute.idColumn)"][updatedObject.@(enumAttribute.idColumn)];
                         </text>
                     }
                 }
