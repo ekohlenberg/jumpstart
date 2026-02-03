@@ -41,7 +41,6 @@ dotnet server templates-logic,model,server/dotnet/logic/DispatcherThread.core.cs
 dotnet server templates-logic,model,server/dotnet/logic/HealthMonitorThread.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/SchedulerClient.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/AgentClient.core.cs.cshtml,./server/logic,TRUE
-dotnet server templates-logic,model,server/dotnet/logic/WorkflowExecutive.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/WorkflowLogic.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,model,server/dotnet/logic/NotificationRegistrar.core.cs.cshtml,./server/logic,TRUE
 dotnet server templates-logic,object,server/dotnet/logic/templateLogic.user.cs.cshtml,./server/logic,FALSE

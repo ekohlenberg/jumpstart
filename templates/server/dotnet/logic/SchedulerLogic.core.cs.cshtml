@@ -31,7 +31,7 @@ namespace @(Model.Namespace).core
         long register(ServerNode serverNode);
         void unregister(long serverNodeId);
        
-
+     
       
     }
 
@@ -63,6 +63,8 @@ namespace @(Model.Namespace).core
             get { return _thisServerNode; }
             set { _thisServerNode = value; }
         }
+
+        
 
         /// <summary>
         /// Sets the singleton Scheduler instance

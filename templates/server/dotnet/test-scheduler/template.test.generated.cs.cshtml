@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using @Model.Namespace;
 using @(Model.Namespace).core;
@@ -9,9 +10,27 @@ namespace @Model.Namespace
 {
     public partial class SchedulerTest 
     {
+        private static ServerNode schedulerNode;
         private static Dictionary<long, ServerNode> agents = new Dictionary<long, ServerNode>();
         private static List<Process> processes = new List<Process>();
         private static List<Workflow> workflows = new List<Workflow>();
+       
+       /// <summary>
+        /// Gets the singleton Scheduler instance
+        /// </summary>
+        /// <returns>The ServerNode instance of the scheduler</returns>
+        public static void InitSchedulerNode()
+        {
+             schedulerNode = null;
+
+            void SchedulerSelectCallback(System.Data.Common.DbDataReader rdr)
+                   {
+                    schedulerNode = new ServerNode()   ;
+                    DBPersist.autoAssign(rdr, schedulerNode);
+                   }
+            DBPersist.select(SchedulerSelectCallback, $"select * from core.server_node where server_node_type_id = {(long)ServerNode.ServerNodeType.Scheduler} and server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online}");
+
+       }
 
         /// <summary>
         /// Delete all existing test workflows
@@ -58,7 +77,7 @@ namespace @Model.Namespace
                 DBPersist.autoAssign(rdr, process);
                 processes.Add(process);
             }
-            DBPersist.select(ProcessSelectCallback, "SELECT * FROM core.process WHERE script_id IN (SELECT id FROM core.script WHERE name LIKE 'test-scheduler%')");
+            DBPersist.select(ProcessSelectCallback, "SELECT * FROM core.process WHERE script_id IN (SELECT id FROM core.script WHERE name LIKE 'test%')");
 
             if (processes.Count == 0)
             {
@@ -66,6 +85,13 @@ namespace @Model.Namespace
             }
 
             Console.WriteLine($"SchedulerTest: Loaded {agents.Count} agents and {processes.Count} processes");
+
+            InitSchedulerNode();
+
+            if (schedulerNode == null)
+            {
+                throw new Exception("Scheduler node not found. Please ensure the scheduler is configured correctly.");  
+            }
         }
 
         /// <summary>
@@ -100,8 +126,8 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow.id} with sequence {childWorkflow.seq}");
 
                 // Execute parent workflow
-                var schedulerLogic = SchedulerLogic.Create();
-                schedulerLogic.execute(parentWorkflow.id);
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
                 Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution");
             }
             catch (Exception ex)
@@ -161,8 +187,8 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} with sequence {childWorkflow2.seq}");
 
                 // Execute parent workflow
-                var schedulerLogic = SchedulerLogic.Create();
-                schedulerLogic.execute(parentWorkflow.id);
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
                 Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution");
             }
             catch (Exception ex)
@@ -249,8 +275,8 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow4.id} with sequence {childWorkflow4.seq}");
 
                 // Execute parent workflow
-                var schedulerLogic = SchedulerLogic.Create();
-                schedulerLogic.execute(parentWorkflow.id);
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
                 Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution");
             }
             catch (Exception ex)
@@ -328,8 +354,8 @@ namespace @Model.Namespace
                 Console.WriteLine($"SchedulerTest: Created child process {childProcess2.id} for child folder {childFolder2.id}");
 
                 // Execute parent workflow (should recursively execute child folders and their processes)
-                var schedulerLogic = SchedulerLogic.Create();
-                schedulerLogic.execute(parentWorkflow.id);
+                var schedulerClient = new SchedulerClient(schedulerNode);
+                await schedulerClient.ExecuteAsync(parentWorkflow.id);
                 Console.WriteLine($"SchedulerTest: Parent workflow {parentWorkflow.id} queued for execution (will recursively execute child folders and processes)");
             }
             catch (Exception ex)
