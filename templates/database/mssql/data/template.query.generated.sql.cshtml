@@ -6,21 +6,14 @@
 @using jumpstart;
 
 @{
-	MetaObject metaObject = (MetaObject)Model;
-	//if (metaObject.SchemaName == "sec") return;
-	//if (metaObject.SchemaName == "core") return;
-	
-
-    //foreach( var metaObject in Model.Objects)
-
-	
+	var metaObject = (MetaObject)Model;
 	var domainObj = metaObject.DomainObj;
 	var tableName = metaObject.TableName;
 	var schemaName = metaObject.SchemaName;
-	
+
 	// Get all attributes for this object
 	var attributes = metaObject.Attributes;
-	
+
 	// Find foreign key relationships
 	var foreignKeys = new List<MetaAttribute>();
 	foreach(var attr in attributes)
@@ -30,8 +23,8 @@
 			foreignKeys.Add(attr);
 		}
 	}
-	
-	// Build the SELECT clause for main table attributes 
+
+	// Build the SELECT clause for main table attributes (excluding foreign key columns)
 	var selectColumns = new List<string>();
 	foreach(var attr in attributes)
 	{
@@ -40,20 +33,20 @@
 			selectColumns.Add(tableName + "." + attr.Name);
 		}
 	}
-	
+
 	// Build the SELECT clause for foreign key RWK columns with improved aliasing
 	var fkSelectColumns = new List<string>();
 	var joinClauses = new List<string>();
 	var fkTableNames = new List<string>();
-	
+
 	// Track used aliases to avoid conflicts
 	var usedAliases = new HashSet<string>();
-	
+
 	foreach(var fk in foreignKeys)
 	{
 		var fkTable = fk.FkObject;
 		fkTableNames.Add(fkTable);
-		
+
 		// Find the foreign key object
 		var fkObject = (MetaObject)null;
 		foreach(var obj in metaObject.Model.Objects)
@@ -73,7 +66,7 @@
 			{
 				aliasBase = aliasBase.Substring(0, aliasBase.Length - 3);
 			}
-			
+
 			// Ensure alias is unique
 			var alias = aliasBase;
 			var counter = 1;
@@ -83,7 +76,7 @@
 				counter++;
 			}
 			usedAliases.Add(alias);
-			
+
 			// Get RWK columns from the foreign key table with improved aliasing
 			foreach(var fkObjectAttr in fkObject.Attributes)
 			{
@@ -93,12 +86,12 @@
 					fkSelectColumns.Add(alias + "." + fkObjectAttr.Name + " AS " + alias + "_" + fkObjectAttr.Name);
 				}
 			}
-			
+
 			// Build JOIN clause with unique alias
 			joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + tableName + "." + fk.Name + " = " + alias + ".id");
 		}
 	}
-	
+
 	// Build RWK expression for get-by-rwk query
 	var rwkExpressions = new List<string>();
 	foreach(var attr in attributes)
@@ -109,46 +102,49 @@
 		}
 	}
 	var rwkExpression = string.Join(" AND ", rwkExpressions);
-	
+
 	// Build history column list for the history query
 	var historyColumns = new List<string>();
 	foreach(var attr in attributes)
 	{
-		if (attr.Name != "id")
+		var columnName = attr.Name;
+		if (attr.Name == "id")
 		{
-			historyColumns.Add("history." + schemaName + "_" + tableName + "." + attr.Name);
+			columnName = metaObject.TableName + "_id";
 		}
+		historyColumns.Add("history." + metaObject.SchemaName + "_" + metaObject.TableName + "." + columnName);
 	}
 	var historyColumnList = historyColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", historyColumns) : "";
-	
-        <text>
+
+	<text>
 -- =====================================
 -- Query for @(domainObj) (@(schemaName).@(tableName))
 -- =====================================
+
 DECLARE @@sql_id BIGINT = NEXT VALUE FOR core.sql_identity;
 
 INSERT INTO core.sql (
-    id, 
-    name, 
-    sql_text, 
-    description, 
+	id,
+	name,
+	sql_text,
+	description,
 	created_by,
-    last_updated, 
-    last_updated_by,
+	last_updated,
+	last_updated_by,
 	is_active,
 	version,
 	data_source_id
 ) VALUES (
-    @@sql_id,
-    '@(schemaName).@(tableName)-select',
-    'SELECT 
-        @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
-    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
-    ORDER BY @(tableName).id;',
-    'Select all @(domainObj) records with related @(string.Join(", ", fkTableNames)) information',
-    SYSTEM_USER,
+	@@sql_id,
+	'@(schemaName).@(tableName)-select',
+	'SELECT 
+		@(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
+	FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
+	ORDER BY @(schemaName).@(tableName).id;',
+	'Select all @(domainObj) records with related @(string.Join(", ", fkTableNames)) information',
+	SYSTEM_USER,
 	GETDATE(),
-    SYSTEM_USER,
+	SYSTEM_USER,
 	1,
 	1,
 	(SELECT id FROM core.data_source WHERE name = 'default')
@@ -157,27 +153,27 @@ INSERT INTO core.sql (
 SET @@sql_id = NEXT VALUE FOR core.sql_identity;
 
 INSERT INTO core.sql (
-    id, 
-    name, 
-    sql_text, 
-    description, 
+	id,
+	name,
+	sql_text,
+	description,
 	created_by,
-    last_updated, 
-    last_updated_by,
+	last_updated,
+	last_updated_by,
 	is_active,
 	version,
 	data_source_id
 ) VALUES (
-    @@sql_id,
-    '@(schemaName).@(tableName)-get',
-    'SELECT 
-        @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
-    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
-    WHERE @(tableName).id = ^(id);',
-    'Select single @(domainObj) record by ID with related @(string.Join(", ", fkTableNames)) information',
-    SYSTEM_USER,
+	@@sql_id,
+	'@(schemaName).@(tableName)-get',
+	'SELECT 
+		@(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
+	FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
+	WHERE @(schemaName).@(tableName).id = ^(id);',
+	'Select single @(domainObj) record by ID with related @(string.Join(", ", fkTableNames)) information',
+	SYSTEM_USER,
 	GETDATE(),
-    SYSTEM_USER,
+	SYSTEM_USER,
 	1,
 	1,
 	(SELECT id FROM core.data_source WHERE name = 'default')
@@ -186,27 +182,27 @@ INSERT INTO core.sql (
 SET @@sql_id = NEXT VALUE FOR core.sql_identity;
 
 INSERT INTO core.sql (
-    id, 
-    name, 
-    sql_text, 
-    description, 
+	id,
+	name,
+	sql_text,
+	description,
 	created_by,
-    last_updated, 
-    last_updated_by,
+	last_updated,
+	last_updated_by,
 	is_active,
 	version,
 	data_source_id
 ) VALUES (
-    @@sql_id,
-    '@(schemaName).@(tableName)-get-by-rwk',
-    'SELECT 
-        @(tableName).id@(selectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", fkSelectColumns) : "")
-    FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n    " + string.Join("\n    ", joinClauses) : "")
-    WHERE @(rwkExpression);',
-    'Select single @(domainObj) record by RWK columns with related @(string.Join(", ", fkTableNames)) information',
-    SYSTEM_USER,
+	@@sql_id,
+	'@(schemaName).@(tableName)-get-by-rwk',
+	'SELECT 
+		@(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
+	FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
+	WHERE @(rwkExpression);',
+	'Select single @(domainObj) record by RWK columns with related @(string.Join(", ", fkTableNames)) information',
+	SYSTEM_USER,
 	GETDATE(),
-    SYSTEM_USER,
+	SYSTEM_USER,
 	1,
 	1,
 	(SELECT id FROM core.data_source WHERE name = 'default')
@@ -215,40 +211,39 @@ INSERT INTO core.sql (
 SET @@sql_id = NEXT VALUE FOR core.sql_identity;
 
 INSERT INTO core.sql (
-    id, 
-    name, 
-    sql_text, 
-    description, 
+	id,
+	name,
+	sql_text,
+	description,
 	created_by,
-    last_updated, 
-    last_updated_by,
+	last_updated,
+	last_updated_by,
 	is_active,
 	version,
 	data_source_id
 ) VALUES (
-    @@sql_id,
-    '@(schemaName).@(tableName)-get-history',
-    'SELECT 
-        history.@(schemaName)_@(tableName).@(tableName)_id,
-        history.@(schemaName)_@(tableName).id,
-        history.@(schemaName)_@(tableName).is_active,
-        history.@(schemaName)_@(tableName).created_by,
-        history.@(schemaName)_@(tableName).last_updated,
-        history.@(schemaName)_@(tableName).last_updated_by,
-        history.@(schemaName)_@(tableName).version@(historyColumnList)
-    FROM history.@(schemaName)_@(tableName)
-    WHERE history.@(schemaName)_@(tableName).@(tableName)_id = ^(id)
-    ORDER BY history.@(schemaName)_@(tableName).last_updated DESC;',
-    'Select all history records for @(domainObj) where @(tableName)_id matches the provided id',
-    SYSTEM_USER,
+	@@sql_id,
+	'@(schemaName).@(tableName)-get-history',
+	'SELECT 
+		history.@(schemaName)_@(tableName).@(tableName)_id,
+		history.@(schemaName)_@(tableName).id,
+		history.@(schemaName)_@(tableName).is_active,
+		history.@(schemaName)_@(tableName).created_by,
+		history.@(schemaName)_@(tableName).last_updated,
+		history.@(schemaName)_@(tableName).last_updated_by,
+		history.@(schemaName)_@(tableName).version@(historyColumnList)
+	FROM history.@(schemaName)_@(tableName)
+	WHERE history.@(schemaName)_@(tableName).@(tableName)_id = ^(id)
+	ORDER BY history.@(schemaName)_@(tableName).last_updated DESC;',
+	'Select all history records for @(domainObj) where @(tableName)_id matches the provided id',
+	SYSTEM_USER,
 	GETDATE(),
-    SYSTEM_USER,
+	SYSTEM_USER,
 	1,
 	1,
 	(SELECT id FROM core.data_source WHERE name = 'default')
 );
 
-        </text>
-    
+	</text>
+
 }
-		

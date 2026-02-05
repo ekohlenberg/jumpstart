@@ -1,40 +1,35 @@
 -- Insert default data source record
-INSERT INTO [core].[data_source]
-           ([id]
-           ,[name]
-           ,[is_active]
-           ,[created_by]
-           ,[last_updated]
-           ,[last_updated_by]
-           ,[version])
-     VALUES
-           (NEXT VALUE FOR core.data_source_identity, 
-		   'default',
-		   1,
-		   CURRENT_USER,
-		   getdate(),
-		   CURRENT_USER,
-		   1);
+INSERT INTO [core].[data_source] ([id], [name], [is_active], [created_by], [last_updated], [last_updated_by], [version]) VALUES (NEXT VALUE FOR core.data_source_identity, 'default', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
--- Insert agent status values
-INSERT INTO [core].[agent_status] ([id], [name]) VALUES (1, 'Initializing');
-INSERT INTO [core].[agent_status] ([id], [name]) VALUES (2, 'Online');
-INSERT INTO [core].[agent_status] ([id], [name]) VALUES (3, 'Busy');
-INSERT INTO [core].[agent_status] ([id], [name]) VALUES (4, 'Offline');
+-- Insert server node type values
+INSERT INTO [core].[server_node_type] ([id], [name]) VALUES (1, 'Agent');
+INSERT INTO [core].[server_node_type] ([id], [name]) VALUES (2, 'Scheduler');
+INSERT INTO [core].[server_node_type] ([id], [name]) VALUES (3, 'ApiServer');
+
+-- Insert server node status values
+INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (1, 'Initializing');
+INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (2, 'Online');
+INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (3, 'Busy');
+INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (4, 'Offline');
+
+-- Insert workflow type values
+INSERT INTO [core].[workflow_type] ([id], [name]) VALUES (1, 'Folder');
+INSERT INTO [core].[workflow_type] ([id], [name]) VALUES (2, 'Process');
 
 -- Insert on_failure action values
 INSERT INTO [core].[on_failure] ([id], [action]) VALUES (1, 'Stop');
 INSERT INTO [core].[on_failure] ([id], [action]) VALUES (2, 'Continue');
 
--- Insert exec_status values
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (1, 'Dispatched');
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (2, 'Executing');
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (3, 'Completed');
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (4, 'Failed');
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (5, 'Cancelled');
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (6, 'Timeout');
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (7, 'Interrupted');
-INSERT INTO [core].[exec_status] ([id], [status]) VALUES (8, 'Suspended');
+
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (1, '');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (2, 'Dispatched');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (3, 'Executing');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (4, 'Completed');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (5, 'Failed');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (6, 'Cancelled');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (7, 'Timeout');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (8, 'Interrupted');
+INSERT INTO [core].[exec_status] ([id], [name]) VALUES (9, 'Suspended');
 
 -- Insert script type values
 INSERT INTO [core].[script_type] ([id], [name]) VALUES (1, 'CSharp');
@@ -97,7 +92,13 @@ INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [l
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'delete', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
 
-
+-- Scheduler Operations
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'execute', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'validate', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'configure', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'health', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'register', 1, current_timestamp, current_user, current_user, 1);
+insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity , 'Scheduler', 'unregister', 1,current_timestamp,current_user,current_user ,1);
 
 DECLARE @@operation_id BIGINT;
 @{
@@ -105,28 +106,22 @@ DECLARE @@operation_id BIGINT;
 	{
 		<text>
 		
-
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'select', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
-		
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'get', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
-		
+		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'view', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'insert', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
-
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'put', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
-		
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'update', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
-		
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'delete', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
-
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'history', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
-
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
 		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'children', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
 		</text>
