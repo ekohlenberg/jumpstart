@@ -151,10 +151,53 @@ SELECT
 FROM core.script s
 WHERE s.name LIKE 'test%';
 
--- Insert workflow record for test workflow
+-- Insert explicit process for hello-world script
+INSERT INTO core.process(
+    id, name, script_id, is_active, created_by, last_updated, last_updated_by, version)
+SELECT
+    nextval('core.process_identity'),
+    'test hello world process',
+    s.id,
+    1,
+    current_user,
+    current_timestamp,
+    current_user,
+    1
+FROM core.script s
+WHERE s.name = 'test hello-world script';
+
+-- Insert process records for all other test scripts
+INSERT INTO core.process(
+    id, name, script_id, is_active, created_by, last_updated, last_updated_by, version)
+SELECT 
+    nextval('core.process_identity'),
+    s.name,
+    s.id,
+    1,
+    current_user,
+    current_timestamp,
+    current_user,
+    1
+FROM core.script s
+WHERE s.name LIKE 'test%'
+  AND s.name <> 'test hello-world script';
+
+-- Insert workflow record for test workflow (type=Process, link to hello-world process)
 INSERT INTO core.workflow(
-	id, parent_id, name, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (nextval('core.workflow_identity'), null, 'test workflow', 1, current_user, current_timestamp, current_user, 1);
+    id, workflow_type_id, parent_id, name, process_id, is_active, created_by, last_updated, last_updated_by, version)
+SELECT
+    nextval('core.workflow_identity'),
+    2,
+    null,
+    'test workflow',
+    p.id,
+    1,
+    current_user,
+    current_timestamp,
+    current_user,
+    1
+FROM core.process p
+WHERE p.name = 'test hello world process';
 
 
 

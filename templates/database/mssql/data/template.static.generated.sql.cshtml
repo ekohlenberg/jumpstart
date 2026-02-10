@@ -1,40 +1,35 @@
 -- Insert default data source record
 INSERT INTO [core].[data_source] ([id], [name], [is_active], [created_by], [last_updated], [last_updated_by], [version]) VALUES (NEXT VALUE FOR core.data_source_identity, 'default', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
--- Insert server node type values
-INSERT INTO [core].[server_node_type] ([id], [name]) VALUES (1, 'Agent');
-INSERT INTO [core].[server_node_type] ([id], [name]) VALUES (2, 'Scheduler');
-INSERT INTO [core].[server_node_type] ([id], [name]) VALUES (3, 'ApiServer');
+INSERT INTO [core].[server_node_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'Agent', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[server_node_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Scheduler', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[server_node_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'ApiServer', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
--- Insert server node status values
-INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (1, 'Initializing');
-INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (2, 'Online');
-INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (3, 'Busy');
-INSERT INTO [core].[server_node_status] ([id], [name]) VALUES (4, 'Offline');
+INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'Initializing', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Online', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Busy', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (4, 'Offline', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
--- Insert workflow type values
-INSERT INTO [core].[workflow_type] ([id], [name]) VALUES (1, 'Folder');
-INSERT INTO [core].[workflow_type] ([id], [name]) VALUES (2, 'Process');
+INSERT INTO [core].[workflow_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'Folder', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[workflow_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Process', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
--- Insert on_failure action values
-INSERT INTO [core].[on_failure] ([id], [action]) VALUES (1, 'Stop');
-INSERT INTO [core].[on_failure] ([id], [action]) VALUES (2, 'Continue');
+INSERT INTO [core].[on_failure] ([id], [action], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'Stop', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[on_failure] ([id], [action], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Continue', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
 
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (1, '');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (2, 'Dispatched');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (3, 'Executing');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (4, 'Completed');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (5, 'Failed');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (6, 'Cancelled');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (7, 'Timeout');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (8, 'Interrupted');
-INSERT INTO [core].[exec_status] ([id], [name]) VALUES (9, 'Suspended');
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, '', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Dispatched', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Executing', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (4, 'Completed', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (5, 'Failed', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (6, 'Cancelled', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (7, 'Timeout', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (8, 'Interrupted', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (9, 'Suspended', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
--- Insert script type values
-INSERT INTO [core].[script_type] ([id], [name]) VALUES (1, 'CSharp');
-INSERT INTO [core].[script_type] ([id], [name]) VALUES (2, 'PowerShell');
-INSERT INTO [core].[script_type] ([id], [name]) VALUES (3, 'Python');
+INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'CSharp', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'PowerShell', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Python', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
 -- Insert AgentLogic method operations
 -- Process Management Operations
@@ -75,7 +70,6 @@ INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [l
 -- System Operations
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'shutdown', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'reload', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'update', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'diagnose', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'Agent', 'health', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 

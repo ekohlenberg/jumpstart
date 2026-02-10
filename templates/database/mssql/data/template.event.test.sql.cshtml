@@ -54,8 +54,8 @@ namespace Generated
 }', 1, 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
 
 INSERT INTO [core].[script](
-	id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (NEXT VALUE FOR core.script_identity, 'test long loop script', 
+    id, name, source, script_type_id, is_active, created_by, last_updated, last_updated_by, version)
+    VALUES (NEXT VALUE FOR core.script_identity, 'test infinite loop script', 
 'using System;
 using System.Threading;
 using System.IO;
@@ -63,13 +63,13 @@ using @Model.Name;
 
 namespace Generated
 {
-    public class LongLoopScript : IScript
+    public class InfiniteLoopScript : IScript
     {
         public void Execute(ScriptContext context)
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 30; i++)
             {
-                Console.WriteLine($"Long loop: {i}");
+                Console.WriteLine("Long loop: " + i);
                 Thread.Sleep(1000);
             }
         }
@@ -151,10 +151,27 @@ SELECT
 FROM [core].[script] s
 WHERE s.name LIKE 'test%';
 
--- Insert workflow record for test workflow
+
+
+
+-- Insert workflow record for test workflow (type=Process, link to hello-world process)
 INSERT INTO [core].[workflow](
-	id, parent_workflow_id, name, description, is_active, created_by, last_updated, last_updated_by, version)
-	VALUES (NEXT VALUE FOR core.workflow_identity, null, 'test workflow', 'test workflow', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+    id, workflow_type_id, parent_id, name, process_id, is_active, created_by, last_updated, last_updated_by, version, last_start_time, last_end_time)
+SELECT
+    NEXT VALUE FOR core.workflow_identity,
+    2,
+    null,
+    'test workflow',
+    p.id,
+    1,
+    SYSTEM_USER,
+    GETDATE(),
+    SYSTEM_USER,
+    1,
+    '1900-01-01 00:00:00',
+    '1900-01-01 00:00:00'
+FROM [core].[process] p
+WHERE p.name = 'test hello world process';
 
 -- Insert event services
 WITH all_object_insert_script AS (
