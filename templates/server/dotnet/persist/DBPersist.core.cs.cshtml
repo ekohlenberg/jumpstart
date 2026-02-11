@@ -226,6 +226,7 @@ namespace @Model.Name
             catch(Exception x)
             {
                 Logger.Error(x.Message + ": " + sql + " on connection '" + connectionName + "'");
+                Logger.Debug($"Parameters: {string.Join(", ", parameters?.Select(p => $"{p.Key}={p.Value}") ?? new string[0])}");
             }
         }
 

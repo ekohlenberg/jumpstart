@@ -208,5 +208,15 @@ namespace @Model.Name
                 return "Unknown";
             }
         }
+
+        /// <summary>
+        /// Returns a legacy minimum date used by some SQL Server logic (1/1/1900 00:00:00).
+        /// </summary>
+        public static DateTime MinDateValue()
+        {
+            return new DateTime(1900, 1, 1, 0, 0, 0);
+        }
+
+        
     }
 }

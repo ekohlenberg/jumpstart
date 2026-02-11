@@ -62,6 +62,8 @@ namespace @Model.Namespace
                             workflow.process_id = process.id;
                             workflow.parent_id = parentWorkflow.id;
                             workflow.seq = seq;
+                            workflow.last_start_time = Util.MinDateValue();
+                            workflow.last_end_time = Util.MinDateValue();
                             workflow.on_failure_action_id = (long)Workflow.OnFailureAction.Continue;
                             seq+=10;
                             workflows.Add(workflow);

@@ -108,6 +108,9 @@ namespace @Model.Namespace
                 var parentWorkflow = new Workflow();
                 parentWorkflow.name = "test-scheduler-single-job";
                 parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
+                parentWorkflow.last_start_time = Util.MinDateValue();
+                parentWorkflow.last_end_time = Util.MinDateValue();
+
                 parentWorkflow.is_active = 1;
                 DBPersist.insert(parentWorkflow, "default");
                 Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
@@ -120,6 +123,8 @@ namespace @Model.Namespace
                 childWorkflow.process_id = processes[0].id;
                 childWorkflow.server_node_id = agents.Values.First().id;
                 childWorkflow.seq = 10;
+                childWorkflow.last_start_time = Util.MinDateValue();
+                childWorkflow.last_end_time = Util.MinDateValue();
                 childWorkflow.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childWorkflow.is_active = 1;
                 DBPersist.insert(childWorkflow, "default");
@@ -157,6 +162,9 @@ namespace @Model.Namespace
                 parentWorkflow.name = "test-scheduler-two-job";
                 parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
                 parentWorkflow.is_active = 1;
+                parentWorkflow.last_start_time = Util.MinDateValue();
+                parentWorkflow.last_end_time = Util.MinDateValue();
+            
                 DBPersist.insert(parentWorkflow, "default");
                 Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
 
@@ -170,6 +178,9 @@ namespace @Model.Namespace
                 childWorkflow1.seq = 10;
                 childWorkflow1.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childWorkflow1.is_active = 1;
+                childWorkflow1.last_start_time = Util.MinDateValue();
+                childWorkflow1.last_end_time = Util.MinDateValue();
+
                 DBPersist.insert(childWorkflow1, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow1.id} with sequence {childWorkflow1.seq}");
 
@@ -183,6 +194,8 @@ namespace @Model.Namespace
                 childWorkflow2.seq = 20;
                 childWorkflow2.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childWorkflow2.is_active = 1;
+                childWorkflow2.last_start_time = Util.MinDateValue();
+                childWorkflow2.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childWorkflow2, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} with sequence {childWorkflow2.seq}");
 
@@ -218,6 +231,8 @@ namespace @Model.Namespace
                 var parentWorkflow = new Workflow();
                 parentWorkflow.name = "test-scheduler-four-job-concurrent";
                 parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
+                parentWorkflow.last_start_time = Util.MinDateValue();
+                parentWorkflow.last_end_time = Util.MinDateValue();
                 parentWorkflow.is_active = 1;
                 DBPersist.insert(parentWorkflow, "default");
                 Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
@@ -232,6 +247,8 @@ namespace @Model.Namespace
                 childWorkflow1.seq = 10;
                 childWorkflow1.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childWorkflow1.is_active = 1;
+                childWorkflow1.last_start_time = Util.MinDateValue();
+                childWorkflow1.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childWorkflow1, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow1.id} with sequence {childWorkflow1.seq}");
 
@@ -245,6 +262,8 @@ namespace @Model.Namespace
                 childWorkflow2.seq = 20;
                 childWorkflow2.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childWorkflow2.is_active = 1;
+                childWorkflow2.last_start_time = Util.MinDateValue();
+                childWorkflow2.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childWorkflow2, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow2.id} with sequence {childWorkflow2.seq} (concurrent)");
 
@@ -258,6 +277,8 @@ namespace @Model.Namespace
                 childWorkflow3.seq = 20;
                 childWorkflow3.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childWorkflow3.is_active = 1;
+                childWorkflow3.last_start_time = Util.MinDateValue();
+                childWorkflow3.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childWorkflow3, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow3.id} with sequence {childWorkflow3.seq} (concurrent)");
 
@@ -271,6 +292,8 @@ namespace @Model.Namespace
                 childWorkflow4.seq = 30;
                 childWorkflow4.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childWorkflow4.is_active = 1;
+                childWorkflow4.last_start_time = Util.MinDateValue();
+                childWorkflow4.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childWorkflow4, "default");
                 Console.WriteLine($"SchedulerTest: Created child workflow {childWorkflow4.id} with sequence {childWorkflow4.seq}");
 
@@ -306,6 +329,8 @@ namespace @Model.Namespace
                 parentWorkflow.name = "test-scheduler-nested-parent";
                 parentWorkflow.workflow_type_id = (long)Workflow.WorkflowType.Folder;
                 parentWorkflow.is_active = 1;
+                parentWorkflow.last_start_time = Util.MinDateValue();
+                parentWorkflow.last_end_time = Util.MinDateValue();
                 DBPersist.insert(parentWorkflow, "default");
                 Console.WriteLine($"SchedulerTest: Created parent workflow folder {parentWorkflow.id} - {parentWorkflow.name}");
 
@@ -315,6 +340,8 @@ namespace @Model.Namespace
                 childFolder1.workflow_type_id = (long)Workflow.WorkflowType.Folder;
                 childFolder1.parent_id = parentWorkflow.id;
                 childFolder1.is_active = 1;
+                childFolder1.last_start_time = Util.MinDateValue();
+                childFolder1.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childFolder1, "default");
                 Console.WriteLine($"SchedulerTest: Created child folder {childFolder1.id} - {childFolder1.name}");
 
@@ -328,6 +355,8 @@ namespace @Model.Namespace
                 childProcess1.seq = 10;
                 childProcess1.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childProcess1.is_active = 1;
+                childProcess1.last_start_time = Util.MinDateValue();
+                childProcess1.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childProcess1, "default");
                 Console.WriteLine($"SchedulerTest: Created child process {childProcess1.id} for child folder {childFolder1.id}");
 
@@ -337,6 +366,8 @@ namespace @Model.Namespace
                 childFolder2.workflow_type_id = (long)Workflow.WorkflowType.Folder;
                 childFolder2.parent_id = parentWorkflow.id;
                 childFolder2.is_active = 1;
+                childFolder2.last_start_time = Util.MinDateValue();
+                childFolder2.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childFolder2, "default");
                 Console.WriteLine($"SchedulerTest: Created child folder {childFolder2.id} - {childFolder2.name}");
 
@@ -350,6 +381,8 @@ namespace @Model.Namespace
                 childProcess2.seq = 10;
                 childProcess2.on_failure_action_id = (long)Workflow.OnFailureAction.Stop;
                 childProcess2.is_active = 1;
+                childProcess2.last_start_time = Util.MinDateValue();
+                childProcess2.last_end_time = Util.MinDateValue();
                 DBPersist.insert(childProcess2, "default");
                 Console.WriteLine($"SchedulerTest: Created child process {childProcess2.id} for child folder {childFolder2.id}");
 

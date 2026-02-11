@@ -406,7 +406,7 @@ namespace @(Model.Namespace).core
             Execution.ExecStatus execStatus = Execution.ExecStatus.Executing;
             workflow.exec_status_id = (long)execStatus;
             workflow.last_start_time = DateTime.UtcNow;
-            workflow.last_end_time = DateTime.MinValue;
+            workflow.last_end_time = Util.MinDateValue();
             workflowLogic.update(workflow.id, workflow);
 
             IScriptLogic scriptLogic = ScriptLogic.Create();
