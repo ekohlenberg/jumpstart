@@ -90,7 +90,7 @@ namespace @Model.Namespace
 
             execLog.workflow_id = workflow.id;
             execLog.start_time = workflow.last_start_time;
-            execLog.end_time = DateTime.MinValue;
+            execLog.end_time = Util.MinDateValue();
             execLog.exec_status_id = workflow.exec_status_id;
             execLog.is_active = 1;
             DBPersist.insert(execLog);

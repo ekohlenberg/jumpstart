@@ -184,6 +184,7 @@ else
             var remoteClient = ClientFactory.CreateClient("RemoteAPI");
             @(Model.DomainVar)List = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)View[]>("api/@(Model.DomainVar)");
             Console.WriteLine($"ListTemplate: Reloaded {@(Model.DomainVar)List?.Length ?? 0} @(Model.DomainVar) records");
+            await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
         {
