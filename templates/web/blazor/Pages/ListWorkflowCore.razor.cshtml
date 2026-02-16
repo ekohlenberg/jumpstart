@@ -23,12 +23,13 @@ else
     Console.WriteLine($"ListWorkflowCore: About to render DataTable with {@@workflowList.Length} items");
 
 
-    <DataTable Data="&at;workflowList"
-               DataType="typeof(WorkflowView)"
-               ShowActions="true"
-               ShowAddButton="true"
-               OnEdit="&at;OnEditWorkflow"
-               OnAdd="&at;OnAddWorkflow" />
+    <DataTableContextMenu Data="&at;workflowList"
+                          DataType="typeof(WorkflowView)"
+                          ShowActions="true"
+                          ShowAddButton="true"
+                          OnEdit="&at;OnEditWorkflow"
+                          OnAdd="&at;OnAddWorkflow"
+                          ContextMenuItems="&at;_workflowContextMenuItems" />
 
     Console.WriteLine($"ListWorkflowCore: DataTable rendered");
 }
@@ -38,9 +39,15 @@ else
     private HubConnection? _hubConnection;
     private string _domainObjectName = "Workflow";
     private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
+    private List<DataTableContextMenu.ContextMenuItem> _workflowContextMenuItems = new();
 
     protected override async Task OnInitializedAsync()
     {
+        _workflowContextMenuItems = new List<DataTableContextMenu.ContextMenuItem>
+        {
+            new DataTableContextMenu.ContextMenuItem { Label = "Run", Action = RunWorkflow }
+        };
+
         var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 
         workflowList = await remoteClient.GetFromJsonAsync<WorkflowView[]>("api/workflow");
@@ -209,6 +216,12 @@ else
     {
         var workflow = (WorkflowView)item;
         Navigation.NavigateTo($"edit-workflow/{workflow.id}");
+    }
+
+    private async Task RunWorkflow(long id)
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+        await remoteClient.GetAsync($"api/workflow/run/{id}");
     }
 
     public async ValueTask DisposeAsync()

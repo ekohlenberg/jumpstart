@@ -5,6 +5,7 @@ dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,w
 dotnet server templates-common,model,web/blazor/Components/TabControl.razor.cshtml,web/components,TRUE
 dotnet server templates-common,model,web/blazor/Components/TabItem.cs.cshtml,web/components,TRUE
 dotnet server templates-common,model,web/blazor/Components/DataTable.razor.cshtml,web/components,TRUE
+dotnet server templates-common,model,web/blazor/Components/DataTableContextMenu.razor.cshtml,web/components,TRUE
 dotnet server templates-common,model,shared/dotnet/common/Util.core.cs.cshtml,web/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cshtml,web/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,web/common,TRUE
