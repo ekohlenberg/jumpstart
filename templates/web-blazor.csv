@@ -72,4 +72,5 @@ Blazor wasm content,model,web/blazor/template.sln.cshtml,web/,FALSE
 Blazor wasm content,object,web/blazor/Pages/Edittemplate.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,object,web/blazor/Pages/Listtemplate.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Pages/Home.razor,web/Pages,TRUE
+Blazor wasm content,model,web/blazor/Pages/ListWorkflowCore.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Program.cs.cshtml,web,TRUE

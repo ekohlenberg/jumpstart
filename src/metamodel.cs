@@ -325,6 +325,8 @@ public class ViewRelationship
         public string Label {get; private set;}
         public string SchemaName {get; set;}
         public string NavMenu {get; set;}
+        private string _uri = string.Empty;
+        public string Uri { get { return string.IsNullOrEmpty(_uri) ? DomainVar : _uri; } }
 
         public MetaModel Model {get;set;}
         
@@ -361,7 +363,7 @@ public class ViewRelationship
                 return _globalAttributes;
             }
         }
-        public MetaObject(string _namespace, string tableName, string schemaName, string label, string navMenu)
+        public MetaObject(string _namespace, string tableName, string schemaName, string label, string navMenu, string uri = "")
         {
             Namespace = _namespace;
             TableName = tableName;
@@ -370,6 +372,7 @@ public class ViewRelationship
             Name = tableName;
             Label = label;
             NavMenu = navMenu;
+            _uri = uri ?? string.Empty;
             SchemaName = schemaName;
             FileName = DomainObj;
         }

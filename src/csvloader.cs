@@ -12,6 +12,7 @@ public class MetadataRecord {
     public string TABLE_NAME {get;set;}
     public string TABLE_LABEL {get;set;}
     public string NAV_MENU {get;set;}
+    public string URI {get;set;}
     public string COLUMN_NAME {get;set;}
     public string COLUMN_LABEL {get;set;}
     public string FK_TYPE {get;set;}
@@ -46,8 +47,12 @@ public class CSVLoader
     public virtual void Load(string modelPath, MetaModel metaModel)
     {
         
+        var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            MissingFieldFound = null
+        };
         using (var reader = new StreamReader(modelPath))
-        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+        using (var csv = new CsvReader(reader, config))
         {
             var records = csv.GetRecords<MetadataRecord>();
             foreach (MetadataRecord mr in records)
@@ -94,7 +99,7 @@ public class CSVLoader
 
         if (!schema.ObjectMap.TryGetValue(mr.TABLE_NAME, out metaObject))      
         {
-            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.NAV_MENU);
+            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.NAV_MENU, mr.URI ?? "");
             schema.Objects.Add( metaObject );
             schema.ObjectMap[mr.TABLE_NAME] = metaObject;
         }
