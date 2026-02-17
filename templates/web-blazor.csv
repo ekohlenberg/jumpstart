@@ -11,6 +11,7 @@ dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cs
 dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,web/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,web/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,web/domain,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/appsettings.json,web/wwwroot,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/index.html.cshtml,web/wwwroot,TRUE
 Blazor wasm content,model,web/blazor/wwwroot/css/app.css,web/wwwroot/css,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/icon-192.png,web/wwwroot,FALSE
