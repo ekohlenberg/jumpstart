@@ -13,8 +13,12 @@ using System.Reflection;
 namespace @Model.Namespace
 {
    
+   public interface IWorkflowCoreLogic : IWorkflowLogic
+   {
+        void run( long workflowId);
+   }
 
-    public class WorkflowCoreLogic : WorkflowUserLogic
+    public class WorkflowCoreLogic : WorkflowUserLogic, IWorkflowCoreLogic
     {
         // Delegate type for execution status handlers
         public delegate void ExecutionStatusHandler(Workflow workflow);
@@ -39,15 +43,15 @@ namespace @Model.Namespace
          /// <summary>
         /// Creates and initializes a proxy instance of the logic implementation for the domain object.
         /// </summary>
-        /// <returns>An initialized proxy implementing <see cref="IWorkflowLogic"/>.</returns>
-        public static new IWorkflowLogic Create()
+        /// <returns>An initialized proxy implementing <see cref="IWorkflowCoreLogic"/>.</returns>
+        public static new IWorkflowCoreLogic Create()
         {
-            var workflowCoreLogic = new WorkflowCoreLogic();
+            WorkflowCoreLogic workflowCoreLogic = new WorkflowCoreLogic();
 
-            var proxy = DispatchProxy.Create<IWorkflowLogic, Proxy<IWorkflowLogic>>();
-            ((Proxy<IWorkflowLogic>)proxy).Initialize();
-            ((Proxy<IWorkflowLogic>)proxy).Target = workflowCoreLogic ;
-            ((Proxy<IWorkflowLogic>)proxy).DomainObj = "Workflow";
+            var proxy = DispatchProxy.Create<IWorkflowCoreLogic, Proxy<IWorkflowCoreLogic>>();
+            ((Proxy<IWorkflowCoreLogic>)proxy).Initialize();
+            ((Proxy<IWorkflowCoreLogic>)proxy).Target = workflowCoreLogic ;
+            ((Proxy<IWorkflowCoreLogic>)proxy).DomainObj = "Workflow";
 
             return proxy;
         }
@@ -59,6 +63,24 @@ namespace @Model.Namespace
             InvokeExecutionStatusHandler(workflow.exec_status_id, workflow);
         }
 
+        public virtual void run( long workflowId)
+        {
+            var workflow = WorkflowLogic.Create().get(workflowId);
+            if (workflow == null)
+                throw new Exception($"Workflow {workflowId} not found");
+
+            var schedulerNodes = DBPersist.select<ServerNode>(
+                $"SELECT * FROM core.server_node WHERE server_node_type_id = {(long)ServerNode.ServerNodeType.Scheduler} " +
+                $"AND server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online} " +
+                $"AND is_active = 1 " +
+                $"ORDER BY registered_at DESC");
+
+            if (schedulerNodes == null || schedulerNodes.Count == 0)
+                throw new Exception("No online Scheduler server node available");
+
+            using var schedulerClient = new SchedulerClient(schedulerNodes[0]);
+            var executionId = schedulerClient.ExecuteAsync(workflowId);
+        }
         /// <summary>
         /// Invokes the execution status handler for the given status and workflow.
         /// </summary>

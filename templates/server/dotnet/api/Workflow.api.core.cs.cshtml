@@ -16,22 +16,18 @@ namespace @(Model.Namespace).Controllers
         [HttpGet("run/{id}")]
         public async Task<IActionResult> Run(long id)
         {
-            var workflow = WorkflowLogic.Create().get(id);
-            if (workflow == null)
-                return NotFound($"Workflow {id} not found");
+            var workflowCoreLogic = WorkflowCoreLogic.Create();
 
-            var schedulerNodes = DBPersist.select<ServerNode>(
-                $"SELECT * FROM core.server_node WHERE server_node_type_id = {(long)ServerNode.ServerNodeType.Scheduler} " +
-                $"AND server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online} " +
-                $"AND is_active = 1 " +
-                $"ORDER BY registered_at DESC");
+            try
+            {
+                workflowCoreLogic.run(id);
+            }
+            catch(Exception x)
+            {
+                return StatusCode(503, x.Message);
+            }
 
-            if (schedulerNodes == null || schedulerNodes.Count == 0)
-                return StatusCode(503, "No online Scheduler server node available");
-
-            using var schedulerClient = new SchedulerClient(schedulerNodes[0]);
-            var executionId = await schedulerClient.ExecuteAsync(id);
-
+            
             return Ok(executionId);
         }
 
