@@ -29,7 +29,8 @@ else
                           ShowAddButton="true"
                           OnEdit="&at;OnEditWorkflow"
                           OnAdd="&at;OnAddWorkflow"
-                          ContextMenuItems="&at;_workflowContextMenuItems" />
+                          ContextMenuItems="&at;_workflowContextMenuItems"
+                          ImageColumns="&at;_imageColumns" />
 
     Console.WriteLine($"ListWorkflowCore: DataTable rendered");
 }
@@ -40,6 +41,10 @@ else
     private string _domainObjectName = "Workflow";
     private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
     private List<DataTableContextMenu.ContextMenuItem> _workflowContextMenuItems = new();
+    private Dictionary<string, string> _imageColumns = new()
+    {
+        { "exec_status_name", "exec_status_image" }
+    };
 
     protected override async Task OnInitializedAsync()
     {

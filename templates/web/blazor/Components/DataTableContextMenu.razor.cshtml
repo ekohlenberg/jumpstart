@@ -45,7 +45,26 @@
                         <tr @@oncontextmenu="@@(e => OnRowContextMenu(e, rowId))" @@oncontextmenu:preventDefault="true" class="ctx-row">
                             @@foreach (var property in GetDisplayProperties())
                             {
-                                <td>@@GetPropertyValueSafely(item, property)</td>
+                                @@if (ImageColumns != null && ImageColumns.ContainsKey(property.Name))
+                                {
+                                    var imgProp = item.GetType().GetProperty(ImageColumns[property.Name]);
+                                    var imgSrc = imgProp != null ? imgProp.GetValue(item)?.ToString() : "";
+                                    var altText = GetPropertyValueSafely(item, property);
+                                    <td>
+                                        @@if (!string.IsNullOrEmpty(imgSrc))
+                                        {
+                                            <img src="@@imgSrc" alt="@@altText" title="@@altText" style="height:24px;" />
+                                        }
+                                        else
+                                        {
+                                            @@altText
+                                        }
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>@@GetPropertyValueSafely(item, property)</td>
+                                }
                             }
                             @@if (ShowActions)
                             {
@@ -163,6 +182,7 @@
     [Parameter] public EventCallback<object> OnDelete { get; set; }
     [Parameter] public EventCallback OnAdd { get; set; }
     [Parameter] public List<ContextMenuItem> ContextMenuItems { get; set; } = new();
+    [Parameter] public Dictionary<string, string>? ImageColumns { get; set; }
 
     private bool _menuVisible = false;
     private double _menuX = 0;

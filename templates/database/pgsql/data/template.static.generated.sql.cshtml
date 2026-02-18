@@ -21,15 +21,15 @@ insert into core.on_failure (id, action) values (1, 'Stop');
 insert into core.on_failure (id, action) values (2, 'Continue');
 
 
-insert into core.exec_status (id, name) values (1, '');
-insert into core.exec_status (id, name) values (2, 'Dispatched');
-insert into core.exec_status (id, name) values (3, 'Executing');
-insert into core.exec_status (id, name) values (4, 'Completed');
-insert into core.exec_status (id, name) values (5, 'Failed');
-insert into core.exec_status (id, name) values (6, 'Cancelled');	
-insert into core.exec_status (id, name) values (7, 'Timeout');
-insert into core.exec_status (id, name) values (8, 'Interrupted');
-insert into core.exec_status (id, name) values (9, 'Suspended');
+insert into core.exec_status (id, name, image) values (1, '', 'images/exec-status-1.png');
+insert into core.exec_status (id, name, image) values (2, 'Dispatched', 'images/exec-status-2.png');
+insert into core.exec_status (id, name, image) values (3, 'Executing', 'images/exec-status-3.png');
+insert into core.exec_status (id, name, image) values (4, 'Completed', 'images/exec-status-4.png');
+insert into core.exec_status (id, name, image) values (5, 'Failed', 'images/exec-status-5.png');
+insert into core.exec_status (id, name, image) values (6, 'Cancelled', 'images/exec-status-6.png');	
+insert into core.exec_status (id, name, image) values (7, 'Timeout', 'images/exec-status-7.png');
+insert into core.exec_status (id, name, image) values (8, 'Interrupted', 'images/exec-status-8.png');
+insert into core.exec_status (id, name, image) values (9, 'Suspended', 'images/exec-status-9.png');
 
 -- Insert script type values
 insert into core.script_type (id, name) values (1, 'CSharp');
