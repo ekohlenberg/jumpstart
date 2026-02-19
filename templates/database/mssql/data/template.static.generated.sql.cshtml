@@ -17,15 +17,15 @@ INSERT INTO [core].[on_failure] ([id], [action], [is_active], [last_updated], [c
 INSERT INTO [core].[on_failure] ([id], [action], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Continue', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
 
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, '', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Dispatched', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Executing', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (4, 'Completed', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (5, 'Failed', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (6, 'Cancelled', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (7, 'Timeout', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (8, 'Interrupted', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (9, 'Suspended', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, '', 'images/exec-status-1.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Dispatched', 'images/exec-status-2.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Executing', 'images/exec-status-3.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (4, 'Completed', 'images/exec-status-4.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (5, 'Failed', 'images/exec-status-5.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (6, 'Cancelled', 'images/exec-status-6.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (7, 'Timeout', 'images/exec-status-7.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (8, 'Interrupted', 'images/exec-status-8.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (9, 'Suspended', 'images/exec-status-9.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 
 INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'CSharp', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
 INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'PowerShell', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
