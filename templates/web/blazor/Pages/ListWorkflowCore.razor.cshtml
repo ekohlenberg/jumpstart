@@ -30,7 +30,8 @@ else
                           OnEdit="&at;OnEditWorkflow"
                           OnAdd="&at;OnAddWorkflow"
                           ContextMenuItems="&at;_workflowContextMenuItems"
-                          ImageColumns="&at;_imageColumns" />
+                          ImageColumns="&at;_imageColumns"
+                          HiddenColumns="&at;_hiddenColumns" />
 
     Console.WriteLine($"ListWorkflowCore: DataTable rendered");
 }
@@ -45,6 +46,7 @@ else
     {
         { "exec_status_name", "exec_status_image" }
     };
+    private HashSet<string> _hiddenColumns = new() { "exec_status_image" };
 
     protected override async Task OnInitializedAsync()
     {
@@ -214,13 +216,15 @@ else
 
     async Task OnAddWorkflow()
     {
-        Navigation.NavigateTo("edit-workflow");
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        Navigation.NavigateTo($"edit-workflow?returnUrl={Uri.EscapeDataString(currentPath)}");
     }
 
     async Task OnEditWorkflow(object item)
     {
         var workflow = (WorkflowView)item;
-        Navigation.NavigateTo($"edit-workflow/{workflow.id}");
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        Navigation.NavigateTo($"edit-workflow/{workflow.id}?returnUrl={Uri.EscapeDataString(currentPath)}");
     }
 
     private async Task RunWorkflow(long id)

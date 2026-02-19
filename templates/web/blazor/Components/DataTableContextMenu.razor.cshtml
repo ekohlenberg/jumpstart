@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
+@using System.Linq
 @using System.Reflection
 
 @@namespace @(Model.Namespace).Components
@@ -183,6 +184,7 @@
     [Parameter] public EventCallback OnAdd { get; set; }
     [Parameter] public List<ContextMenuItem> ContextMenuItems { get; set; } = new();
     [Parameter] public Dictionary<string, string>? ImageColumns { get; set; }
+    [Parameter] public HashSet<string>? HiddenColumns { get; set; }
 
     private bool _menuVisible = false;
     private double _menuX = 0;
@@ -232,7 +234,12 @@
 
         if (DataType != null)
         {
-            return ReflectionHelper.GetDisplayProperties(DataType);
+            var props = ReflectionHelper.GetDisplayProperties(DataType);
+            if (HiddenColumns != null && HiddenColumns.Count > 0)
+            {
+                props = props.Where(p => !HiddenColumns.Contains(p.Name)).ToArray();
+            }
+            return props;
         }
 
         return new System.Reflection.PropertyInfo[0];

@@ -42,6 +42,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseStaticFiles();
+
 // 2. Use the configured CORS policy
 app.UseCors("AllowFrontendApp");
 

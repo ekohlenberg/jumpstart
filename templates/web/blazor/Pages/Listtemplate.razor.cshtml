@@ -194,13 +194,15 @@ else
 
     async Task OnAdd@(Model.DomainObj)()
     {
-        Navigation.NavigateTo("edit-@(Model.DomainVar)");
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        Navigation.NavigateTo($"edit-@(Model.DomainVar)?returnUrl={Uri.EscapeDataString(currentPath)}");
     }
 
     async Task OnEdit@(Model.DomainObj)(object item)
     {
         var @(Model.DomainVar) = (@(Model.DomainObj)View)item;
-        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{@(Model.DomainVar).id}");
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        Navigation.NavigateTo($"edit-@(Model.DomainVar)/{@(Model.DomainVar).id}?returnUrl={Uri.EscapeDataString(currentPath)}");
     }
 
     public async ValueTask DisposeAsync()
