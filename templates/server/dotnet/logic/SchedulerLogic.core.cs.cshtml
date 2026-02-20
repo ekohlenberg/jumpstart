@@ -222,14 +222,23 @@ namespace @(Model.Namespace).core
 
                 Console.WriteLine($"SchedulerLogic: Executing workflow {workflowId} - {workflow.name}");
 
-                // Collect all child workflows recursively
-                List<Workflow> childWorkflows = new List<Workflow>();
-                CollectChildWorkflows(workflowId, childWorkflows);
+                // Collect all child workflows recursively or run a single process workflow
 
-                if (childWorkflows.Count == 0)
+                List<Workflow> childWorkflows = new List<Workflow>();
+
+                if (workflow.workflow_type_id == (long) Workflow.WorkflowType.Folder) 
                 {
-                    Console.WriteLine($"SchedulerLogic: No child workflows found for workflow {workflowId}");
-                    return;
+                    CollectChildWorkflows(workflowId, childWorkflows);
+
+                    if (childWorkflows.Count == 0)
+                    {
+                        Console.WriteLine($"SchedulerLogic: No child workflows found for workflow {workflowId}");
+                        return;
+                    }
+                }
+                else // executing a single process workflow
+                {
+                    childWorkflows.Add(workflow);
                 }
 
                 // Group by sequence and sort

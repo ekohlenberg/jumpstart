@@ -5,11 +5,13 @@ dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,w
 dotnet server templates-common,model,web/blazor/Components/TabControl.razor.cshtml,web/components,TRUE
 dotnet server templates-common,model,web/blazor/Components/TabItem.cs.cshtml,web/components,TRUE
 dotnet server templates-common,model,web/blazor/Components/DataTable.razor.cshtml,web/components,TRUE
+dotnet server templates-common,model,web/blazor/Components/DataTableContextMenu.razor.cshtml,web/components,TRUE
 dotnet server templates-common,model,shared/dotnet/common/Util.core.cs.cshtml,web/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cshtml,web/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,web/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,web/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,web/domain,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/appsettings.json,web/wwwroot,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/index.html.cshtml,web/wwwroot,TRUE
 Blazor wasm content,model,web/blazor/wwwroot/css/app.css,web/wwwroot/css,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/icon-192.png,web/wwwroot,FALSE
@@ -58,6 +60,15 @@ Blazor wasm content,model,web/blazor/wwwroot/lib/bootstrap/dist/js/bootstrap.min
 Blazor wasm content,model,web/blazor/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.min.js.map,web/wwwroot/lib/bootstrap/dist/js,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/lib/bootstrap/dist/js/bootstrap.js.map,web/wwwroot/lib/bootstrap/dist/js,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/lib/bootstrap/dist/js/bootstrap.min.js.map,web/wwwroot/lib/bootstrap/dist/js,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-1.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-2.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-3.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-4.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-5.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-6.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-7.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-8.png,web/wwwroot/images,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/images/exec-status-9.png,web/wwwroot/images,FALSE
 Blazor wasm content,model,web/blazor/template.sln,web/blazor,FALSE
 Blazor wasm content,model,web/blazor/Components/ReflectionHelper.cs.cshtml,web/Components,TRUE
 Blazor wasm content,model,web/blazor/Layout/MainLayout.razor.css,web/Layout,FALSE
@@ -72,4 +83,5 @@ Blazor wasm content,model,web/blazor/template.sln.cshtml,web/,FALSE
 Blazor wasm content,object,web/blazor/Pages/Edittemplate.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,object,web/blazor/Pages/Listtemplate.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Pages/Home.razor,web/Pages,TRUE
+Blazor wasm content,model,web/blazor/Pages/ListWorkflowCore.razor.cshtml,web/Pages,TRUE
 Blazor wasm content,model,web/blazor/Program.cs.cshtml,web,TRUE

@@ -1,0 +1,11 @@
+title: Jumpstart Documentation
+description: Enterprise-grade code generation framework for full-stack .NET applications
+theme: jekyll-theme-cayman
+baseurl: "/jumpstart"
+
+header_pages:
+  - index.md
+  - getting-started.md
+  - metadata.md
+  - generator.md
+  - generated-application/index.md

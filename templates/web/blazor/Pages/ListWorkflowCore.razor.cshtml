@@ -1,0 +1,266 @@
+@@page "/core/workflow"
+@@using System.Collections.Generic;
+@@using @(Model.Namespace).Components;
+@@inject HttpClient Http
+@@inject IHttpClientFactory ClientFactory
+@@inject NavigationManager Navigation
+@@implements IAsyncDisposable
+@@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+
+<PageTitle>Workflow</PageTitle>
+
+<h1>Workflow</h1>
+
+<p>This component demonstrates fetching Workflow data from the server.</p>
+
+@@if (workflowList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    Console.WriteLine($"ListWorkflowCore: About to render DataTable with {@@workflowList.Length} items");
+
+
+    <DataTableContextMenu Data="&at;workflowList"
+                          DataType="typeof(WorkflowView)"
+                          ShowActions="true"
+                          ShowAddButton="true"
+                          OnEdit="&at;OnEditWorkflow"
+                          OnAdd="&at;OnAddWorkflow"
+                          ContextMenuItems="&at;_workflowContextMenuItems"
+                          ImageColumns="&at;_imageColumns"
+                          HiddenColumns="&at;_hiddenColumns" />
+
+    Console.WriteLine($"ListWorkflowCore: DataTable rendered");
+}
+
+@@code {
+    protected  WorkflowView[]? workflowList;
+    private HubConnection? _hubConnection;
+    private string _domainObjectName = "Workflow";
+    private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
+    private List<DataTableContextMenu.ContextMenuItem> _workflowContextMenuItems = new();
+    private Dictionary<string, string> _imageColumns = new()
+    {
+        { "exec_status_name", "exec_status_image" }
+    };
+    private HashSet<string> _hiddenColumns = new() { "exec_status_image" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _workflowContextMenuItems = new List<DataTableContextMenu.ContextMenuItem>
+        {
+            new DataTableContextMenu.ContextMenuItem { Label = "Run", Action = RunWorkflow }
+        };
+
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        workflowList = await remoteClient.GetFromJsonAsync<WorkflowView[]>("api/workflow");
+
+        Console.WriteLine($"ListWorkflowCore: Loaded {workflowList?.Length ?? 0} workflow records");
+        if (workflowList != null && workflowList.Length > 0)
+        {
+            Console.WriteLine($"ListWorkflowCore: First item type: {workflowList[0].GetType().Name}");
+        }
+
+        // Initialize SignalR connection for real-time updates
+        await InitializeSignalRConnection();
+        await InitEnumData();
+    }
+
+    private async Task InitializeSignalRConnection()
+    {
+        try
+        {
+            // Create hub connection to the notification hub (API server)
+            var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+            var baseAddress = remoteClient.BaseAddress?.ToString() ?? "http://localhost:5200";
+            var hubUrl = $"{baseAddress.TrimEnd('/')}/notificationHub";
+
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(hubUrl)
+                .Build();
+
+            // Handle PropertyUpdated messages
+            _hubConnection.On<PropertyUpdateMessage>("PropertyUpdated", async (message) =>
+            {
+                Console.WriteLine($"ListWorkflowCore: Received update notification for {message.DomainObjectName}[{message.InstanceId}]");
+
+                if (message.DomainObjectName == _domainObjectName)
+                {
+                    await HandlePropertyUpdate(message);
+                }
+            });
+
+            // Start the connection
+            await _hubConnection.StartAsync();
+            Console.WriteLine($"ListWorkflowCore: SignalR connection started");
+
+            // Subscribe to domain object updates
+            await _hubConnection.InvokeAsync("SubscribeToDomainObject", _domainObjectName);
+            Console.WriteLine($"ListWorkflowCore: Subscribed to {_domainObjectName} updates");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ListWorkflowCore: Error initializing SignalR connection: {ex.Message}");
+        }
+    }
+
+    private async Task InitEnumData()
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+
+        var enumWorkflowTypeResult = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/workflowtype/enum");
+        if (enumWorkflowTypeResult != null)
+        {
+            enumData["workflow_type_id"] = enumWorkflowTypeResult.ToDictionary(e => e.id, e => e.rwkString);
+        }
+
+        var enumServerNodeResult = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/servernode/enum");
+        if (enumServerNodeResult != null)
+        {
+            enumData["server_node_id"] = enumServerNodeResult.ToDictionary(e => e.id, e => e.rwkString);
+        }
+
+        var enumProcessResult = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/process/enum");
+        if (enumProcessResult != null)
+        {
+            enumData["process_id"] = enumProcessResult.ToDictionary(e => e.id, e => e.rwkString);
+        }
+
+        var enumExecStatusResult = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/execstatus/enum");
+        if (enumExecStatusResult != null)
+        {
+            enumData["exec_status_id"] = enumExecStatusResult.ToDictionary(e => e.id, e => e.rwkString);
+        }
+
+        var enumScheduleResult = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/schedule/enum");
+        if (enumScheduleResult != null)
+        {
+            enumData["schedule_id"] = enumScheduleResult.ToDictionary(e => e.id, e => e.rwkString);
+        }
+
+        var enumOnFailureResult = await remoteClient.GetFromJsonAsync<List<EnumHelper>>($"api/onfailure/enum");
+        if (enumOnFailureResult != null)
+        {
+            enumData["on_failure_action_id"] = enumOnFailureResult.ToDictionary(e => e.id, e => e.rwkString);
+        }
+    }
+
+    private async Task HandlePropertyUpdate(PropertyUpdateMessage message)
+    {
+        try
+        {
+            if (workflowList == null)
+            {
+                return;
+            }
+
+            // Find the item in the list by ID
+            var index = Array.FindIndex(workflowList, item => item.id == message.InstanceId);
+
+            if (index >= 0)
+            {
+                // Fetch the updated item from the API to ensure we have the complete View object
+                // with all computed properties and enum display values properly populated
+                var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+                var updatedObject = await remoteClient.GetFromJsonAsync<WorkflowView>($"api/workflow/view/{message.InstanceId}");
+                if (updatedObject != null)
+                {
+                    // Update existing item with the fetched object (enum display values are already set by the API)
+                    workflowList[index] = updatedObject;
+                    Console.WriteLine($"ListWorkflowCore: Updated {_domainObjectName}[{message.InstanceId}] in list from API");
+
+                    // Notify UI to update
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            else
+            {
+                // Item not found, might be a new item - reload the list
+                Console.WriteLine($"ListWorkflowCore: {_domainObjectName}[{message.InstanceId}] not found in list, reloading...");
+                await ReloadList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ListWorkflowCore: Error handling property update: {ex.Message}");
+            // On error, fall back to reloading the entire list
+            try
+            {
+                await ReloadList();
+            }
+            catch (Exception reloadEx)
+            {
+                Console.WriteLine($"ListWorkflowCore: Error reloading list: {reloadEx.Message}");
+            }
+        }
+    }
+
+    private async Task ReloadList()
+    {
+        try
+        {
+            var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+            workflowList = await remoteClient.GetFromJsonAsync<WorkflowView[]>("api/workflow");
+            Console.WriteLine($"ListWorkflowCore: Reloaded {workflowList?.Length ?? 0} workflow records");
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ListWorkflowCore: Error reloading list: {ex.Message}");
+        }
+    }
+
+    async Task OnAddWorkflow()
+    {
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        Navigation.NavigateTo($"edit-workflow?returnUrl={Uri.EscapeDataString(currentPath)}");
+    }
+
+    async Task OnEditWorkflow(object item)
+    {
+        var workflow = (WorkflowView)item;
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        Navigation.NavigateTo($"edit-workflow/{workflow.id}?returnUrl={Uri.EscapeDataString(currentPath)}");
+    }
+
+    private async Task RunWorkflow(long id)
+    {
+        var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+        await remoteClient.GetAsync($"api/workflow/run/{id}");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            try
+            {
+                // Unsubscribe from domain object updates
+                await _hubConnection.InvokeAsync("UnsubscribeFromDomainObject", _domainObjectName);
+                Console.WriteLine($"ListWorkflowCore: Unsubscribed from {_domainObjectName} updates");
+
+                // Stop the connection
+                await _hubConnection.StopAsync();
+                await _hubConnection.DisposeAsync();
+                Console.WriteLine($"ListWorkflowCore: SignalR connection disposed");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ListWorkflowCore: Error disposing SignalR connection: {ex.Message}");
+            }
+        }
+    }
+
+    // Message structure for property update notifications (matches server-side PropertyUpdateMessage)
+    private class PropertyUpdateMessage
+    {
+        public string DomainObjectName { get; set; } = string.Empty;
+        public long InstanceId { get; set; }
+        public string JsonData { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+    }
+}

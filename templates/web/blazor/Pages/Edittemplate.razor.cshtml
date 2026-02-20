@@ -63,6 +63,8 @@ else
 	[Parameter]
 	public long? id {get;set;}
 
+	private string? _returnUrl;
+
 	public @(Model.DomainObj) @(Model.DomainVar) {get;set;} = new @(Model.DomainObj)();
 	
 	
@@ -104,6 +106,21 @@ else
 
 	protected override async Task OnParametersSetAsync()
 	{
+		// Read returnUrl from query string
+		var uri = new Uri(Navigation.Uri);
+		if (!string.IsNullOrEmpty(uri.Query))
+		{
+			foreach (var param in uri.Query.TrimStart('?').Split('&'))
+			{
+				var parts = param.Split('=', 2);
+				if (parts.Length == 2 && parts[0] == "returnUrl")
+				{
+					_returnUrl = Uri.UnescapeDataString(parts[1]);
+					break;
+				}
+			}
+		}
+
 		if (id is not null) {
 			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
 			var result = await remoteClient.GetFromJsonAsync<@(Model.DomainObj)>($"api/@(Model.DomainVar)/{id}");
@@ -554,12 +571,12 @@ else
 		}
 
 		// Navigate back to list after successful save
-		Navigation.NavigateTo("/@(Model.DomainVar)");
+		Navigation.NavigateTo(_returnUrl ?? "/@(Model.DomainVar)");
 	}
 
 	void Cancel()
 	{
-		Navigation.NavigateTo("/@(Model.DomainVar)");
+		Navigation.NavigateTo(_returnUrl ?? "/@(Model.DomainVar)");
 	}
 
 	// Helper methods using ReflectionHelper

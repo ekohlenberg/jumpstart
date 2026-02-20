@@ -1,0 +1,36 @@
+
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using @Model.Namespace;
+
+namespace @(Model.Namespace).Controllers
+{
+
+    public partial class WorkflowController
+    {
+
+        // GET api/workflow/run/{id}
+        [HttpGet("run/{id}")]
+        public async Task<IActionResult> Run(long id)
+        {
+            var workflowCoreLogic = WorkflowCoreLogic.Create();
+
+            try
+            {
+                workflowCoreLogic.run(id);
+            }
+            catch(Exception x)
+            {
+                return StatusCode(503, x.Message);
+            }
+
+            
+            return Ok(id);
+        }
+
+
+    }
+}
