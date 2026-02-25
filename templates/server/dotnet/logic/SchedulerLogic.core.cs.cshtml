@@ -362,7 +362,7 @@ namespace @(Model.Namespace).core
                     Logger.Info($"SchedulerLogic: Dispatching process workflow {childWorkflow.id} to agent {serverNode.id}");
 
                     // Invoke server node agent via AgentClient
-                    using (var agentClient = new AgentClient(serverNode))
+                    using (var agentClient = new ScriptAgentClient(serverNode))
                     {
                         // Use ExecuteAsync to send workflow to agent
                         await agentClient.ExecuteAsync(childWorkflow.id);

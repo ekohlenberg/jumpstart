@@ -28,12 +28,12 @@ if [ -d "server/scheduler" ]; then
     cd ../..
 fi
 
-# Start Agent
-if [ -d "server/agent" ]; then
-    cd server/agent
-    dotnet run > ../logs/agent.log 2>&1 &
+# Start ScriptAgent
+if [ -d "server/scriptagent" ]; then
+    cd server/scriptagent
+    dotnet run > ../logs/scriptagent.log 2>&1 &
     echo "$!" >> "../../$PID_FILE"
-    echo "Agent started (PID: $!)"
+    echo "ScriptAgent started (PID: $!)"
     cd ../..
 fi
 
