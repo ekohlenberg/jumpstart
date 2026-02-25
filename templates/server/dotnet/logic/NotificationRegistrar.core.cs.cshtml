@@ -171,7 +171,7 @@ namespace @(Model.Namespace)
                 string tableName = baseObject["tableName"]?.ToString();
                 if (!string.IsNullOrEmpty(tableName))
                 {
-                    // Convert table name to domain object name (e.g., "core.agent" -> "Agent")
+                    // Convert table name to domain object name (e.g., "core.scriptagent" -> "ScriptAgent")
                     string[] parts = tableName.Split('.');
                     if (parts.Length > 0)
                     {
@@ -186,7 +186,7 @@ namespace @(Model.Namespace)
             if (method?.DeclaringType != null)
             {
                 string typeName = method.DeclaringType.Name;
-                // Remove "Logic" suffix if present (e.g., "AgentLogic" -> "Agent")
+                // Remove "Logic" suffix if present (e.g., "ScriptAgentLogic" -> "ScriptAgent")
                 if (typeName.EndsWith("Logic"))
                 {
                     return typeName.Substring(0, typeName.Length - 5);

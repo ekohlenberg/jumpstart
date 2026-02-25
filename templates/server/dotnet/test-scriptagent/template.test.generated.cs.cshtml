@@ -123,7 +123,7 @@ namespace @Model.Namespace
                     if (workflow.workflow_type_id != (long)Workflow.WorkflowType.Process) continue;
                     agent = agents[workflow.server_node_id];    
                     
-                    AgentClient agentClient = new AgentClient(agent);
+                    ScriptAgentClient agentClient = new ScriptAgentClient(agent);
                     await agentClient.ExecuteAsync(workflow.id);
                 }
                 catch (Exception ex)

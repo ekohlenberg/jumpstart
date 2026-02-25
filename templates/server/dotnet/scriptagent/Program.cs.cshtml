@@ -26,7 +26,7 @@ for (int port = StartPort; port <= EndPort && port < StartPort + MaxRetries; por
         }
 
         boundPort = port;
-        Console.WriteLine($"Agent will bind to IP: {boundIP}, Port: {boundPort}");
+        Console.WriteLine($"ScriptAgent will bind to IP: {boundIP}, Port: {boundPort}");
         break;
     }
     catch (SocketException)
@@ -83,16 +83,16 @@ app.Lifetime.ApplicationStopping.Register(() =>
 {
     try
     {
-        Console.WriteLine("Agent: Application is shutting down, setting server status to Offline...");
-        var serverNode = @(Model.Namespace).core.AgentLogic.thisServerNode;
+        Console.WriteLine("ScriptAgent: Application is shutting down, setting server status to Offline...");
+        var serverNode = @(Model.Namespace).core.ScriptAgentLogic.thisServerNode;
         if (serverNode != null && serverNode.id > 0)
         {
-            @(Model.Namespace).core.AgentLogic.Create().unregister(serverNode.id);
-            Console.WriteLine("Agent: Server node unregistered, status updated to Offline");
+            @(Model.Namespace).core.ScriptAgentLogic.Create().unregister(serverNode.id);
+            Console.WriteLine("ScriptAgent: Server node unregistered, status updated to Offline");
         }
         else
         {
-            Console.WriteLine("Agent: Server node not registered, skipping status update");
+            Console.WriteLine("ScriptAgent: Server node not registered, skipping status update");
         }
     }
     catch (Exception ex)
@@ -110,39 +110,39 @@ var registrationTask = Task.Run(async () =>
         await Task.Delay(1000);
         
         // Call registration callback
-        await RegisterAgent(boundIP, boundPort);
+        await RegisterScriptAgent(boundIP, boundPort);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error during agent registration: {ex.Message}");
+        Console.WriteLine($"Error during scriptagent registration: {ex.Message}");
     }
 });
 
 app.Run();
 
 // Registration callback function
-static async Task RegisterAgent(IPAddress boundIP, int port)
+static async Task RegisterScriptAgent(IPAddress boundIP, int port)
 {
     // Get SessionInfo singleton and populate it with system information
     var sessionInfo = SessionInfo.Instance;
     Util.PopulateSessionInfo(sessionInfo);
     
     // Add agent-specific information to the session
-    sessionInfo.SetValue("AgentIPAddress", boundIP.ToString());
-    sessionInfo.SetValue("AgentPort", port.ToString());
-    sessionInfo.SetValue("AgentURL", $"http://{boundIP}:{port}");
+    sessionInfo.SetValue("ScriptAgentIPAddress", boundIP.ToString());
+    sessionInfo.SetValue("ScriptAgentPort", port.ToString());
+    sessionInfo.SetValue("ScriptAgentURL", $"http://{boundIP}:{port}");
     
     // Set ServerNode keys that are used in registration
     sessionInfo.SetValue("ServerNodeIPAddress", boundIP.ToString());
     sessionInfo.SetValue("ServerNodeURL", $"http://{boundIP}:{port}");
     
     var computerName   = sessionInfo.GetValue("ComputerName", Environment.MachineName);
-    var agentId = $"{computerName}:{port}";
+    var scriptAgentId = $"{computerName}:{port}";
     
     Console.WriteLine($"==============================================");
-    Console.WriteLine($"Agent Registration");
+    Console.WriteLine($"ScriptAgent Registration");
     Console.WriteLine($"==============================================");
-    Console.WriteLine($"Agent ID: {agentId}");
+    Console.WriteLine($"ScriptAgent ID: {agentId}");
     Console.WriteLine($"Computer Name: {computerName}");
     Console.WriteLine($"IP Address: {boundIP}");
     Console.WriteLine($"Port: {port}");
@@ -173,7 +173,7 @@ static async Task RegisterAgent(IPAddress boundIP, int port)
             
         };
 
-        @(Model.Namespace).core.AgentLogic.Create().register(registrationData);
+        @(Model.Namespace).core.ScriptAgentLogic.Create().register(registrationData);
         
     
 }

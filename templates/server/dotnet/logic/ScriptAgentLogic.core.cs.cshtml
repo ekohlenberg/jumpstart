@@ -10,7 +10,7 @@ namespace @(Model.Namespace).core
     /// <summary>
     /// Interface for Agent logic operations
     /// </summary>
-    public interface IAgentLogic
+    public interface IScriptAgentLogic
     {
         // Process Management Operations
         void stop(long workflowId);
@@ -68,7 +68,7 @@ namespace @(Model.Namespace).core
 
     }
 
-    public partial class AgentLogic : IAgentLogic
+    public partial class ScriptAgentLogic : IScriptAgentLogic
     {
         
         // Singleton thread-safe queue for executing workflows
@@ -85,14 +85,14 @@ namespace @(Model.Namespace).core
         private static ServerNode _thisServerNode;
         private static readonly object _serverNodeLock = new object();
 
-        public static IAgentLogic Create()
+        public static IScriptAgentLogic Create()
         {
-            var agentLogic = new AgentLogic();
+            var agentLogic = new ScriptAgentLogic();
 
-            var proxy = DispatchProxy.Create<IAgentLogic, Proxy<IAgentLogic>>();
-            ((Proxy<IAgentLogic>)proxy).Initialize();
-            ((Proxy<IAgentLogic>)proxy).Target = agentLogic;
-            ((Proxy<IAgentLogic>)proxy).DomainObj = "Agent";
+            var proxy = DispatchProxy.Create<IScriptAgentLogic, Proxy<IScriptAgentLogic>>();
+            ((Proxy<IScriptAgentLogic>)proxy).Initialize();
+            ((Proxy<IScriptAgentLogic>)proxy).Target = agentLogic;
+            ((Proxy<IScriptAgentLogic>)proxy).DomainObj = "ScriptAgent";
 
             return proxy;
         }
@@ -108,7 +108,7 @@ namespace @(Model.Namespace).core
         public static void EnqueueWorkflow(long workflowId)
         {
             _workflowQueue.Enqueue(workflowId);
-            Console.WriteLine($"AgentLogic: Enqueued workflow {workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: Enqueued workflow {workflowId}");
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace @(Model.Namespace).core
             {
                 if (_isProcessing)
                 {
-                    Console.WriteLine("AgentLogic: Queue is already being processed");
+                    Console.WriteLine("ScriptAgentLogic: Queue is already being processed");
                     return;
                 }
                 _isProcessing = true;
@@ -137,18 +137,18 @@ namespace @(Model.Namespace).core
 
             try
             {
-                Console.WriteLine($"AgentLogic: Starting to process {_workflowQueue.Count} workflows");
+                Console.WriteLine($"ScriptAgentLogic: Starting to process {_workflowQueue.Count} workflows");
                 
                 while (_workflowQueue.TryDequeue(out long workflowId))
                 {
                     try
                     {
-                        AgentLogic.ExecuteWorkflow(workflowId);
-                        Console.WriteLine($"AgentLogic: Successfully processed workflow {workflowId}");
+                        ScriptAgentLogic.ExecuteWorkflow(workflowId);
+                        Console.WriteLine($"ScriptAgentLogic: Successfully processed workflow {workflowId}");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"AgentLogic: Error processing workflow {workflowId}: {ex.Message}");
+                        Console.WriteLine($"ScriptAgentLogic: Error processing workflow {workflowId}: {ex.Message}");
                     }
                 }
             }
@@ -167,7 +167,7 @@ namespace @(Model.Namespace).core
         public static void ClearQueue()
         {
             while (_workflowQueue.TryDequeue(out _)) { }
-            Console.WriteLine("AgentLogic: Queue cleared");
+            Console.WriteLine("ScriptAgentLogic: Queue cleared");
         }
 
         // =====================================
@@ -188,7 +188,7 @@ namespace @(Model.Namespace).core
                         if (_thisServerNode == null)
                         {
                             _thisServerNode = new ServerNode();
-                            Console.WriteLine("AgentLogic: Created singleton ServerNode instance");
+                            Console.WriteLine("ScriptAgentLogic: Created singleton ServerNode instance");
                         }
                     }
                 }
@@ -205,7 +205,7 @@ namespace @(Model.Namespace).core
             lock (_serverNodeLock)
             {
                 _thisServerNode = serverNode;
-                Console.WriteLine($"AgentLogic: Set singleton ServerNode instance (ID: {serverNode?.id})");
+                Console.WriteLine($"ScriptAgentLogic: Set singleton ServerNode instance (ID: {serverNode?.id})");
             }
         }
 
@@ -217,7 +217,7 @@ namespace @(Model.Namespace).core
             lock (_serverNodeLock)
             {
                 _thisServerNode = null;
-                Console.WriteLine("AgentLogic: Cleared singleton ServerNode instance");
+                Console.WriteLine("ScriptAgentLogic: Cleared singleton ServerNode instance");
             }
         }
 
@@ -231,11 +231,11 @@ namespace @(Model.Namespace).core
             {
                 thisServerNode.server_node_status_id = (long)status;
                 ServerNodeLogic.Create().update(thisServerNode.id, thisServerNode);
-                Logger.Debug($"AgentLogic.UpdateAgentStatus: Set server node status to {status}");
+                Logger.Debug($"ScriptAgentLogic.UpdateAgentStatus: Set server node status to {status}");
             }
             else
             {
-                Logger.Error("AgentLogic.UpdateAgentStatus: Server node is null");
+                Logger.Error("ScriptAgentLogic.UpdateAgentStatus: Server node is null");
             }
         }
 
@@ -249,7 +249,7 @@ namespace @(Model.Namespace).core
             {
                 if (serverNodeId <= 0)
                 {
-                    Logger.Warn($"AgentLogic.SetStatusOffline: Invalid server node ID: {serverNodeId}");
+                    Logger.Warn($"ScriptAgentLogic.SetStatusOffline: Invalid server node ID: {serverNodeId}");
                     return;
                 }
 
@@ -261,16 +261,16 @@ namespace @(Model.Namespace).core
                 {
                     serverNode.server_node_status_id = (long)ServerNode.ServerNodeStatus.Offline;
                     ServerNodeLogic.Create().update(serverNode.id, serverNode);
-                    Logger.Info($"AgentLogic.SetStatusOffline: Set server node {serverNodeId} status to Offline");
+                    Logger.Info($"ScriptAgentLogic.SetStatusOffline: Set server node {serverNodeId} status to Offline");
                 }
                 else
                 {
-                    Logger.Warn($"AgentLogic.SetStatusOffline: Server node {serverNodeId} not found");
+                    Logger.Warn($"ScriptAgentLogic.SetStatusOffline: Server node {serverNodeId} not found");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"AgentLogic.SetStatusOffline: Error setting status to Offline for server node {serverNodeId}: {ex.Message}", ex);
+                Logger.Error($"ScriptAgentLogic.SetStatusOffline: Error setting status to Offline for server node {serverNodeId}: {ex.Message}", ex);
             }
         }
 
@@ -283,18 +283,18 @@ namespace @(Model.Namespace).core
             {
                 if (_executionThread != null && _executionThread.IsAlive)
                 {
-                    Console.WriteLine("AgentLogic: Execution thread is already running");
+                    Console.WriteLine("ScriptAgentLogic: Execution thread is already running");
                     return;
                 }
 
                 _shouldStop = false;
                 _executionThread = new Thread(ExecutionThreadCallback)
                 {
-                    Name = "AgentLogic-ExecutionThread",
+                    Name = "ScriptAgentLogic-ExecutionThread",
                     IsBackground = false
                 };
                 _executionThread.Start();
-                Console.WriteLine("AgentLogic: Execution thread started");
+                Console.WriteLine("ScriptAgentLogic: Execution thread started");
             }
         }
 
@@ -307,7 +307,7 @@ namespace @(Model.Namespace).core
             {
                 if (_executionThread == null || !_executionThread.IsAlive)
                 {
-                    Console.WriteLine("AgentLogic: Execution thread is not running");
+                    Console.WriteLine("ScriptAgentLogic: Execution thread is not running");
                     return;
                 }
 
@@ -316,11 +316,11 @@ namespace @(Model.Namespace).core
                 
                 if (_executionThread.IsAlive)
                 {
-                    Console.WriteLine("AgentLogic: Execution thread did not stop gracefully");
+                    Console.WriteLine("ScriptAgentLogic: Execution thread did not stop gracefully");
                 }
                 else
                 {
-                    Console.WriteLine("AgentLogic: Execution thread stopped");
+                    Console.WriteLine("ScriptAgentLogic: Execution thread stopped");
                 }
             }
         }
@@ -330,7 +330,7 @@ namespace @(Model.Namespace).core
         /// </summary>
         private static void ExecutionThreadCallback()
         {
-            Console.WriteLine("AgentLogic: Execution thread started processing");
+            Console.WriteLine("ScriptAgentLogic: Execution thread started processing");
             
             while (!_shouldStop)
             {
@@ -338,7 +338,7 @@ namespace @(Model.Namespace).core
                 {
                     if (_workflowQueue.TryDequeue(out long workflowId))
                     {
-                        Console.WriteLine($"AgentLogic: Processing workflow {workflowId}");
+                        Console.WriteLine($"ScriptAgentLogic: Processing workflow {workflowId}");
                         
                         // Set agent status to Busy before execution
                         UpdateAgentStatus(ServerNode.ServerNodeStatus.Busy);
@@ -346,9 +346,9 @@ namespace @(Model.Namespace).core
                         try
                         {
                             // Create a new instance and execute the script (blocking)
-                            AgentLogic.ExecuteWorkflow(workflowId);
+                            ScriptAgentLogic.ExecuteWorkflow(workflowId);
                             
-                            Console.WriteLine($"AgentLogic: Completed workflow {workflowId}");
+                            Console.WriteLine($"ScriptAgentLogic: Completed workflow {workflowId}");
                         }
                         finally
                         {
@@ -364,12 +364,12 @@ namespace @(Model.Namespace).core
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"AgentLogic: Error in execution thread: {ex.Message}");
+                    Console.WriteLine($"ScriptAgentLogic: Error in execution thread: {ex.Message}");
                     // Continue processing other workflows even if one fails
                 }
             }
             
-            Console.WriteLine("AgentLogic: Execution thread stopped");
+            Console.WriteLine("ScriptAgentLogic: Execution thread stopped");
         }
 
         // =====================================
@@ -443,7 +443,7 @@ namespace @(Model.Namespace).core
             }
             catch (Exception ex)
             {
-                Logger.Error($"AgentLogic: Error in ExecuteWorkflow: {ex.Message}", ex);
+                Logger.Error($"ScriptAgentLogic: Error in ExecuteWorkflow: {ex.Message}", ex);
                 execStatus = Execution.ExecStatus.Failed;
             }
             workflow.exec_status_id = (long)execStatus;
@@ -459,31 +459,31 @@ namespace @(Model.Namespace).core
 
         public void stop(long workflowId)
         {
-            Logger.Info($"AgentLogic: stop - workflowId={workflowId}");
+            Logger.Info($"ScriptAgentLogic: stop - workflowId={workflowId}");
             // TODO: Implement stop logic
         }
 
         public void kill(long workflowId)
         {
-            Logger.Info($"AgentLogic: kill - workflowId={workflowId}");
+            Logger.Info($"ScriptAgentLogic: kill - workflowId={workflowId}");
             // TODO: Implement kill logic
         }
 
         public void restart(long workflowId)
         {
-            Logger.Info($"AgentLogic: restart - workflowId={workflowId}");
+            Logger.Info($"ScriptAgentLogic: restart - workflowId={workflowId}");
             // TODO: Implement restart logic
         }
 
         public void pause(long workflowId)
         {
-            Logger.Info($"AgentLogic: pause - workflowId={workflowId}");
+            Logger.Info($"ScriptAgentLogic: pause - workflowId={workflowId}");
             // TODO: Implement pause logic
         }
 
         public void resume(long workflowId)
         {
-            Logger.Info($"AgentLogic: resume - workflowId={workflowId}");
+            Logger.Info($"ScriptAgentLogic: resume - workflowId={workflowId}");
             // TODO: Implement resume logic
         }
 
@@ -493,14 +493,14 @@ namespace @(Model.Namespace).core
 
         public object status(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: status - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: status - workflowId={workflowId}");
             // TODO: Implement status logic
             return new { workflowId, status = "unknown" };
         }
 
         public void heartbeat(object heartbeatData)
         {
-            Console.WriteLine($"AgentLogic: heartbeat");
+            Console.WriteLine($"ScriptAgentLogic: heartbeat");
             // TODO: Implement heartbeat logic
             // - Update agent last-seen timestamp
             // - Report current load/capacity
@@ -509,7 +509,7 @@ namespace @(Model.Namespace).core
 
         public void report(object reportData)
         {
-            Console.WriteLine($"AgentLogic: report");
+            Console.WriteLine($"ScriptAgentLogic: report");
             // TODO: Implement report logic
             // - Send execution reports to scheduler
             // - Update execution status
@@ -517,14 +517,14 @@ namespace @(Model.Namespace).core
 
         public void log(object logData)
         {
-            Console.WriteLine($"AgentLogic: log");
+            Console.WriteLine($"ScriptAgentLogic: log");
             // TODO: Implement log logic
             // - Send log entries to centralized logging
         }
 
         public void metrics(object metricsData)
         {
-            Console.WriteLine($"AgentLogic: metrics");
+            Console.WriteLine($"ScriptAgentLogic: metrics");
             // TODO: Implement metrics logic
             // - Collect performance metrics
             // - Send to monitoring system
@@ -536,7 +536,7 @@ namespace @(Model.Namespace).core
 
         public long register(ServerNode registrationData)
         {
-            Console.WriteLine($"AgentLogic: register");
+            Console.WriteLine($"ScriptAgentLogic: register");
             ServerNodeLogic.Create().put(registrationData);
             SetThisServerNode(registrationData);
             return registrationData.id;
@@ -544,14 +544,14 @@ namespace @(Model.Namespace).core
 
         public void unregister(long serverNodeId)
         {
-            Logger.Debug($"AgentLogic: unregister - serverNodeId={serverNodeId}");
+            Logger.Debug($"ScriptAgentLogic: unregister - serverNodeId={serverNodeId}");
             SetStatusOffline(serverNodeId);
             
         }
 
         public object capabilities()
         {
-            Console.WriteLine($"AgentLogic: capabilities");
+            Console.WriteLine($"ScriptAgentLogic: capabilities");
             // TODO: Implement capabilities logic
             // - Return server node capabilities (CPU, memory, etc.)
             return new { cpu = "unknown", memory = "unknown", capabilities = new List<string>() };
@@ -559,14 +559,14 @@ namespace @(Model.Namespace).core
 
         public void allocate(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: allocate - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: allocate - workflowId={workflowId}");
             // TODO: Implement allocate logic
             // - Allocate resources for workflow
         }
 
         public void release(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: release - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: release - workflowId={workflowId}");
             // TODO: Implement release logic
             // - Release resources after workflow
         }
@@ -577,14 +577,14 @@ namespace @(Model.Namespace).core
 
         public void execute(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: execute - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: execute - workflowId={workflowId}");
             EnqueueWorkflow(workflowId);
             StartExecutionThread();
         }
 
         public object validate(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: validate - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: validate - workflowId={workflowId}");
             // TODO: Implement validate logic
             // - Validate workflow requirements
             // - Check resource availability
@@ -593,7 +593,7 @@ namespace @(Model.Namespace).core
 
         public void prepare(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: prepare - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: prepare - workflowId={workflowId}");
             // TODO: Implement prepare logic
             // - Prepare environment for workflow
             // - Download dependencies
@@ -602,7 +602,7 @@ namespace @(Model.Namespace).core
 
         public void cleanup(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: cleanup - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: cleanup - workflowId={workflowId}");
             // TODO: Implement cleanup logic
             // - Clean up temporary files
             // - Release resources
@@ -610,7 +610,7 @@ namespace @(Model.Namespace).core
 
         public void retry(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: retry - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: retry - workflowId={workflowId}");
             // TODO: Implement retry logic
             // - Retry failed workflow
         }
@@ -621,28 +621,28 @@ namespace @(Model.Namespace).core
 
         public object ping()
         {
-            Console.WriteLine($"AgentLogic: ping");
+            Console.WriteLine($"ScriptAgentLogic: ping");
             // TODO: Implement ping logic
             return new { status = "alive", timestamp = DateTime.UtcNow };
         }
 
         public void acknowledge(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: acknowledge - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: acknowledge - workflowId={workflowId}");
             // TODO: Implement acknowledge logic
             // - Acknowledge receipt of workflow request
         }
 
         public void notify(object notificationData)
         {
-            Console.WriteLine($"AgentLogic: notify");
+            Console.WriteLine($"ScriptAgentLogic: notify");
             // TODO: Implement notify logic
             // - Send notification to scheduler or other systems
         }
 
         public object request(object requestData)
         {
-            Console.WriteLine($"AgentLogic: request");
+            Console.WriteLine($"ScriptAgentLogic: request");
             // TODO: Implement request logic
             // - Request resources or information
             return new { status = "pending" };
@@ -654,7 +654,7 @@ namespace @(Model.Namespace).core
 
         public void shutdown()
         {
-            Console.WriteLine($"AgentLogic: shutdown");
+            Console.WriteLine($"ScriptAgentLogic: shutdown");
             // TODO: Implement shutdown logic
             // - Complete running executions
             // - Unregister from scheduler
@@ -663,7 +663,7 @@ namespace @(Model.Namespace).core
 
         public void reload()
         {
-            Console.WriteLine($"AgentLogic: reload");
+            Console.WriteLine($"ScriptAgentLogic: reload");
             // TODO: Implement reload logic
             // - Reload configuration
             // - Refresh capabilities
@@ -671,7 +671,7 @@ namespace @(Model.Namespace).core
 
         public void update(object updateData)
         {
-            Console.WriteLine($"AgentLogic: update");
+            Console.WriteLine($"ScriptAgentLogic: update");
             // TODO: Implement update logic
             // - Update agent software
             // - Apply configuration changes
@@ -679,7 +679,7 @@ namespace @(Model.Namespace).core
 
         public object diagnose()
         {
-            Console.WriteLine($"AgentLogic: diagnose");
+            Console.WriteLine($"ScriptAgentLogic: diagnose");
             // TODO: Implement diagnose logic
             // - Run system diagnostics
             // - Check health status
@@ -689,7 +689,7 @@ namespace @(Model.Namespace).core
 
         public object health()
         {
-            Console.WriteLine($"AgentLogic: health");
+            Console.WriteLine($"ScriptAgentLogic: health");
             // TODO: Implement health logic
             // - Check system health
             // - Return health status
@@ -702,7 +702,7 @@ namespace @(Model.Namespace).core
 
         public object authenticate(object credentials)
         {
-            Console.WriteLine($"AgentLogic: authenticate");
+            Console.WriteLine($"ScriptAgentLogic: authenticate");
             // TODO: Implement authenticate logic
             // - Verify agent credentials
             // - Generate authentication token
@@ -711,7 +711,7 @@ namespace @(Model.Namespace).core
 
         public object authorize(object authorizationData)
         {
-            Console.WriteLine($"AgentLogic: authorize");
+            Console.WriteLine($"ScriptAgentLogic: authorize");
             // TODO: Implement authorize logic
             // - Check authorization for operation
             return new { authorized = true };
@@ -723,7 +723,7 @@ namespace @(Model.Namespace).core
 
         public List<long> select()
         {
-            Console.WriteLine("AgentLogic: select all workflows");
+            Console.WriteLine("ScriptAgentLogic: select all workflows");
             // TODO: Implement select logic
             // - Get all workflow IDs for this agent
             return new List<long>();
@@ -731,7 +731,7 @@ namespace @(Model.Namespace).core
 
         public object get(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: get - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: get - workflowId={workflowId}");
             // TODO: Implement get logic
             // - Get workflow details
             return new { workflowId, status = "unknown" };
@@ -739,7 +739,7 @@ namespace @(Model.Namespace).core
 
         public object getAgentInfo()
         {
-            Console.WriteLine($"AgentLogic: getAgentInfo");
+            Console.WriteLine($"ScriptAgentLogic: getAgentInfo");
             // TODO: Implement getAgentInfo logic
             // - Return agent information (hostname, port, capabilities, status)
             return new 
@@ -752,7 +752,7 @@ namespace @(Model.Namespace).core
 
         public long insert(object workflowDefinition)
         {
-            Console.WriteLine($"AgentLogic: insert - create workflow");
+            Console.WriteLine($"ScriptAgentLogic: insert - create workflow");
             // TODO: Implement insert logic
             // - Create new workflow record
             // - Return workflow ID
@@ -761,14 +761,14 @@ namespace @(Model.Namespace).core
 
         public void update(long workflowId, object workflowData)
         {
-            Console.WriteLine($"AgentLogic: update - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: update - workflowId={workflowId}");
             // TODO: Implement update logic
             // - Update workflow details
         }
 
         public void delete(long workflowId)
         {
-            Console.WriteLine($"AgentLogic: delete - workflowId={workflowId}");
+            Console.WriteLine($"ScriptAgentLogic: delete - workflowId={workflowId}");
             // TODO: Implement delete logic
             // - Delete workflow record
         }
