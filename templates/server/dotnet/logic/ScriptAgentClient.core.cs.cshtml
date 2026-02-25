@@ -9,17 +9,17 @@ namespace @Model.Namespace
     /// <summary>
     /// REST client for communicating with Agent services
     /// </summary>
-    public class AgentClient : IDisposable
+    public class ScriptAgentClient : IDisposable
     {
         private readonly HttpClient _httpClient;
         private readonly ServerNode _serverNode;
 
-        public AgentClient(ServerNode serverNode)
+        public ScriptAgentClient(ServerNode serverNode)
         {
             _serverNode = serverNode ?? throw new ArgumentNullException(nameof(serverNode));
             if (string.IsNullOrEmpty(_serverNode.url))
             {
-                throw new Exception("Agent URL is not set for server node " + _serverNode.id);
+                throw new Exception("ScriptAgent URL is not set for server node " + _serverNode.id);
             }
 
             _httpClient = new HttpClient
@@ -39,7 +39,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task StopAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/stop/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/stop/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -48,7 +48,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task KillAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/kill/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/kill/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -57,7 +57,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task RestartAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/restart/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/restart/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -66,7 +66,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task PauseAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/pause/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/pause/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -75,7 +75,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task ResumeAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/resume/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/resume/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -88,7 +88,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> GetStatusAsync(long executionId)
         {
-            var response = await _httpClient.GetAsync($"/api/agent/status/{executionId}");
+            var response = await _httpClient.GetAsync($"/api/scriptagent/status/{executionId}");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -98,7 +98,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task HeartbeatAsync(object heartbeatData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/heartbeat", heartbeatData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/heartbeat", heartbeatData);
             response.EnsureSuccessStatusCode();
         }
 
@@ -107,7 +107,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task ReportAsync(object reportData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/report", reportData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/report", reportData);
             response.EnsureSuccessStatusCode();
         }
 
@@ -116,7 +116,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task LogAsync(object logData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/log", logData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/log", logData);
             response.EnsureSuccessStatusCode();
         }
 
@@ -125,7 +125,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task MetricsAsync(object metricsData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/metrics", metricsData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/metrics", metricsData);
             response.EnsureSuccessStatusCode();
         }
 
@@ -138,7 +138,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<long> RegisterAsync(object registrationData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/register", registrationData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/register", registrationData);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<long>();
         }
@@ -148,7 +148,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task UnregisterAsync(long agentId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/unregister/{agentId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/unregister/{agentId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -157,7 +157,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> GetCapabilitiesAsync()
         {
-            var response = await _httpClient.GetAsync("/api/agent/capabilities");
+            var response = await _httpClient.GetAsync("/api/scriptagent/capabilities");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -167,7 +167,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<long> AllocateAsync(long executionId)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/allocate", executionId);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/allocate", executionId);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<long>();
         }
@@ -177,7 +177,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task ReleaseAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/release/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/release/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -190,7 +190,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<long> ExecuteAsync(long executionId)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/execute", executionId);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/execute", executionId);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<long>();
         }
@@ -200,7 +200,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> ValidateAsync(long executionId)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/validate", executionId);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/validate", executionId);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -210,7 +210,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<long> PrepareAsync(long executionId)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/prepare", executionId);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/prepare", executionId);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<long>();
         }
@@ -220,7 +220,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task CleanupAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/cleanup/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/cleanup/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -229,7 +229,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task RetryAsync(long executionId)
         {
-            var response = await _httpClient.PostAsync($"/api/agent/retry/{executionId}", null);
+            var response = await _httpClient.PostAsync($"/api/scriptagent/retry/{executionId}", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -242,7 +242,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> PingAsync()
         {
-            var response = await _httpClient.GetAsync("/api/agent/ping");
+            var response = await _httpClient.GetAsync("/api/scriptagent/ping");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -252,7 +252,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task AcknowledgeAsync(long executionId)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/acknowledge", executionId);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/acknowledge", executionId);
             response.EnsureSuccessStatusCode();
         }
 
@@ -261,7 +261,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task NotifyAsync(object notificationData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/notify", notificationData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/notify", notificationData);
             response.EnsureSuccessStatusCode();
         }
 
@@ -270,7 +270,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> RequestAsync(object requestData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/request", requestData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/request", requestData);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -284,7 +284,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task ShutdownAsync()
         {
-            var response = await _httpClient.PostAsync("/api/agent/shutdown", null);
+            var response = await _httpClient.PostAsync("/api/scriptagent/shutdown", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -293,7 +293,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task ReloadAsync()
         {
-            var response = await _httpClient.PostAsync("/api/agent/reload", null);
+            var response = await _httpClient.PostAsync("/api/scriptagent/reload", null);
             response.EnsureSuccessStatusCode();
         }
 
@@ -302,7 +302,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task UpdateAsync(object updateData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/update", updateData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/update", updateData);
             response.EnsureSuccessStatusCode();
         }
 
@@ -311,7 +311,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> DiagnoseAsync()
         {
-            var response = await _httpClient.GetAsync("/api/agent/diagnose");
+            var response = await _httpClient.GetAsync("/api/scriptagent/diagnose");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -321,7 +321,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> GetHealthAsync()
         {
-            var response = await _httpClient.GetAsync("/api/agent/health");
+            var response = await _httpClient.GetAsync("/api/scriptagent/health");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -335,7 +335,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> AuthenticateAsync(object credentials)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/authenticate", credentials);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/authenticate", credentials);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -345,7 +345,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> AuthorizeAsync(object authorizationData)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/authorize", authorizationData);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/authorize", authorizationData);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -359,7 +359,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<List<long>> GetExecutionsAsync()
         {
-            var response = await _httpClient.GetAsync("/api/agent/executions");
+            var response = await _httpClient.GetAsync("/api/scriptagent/executions");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<List<long>>();
         }
@@ -369,7 +369,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> GetExecutionAsync(long executionId)
         {
-            var response = await _httpClient.GetAsync($"/api/agent/execution/{executionId}");
+            var response = await _httpClient.GetAsync($"/api/scriptagent/execution/{executionId}");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -379,7 +379,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<object?> GetAgentInfoAsync()
         {
-            var response = await _httpClient.GetAsync("/api/agent/info");
+            var response = await _httpClient.GetAsync("/api/scriptagent/info");
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<object>();
         }
@@ -389,7 +389,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task<long> CreateExecutionAsync(object executionDefinition)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/agent/execution", executionDefinition);
+            var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/execution", executionDefinition);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<long>();
         }
@@ -399,7 +399,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task UpdateExecutionAsync(long executionId, object executionData)
         {
-            var response = await _httpClient.PutAsJsonAsync($"/api/agent/execution/{executionId}", executionData);
+            var response = await _httpClient.PutAsJsonAsync($"/api/scriptagent/execution/{executionId}", executionData);
             response.EnsureSuccessStatusCode();
         }
 
@@ -408,7 +408,7 @@ namespace @Model.Namespace
         /// </summary>
         public async Task DeleteExecutionAsync(long executionId)
         {
-            var response = await _httpClient.DeleteAsync($"/api/agent/execution/{executionId}");
+            var response = await _httpClient.DeleteAsync($"/api/scriptagent/execution/{executionId}");
             response.EnsureSuccessStatusCode();
         }
 

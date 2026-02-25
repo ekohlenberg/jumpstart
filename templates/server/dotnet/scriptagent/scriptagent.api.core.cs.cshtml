@@ -13,60 +13,60 @@ namespace @(namespaceName).Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AgentController : ControllerBase
+    public class ScriptAgentController : ControllerBase
     {
         // =====================================
         // Process Management Operations
         // =====================================
 
 
-        // POST api/agent/stop/{executionId}
+        // POST api/scriptagent/stop/{executionId}
         [HttpPost("stop/{executionId}")]
         public ActionResult Stop(long executionId)
         {
             //Console.WriteLine($"Processing Agent STOP: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().stop(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().stop(executionId);
             return Ok();
         }
 
-        // POST api/agent/kill/{executionId}
+        // POST api/scriptagent/kill/{executionId}
         [HttpPost("kill/{executionId}")]
         public ActionResult Kill(long executionId)
         {
             //Console.WriteLine($"Processing Agent KILL: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().kill(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().kill(executionId);
             return Ok();
         }
 
-        // POST api/agent/restart/{executionId}
+        // POST api/scriptagent/restart/{executionId}
         [HttpPost("restart/{executionId}")]
         public ActionResult Restart(long executionId)
         {
             //Console.WriteLine($"Processing Agent RESTART: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().restart(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().restart(executionId);
             return Ok();
         }
 
-        // POST api/agent/pause/{executionId}
+        // POST api/scriptagent/pause/{executionId}
         [HttpPost("pause/{executionId}")]
         public ActionResult Pause(long executionId)
         {
             //Console.WriteLine($"Processing Agent PAUSE: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().pause(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().pause(executionId);
             return Ok();
         }
 
-        // POST api/agent/resume/{executionId}
+        // POST api/scriptagent/resume/{executionId}
         [HttpPost("resume/{executionId}")]
         public ActionResult Resume(long executionId)
         {
             //Console.WriteLine($"Processing Agent RESUME: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().resume(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().resume(executionId);
             return Ok();
         }
 
@@ -74,53 +74,53 @@ namespace @(namespaceName).Controllers
         // Status & Reporting Operations
         // =====================================
 
-        // GET api/agent/status/{executionId}
+        // GET api/scriptagent/status/{executionId}
         [HttpGet("status/{executionId}")]
         public ActionResult<object> Status(long executionId)
         {
             //Console.WriteLine($"Processing Agent STATUS: ID={executionId}");
             
-            var status = @(namespaceName).core.AgentLogic.Create().status(executionId);
+            var status = @(namespaceName).core.ScriptAgentLogic.Create().status(executionId);
             return Ok(status);
         }
 
-        // POST api/agent/heartbeat
+        // POST api/scriptagent/heartbeat
         [HttpPost("heartbeat")]
         public ActionResult Heartbeat([FromBody] object heartbeatData)
         {
             //Console.WriteLine($"Processing Agent HEARTBEAT");
             
-            @(namespaceName).core.AgentLogic.Create().heartbeat(heartbeatData);
+            @(namespaceName).core.ScriptAgentLogic.Create().heartbeat(heartbeatData);
             return Ok();
         }
 
-        // POST api/agent/report
+        // POST api/scriptagent/report
         [HttpPost("report")]
         public ActionResult Report([FromBody] object reportData)
         {
             //Console.WriteLine($"Processing Agent REPORT");
             
-            @(namespaceName).core.AgentLogic.Create().report(reportData);
+            @(namespaceName).core.ScriptAgentLogic.Create().report(reportData);
             return Ok();
         }
 
-        // POST api/agent/log
+        // POST api/scriptagent/log
         [HttpPost("log")]
         public ActionResult Log([FromBody] object logData)
         {
             //Console.WriteLine($"Processing Agent LOG");
             
-            @(namespaceName).core.AgentLogic.Create().log(logData);
+            @(namespaceName).core.ScriptAgentLogic.Create().log(logData);
             return Ok();
         }
 
-        // POST api/agent/metrics
+        // POST api/scriptagent/metrics
         [HttpPost("metrics")]
         public ActionResult Metrics([FromBody] object metricsData)
         {
             //Console.WriteLine($"Processing Agent METRICS");
             
-            @(namespaceName).core.AgentLogic.Create().metrics(metricsData);
+            @(namespaceName).core.ScriptAgentLogic.Create().metrics(metricsData);
             return Ok();
         }
 
@@ -129,33 +129,33 @@ namespace @(namespaceName).Controllers
         // =====================================
 
        
-        // GET api/agent/capabilities
+        // GET api/scriptagent/capabilities
         [HttpGet("capabilities")]
         public ActionResult<object> Capabilities()
         {
             //Console.WriteLine($"Processing Agent CAPABILITIES");
             
-            var capabilities = @(namespaceName).core.AgentLogic.Create().capabilities();
+            var capabilities = @(namespaceName).core.ScriptAgentLogic.Create().capabilities();
             return Ok(capabilities);
         }
 
-        // POST api/agent/allocate
+        // POST api/scriptagent/allocate
         [HttpPost("allocate")]
         public ActionResult<long> Allocate([FromBody] long executionId)
         {
             //Console.WriteLine($"Processing Agent ALLOCATE: {executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().allocate(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().allocate(executionId);
             return Ok(executionId);
         }
 
-        // POST api/agent/release/{executionId}
+        // POST api/scriptagent/release/{executionId}
         [HttpPost("release/{executionId}")]
         public ActionResult Release(long executionId)
         {
             //Console.WriteLine($"Processing Agent RELEASE: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().release(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().release(executionId);
             return Ok();
         }
 
@@ -163,53 +163,53 @@ namespace @(namespaceName).Controllers
         // Job Execution Operations
         // =====================================
 
-        // POST api/agent/execute
+        // POST api/scriptagent/execute
         [HttpPost("execute")]
         public ActionResult<long> Execute([FromBody] long executionId)
         {
             //Console.WriteLine($"Processing Agent EXECUTE: {executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().execute(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().execute(executionId);
             return Ok(executionId);
         }
 
-        // POST api/agent/validate
+        // POST api/scriptagent/validate
         [HttpPost("validate")]
         public ActionResult Validate([FromBody] long executionId)
         {
             //Console.WriteLine($"Processing Agent VALIDATE: {executionId}");
             
-            var validationResult = @(namespaceName).core.AgentLogic.Create().validate(executionId);
+            var validationResult = @(namespaceName).core.ScriptAgentLogic.Create().validate(executionId);
             return Ok(validationResult);
         }
 
-        // POST api/agent/prepare
+        // POST api/scriptagent/prepare
         [HttpPost("prepare")]
         public ActionResult<long> Prepare([FromBody] long executionId)
         {
             //Console.WriteLine($"Processing Agent PREPARE: {executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().prepare(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().prepare(executionId);
             return Ok(executionId);
         }
 
-        // POST api/agent/cleanup/{executionId}
+        // POST api/scriptagent/cleanup/{executionId}
         [HttpPost("cleanup/{executionId}")]
         public ActionResult Cleanup(long executionId)
         {
             //Console.WriteLine($"Processing Agent CLEANUP: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().cleanup(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().cleanup(executionId);
             return Ok();
         }
 
-        // POST api/agent/retry/{executionId}
+        // POST api/scriptagent/retry/{executionId}
         [HttpPost("retry/{executionId}")]
         public ActionResult Retry(long executionId)
         {
             //Console.WriteLine($"Processing Agent RETRY: ID={executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().retry(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().retry(executionId);
             return Ok();
         }
 
@@ -217,43 +217,43 @@ namespace @(namespaceName).Controllers
         // Communication Operations
         // =====================================
 
-        // GET api/agent/ping
+        // GET api/scriptagent/ping
         [HttpGet("ping")]
         public ActionResult Ping()
         {
             //Console.WriteLine($"Processing Agent PING");
             
-            var pingResponse = @(namespaceName).core.AgentLogic.Create().ping();
+            var pingResponse = @(namespaceName).core.ScriptAgentLogic.Create().ping();
             return Ok(pingResponse);
         }
 
-        // POST api/agent/acknowledge
+        // POST api/scriptagent/acknowledge
         [HttpPost("acknowledge")]
         public ActionResult Acknowledge([FromBody] long executionId)
         {
             //Console.WriteLine($"Processing Agent ACKNOWLEDGE: {executionId}");
             
-            @(namespaceName).core.AgentLogic.Create().acknowledge(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().acknowledge(executionId);
             return Ok();
         }
 
-        // POST api/agent/notify
+        // POST api/scriptagent/notify
         [HttpPost("notify")]
         public ActionResult Notify([FromBody] object notificationData)
         {
             //Console.WriteLine($"Processing Agent NOTIFY");
             
-            @(namespaceName).core.AgentLogic.Create().notify(notificationData);
+            @(namespaceName).core.ScriptAgentLogic.Create().notify(notificationData);
             return Ok();
         }
 
-        // POST api/agent/request
+        // POST api/scriptagent/request
         [HttpPost("request")]
         public new ActionResult<object> Request([FromBody] object requestData)
         {
             //Console.WriteLine($"Processing Agent REQUEST");
             
-            var response = @(namespaceName).core.AgentLogic.Create().request(requestData);
+            var response = @(namespaceName).core.ScriptAgentLogic.Create().request(requestData);
             return Ok(response);
         }
 
@@ -261,53 +261,53 @@ namespace @(namespaceName).Controllers
         // System Operations
         // =====================================
 
-        // POST api/agent/shutdown
+        // POST api/scriptagent/shutdown
         [HttpPost("shutdown")]
         public ActionResult Shutdown()
         {
             //Console.WriteLine($"Processing Agent SHUTDOWN");
             
-            @(namespaceName).core.AgentLogic.Create().shutdown();
+            @(namespaceName).core.ScriptAgentLogic.Create().shutdown();
             return Ok();
         }
 
-        // POST api/agent/reload
+        // POST api/scriptagent/reload
         [HttpPost("reload")]
         public ActionResult Reload()
         {
             //Console.WriteLine($"Processing Agent RELOAD");
             
-            @(namespaceName).core.AgentLogic.Create().reload();
+            @(namespaceName).core.ScriptAgentLogic.Create().reload();
             return Ok();
         }
 
-        // POST api/agent/update
+        // POST api/scriptagent/update
         [HttpPost("update")]
         public ActionResult Update([FromBody] object updateData)
         {
             //Console.WriteLine($"Processing Agent UPDATE");
             
-            @(namespaceName).core.AgentLogic.Create().update(updateData);
+            @(namespaceName).core.ScriptAgentLogic.Create().update(updateData);
             return Ok();
         }
 
-        // GET api/agent/diagnose
+        // GET api/scriptagent/diagnose
         [HttpGet("diagnose")]
         public ActionResult Diagnose()
         {
             //Console.WriteLine($"Processing Agent DIAGNOSE");
             
-            var diagnostics = @(namespaceName).core.AgentLogic.Create().diagnose();
+            var diagnostics = @(namespaceName).core.ScriptAgentLogic.Create().diagnose();
             return Ok(diagnostics);
         }
 
-        // GET api/agent/health
+        // GET api/scriptagent/health
         [HttpGet("health")]
         public ActionResult Health()
         {
             //Console.WriteLine($"Processing Agent HEALTH");
             
-            var healthStatus = @(namespaceName).core.AgentLogic.Create().health();
+            var healthStatus = @(namespaceName).core.ScriptAgentLogic.Create().health();
             return Ok(healthStatus);
         }
 
@@ -315,23 +315,23 @@ namespace @(namespaceName).Controllers
         // Security Operations
         // =====================================
 
-        // POST api/agent/authenticate
+        // POST api/scriptagent/authenticate
         [HttpPost("authenticate")]
         public ActionResult Authenticate([FromBody] object credentials)
         {
             //Console.WriteLine($"Processing Agent AUTHENTICATE");
             
-            var authResult = @(namespaceName).core.AgentLogic.Create().authenticate(credentials);
+            var authResult = @(namespaceName).core.ScriptAgentLogic.Create().authenticate(credentials);
             return Ok(authResult);
         }
 
-        // POST api/agent/authorize
+        // POST api/scriptagent/authorize
         [HttpPost("authorize")]
         public ActionResult Authorize([FromBody] object authorizationData)
         {
             //Console.WriteLine($"Processing Agent AUTHORIZE");
             
-            var authResult = @(namespaceName).core.AgentLogic.Create().authorize(authorizationData);
+            var authResult = @(namespaceName).core.ScriptAgentLogic.Create().authorize(authorizationData);
             return Ok(authResult);
         }
 
@@ -344,52 +344,52 @@ namespace @(namespaceName).Controllers
         public ActionResult<IEnumerable<long>> GetExecutions()
         {
             //Console.WriteLine("Processing GET Execution List");
-            List<long> executionIds = @(namespaceName).core.AgentLogic.Create().select();
+            List<long> executionIds = @(namespaceName).core.ScriptAgentLogic.Create().select();
             return Ok(executionIds);
         }
 
-        // GET api/agent/execution/{executionId}
+        // GET api/scriptagent/execution/{executionId}
         [HttpGet("execution/{executionId}")]
         public ActionResult<object> GetExecution(long executionId)
         {
             //Console.WriteLine($"Processing Agent GET Execution ID={executionId}");
-            var execution = @(namespaceName).core.AgentLogic.Create().get(executionId);
+            var execution = @(namespaceName).core.ScriptAgentLogic.Create().get(executionId);
             return Ok(execution);
         }
 
-        // GET api/agent/info
+        // GET api/scriptagent/info
         [HttpGet("info")]
         public ActionResult<object> GetAgent()
         {
             //Console.WriteLine($"Processing Agent GET Info");
-            var agentInfo = @(namespaceName).core.AgentLogic.Create().getAgentInfo();
+            var agentInfo = @(namespaceName).core.ScriptAgentLogic.Create().getAgentInfo();
             return Ok(agentInfo);
         }
 
-        // POST api/agent/execution
+        // POST api/scriptagent/execution
         [HttpPost("execution")]
         public ActionResult<long> CreateExecution([FromBody] object executionDefinition)
         {
             //Console.WriteLine($"Processing Agent POST: Create Execution");
-            long executionId = @(namespaceName).core.AgentLogic.Create().insert(executionDefinition);
+            long executionId = @(namespaceName).core.ScriptAgentLogic.Create().insert(executionDefinition);
             return CreatedAtAction(nameof(GetExecution), new { executionId = executionId }, executionId);
         }
 
-        // PUT api/agent/execution/{executionId}
+        // PUT api/scriptagent/execution/{executionId}
         [HttpPut("execution/{executionId}")]
         public ActionResult UpdateExecution(long executionId, [FromBody] object executionData)
         {
             //Console.WriteLine($"Processing Agent PUT: Update Execution ID={executionId}");
-            @(namespaceName).core.AgentLogic.Create().update(executionId, executionData);
+            @(namespaceName).core.ScriptAgentLogic.Create().update(executionId, executionData);
             return Ok();
         }
 
-        // DELETE api/agent/execution/{executionId}
+        // DELETE api/scriptagent/execution/{executionId}
         [HttpDelete("execution/{executionId}")]
         public ActionResult DeleteExecution(long executionId)
         {
             //Console.WriteLine($"Processing Agent DELETE: Execution ID={executionId}");
-            @(namespaceName).core.AgentLogic.Create().delete(executionId);
+            @(namespaceName).core.ScriptAgentLogic.Create().delete(executionId);
             return Ok();
         }
     }
