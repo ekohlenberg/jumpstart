@@ -8,7 +8,8 @@ const int EndPort = 5200;
 const int MaxRetries = 100;
 
 int boundPort = 0;
-IPAddress boundIP = Config.getNetworkInterfaceIP();
+//IPAddress boundIP = Config.getNetworkInterfaceIP();
+IPAddress boundIP = IPAddress.Any; // Listen on all interfaces. The actual IP will be determined by the client when it connects.
 var builder = WebApplication.CreateBuilder(args);
 
 // Try to find an available port
@@ -126,27 +127,28 @@ static async Task RegisterScriptAgent(IPAddress boundIP, int port)
     // Get SessionInfo singleton and populate it with system information
     var sessionInfo = SessionInfo.Instance;
     Util.PopulateSessionInfo(sessionInfo);
-    
+    var computerName   = sessionInfo.GetValue("ComputerName", Environment.MachineName);
+
     // Add agent-specific information to the session
     sessionInfo.SetValue("ScriptAgentIPAddress", boundIP.ToString());
     sessionInfo.SetValue("ScriptAgentPort", port.ToString());
-    sessionInfo.SetValue("ScriptAgentURL", $"http://{boundIP}:{port}");
+    sessionInfo.SetValue("ScriptAgentURL", $"http://{computerName}:{port}");
     
     // Set ServerNode keys that are used in registration
     sessionInfo.SetValue("ServerNodeIPAddress", boundIP.ToString());
-    sessionInfo.SetValue("ServerNodeURL", $"http://{boundIP}:{port}");
+    sessionInfo.SetValue("ServerNodeURL", $"http://{computerName}:{port}");
     
-    var computerName   = sessionInfo.GetValue("ComputerName", Environment.MachineName);
+
     var scriptAgentId = $"{computerName}:{port}";
     
     Console.WriteLine($"==============================================");
     Console.WriteLine($"ScriptAgent Registration");
     Console.WriteLine($"==============================================");
-    Console.WriteLine($"ScriptAgent ID: {agentId}");
+    Console.WriteLine($"ScriptAgent ID: {scriptAgentId}");
     Console.WriteLine($"Computer Name: {computerName}");
     Console.WriteLine($"IP Address: {boundIP}");
     Console.WriteLine($"Port: {port}");
-    Console.WriteLine($"URL: http://{boundIP}:{port}");
+    Console.WriteLine($"URL: {sessionInfo.GetValue("ServerNodeURL")}");
     Console.WriteLine($"User: {sessionInfo.GetValue("UserName", "Unknown")}");
     Console.WriteLine($"Domain: {sessionInfo.GetValue("UserDomain", "Unknown")}");
     Console.WriteLine($"==============================================");

@@ -9,7 +9,8 @@ const int EndPort = 5100;
 const int MaxRetries = 100;
 
 int boundPort = 0;
-IPAddress boundIP = Config.getNetworkInterfaceIP();
+//IPAddress boundIP = Config.getNetworkInterfaceIP();
+IPAddress boundIP = IPAddress.Any; // Listen on all interfaces. The actual IP will be determined by the client when it connects.
 var builder = WebApplication.CreateBuilder(args);
 
 // Try to find an available port
@@ -143,17 +144,18 @@ static async Task RegisterScheduler(IPAddress boundIP, int port)
     // Get SessionInfo singleton and populate it with system information
     var sessionInfo = SessionInfo.Instance;
     Util.PopulateSessionInfo(sessionInfo);
-    
+    var computerName = sessionInfo.GetValue("ComputerName", Environment.MachineName);
+
     // Add scheduler-specific information to the session
     sessionInfo.SetValue("SchedulerIPAddress", boundIP.ToString());
     sessionInfo.SetValue("SchedulerPort", port.ToString());
-    sessionInfo.SetValue("SchedulerURL", $"http://{boundIP}:{port}");
+    sessionInfo.SetValue("SchedulerURL", $"http://{computerName}:{port}");
     
     // Set ServerNode keys that are used in registration
     sessionInfo.SetValue("ServerNodeIPAddress", boundIP.ToString());
-    sessionInfo.SetValue("ServerNodeURL", $"http://{boundIP}:{port}");
+    sessionInfo.SetValue("ServerNodeURL", $"http://{computerName}:{port}");
     
-    var computerName = sessionInfo.GetValue("ComputerName", Environment.MachineName);
+
     var schedulerId = $"{computerName}:{port}";
     
     Console.WriteLine($"==============================================");
@@ -163,7 +165,7 @@ static async Task RegisterScheduler(IPAddress boundIP, int port)
     Console.WriteLine($"Computer Name: {computerName}");
     Console.WriteLine($"IP Address: {boundIP}");
     Console.WriteLine($"Port: {port}");
-    Console.WriteLine($"URL: http://{boundIP}:{port}");
+    Console.WriteLine($"URL: {sessionInfo.GetValue("ServerNodeURL")}");
     Console.WriteLine($"User: {sessionInfo.GetValue("UserName", "Unknown")}");
     Console.WriteLine($"Domain: {sessionInfo.GetValue("UserDomain", "Unknown")}");
     Console.WriteLine($"==============================================");

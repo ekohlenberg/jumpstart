@@ -20,7 +20,7 @@ namespace @(Model.Namespace).Controllers
 
             try
             {
-                workflowCoreLogic.run(id);
+                await workflowCoreLogic.run(id);
             }
             catch(Exception x)
             {

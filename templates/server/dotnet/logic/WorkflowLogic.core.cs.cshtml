@@ -15,7 +15,7 @@ namespace @Model.Namespace
    
    public interface IWorkflowCoreLogic : IWorkflowLogic
    {
-        void run( long workflowId);
+        Task run( long workflowId);
    }
 
     public class WorkflowCoreLogic : WorkflowUserLogic, IWorkflowCoreLogic
@@ -63,7 +63,7 @@ namespace @Model.Namespace
             InvokeExecutionStatusHandler(workflow.exec_status_id, workflow);
         }
 
-        public virtual void run( long workflowId)
+        public virtual async Task run( long workflowId)
         {
             var workflow = WorkflowLogic.Create().get(workflowId);
             if (workflow == null)
@@ -79,7 +79,7 @@ namespace @Model.Namespace
                 throw new Exception("No online Scheduler server node available");
 
             using var schedulerClient = new SchedulerClient(schedulerNodes[0]);
-            var executionId = schedulerClient.ExecuteAsync(workflowId);
+            await schedulerClient.ExecuteAsync(workflowId);
         }
         /// <summary>
         /// Invokes the execution status handler for the given status and workflow.
