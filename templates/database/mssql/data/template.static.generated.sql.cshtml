@@ -1,126 +1,170 @@
--- Insert default data source record
-INSERT INTO [core].[data_source] ([id], [name], [is_active], [created_by], [last_updated], [last_updated_by], [version]) VALUES (NEXT VALUE FOR core.data_source_identity, 'default', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER, 1);
+DECLARE @@ds_id BIGINT = NEXT VALUE FOR core.data_source_identity;
+INSERT INTO [core].[data_source] ([id], [txn_id], [name], [is_active], [created_by], [last_updated], [last_updated_by]) VALUES (@@ds_id, @@ds_id, 'default', 1, SYSTEM_USER, GETDATE(), SYSTEM_USER);
 
-INSERT INTO [core].[server_node_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'ScriptAgent', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[server_node_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Scheduler', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[server_node_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'ApiServer', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[server_node_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (1, 1, 'ScriptAgent', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[server_node_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (2, 2, 'Scheduler', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[server_node_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (3, 3, 'ApiServer', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
-INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'Initializing', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Online', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Busy', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[server_node_status] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (4, 'Offline', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[server_node_status] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (1, 1, 'Initializing', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[server_node_status] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (2, 2, 'Online', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[server_node_status] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (3, 3, 'Busy', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[server_node_status] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (4, 4, 'Offline', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
-INSERT INTO [core].[workflow_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'Folder', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[workflow_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Process', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[workflow_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (1, 1, 'Folder', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[workflow_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (2, 2, 'Process', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
-INSERT INTO [core].[on_failure] ([id], [action], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'Stop', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[on_failure] ([id], [action], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Continue', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[on_failure] ([id], [txn_id], [action], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (1, 1, 'Stop', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[on_failure] ([id], [txn_id], [action], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (2, 2, 'Continue', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, '', 'images/exec-status-1.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'Dispatched', 'images/exec-status-2.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Executing', 'images/exec-status-3.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (4, 'Completed', 'images/exec-status-4.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (5, 'Failed', 'images/exec-status-5.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (6, 'Cancelled', 'images/exec-status-6.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (7, 'Timeout', 'images/exec-status-7.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (8, 'Interrupted', 'images/exec-status-8.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[exec_status] ([id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (9, 'Suspended', 'images/exec-status-9.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (1, 1, '', 'images/exec-status-1.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (2, 2, 'Dispatched', 'images/exec-status-2.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (3, 3, 'Executing', 'images/exec-status-3.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (4, 4, 'Completed', 'images/exec-status-4.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (5, 5, 'Failed', 'images/exec-status-5.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (6, 6, 'Cancelled', 'images/exec-status-6.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (7, 7, 'Timeout', 'images/exec-status-7.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (8, 8, 'Interrupted', 'images/exec-status-8.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[exec_status] ([id], [txn_id], [name], [image], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (9, 9, 'Suspended', 'images/exec-status-9.png', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
-INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (1, 'CSharp', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (2, 'PowerShell', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [core].[script_type] ([id], [name], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (3, 'Python', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+INSERT INTO [core].[script_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (1, 1, 'CSharp', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[script_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (2, 2, 'PowerShell', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+INSERT INTO [core].[script_type] ([id], [txn_id], [name], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (3, 3, 'Python', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- Insert AgentLogic method operations
+DECLARE @@operation_id BIGINT;
+
 -- Process Management Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'start', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'stop', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'kill', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'restart', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'pause', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'resume', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'start', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'stop', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'kill', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'restart', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'pause', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'resume', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- Status & Reporting Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'status', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'heartbeat', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'report', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'log', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'metrics', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'status', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'heartbeat', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'report', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'log', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'metrics', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- Resource Management Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'register', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'unregister', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'capabilities', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'allocate', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'release', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'register', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'unregister', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'capabilities', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'allocate', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'release', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- Job Execution Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'execute', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'validate', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'prepare', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'cleanup', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'retry', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'execute', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'validate', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'prepare', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'cleanup', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'retry', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- Communication Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'ping', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'acknowledge', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'notify', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'request', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'ping', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'acknowledge', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'notify', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'request', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- System Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'shutdown', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'reload', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'diagnose', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'health', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'shutdown', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'reload', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'diagnose', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'health', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- Security Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'authenticate', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'authorize', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'authenticate', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'authorize', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 -- Standard Operations
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'select', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'get', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'getAgentInfo', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'insert', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'update', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
-INSERT INTO [sec].[operation] ([id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by], [version]) VALUES (NEXT VALUE FOR sec.operation_identity, 'ScriptAgent', 'delete', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER, 1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'select', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'get', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'getAgentInfo', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'insert', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'update', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'ScriptAgent', 'delete', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 
 -- Scheduler Operations
-insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'execute', 1, current_timestamp, current_user, current_user, 1);
-insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'validate', 1, current_timestamp, current_user, current_user, 1);
-insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'configure', 1, current_timestamp, current_user, current_user, 1);
-insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'health', 1, current_timestamp, current_user, current_user, 1);
-insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity, 'Scheduler', 'register', 1, current_timestamp, current_user, current_user, 1);
-insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity , 'Scheduler', 'unregister', 1,current_timestamp,current_user,current_user ,1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'Scheduler', 'execute', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'Scheduler', 'validate', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'Scheduler', 'configure', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'Scheduler', 'health', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'Scheduler', 'register', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'Scheduler', 'unregister', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
-insert into sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) values (NEXT VALUE FOR sec.operation_identity , 'Workflow', 'run', 1,current_timestamp,current_user,current_user ,1);
+SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
+INSERT INTO [sec].[operation] ([id], [txn_id], [objectname], [methodname], [is_active], [last_updated], [created_by], [last_updated_by]) VALUES (@@operation_id, @@operation_id, 'Workflow', 'run', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 
 
-DECLARE @@operation_id BIGINT;
 @{
 	foreach( var metaObject in Model.Objects)
 	{
 		<text>
-		
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'select', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'select', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'get', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'get', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'view', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'view', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'insert', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'insert', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'put', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'put', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'update', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'update', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'delete', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'delete', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'history', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'history', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		SELECT @@operation_id = NEXT VALUE FOR sec.operation_identity;
-		INSERT INTO sec.operation (id, objectname, methodname, is_active, last_updated, created_by, last_updated_by, version) VALUES (@@operation_id,'@metaObject.DomainObj', 'children', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER,1);
+		INSERT INTO sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) VALUES (@@operation_id, @@operation_id, '@metaObject.DomainObj', 'children', 1, GETDATE(), SYSTEM_USER, SYSTEM_USER);
 		</text>
 
 	}

@@ -87,8 +87,8 @@
 				}
 			}
 
-			// Build JOIN clause with unique alias
-			joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + tableName + "." + fk.Name + " = " + alias + ".id");
+			// Build JOIN clause with unique alias, filtering to active rows only
+			joinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + tableName + "." + fk.Name + " = " + alias + ".id AND " + alias + ".is_active = 1");
 		}
 	}
 
@@ -103,28 +103,17 @@
 	}
 	var rwkExpression = string.Join(" AND ", rwkExpressions);
 
-	// Build history column list for the history query
-	var historyColumns = new List<string>();
-	foreach(var attr in attributes)
-	{
-		var columnName = attr.Name;
-		if (attr.Name == "id")
-		{
-			columnName = metaObject.TableName + "_id";
-		}
-		historyColumns.Add("history." + metaObject.SchemaName + "_" + metaObject.TableName + "." + columnName);
-	}
-	var historyColumnList = historyColumns.Count > 0 ? ",\n        " + string.Join(",\n        ", historyColumns) : "";
-
 	<text>
 -- =====================================
 -- Query for @(domainObj) (@(schemaName).@(tableName))
 -- =====================================
 
-DECLARE @@sql_id BIGINT = NEXT VALUE FOR core.sql_identity;
+DECLARE @@sql_id BIGINT;
 
+SET @@sql_id = NEXT VALUE FOR core.sql_identity;
 INSERT INTO core.sql (
 	id,
+	txn_id,
 	name,
 	sql_text,
 	description,
@@ -132,28 +121,28 @@ INSERT INTO core.sql (
 	last_updated,
 	last_updated_by,
 	is_active,
-	version,
 	data_source_id
 ) VALUES (
 	@@sql_id,
+	@@sql_id,
 	'@(schemaName).@(tableName)-select',
-	'SELECT 
+	'SELECT
 		@(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
 	FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
+	WHERE @(schemaName).@(tableName).is_active = 1
 	ORDER BY @(schemaName).@(tableName).id;',
 	'Select all @(domainObj) records with related @(string.Join(", ", fkTableNames)) information',
 	SYSTEM_USER,
 	GETDATE(),
 	SYSTEM_USER,
 	1,
-	1,
-	(SELECT id FROM core.data_source WHERE name = 'default')
+	(SELECT id FROM core.data_source WHERE name = 'default' AND is_active = 1)
 );
 
 SET @@sql_id = NEXT VALUE FOR core.sql_identity;
-
 INSERT INTO core.sql (
 	id,
+	txn_id,
 	name,
 	sql_text,
 	description,
@@ -161,28 +150,27 @@ INSERT INTO core.sql (
 	last_updated,
 	last_updated_by,
 	is_active,
-	version,
 	data_source_id
 ) VALUES (
 	@@sql_id,
+	@@sql_id,
 	'@(schemaName).@(tableName)-get',
-	'SELECT 
+	'SELECT
 		@(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
 	FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
-	WHERE @(schemaName).@(tableName).id = ^(id);',
+	WHERE @(schemaName).@(tableName).id = ^(id) AND @(schemaName).@(tableName).is_active = 1;',
 	'Select single @(domainObj) record by ID with related @(string.Join(", ", fkTableNames)) information',
 	SYSTEM_USER,
 	GETDATE(),
 	SYSTEM_USER,
 	1,
-	1,
-	(SELECT id FROM core.data_source WHERE name = 'default')
+	(SELECT id FROM core.data_source WHERE name = 'default' AND is_active = 1)
 );
 
 SET @@sql_id = NEXT VALUE FOR core.sql_identity;
-
 INSERT INTO core.sql (
 	id,
+	txn_id,
 	name,
 	sql_text,
 	description,
@@ -190,28 +178,27 @@ INSERT INTO core.sql (
 	last_updated,
 	last_updated_by,
 	is_active,
-	version,
 	data_source_id
 ) VALUES (
 	@@sql_id,
+	@@sql_id,
 	'@(schemaName).@(tableName)-get-by-rwk',
-	'SELECT 
+	'SELECT
 		@(schemaName).@(tableName).id@(selectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", selectColumns) : "")@(fkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", fkSelectColumns) : "")
 	FROM @(schemaName).@(tableName)@(joinClauses.Count > 0 ? "\n        " + string.Join("\n        ", joinClauses) : "")
-	WHERE @(rwkExpression);',
+	WHERE @(rwkExpression) AND @(schemaName).@(tableName).is_active = 1;',
 	'Select single @(domainObj) record by RWK columns with related @(string.Join(", ", fkTableNames)) information',
 	SYSTEM_USER,
 	GETDATE(),
 	SYSTEM_USER,
 	1,
-	1,
-	(SELECT id FROM core.data_source WHERE name = 'default')
+	(SELECT id FROM core.data_source WHERE name = 'default' AND is_active = 1)
 );
 
 SET @@sql_id = NEXT VALUE FOR core.sql_identity;
-
 INSERT INTO core.sql (
 	id,
+	txn_id,
 	name,
 	sql_text,
 	description,
@@ -219,29 +206,22 @@ INSERT INTO core.sql (
 	last_updated,
 	last_updated_by,
 	is_active,
-	version,
 	data_source_id
 ) VALUES (
 	@@sql_id,
+	@@sql_id,
 	'@(schemaName).@(tableName)-get-history',
-	'SELECT 
-		history.@(schemaName)_@(tableName).@(tableName)_id,
-		history.@(schemaName)_@(tableName).id,
-		history.@(schemaName)_@(tableName).is_active,
-		history.@(schemaName)_@(tableName).created_by,
-		history.@(schemaName)_@(tableName).last_updated,
-		history.@(schemaName)_@(tableName).last_updated_by,
-		history.@(schemaName)_@(tableName).version@(historyColumnList)
-	FROM history.@(schemaName)_@(tableName)
-	WHERE history.@(schemaName)_@(tableName).@(tableName)_id = ^(id)
-	ORDER BY history.@(schemaName)_@(tableName).last_updated DESC;',
-	'Select all history records for @(domainObj) where @(tableName)_id matches the provided id',
+	'SELECT
+		@(schemaName).@(tableName).*
+	FROM @(schemaName).@(tableName)
+	WHERE @(schemaName).@(tableName).id = ^(id)
+	ORDER BY @(schemaName).@(tableName).txn_id DESC;',
+	'Select all history records for @(domainObj) by id, ordered newest first',
 	SYSTEM_USER,
 	GETDATE(),
 	SYSTEM_USER,
 	1,
-	1,
-	(SELECT id FROM core.data_source WHERE name = 'default')
+	(SELECT id FROM core.data_source WHERE name = 'default' AND is_active = 1)
 );
 
 	</text>

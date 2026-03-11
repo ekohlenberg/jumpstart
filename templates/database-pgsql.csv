@@ -1,9 +1,7 @@
 ﻿COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
 postgresql database-create database,model,database/pgsql/ddl/template.database.create.generated.sql.cshtml,./database/ddl,true
-postgresql database-create audit schema,model,database/pgsql/ddl/audit.schema.create.generated.sql.cshtml,./database/ddl,true
 postgresql database-create app schemas,schema,database/pgsql/ddl/template.schema.create.generated.sql.cshtml,./database/ddl,true
 postgresql database-create app tables,object,database/pgsql/ddl/template.table.generated.sql.cshtml,./database/ddl,true
-postgresql database-create audit tables,object,database/pgsql/ddl/template.audit.generated.sql.cshtml,./database/ddl,true
 postgresql database-create sequences,object,database/pgsql/ddl/template.sequence.generated.sql.cshtml,./database/ddl,true
 postgresql database-create rwk indexes,object,database/pgsql/ddl/template.rwkindex.generated.sql.cshtml,./database/ddl,true
 postgresql database-bash build script,build, database/pgsql/ddl/build.py.cshtml,./database/ddl,true

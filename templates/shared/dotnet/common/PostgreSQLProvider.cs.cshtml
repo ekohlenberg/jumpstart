@@ -38,16 +38,6 @@ namespace @Model.Name
             return $"SELECT nextval('{tableName}_identity');";
         }
 
-        public string GetVersionSql(string tableName, long id)
-        {
-            return $@@"with ver_check as (
-                select max(version) as v from {tableName}
-                where id={id}
-                union all select 0 as v
-                )
-                select max(v)+1 from ver_check";
-        }
-
         public string FormatParameter(string parameterName)
         {
             return $"@@{parameterName}";

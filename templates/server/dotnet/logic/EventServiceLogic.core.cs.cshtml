@@ -71,11 +71,13 @@ namespace @Model.Namespace
                 }
                 else
                 {
-                    string sql = @@"SELECT s.id, s.name, s.source, s.is_active, s.created_by, s.last_updated, s.last_updated_by, s.version
+                    string sql = @@"SELECT s.id, s.name, s.source, s.is_active, s.created_by, s.last_updated, s.last_updated_by, s.txn_id
     FROM core.event_service e
 inner join core.script s on
-    s.id=e.script_id
+    s.id=e.script_id 
+    and s.is_active=1
 where
+e.is_active=1 and
 e.event_type='^(eventtype)' and
 '^(objectname)' like e.objectname_filter and
 '^(methodname)' like e.methodname_filter";

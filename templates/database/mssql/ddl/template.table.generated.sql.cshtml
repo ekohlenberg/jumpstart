@@ -9,8 +9,10 @@ GO
 create table @Model.SchemaName.@Model.TableName (
 @for (int i = 0; i < Model.Attributes.Count; i++) {
     var column = Model.Attributes[i];
+
+    // txn_id is the primary key; id is a regular (non-unique) column
     var pk = "";
-    if (column.Name == "id"){
+    if (column.Name == "txn_id"){
         pk = "PRIMARY KEY";
     }
 
@@ -29,10 +31,10 @@ create table @Model.SchemaName.@Model.TableName (
         nullable = " not null";
     }
 
-    var comma = "";
-    if (i < Model.Attributes.Count - 1) {
-        comma = ",";
-    } 
+    var comma = ",";
+    if (i == Model.Attributes.Count - 1) {
+        comma = "";
+    }
 
     @("\t\t" +
 column.Name + " " + column.MSSQLDataType + len + " " + pk + nullable + comma + @"
@@ -40,6 +42,7 @@ column.Name + " " + column.MSSQLDataType + len + " " + pk + nullable + comma + @
 )
     ;
 
-        
+
     }
 );
+CREATE INDEX IX_@(Model.SchemaName)_@(Model.TableName)_id_is_active ON @(Model.SchemaName).@(Model.TableName) (id, is_active);

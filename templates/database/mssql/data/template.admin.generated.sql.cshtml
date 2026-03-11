@@ -6,6 +6,7 @@ DECLARE @@principal_id BIGINT, @@password_id BIGINT, @@role_id BIGINT, @@role_ma
 SELECT @@principal_id = NEXT VALUE FOR app.principal_identity;
 INSERT INTO app.principal(
     id,
+    txn_id,
     first_name,
     last_name,
     username,
@@ -15,46 +16,41 @@ INSERT INTO app.principal(
     is_active,
     created_by,
     last_updated,
-    last_updated_by,
-    version
+    last_updated_by
 )
 VALUES (
-    @@principal_id,          -- Use next value from principal_identity sequence
+    @@principal_id,
+    @@principal_id,
     'Admin',
     'Principal',
-    'admin',                               -- Unique username
+    'admin',
     'admin@@mydomain.com',
     GETDATE(),
     GETDATE(),
     1,
     'system',
     GETDATE(),
-    'system',
-    1
+    'system'
 );
 
 SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity;
 
 WITH admin_principal_id AS (
-    SELECT id
-    FROM app.principal
-    WHERE username = 'admin'
+    SELECT id FROM app.principal WHERE username = 'admin' AND is_active = 1
 )
-
 INSERT INTO sec.principal_password(
-    id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by, version)
-SELECT  @@password_id,
+    id, txn_id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by)
+SELECT @@password_id,
+    @@password_id,
     admin_principal_id.id,
-     CAST(FLOOR(RAND(CHECKSUM(NEWID())) * 100000 + 1) AS NVARCHAR(10)),  
-     GETDATE(),
-     1,
-     1,
-     SYSTEM_USER,
-     GETDATE(),
-     SYSTEM_USER,
-     1
-FROM
-    admin_principal_id;
+    CAST(FLOOR(RAND(CHECKSUM(NEWID())) * 100000 + 1) AS NVARCHAR(10)),
+    GETDATE(),
+    1,
+    1,
+    SYSTEM_USER,
+    GETDATE(),
+    SYSTEM_USER
+FROM admin_principal_id;
 
 -- =====================================
 -- 2) Create Admin Role
@@ -62,111 +58,78 @@ FROM
 SELECT @@role_id = NEXT VALUE FOR sec.op_role_identity;
 INSERT INTO sec.op_role(
     id,
+    txn_id,
     name,
     is_active,
     created_by,
     last_updated,
-    last_updated_by,
-    version
+    last_updated_by
 )
 VALUES (
-    @@role_id,       -- Use next value from op_role_identity sequence
-    'Administrator',                       -- Unique role name
+    @@role_id,
+    @@role_id,
+    'Administrator',
     1,
     'system',
     GETDATE(),
-    'system',
-    1
+    'system'
 );
 
 -- =====================================
 -- 3) Grant All Operations to Admin Role
 --    (Map every operation in sec.operation to the admin role)
---    Using a cursor to get unique sequence values for each operation
+--    CROSS APPLY ensures NEXT VALUE FOR is called once per row so id = txn_id
 -- =====================================
-DECLARE @@op_id BIGINT;
-
-
--- Get the admin role ID
 DECLARE @@admin_role_id BIGINT;
-SELECT @@admin_role_id = id FROM sec.op_role WHERE name = 'Administrator';
+SELECT @@admin_role_id = id FROM sec.op_role WHERE name = 'Administrator' AND is_active = 1;
 
--- Cursor to iterate through all operations
-DECLARE operation_cursor CURSOR FOR
-    SELECT id FROM sec.operation;
-
-OPEN operation_cursor;
-FETCH NEXT FROM operation_cursor INTO @@op_id;
-
-WHILE @@@@FETCH_STATUS = 0
-BEGIN
-    -- Get next sequence value for each operation
-    SELECT @@role_map_id = NEXT VALUE FOR sec.op_role_map_identity;
-    
-    INSERT INTO sec.op_role_map(
-        id,
-        op_id,
-        op_role_id,
-        is_active,
-        created_by,
-        last_updated,
-        last_updated_by,
-        version
-    )
-    VALUES (
-        @@role_map_id,
-        @@op_id,
-        @@admin_role_id,
-        1,
-        'system',
-        GETDATE(),
-        'system',
-        1
-    );
-    
-    FETCH NEXT FROM operation_cursor INTO @@op_id;
-END
-
-CLOSE operation_cursor;
-DEALLOCATE operation_cursor;
+INSERT INTO sec.op_role_map(
+    id,
+    txn_id,
+    op_id,
+    op_role_id,
+    is_active,
+    created_by,
+    last_updated,
+    last_updated_by
+)
+SELECT seq.n, seq.n, op.id, @@admin_role_id, 1, 'system', GETDATE(), 'system'
+FROM sec.operation op
+CROSS APPLY (SELECT NEXT VALUE FOR sec.op_role_map_identity AS n) seq
+WHERE op.is_active = 1;
 
 -- =====================================
 -- 4) Map Admin Principal to Admin Role
---    Using sub-selects on sec.principal (by username)
+--    Using sub-selects on app.principal (by username)
 --    and sec.op_role (by name)
 -- =====================================
 SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity;
 
 WITH admin_principal_id AS (
-    SELECT id
-    FROM app.principal
-    WHERE username = 'admin'
+    SELECT id FROM app.principal WHERE username = 'admin' AND is_active = 1
 ),
 admin_role_id AS (
-    SELECT id
-    FROM sec.op_role
-    WHERE name = 'Administrator'
+    SELECT id FROM sec.op_role WHERE name = 'Administrator' AND is_active = 1
 )
-
 INSERT INTO sec.op_role_member(
     id,
+    txn_id,
     principal_id,
     op_role_id,
     is_active,
     created_by,
     last_updated,
-    last_updated_by,
-    version
+    last_updated_by
 )
 SELECT
-    @@role_member_id,  -- PK for op_role_member
+    @@role_member_id,
+    @@role_member_id,
     admin_principal_id.id,
     admin_role_id.id,
     1,
     'system',
     GETDATE(),
-    'system',
-    1
+    'system'
 FROM admin_principal_id
 CROSS JOIN admin_role_id;
 

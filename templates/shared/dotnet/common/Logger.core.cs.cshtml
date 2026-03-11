@@ -316,7 +316,7 @@ namespace @Model.Name
                         try
                         {
                             _connectionString = Config.getString("db.connection");
-                            _tableName = _provider.FormatTableName("history.log");
+                            _tableName = _provider.FormatTableName("core.log");
                             _insertSql = $"INSERT INTO {_tableName} (level, timestamp, principalname, program, filepath, linenumber, membername, message) " +
                                         "VALUES (@@level, @@timestamp, @@principalname, @@program, @@filepath, @@linenumber, @@membername, @@message);";
                             _initialized = true;

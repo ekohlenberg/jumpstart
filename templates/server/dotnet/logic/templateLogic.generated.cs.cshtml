@@ -105,7 +105,10 @@ namespace @namespaceName
         /// <returns>List of <see cref="@(domainObj)History"/> entries associated with the given id.</returns>
         public virtual List<@(domainObj)History> history(long id)
         {
-            List<@(domainObj)History> @(domainVar)History = DBPersist.ExecuteQueryByName<@(domainObj)History>("@(schemaName).@(tableName)-get-history", new BaseObject() { { "id", id } });
+            // History rows live in the same table. Return all versions newest-first.
+            // is_active=1 is the current version; is_active=0 rows are prior versions.
+            List<@(domainObj)History> @(domainVar)History = DBPersist.select<@(domainObj)History>(
+                $"SELECT * FROM @(schemaName).@(tableName) WHERE id = {id} ORDER BY txn_id DESC");
 
             return @(domainVar)History;
         }
@@ -137,7 +140,7 @@ namespace @namespaceName
         {
             Logger.Debug($"Processing @(domainObj)Logic get ID={id}");
 
-            @(domainObj) @(domainVar) = DBPersist.select<@(domainObj)>($"SELECT * FROM @(schemaName).@(tableName) WHERE id = {id}").FirstOrDefault();
+            @(domainObj) @(domainVar) = DBPersist.select<@(domainObj)>($"SELECT * FROM @(schemaName).@(tableName) WHERE id = {id} AND is_active = 1").FirstOrDefault();
             
 
             return @(domainVar);

@@ -34,7 +34,7 @@ namespace @namespaceName
             tableName = "@schemaName.@tableName";
             schemaName = "@schemaName";
             tableBaseName = "@tableName";
-            auditTableName = "history.@(schemaName)_@(tableName)";
+            auditTableName = "@schemaName.@tableName"; // history rows live in the same table (is_active=0)
 
             @foreach (var attr in Model.Attributes)
             {
@@ -106,45 +106,11 @@ namespace @namespaceName
     {
         protected override void Initialize()
         {
-            // History object initializer - override table name and add foreign key
+            // History rows live in the same table as the active row.
+            // is_active=0 rows are prior versions; is_active=1 is the current row.
             base.Initialize();
-            
             domainName = "@(className)History";
-            tableName = "history.@(schemaName)_@(tableName)";
-            tableBaseName = "@(schemaName)_@(tableName)";
-          
-
-            // Add the foreign key to the original object
-            rwk.Add("@(tableName)_id");
-            _defaults["@(tableName)_id"] = default(long);
-        }
-
-        // Foreign key property to the original object
-        [ColumnInfo("@(classLabel) ID")]
-        public long @(tableName)_id
-        {
-            get
-            {
-                long _@(tableName)_id = default(long);
-                
-                try
-                {
-                    if(this.ContainsKey("@(tableName)_id"))
-                    {
-                        _@(tableName)_id = Convert.ToInt64(this["@(tableName)_id"].ToString());
-                    }
-                }
-                catch(Exception)
-                {
-                    //Logger.Error($"Error getting @(tableName)_id: {e.Message}");
-                    _@(tableName)_id = default(long);
-                }
-                return _@(tableName)_id;
-            }
-            set
-            {
-                this["@(tableName)_id"] = value;
-            }
+            // tableName and schemaName remain the same as the parent class
         }
     }
 

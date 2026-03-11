@@ -82,11 +82,12 @@ namespace @Model.Name
 
         static public long insert( BaseObject baseObject, string connectionName = "default" )
         {
+            // On insert: id and txn_id share the same identity value
             long id = identity(baseObject, connectionName);
-            int ver = version(baseObject, connectionName);
 
             baseObject["id"] = id;
-            baseObject["version"] = ver;
+            baseObject["txn_id"] = id;
+            baseObject["is_active"] = 1;
             baseObject["created_by"] = Environment.UserName;
             baseObject["last_updated"] = DateTime.UtcNow;
             baseObject["last_updated_by"] = Environment.UserName;
@@ -94,95 +95,41 @@ namespace @Model.Name
             var (sql, parameters) = insertSql(baseObject, baseObject.tableName, connectionName);
             execCmd(sql, parameters, connectionName);
 
-            audit(baseObject, connectionName);
-
             return id;
         }
 
-        static public long audit( BaseObject baseObject, string connectionName = "default" )
-        {
-            // Create the appropriate History object using factory pattern
-            BaseObject auditBaseObject = CreateHistoryObject(baseObject);
-
-            string auditFKCol = baseObject.tableBaseName + "_id";
-            auditBaseObject[auditFKCol] = baseObject["id"];
-            long id = identity(baseObject, connectionName);
-            auditBaseObject["id"] = id;
-
-            Logger.Debug("Audit: " + auditBaseObject.ToString());
-
-            var (sql, parameters) = insertSql(auditBaseObject, baseObject.auditTableName, connectionName);
-            execCmd(sql, parameters, connectionName);
-
-            return id;
-        }
-
-        private static BaseObject CreateHistoryObject(BaseObject baseObject)
-        {
-            // Get the type of the base object
-            Type baseObjectType = baseObject.GetType();
-            
-            // Construct the History class name
-            string historyClassName = baseObjectType.Name + "History";
-            
-            // Get the History type from the same assembly
-            Type historyType = baseObjectType.Assembly.GetType(baseObjectType.Namespace + "." + historyClassName);
-            
-            if (historyType == null)
-            {
-                // Fallback to original behavior if History class doesn't exist
-                Logger.Warning($"History class {historyClassName} not found for {baseObjectType.Name}, using BaseObject fallback");
-                return new BaseObject(baseObject);
-            }
-            
-            try
-            {
-                // Create an instance of the History class
-                var historyObject = Activator.CreateInstance(historyType) as BaseObject;
-                
-                if (historyObject == null)
-                {
-                    Logger.Error($"Failed to create instance of {historyClassName}");
-                    return new BaseObject(baseObject);
-                }
-                
-                // Copy all properties from the base object to the history object
-                foreach (var key in baseObject.Keys)
-                {
-                    historyObject[key] = baseObject[key];
-                }
-                
-                return historyObject;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Error creating History object for {baseObjectType.Name}: {ex.Message}");
-                return new BaseObject(baseObject);
-            }
-        }
-        
         static public void update(BaseObject baseObject, string connectionName = "default")
         {
-            baseObject["version"] = version(baseObject, connectionName);
+            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
+            long existingId = Convert.ToInt64(baseObject["id"]);
+
+            // Mark all current active rows for this id as inactive
+            string deactivateSql = $"UPDATE {provider.FormatTableName(baseObject.tableName)} " +
+                                   $"SET {provider.FormatColumnName("is_active")} = 0 " +
+                                   $"WHERE {provider.FormatColumnName("id")} = {existingId} " +
+                                   $"AND {provider.FormatColumnName("is_active")} = 1";
+            execCmd(deactivateSql, connectionName);
+
+            // Insert the new version row with a fresh txn_id
+            long newTxnId = identity(baseObject, connectionName);
+            baseObject["txn_id"] = newTxnId;
+            baseObject["is_active"] = 1;
             baseObject["last_updated"] = DateTime.UtcNow;
             baseObject["last_updated_by"] = Environment.UserName;
 
-            string sql = updateSql(baseObject, connectionName);
-            execCmd(sql, connectionName);
-
-            audit(baseObject, connectionName);
+            var (sql, parameters) = insertSql(baseObject, baseObject.tableName, connectionName);
+            execCmd(sql, parameters, connectionName);
         }
 
         static public void update( BaseObject baseObject, BaseObject filter, string connectionName = "default")
         {
-            baseObject["version"] = version(baseObject, connectionName);
+            // Filter-based bulk update — used for operational state changes (e.g. deactivating exec logs).
+            // These are not entity-version updates, so we update in place without creating a new version row.
             baseObject["last_updated"] = DateTime.UtcNow;
             baseObject["last_updated_by"] = Environment.UserName;
 
             string sql = updateSql(baseObject, filter, connectionName);
             execCmd(sql, connectionName);
-
-            audit(baseObject, connectionName);
         }
 
         public static void execCmd( BaseObject parameters, string sqlTemplate, string connectionName = "default")
@@ -364,8 +311,8 @@ namespace @Model.Name
         static public void put(BaseObject baseObject, string rwkCol, string connectionName = "default")
         {
             IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
-            
-            string sql = "select * from " + provider.FormatTableName("^(tableName)") + " where " + provider.FormatColumnName("^(rwkCol)") + " = ^(rwkValue)";
+
+            string sql = "select * from " + provider.FormatTableName("^(tableName)") + " where " + provider.FormatColumnName("^(rwkCol)") + " = ^(rwkValue) and is_active=1";
             bool found = false;
 
             BaseObject filter = new BaseObject();
@@ -395,7 +342,7 @@ namespace @Model.Name
         {
             IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
             
-            string sql = "select * from " + provider.FormatTableName("^(schemaName).^(tableName)") + " where ^(expression)";
+            string sql = "select * from " + provider.FormatTableName("^(schemaName).^(tableName)") + " where ^(expression) and is_active=1";
             int count = 0;
             StringBuilder expression = new StringBuilder();
             bool hasId = false;
@@ -456,37 +403,11 @@ namespace @Model.Name
             return id;
         }
 
-        static int version(BaseObject baseObject, string connectionName = "default")
-        {
-            IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
-            int ver = 0;
-            
-            long id = 0;
-            if (baseObject.ContainsKey("id"))
-            {
-                if (!Int64.TryParse(baseObject["id"].ToString(), out id))
-                {
-                    id = 0;
-                }
-            }
-                
-            string sql = provider.GetVersionSql(baseObject.tableName, id);
-
-            SelectCallback scb = (rdr) =>
-            {
-                ver = Convert.ToInt32(rdr[0]);
-            };
-
-            select(scb, sql, connectionName);
-
-            return ver;
-        }
-        
         static string getSql( BaseObject t, string connectionName = "default")
         {
             IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
-            
-            string sqlTemplate = "select * from ^(table) where id=^(id)";
+
+            string sqlTemplate = "select * from ^(table) where id=^(id) and is_active=1";
 
             BaseObject p = new BaseObject();
 
