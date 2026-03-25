@@ -150,14 +150,6 @@ FROM core.script s
 CROSS JOIN LATERAL (SELECT nextval('core.process_identity') AS n) seq
 WHERE s.name = 'test hello-world script' AND s.is_active = 1;
 
--- Insert process records for all other test scripts
-INSERT INTO core.process(id, txn_id, name, script_id, is_active, created_by, last_updated, last_updated_by)
-SELECT n, n, s.name, s.id, 1, current_user, current_timestamp, current_user
-FROM core.script s
-CROSS JOIN LATERAL (SELECT nextval('core.process_identity') AS n) seq
-WHERE s.name LIKE 'test%'
-  AND s.name <> 'test hello-world script'
-  AND s.is_active = 1;
 
 -- Insert workflow record for test workflow (type=Process, link to hello-world process)
 INSERT INTO core.workflow(id, txn_id, workflow_type_id, parent_id, name, process_id, is_active, created_by, last_updated, last_updated_by)

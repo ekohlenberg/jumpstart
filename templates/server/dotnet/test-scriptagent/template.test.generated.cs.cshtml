@@ -28,7 +28,7 @@ namespace @Model.Namespace
                     DBPersist.autoAssign(rdr, agent);
                     agents.Add(agent.id, agent);
                    }
-                   DBPersist.select(AgentSelectCallback, $"select * from core.server_node where server_node_type_id = {(long)ServerNode.ServerNodeType.Agent} and server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online}");
+                   DBPersist.select(AgentSelectCallback, $"select * from core.server_node where server_node_type_id = {(long)ServerNode.ServerNodeType.Agent} and server_node_status_id = {(long)ServerNode.ServerNodeStatus.Online} and is_active=1");
 
                    void ProcessSelectCallback(System.Data.Common.DbDataReader rdr)
                    {
@@ -36,7 +36,7 @@ namespace @Model.Namespace
                     DBPersist.autoAssign(rdr, process);
                     processes.Add(process);
                    }
-                   DBPersist.select(ProcessSelectCallback, "select * from core.process where script_id in (select id from core.script where name like 'test%')");
+                   DBPersist.select(ProcessSelectCallback, "select * from core.process where script_id in (select id from core.script where name like 'test%' and is_active=1)");
 
                     // Insert parent test workflow folder
 
@@ -93,7 +93,7 @@ namespace @Model.Namespace
             {
                 agents.Clear();
                 Console.WriteLine("WorkflowProcessTest: Selecting workflows...");
-                workflows = DBPersist.select<Workflow>($"select * from core.workflow where name like 'test%' and workflow_type_id = {(long)Workflow.WorkflowType.Process} order by seq");
+                workflows = DBPersist.select<Workflow>($"select * from core.workflow where name like 'test%' and workflow_type_id = {(long)Workflow.WorkflowType.Process} and is_active=1 order by seq");
                 Console.WriteLine($"WorkflowProcessTest: Selected {workflows.Count} workflows");
 
                 foreach (var workflow in workflows)

@@ -1,117 +1,117 @@
 -- Insert default data source record
-insert into core.data_source (id, txn_id, name, is_active, created_by, last_updated, last_updated_by ) SELECT n, n, 'default', true, current_user, current_timestamp, current_user FROM (SELECT nextval('core.data_source_identity') n) t;
+insert into core.data_source (id, txn_id, name, is_active, created_by, last_updated, last_updated_by ) SELECT n, n, 'default', 1, current_user, current_timestamp, current_user FROM (SELECT nextval('core.data_source_identity') n) t;
 
 -- Insert server node type values
-insert into core.server_node_type (id, txn_id, name) values (1, 1, 'ScriptAgent');
-insert into core.server_node_type (id, txn_id, name) values (2, 2, 'Scheduler');
-insert into core.server_node_type (id, txn_id, name) values (3, 3, 'ApiServer');
+insert into core.server_node_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (1, 1, 'ScriptAgent', 1, current_user, current_timestamp, current_user);
+insert into core.server_node_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (2, 2, 'Scheduler', 1, current_user, current_timestamp, current_user);
+insert into core.server_node_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (3, 3, 'ApiServer', 1, current_user, current_timestamp, current_user);
 
 -- Insert server node status values
-insert into core.server_node_status (id, txn_id, name) values (1, 1, 'Initializing');
-insert into core.server_node_status (id, txn_id, name) values (2, 2, 'Online');
-insert into core.server_node_status (id, txn_id, name) values (3, 3, 'Busy');
-insert into core.server_node_status (id, txn_id, name) values (4, 4, 'Offline');
+insert into core.server_node_status (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (1, 1, 'Initializing', 1, current_user, current_timestamp, current_user);
+insert into core.server_node_status (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (2, 2, 'Online', 1, current_user, current_timestamp, current_user);
+insert into core.server_node_status (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (3, 3, 'Busy', 1, current_user, current_timestamp, current_user);
+insert into core.server_node_status (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (4, 4, 'Offline', 1, current_user, current_timestamp, current_user);
 
 -- Insert workflow type values
-insert into core.workflow_type (id, txn_id, name) values (1, 1, 'Folder');
-insert into core.workflow_type (id, txn_id, name) values (2, 2, 'Process');
+insert into core.workflow_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (1, 1, 'Folder', 1, current_user, current_timestamp, current_user);
+insert into core.workflow_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (2, 2, 'Process', 1, current_user, current_timestamp, current_user);
 
 -- Insert on_failure action values
-insert into core.on_failure (id, txn_id, action) values (1, 1, 'Stop');
-insert into core.on_failure (id, txn_id, action) values (2, 2, 'Continue');
+insert into core.on_failure (id, txn_id, action, is_active, created_by, last_updated, last_updated_by) values (1, 1, 'Stop', 1, current_user, current_timestamp, current_user);
+insert into core.on_failure (id, txn_id, action, is_active, created_by, last_updated, last_updated_by) values (2, 2, 'Continue', 1, current_user, current_timestamp, current_user);
 
 
-insert into core.exec_status (id, txn_id, name, image) values (1, 1, '', 'images/exec-status-1.png');
-insert into core.exec_status (id, txn_id, name, image) values (2, 2, 'Dispatched', 'images/exec-status-2.png');
-insert into core.exec_status (id, txn_id, name, image) values (3, 3, 'Executing', 'images/exec-status-3.png');
-insert into core.exec_status (id, txn_id, name, image) values (4, 4, 'Completed', 'images/exec-status-4.png');
-insert into core.exec_status (id, txn_id, name, image) values (5, 5, 'Failed', 'images/exec-status-5.png');
-insert into core.exec_status (id, txn_id, name, image) values (6, 6, 'Cancelled', 'images/exec-status-6.png');
-insert into core.exec_status (id, txn_id, name, image) values (7, 7, 'Timeout', 'images/exec-status-7.png');
-insert into core.exec_status (id, txn_id, name, image) values (8, 8, 'Interrupted', 'images/exec-status-8.png');
-insert into core.exec_status (id, txn_id, name, image) values (9, 9, 'Suspended', 'images/exec-status-9.png');
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (1, 1, '', 'images/exec-status-1.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (2, 2, 'Dispatched', 'images/exec-status-2.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (3, 3, 'Executing', 'images/exec-status-3.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (4, 4, 'Completed', 'images/exec-status-4.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (5, 5, 'Failed', 'images/exec-status-5.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (6, 6, 'Cancelled', 'images/exec-status-6.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (7, 7, 'Timeout', 'images/exec-status-7.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (8, 8, 'Interrupted', 'images/exec-status-8.png', 1, current_user, current_timestamp, current_user);
+insert into core.exec_status (id, txn_id, name, image, is_active, created_by, last_updated, last_updated_by) values (9, 9, 'Suspended', 'images/exec-status-9.png', 1, current_user, current_timestamp, current_user);
 
 -- Insert script type values
-insert into core.script_type (id, txn_id, name) values (1, 1, 'CSharp');
-insert into core.script_type (id, txn_id, name) values (2, 2, 'PowerShell');
-insert into core.script_type (id, txn_id, name) values (3, 3, 'Python');
+insert into core.script_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (1, 1, 'CSharp', 1, current_user, current_timestamp, current_user);
+insert into core.script_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (2, 2, 'PowerShell', 1, current_user, current_timestamp, current_user);
+insert into core.script_type (id, txn_id, name, is_active, created_by, last_updated, last_updated_by) values (3, 3, 'Python', 1, current_user, current_timestamp, current_user);
 
 -- Insert AgentLogic method operations
 -- Process Management Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'start', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'stop', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'kill', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'restart', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'pause', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'resume', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'start', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'stop', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'kill', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'restart', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'pause', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'resume', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- Status & Reporting Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'status', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'heartbeat', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'report', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'log', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'metrics', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'status', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'heartbeat', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'report', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'log', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'metrics', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- Resource Management Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'register', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'unregister', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'capabilities', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'allocate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'release', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'register', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'unregister', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'capabilities', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'allocate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'release', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- Job Execution Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'execute', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'validate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'execute', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'validate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- Communication Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'ping', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'acknowledge', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'notify', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'request', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'ping', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'acknowledge', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'notify', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'request', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- System Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'shutdown', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'reload', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'update', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'diagnose', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'health', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'shutdown', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'reload', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'update', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'diagnose', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'health', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- Security Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'authenticate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'authorize', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'authenticate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'authorize', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- Standard Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'select', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'get', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'getAgentInfo', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'insert', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'update', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'delete', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'select', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'get', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'getAgentInfo', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'insert', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'update', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'ScriptAgent', 'delete', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 -- Scheduler Operations
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'execute', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'validate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'configure', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'health', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'register', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'unregister', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'execute', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'validate', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'configure', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'health', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'register', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Scheduler', 'unregister', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
-insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Workflow', 'run', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'Workflow', 'run', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 
 @{
 	foreach( var metaObject in Model.Objects)
 	{
 		<text>
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'select', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'get', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'view', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'insert', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'put', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'update', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'delete', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'history', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
-		insert into sec.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'children', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('sec.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'select', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'get', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'view', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'insert', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'put', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'update', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'delete', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'history', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
+		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, '@metaObject.DomainObj', 'children', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 		</text>
 
