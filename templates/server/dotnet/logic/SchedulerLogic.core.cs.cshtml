@@ -311,7 +311,7 @@ namespace @(Model.Namespace).core
                 directChildren.Add(wf);
             }
             DBPersist.select(WorkflowSelectCallback, 
-                $"SELECT * FROM core.workflow WHERE parent_id = {parentWorkflowId} ORDER BY seq");
+                $"SELECT * FROM core.workflow WHERE parent_id = {parentWorkflowId} and is_active=1 ORDER BY seq");
 
             // Process each child workflow
             foreach (var childWorkflow in directChildren)
