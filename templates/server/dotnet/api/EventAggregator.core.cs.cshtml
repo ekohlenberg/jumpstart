@@ -17,7 +17,7 @@ namespace @(Model.Namespace)
         /// <param name="domainObjectName">Domain object name (e.g., "Execution", "Workflow", "Agent")</param>
         /// <param name="instanceId">Instance ID of the domain object</param>
         /// <param name="jsonData">JSON string representation of the entire updated BaseObject</param>
-        Task PublishAsync(string domainObjectName, long instanceId, string jsonData);
+        global::System.Threading.Tasks.Task PublishAsync(string domainObjectName, long instanceId, string jsonData);
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ namespace @(Model.Namespace)
         /// <summary>
         /// Publishes an object update event to all clients subscribed to the domain object type
         /// </summary>
-        public async Task PublishAsync(string domainObjectName, long instanceId, string jsonData)
+        public async global::System.Threading.Tasks.Task PublishAsync(string domainObjectName, long instanceId, string jsonData)
         {
             try
             {

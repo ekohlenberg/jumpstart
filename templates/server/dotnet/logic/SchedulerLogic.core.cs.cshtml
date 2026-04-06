@@ -256,10 +256,10 @@ namespace @(Model.Namespace).core
                     Console.WriteLine($"SchedulerLogic: Executing sequence {seq} with {sequenceWorkflows.Count} child workflows");
 
                     // Execute all workflows in this sequence concurrently
-                    List<Task> tasks = new List<Task>();
+                    List<global::System.Threading.Tasks.Task> tasks = new List<global::System.Threading.Tasks.Task>();
                     foreach (var sequenceWorkflow in sequenceWorkflows)
                     {
-                        tasks.Add(Task.Run(async () =>
+                        tasks.Add(global::System.Threading.Tasks.Task.Run(async () =>
                         {
                             try
                             {
@@ -280,7 +280,7 @@ namespace @(Model.Namespace).core
                     }
 
                     // Wait for all workflows in this sequence to complete
-                    Task.WaitAll(tasks.ToArray());
+                    global::System.Threading.Tasks.Task.WaitAll(tasks.ToArray());
                     
                     Console.WriteLine($"SchedulerLogic: Sequence {seq} completed");
                 }
@@ -335,7 +335,7 @@ namespace @(Model.Namespace).core
         /// If it's a Folder type, dispatches back to the scheduler (recursive execution)
         /// </summary>
         /// <param name="childWorkflow">The child workflow to execute</param>
-        private static async Task ExecuteChildWorkflowAsync(Workflow childWorkflow)
+        private static async global::System.Threading.Tasks.Task ExecuteChildWorkflowAsync(Workflow childWorkflow)
         {
             try
             {

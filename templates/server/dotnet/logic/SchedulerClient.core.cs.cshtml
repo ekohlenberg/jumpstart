@@ -52,7 +52,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Cancel a scheduled job
         /// </summary>
-        public async Task CancelAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task CancelAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/cancel/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -61,7 +61,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Pause a running job
         /// </summary>
-        public async Task PauseAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task PauseAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/pause/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -70,7 +70,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Resume a paused job
         /// </summary>
-        public async Task ResumeAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task ResumeAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/resume/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -79,7 +79,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Retry a failed job
         /// </summary>
-        public async Task RetryAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task RetryAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/retry/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -88,7 +88,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Abort a running job
         /// </summary>
-        public async Task AbortAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task AbortAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/abort/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -147,7 +147,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Register a worker node
         /// </summary>
-        public async Task RegisterAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task RegisterAsync(long workflowId)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scheduler/register", workflowId);
             response.EnsureSuccessStatusCode();
@@ -156,7 +156,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Unregister a worker node
         /// </summary>
-        public async Task UnregisterAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task UnregisterAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/unregister/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -215,7 +215,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Update a workflow
         /// </summary>
-        public async Task UpdateWorkflowAsync(long workflowId, object workflowDefinition)
+        public async global::System.Threading.Tasks.Task UpdateWorkflowAsync(long workflowId, object workflowDefinition)
         {
             var response = await _httpClient.PutAsJsonAsync($"/api/scheduler/workflow/{workflowId}", workflowDefinition);
             response.EnsureSuccessStatusCode();
@@ -224,7 +224,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Delete a workflow
         /// </summary>
-        public async Task DeleteWorkflowAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task DeleteWorkflowAsync(long workflowId)
         {
             var response = await _httpClient.DeleteAsync($"/api/scheduler/workflow/{workflowId}");
             response.EnsureSuccessStatusCode();
@@ -243,7 +243,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Deallocate resources for a workflow
         /// </summary>
-        public async Task DeallocateAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task DeallocateAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/deallocate/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -252,7 +252,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Balance load across agents
         /// </summary>
-        public async Task BalanceAsync()
+        public async global::System.Threading.Tasks.Task BalanceAsync()
         {
             var response = await _httpClient.PostAsync("/api/scheduler/balance", null);
             response.EnsureSuccessStatusCode();
@@ -261,7 +261,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Scale resources
         /// </summary>
-        public async Task ScaleAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task ScaleAsync(long workflowId)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scheduler/scale", workflowId);
             response.EnsureSuccessStatusCode();
@@ -280,7 +280,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Trigger dependent workflows
         /// </summary>
-        public async Task TriggerAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task TriggerAsync(long workflowId)
         {
             var response = await _httpClient.PostAsync($"/api/scheduler/trigger/{workflowId}", null);
             response.EnsureSuccessStatusCode();
@@ -339,7 +339,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Prioritize a workflow
         /// </summary>
-        public async Task PrioritizeAsync(long workflowId, int priority)
+        public async global::System.Threading.Tasks.Task PrioritizeAsync(long workflowId, int priority)
         {
             var response = await _httpClient.PostAsJsonAsync($"/api/scheduler/prioritize/{workflowId}", priority);
             response.EnsureSuccessStatusCode();
@@ -348,7 +348,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Recover from failures
         /// </summary>
-        public async Task RecoverAsync()
+        public async global::System.Threading.Tasks.Task RecoverAsync()
         {
             var response = await _httpClient.PostAsync("/api/scheduler/recover", null);
             response.EnsureSuccessStatusCode();
@@ -367,7 +367,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Configure workflow
         /// </summary>
-        public async Task ConfigureAsync(long workflowId)
+        public async global::System.Threading.Tasks.Task ConfigureAsync(long workflowId)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scheduler/configure", workflowId);
             response.EnsureSuccessStatusCode();
@@ -376,7 +376,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Update workflow configuration
         /// </summary>
-        public async Task UpdateAsync(long workflowId, object updateData)
+        public async global::System.Threading.Tasks.Task UpdateAsync(long workflowId, object updateData)
         {
             var response = await _httpClient.PutAsJsonAsync($"/api/scheduler/update/{workflowId}", updateData);
             response.EnsureSuccessStatusCode();

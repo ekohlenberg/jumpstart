@@ -15,7 +15,7 @@ namespace @(Model.Namespace).Hubs
         /// Subscribe to receive updates for a specific domain object type
         /// </summary>
         /// <param name="domainObjectName">Domain object name (e.g., "Execution", "Workflow", "Agent")</param>
-        public async Task SubscribeToDomainObject(string domainObjectName)
+        public async global::System.Threading.Tasks.Task SubscribeToDomainObject(string domainObjectName)
         {
             if (string.IsNullOrWhiteSpace(domainObjectName))
             {
@@ -35,7 +35,7 @@ namespace @(Model.Namespace).Hubs
         /// Unsubscribe from updates for a specific domain object type
         /// </summary>
         /// <param name="domainObjectName">Domain object name to unsubscribe from</param>
-        public async Task UnsubscribeFromDomainObject(string domainObjectName)
+        public async global::System.Threading.Tasks.Task UnsubscribeFromDomainObject(string domainObjectName)
         {
             if (string.IsNullOrWhiteSpace(domainObjectName))
             {
@@ -52,7 +52,7 @@ namespace @(Model.Namespace).Hubs
         /// <summary>
         /// Called when a client connects
         /// </summary>
-        public override async Task OnConnectedAsync()
+        public override async global::System.Threading.Tasks.Task OnConnectedAsync()
         {
             Logger.Info($"Client connected: {Context.ConnectionId}");
             await base.OnConnectedAsync();
@@ -61,7 +61,7 @@ namespace @(Model.Namespace).Hubs
         /// <summary>
         /// Called when a client disconnects
         /// </summary>
-        public override async Task OnDisconnectedAsync(Exception exception)
+        public override async global::System.Threading.Tasks.Task OnDisconnectedAsync(Exception exception)
         {
             if (exception != null)
             {

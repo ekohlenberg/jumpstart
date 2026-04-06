@@ -123,7 +123,7 @@ namespace @(Model.Namespace).core
         /// <summary>
         /// Processes all queued workflows
         /// </summary>
-        public static async Task ProcessQueueAsync()
+        public static async global::System.Threading.Tasks.Task ProcessQueueAsync()
         {
             lock (_queueLock)
             {
