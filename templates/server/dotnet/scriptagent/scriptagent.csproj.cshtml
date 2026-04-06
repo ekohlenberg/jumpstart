@@ -4,6 +4,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>scriptagent</AssemblyName>
+    <OutputPath>..\..\bin</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,8 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\shared\common\common.csproj" />
     <ProjectReference Include="..\..\shared\domain\domain.csproj" />
-    <ProjectReference Include="..\logic\logic.csproj" />
-     <ProjectReference Include="..\persist\persist.csproj" />
+    <ProjectReference Include="..\..\shared\logic\logic.csproj" />
+     <ProjectReference Include="..\..\shared\persist\persist.csproj" />
   </ItemGroup>
 
   <ItemGroup>
