@@ -7,14 +7,14 @@
 
 @{
     var metaObject = (MetaObject)Model;
-    
+
     var domainObj = metaObject.DomainObj;
     var tableName = metaObject.TableName;
     var schemaName = metaObject.SchemaName;
-    
+
     // Get all child relationships
     var children = metaObject.Children;
-    
+
     if (children.Count > 0)
     {
         <text>
@@ -23,7 +23,7 @@
 -- =====================================
 
         </text>
-        
+
         foreach(var child in children)
         {
             var childObject = child.Object;
@@ -33,10 +33,10 @@
             var childSchemaName = childObject.SchemaName;
             var childDomainObj = childObject.DomainObj;
             var childDomainVar = childObject.DomainVar;
-            
+
             // Get all attributes for the child object
             var childAttributes = childObject.Attributes;
-            
+
             // Find foreign key relationships in the child object
             var childForeignKeys = new List<MetaAttribute>();
             foreach(var attr in childAttributes)
@@ -46,7 +46,7 @@
                     childForeignKeys.Add(attr);
                 }
             }
-            
+
             // Build the SELECT clause for child table attributes (excluding foreign key columns)
             var childSelectColumns = new List<string>();
             foreach(var attr in childAttributes)
@@ -56,20 +56,20 @@
                     childSelectColumns.Add(childTableName + "." + attr.Name);
                 }
             }
-            
+
             // Build the SELECT clause for foreign key RWK columns with improved aliasing
             var childFkSelectColumns = new List<string>();
             var childJoinClauses = new List<string>();
             var childFkTableNames = new List<string>();
-            
+
             // Track used aliases to avoid conflicts
             var childUsedAliases = new HashSet<string>();
-            
+
             foreach(var fk in childForeignKeys)
             {
                 var fkTable = fk.FkObject;
                 childFkTableNames.Add(fkTable);
-                
+
                 // Find the foreign key object
                 var fkObject = (MetaObject)null;
                 foreach(var obj in childObject.Model.Objects)
@@ -88,7 +88,7 @@
                     {
                         aliasBase = aliasBase.Substring(0, aliasBase.Length - 3);
                     }
-                    
+
                     // Ensure alias is unique
                     var alias = aliasBase;
                     var counter = 1;
@@ -98,7 +98,7 @@
                         counter++;
                     }
                     childUsedAliases.Add(alias);
-                    
+
                     // Get RWK columns from the foreign key table with improved aliasing
                     foreach(var fkObjectAttr in fkObject.Attributes)
                     {
@@ -107,39 +107,28 @@
                             childFkSelectColumns.Add(alias + "." + fkObjectAttr.Name + " AS " + alias + "_" + fkObjectAttr.Name);
                         }
                     }
-                    
-                    // Build JOIN clause with unique alias
-                    childJoinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + childTableName + "." + fk.Name + " = " + alias + ".id");
+
+                    // Build JOIN clause with unique alias, filtering to active rows only
+                    childJoinClauses.Add("LEFT JOIN " + fkObject.SchemaName + "." + fkObject.TableName + " " + alias + " ON " + childTableName + "." + fk.Name + " = " + alias + ".id AND " + alias + ".is_active = 1");
                 }
             }
-            
+
             <text>
 -- Child relationship: @(childLabel) (@(childRole))
-INSERT INTO core.sql (
-    id, 
-    name, 
-    sql_text, 
-    description, 
-    last_updated, 
-    last_updated_by,
-    is_active,
-    version,
-    data_source_id
-) VALUES (
-     nextval('core.sql_identity'),
+INSERT INTO core.sql (id, txn_id, name, sql_text, description, last_updated, last_updated_by, is_active, data_source_id)
+SELECT n, n,
     '@(schemaName).@(tableName)-children-@(childDomainVar)-@(childRole)',
-    'SELECT 
+    'SELECT
         @(childSchemaName).@(childTableName).id@(childSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", childSelectColumns) : "")@(childFkSelectColumns.Count > 0 ? ",\n            " + string.Join(",\n            ", childFkSelectColumns) : "")
     FROM @(childSchemaName).@(childTableName)@(childJoinClauses.Count > 0 ? "\n        " + string.Join("\n        ", childJoinClauses) : "")
-    WHERE @(childSchemaName).@(childTableName).@(childRole)_id = ^(id)
+    WHERE @(childSchemaName).@(childTableName).@(childRole)_id = ^(id) AND @(childSchemaName).@(childTableName).is_active = 1
     ORDER BY @(childSchemaName).@(childTableName).id;',
     'Select all @(childLabel) records for @(domainObj) with related @(string.Join(", ", childFkTableNames)) information',
     NOW(),
     CURRENT_USER,
     1,
-    1,
-    (SELECT id FROM core.data_source WHERE name = 'default')
-);
+    (SELECT id FROM core.data_source WHERE name = 'default' AND is_active = 1)
+FROM (SELECT nextval('core.sql_identity') n) t;
 
             </text>
         }

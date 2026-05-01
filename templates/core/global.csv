@@ -3,4 +3,4 @@ is_active,NULL,NO,integer,NULL,Active
 created_by,NULL,NO,varchar,50,Created By
 last_updated,(getdate()),YES,timestamp,NULL,Last Updated
 last_updated_by,NULL,NO,varchar,50,Last Updated By
-version,NULL,YES,integer,NULL,Version
+txn_id,NULL,NO,bigint,NULL,Txn Id

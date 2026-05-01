@@ -58,6 +58,7 @@ namespace @Model.Name
         public string tableBaseName{ get;  set; }
         public string schemaName { get;  set; }
         public string auditTableName { get;  set;}
+        public bool isAudited { get; set; } = true;
         protected List<string> rwk = new List<string>();
 
         public List<string> getRwk() { return rwk;  }

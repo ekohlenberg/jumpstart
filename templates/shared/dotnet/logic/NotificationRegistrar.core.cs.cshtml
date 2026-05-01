@@ -30,7 +30,7 @@ namespace @(Model.Namespace)
             {
                 
                 // Fire-and-forget async operation to avoid blocking
-                _ = Task.Run(async () =>
+                _ = global::System.Threading.Tasks.Task.Run(async () =>
                 {
                     try
                     {
@@ -66,7 +66,7 @@ namespace @(Model.Namespace)
         /// <summary>
         /// Publishes property update notifications for a BaseObject
         /// </summary>
-        private static async Task PublishPropertyUpdates(string domainObj, BaseObject baseObject, MethodInfo method, object[] args)
+        private static async global::System.Threading.Tasks.Task PublishPropertyUpdates(string domainObj, BaseObject baseObject, MethodInfo method, object[] args)
         {
             // Only handle insert/update operations. If this callback is for another method,
             // skip publishing notifications.
@@ -219,7 +219,7 @@ namespace @(Model.Namespace)
         /// <summary>
         /// Publishes a notification to all API servers
         /// </summary>
-        private static async Task PublishNotificationToAll(string domainObjectName, long instanceId, string jsonData)
+        private static async global::System.Threading.Tasks.Task PublishNotificationToAll(string domainObjectName, long instanceId, string jsonData)
         {
             // Get all API server URLs
             List<string> apiServerUrls = await GetApiServerUrls();
@@ -242,20 +242,20 @@ namespace @(Model.Namespace)
             string json = JsonSerializer.Serialize(notificationRequest);
 
             // Broadcast to all API servers in parallel
-            List<Task> publishTasks = new List<Task>();
+            List<global::System.Threading.Tasks.Task> publishTasks = new List<global::System.Threading.Tasks.Task>();
             foreach (string apiServerUrl in apiServerUrls)
             {
                 publishTasks.Add(PublishNotification(apiServerUrl, json, domainObjectName, instanceId));
             }
 
             // Wait for all publish operations to complete (don't throw on individual failures)
-            await Task.WhenAll(publishTasks);
+            await global::System.Threading.Tasks.Task.WhenAll(publishTasks);
         }
 
         /// <summary>
         /// Publishes a notification to a single API server
         /// </summary>
-        private static async Task PublishNotification(string apiServerUrl, string json, 
+        private static async global::System.Threading.Tasks.Task PublishNotification(string apiServerUrl, string json,
             string domainObjectName, long instanceId)
         {
             try

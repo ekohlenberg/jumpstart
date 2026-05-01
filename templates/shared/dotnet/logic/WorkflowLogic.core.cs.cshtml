@@ -15,7 +15,7 @@ namespace @Model.Namespace
    
    public interface IWorkflowCoreLogic : IWorkflowLogic
    {
-        Task run( long workflowId);
+        global::System.Threading.Tasks.Task run( long workflowId);
    }
 
     public class WorkflowCoreLogic : WorkflowUserLogic, IWorkflowCoreLogic
@@ -63,7 +63,7 @@ namespace @Model.Namespace
             InvokeExecutionStatusHandler(workflow.exec_status_id, workflow);
         }
 
-        public virtual async Task run( long workflowId)
+        public virtual async global::System.Threading.Tasks.Task run( long workflowId)
         {
             var workflow = WorkflowLogic.Create().get(workflowId);
             if (workflow == null)

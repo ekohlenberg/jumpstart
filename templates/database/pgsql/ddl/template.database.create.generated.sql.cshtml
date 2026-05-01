@@ -12,3 +12,22 @@ CREATE DATABASE @Model.Name
     IS_TEMPLATE = False;
     
 GRANT CONNECT ON DATABASE @Model.Name TO @Model.Name;
+
+\c @Model.Name
+
+CREATE SCHEMA core; 
+GRANT USAGE ON SCHEMA core TO @Model.Namespace; 
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA core TO @Model.Namespace;
+
+CREATE TABLE core.log (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL,
+    level TEXT NOT NULL,
+    principalname  TEXT NOT NULL,
+    program TEXT NOT NULL,
+    filepath TEXT NOT NULL,
+    linenumber INTEGER NOT NULL,
+    membername TEXT NOT NULL,
+    message TEXT NOT NULL
+  
+);

@@ -1,10 +1,11 @@
-TARGETDIR=./bin/Debug/net9.0
+TARGETDIR=../../../bin/scriptagent/net9.0
 
 default: build
 
 build:
 	@@dotnet build
-	@@cp -r -f ./appsettings.json $(TARGETDIR)
+	@@mkdir -p $(TARGETDIR)
+	@@cp -r -f ../../../usr/server/scriptagent/appsettings.json $(TARGETDIR)
 
 clean:
 	@@rm -rf ./bin

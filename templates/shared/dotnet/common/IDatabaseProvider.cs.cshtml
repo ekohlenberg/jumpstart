@@ -10,7 +10,6 @@ namespace @Model.Name
         DbParameter CreateParameter();
         void AddParameterWithValue(DbCommand command, string parameterName, object value);
         string GetNextIdentitySql(string tableName);
-        string GetVersionSql(string tableName, long id);
         string FormatParameter(string parameterName);
         string FormatTableName(string tableName);
         string FormatColumnName(string columnName);

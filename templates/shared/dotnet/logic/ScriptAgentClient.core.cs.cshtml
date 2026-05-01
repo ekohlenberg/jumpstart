@@ -37,7 +37,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Stop a running process
         /// </summary>
-        public async Task StopAsync(long executionId)
+        public async global::System.Threading.Tasks.Task StopAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/stop/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -46,7 +46,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Kill a process forcefully
         /// </summary>
-        public async Task KillAsync(long executionId)
+        public async global::System.Threading.Tasks.Task KillAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/kill/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -55,7 +55,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Restart a process
         /// </summary>
-        public async Task RestartAsync(long executionId)
+        public async global::System.Threading.Tasks.Task RestartAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/restart/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -64,7 +64,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Pause a process
         /// </summary>
-        public async Task PauseAsync(long executionId)
+        public async global::System.Threading.Tasks.Task PauseAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/pause/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -73,7 +73,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Resume a paused process
         /// </summary>
-        public async Task ResumeAsync(long executionId)
+        public async global::System.Threading.Tasks.Task ResumeAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/resume/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -96,7 +96,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Send heartbeat
         /// </summary>
-        public async Task HeartbeatAsync(object heartbeatData)
+        public async global::System.Threading.Tasks.Task HeartbeatAsync(object heartbeatData)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/heartbeat", heartbeatData);
             response.EnsureSuccessStatusCode();
@@ -105,7 +105,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Send a report
         /// </summary>
-        public async Task ReportAsync(object reportData)
+        public async global::System.Threading.Tasks.Task ReportAsync(object reportData)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/report", reportData);
             response.EnsureSuccessStatusCode();
@@ -114,7 +114,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Send log entry
         /// </summary>
-        public async Task LogAsync(object logData)
+        public async global::System.Threading.Tasks.Task LogAsync(object logData)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/log", logData);
             response.EnsureSuccessStatusCode();
@@ -123,7 +123,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Send metrics
         /// </summary>
-        public async Task MetricsAsync(object metricsData)
+        public async global::System.Threading.Tasks.Task MetricsAsync(object metricsData)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/metrics", metricsData);
             response.EnsureSuccessStatusCode();
@@ -146,7 +146,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Unregister agent
         /// </summary>
-        public async Task UnregisterAsync(long agentId)
+        public async global::System.Threading.Tasks.Task UnregisterAsync(long agentId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/unregister/{agentId}", null);
             response.EnsureSuccessStatusCode();
@@ -175,7 +175,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Release resources
         /// </summary>
-        public async Task ReleaseAsync(long executionId)
+        public async global::System.Threading.Tasks.Task ReleaseAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/release/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -218,7 +218,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Clean up after job
         /// </summary>
-        public async Task CleanupAsync(long executionId)
+        public async global::System.Threading.Tasks.Task CleanupAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/cleanup/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -227,7 +227,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Retry a failed job
         /// </summary>
-        public async Task RetryAsync(long executionId)
+        public async global::System.Threading.Tasks.Task RetryAsync(long executionId)
         {
             var response = await _httpClient.PostAsync($"/api/scriptagent/retry/{executionId}", null);
             response.EnsureSuccessStatusCode();
@@ -250,7 +250,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Acknowledge a command
         /// </summary>
-        public async Task AcknowledgeAsync(long executionId)
+        public async global::System.Threading.Tasks.Task AcknowledgeAsync(long executionId)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/acknowledge", executionId);
             response.EnsureSuccessStatusCode();
@@ -259,7 +259,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Send notification
         /// </summary>
-        public async Task NotifyAsync(object notificationData)
+        public async global::System.Threading.Tasks.Task NotifyAsync(object notificationData)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/notify", notificationData);
             response.EnsureSuccessStatusCode();
@@ -282,7 +282,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Shutdown agent
         /// </summary>
-        public async Task ShutdownAsync()
+        public async global::System.Threading.Tasks.Task ShutdownAsync()
         {
             var response = await _httpClient.PostAsync("/api/scriptagent/shutdown", null);
             response.EnsureSuccessStatusCode();
@@ -291,7 +291,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Reload agent configuration
         /// </summary>
-        public async Task ReloadAsync()
+        public async global::System.Threading.Tasks.Task ReloadAsync()
         {
             var response = await _httpClient.PostAsync("/api/scriptagent/reload", null);
             response.EnsureSuccessStatusCode();
@@ -300,7 +300,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Update agent software
         /// </summary>
-        public async Task UpdateAsync(object updateData)
+        public async global::System.Threading.Tasks.Task UpdateAsync(object updateData)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/scriptagent/update", updateData);
             response.EnsureSuccessStatusCode();
@@ -397,7 +397,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Update an execution
         /// </summary>
-        public async Task UpdateExecutionAsync(long executionId, object executionData)
+        public async global::System.Threading.Tasks.Task UpdateExecutionAsync(long executionId, object executionData)
         {
             var response = await _httpClient.PutAsJsonAsync($"/api/scriptagent/execution/{executionId}", executionData);
             response.EnsureSuccessStatusCode();
@@ -406,7 +406,7 @@ namespace @Model.Namespace
         /// <summary>
         /// Delete an execution
         /// </summary>
-        public async Task DeleteExecutionAsync(long executionId)
+        public async global::System.Threading.Tasks.Task DeleteExecutionAsync(long executionId)
         {
             var response = await _httpClient.DeleteAsync($"/api/scriptagent/execution/{executionId}");
             response.EnsureSuccessStatusCode();

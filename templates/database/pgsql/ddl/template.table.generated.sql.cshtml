@@ -141,8 +141,10 @@ FROM @(firstRelationship.FkObject.SchemaName).@(firstRelationship.FkObject.Table
 CREATE TABLE @(Model.SchemaName).@(Model.TableName) (
 @for (int i = 0; i < Model.Attributes.Count; i++) {
     var column = Model.Attributes[i];
+
+    // txn_id is the primary key; id is a regular (non-unique) column
     var pk = "";
-    if (column.Name == "id"){
+    if (column.Name == "txn_id"){
         pk = "PRIMARY KEY";
     }
 
@@ -157,14 +159,11 @@ CREATE TABLE @(Model.SchemaName).@(Model.TableName) (
     }
 
     var nullable = "";
-/*    if (column.RWK == "1") {
-        nullable = " not null";
+
+    var comma = ",";
+    if (i == Model.Attributes.Count - 1) {
+        comma = "";
     }
-*/
-    var comma = "";
-    if (i < Model.Attributes.Count - 1) {
-        comma = ",";
-    } 
 
     @("\t\t" +
 column.Name + " " + column.SqlDataType + len + " " + pk + nullable + comma + @"
@@ -172,9 +171,10 @@ column.Name + " " + column.SqlDataType + len + " " + pk + nullable + comma + @"
 )
     ;
 
-        
+
     }
 );
+CREATE INDEX ON @(Model.SchemaName).@(Model.TableName) (id, is_active);
 </text>
     }
 }
