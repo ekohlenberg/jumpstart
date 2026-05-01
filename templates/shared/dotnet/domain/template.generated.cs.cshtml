@@ -35,6 +35,7 @@ namespace @namespaceName
             schemaName = "@schemaName";
             tableBaseName = "@tableName";
             auditTableName = "@schemaName.@tableName"; // history rows live in the same table (is_active=0)
+            isAudited = @(Model.IsAudited ? "true" : "false");
 
             @foreach (var attr in Model.Attributes)
             {

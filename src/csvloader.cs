@@ -25,6 +25,7 @@ public class MetadataRecord {
     public string DATA_TYPE {get;set;}
     public string MSSQL_DATA_TYPE {get;set;}
     public string CHARACTER_MAXIMUM_LENGTH {get;set;}
+    public string IS_AUDITED {get;set;}
     /*public string CHARACTER_OCTET_LENGTH {get;set;}
     public string NUMERIC_PRECISION {get;set;}
     public string NUMERIC_PRECISION_RADIX {get;set;}
@@ -99,7 +100,9 @@ public class CSVLoader
 
         if (!schema.ObjectMap.TryGetValue(mr.TABLE_NAME, out metaObject))      
         {
-            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.NAV_MENU, mr.URI ?? "");
+            string auditVal = mr.IS_AUDITED?.Trim() ?? "";
+            bool isAudited = string.IsNullOrEmpty(auditVal) || !(auditVal == "0" || string.Equals(auditVal, "false", StringComparison.OrdinalIgnoreCase) || string.Equals(auditVal, "no", StringComparison.OrdinalIgnoreCase));
+            metaObject = new MetaObject(metaModel.Namespace, mr.TABLE_NAME, mr.TABLE_SCHEMA, mr.TABLE_LABEL, mr.NAV_MENU, mr.URI ?? "", isAudited);
             schema.Objects.Add( metaObject );
             schema.ObjectMap[mr.TABLE_NAME] = metaObject;
         }

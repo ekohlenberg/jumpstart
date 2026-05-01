@@ -231,6 +231,8 @@ namespace @Model.Namespace
                                 break;
                             case "DATE":
                             case "TIMESTAMP":
+                            case "TIMESTAMP WITH TIME ZONE":
+                            case "TIMESTAMPTZ":
                                 result = DateTime.Now;
                                 break;
                             case "NUMERIC":

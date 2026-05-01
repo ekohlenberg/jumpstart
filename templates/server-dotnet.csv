@@ -26,6 +26,9 @@ dotnet server templates-domain,model,shared/dotnet/domain/Workflow.core.cs.cshtm
 dotnet server templates-domain,model,shared/dotnet/domain/Execution.core.cs.cshtml,./gen/shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/Script.core.cs.cshtml,./gen/shared/domain,TRUE
 dotnet server templates-domain,model,shared/dotnet/domain/ServerNode.core.cs.cshtml,./gen/shared/domain,TRUE
+dotnet server templates-persist,model,shared/dotnet/persist/IDBPersist.core.cs.cshtml,./gen/shared/persist,TRUE
+dotnet server templates-persist,model,shared/dotnet/persist/DBPersistAudit.core.cs.cshtml,./gen/shared/persist,TRUE
+dotnet server templates-persist,model,shared/dotnet/persist/DBPersistBasic.core.cs.cshtml,./gen/shared/persist,TRUE
 dotnet server templates-persist,model,shared/dotnet/persist/DBPersist.core.cs.cshtml,./gen/shared/persist,TRUE
 dotnet server templates-persist,model,shared/dotnet/persist/persist.csproj.cshtml,./gen/shared/persist,TRUE
 dotnet server templates-persist,model,shared/dotnet/persist/appsettings.json.cshtml,./usr/shared/persist,FALSE

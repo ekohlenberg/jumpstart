@@ -363,7 +363,9 @@ public class ViewRelationship
                 return _globalAttributes;
             }
         }
-        public MetaObject(string _namespace, string tableName, string schemaName, string label, string navMenu, string uri = "")
+        public bool IsAudited { get; private set; } = true;
+
+        public MetaObject(string _namespace, string tableName, string schemaName, string label, string navMenu, string uri = "", bool isAudited = true)
         {
             Namespace = _namespace;
             TableName = tableName;
@@ -375,6 +377,7 @@ public class ViewRelationship
             _uri = uri ?? string.Empty;
             SchemaName = schemaName;
             FileName = DomainObj;
+            IsAudited = isAudited;
         }
 
         public override string ToString()
