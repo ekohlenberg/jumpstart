@@ -6,6 +6,6 @@ Debug
 packages
 *.log
 *.exe
-
+CLAUDE.md
 # Claude Code worktrees (local-only, not for version control)
 .claude/worktrees/
