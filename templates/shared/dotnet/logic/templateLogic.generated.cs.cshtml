@@ -56,6 +56,17 @@ namespace @namespaceName
         }
 
         /// <summary>
+        /// Creates a direct (non-proxied) instance of the logic class, bypassing authorization enforcement.
+        /// Use only in contexts where no security principal is available, such as import/export tests
+        /// running against an empty database.
+        /// </summary>
+        /// <returns>A direct <see cref="@(domainObj)Logic"/> instance implementing <see cref="I@(domainObj)Logic"/>.</returns>
+        public static I@(domainObj)Logic Unsafe()
+        {
+            return new @(domainObj)Logic();
+        }
+
+        /// <summary>
         /// Selects all domain objects using the default return type of the domain object.
         /// </summary>
         /// <returns>List of <see cref="@(domainObj)"/> instances.</returns>

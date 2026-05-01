@@ -1,0 +1,56 @@
+@{
+    string namespaceName = Model.Namespace;
+    string domainObj     = Model.DomainObj;
+    string tableName     = Model.TableName;
+    string schemaName    = Model.SchemaName;
+}
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using CsvHelper;
+using CsvHelper.Configuration;
+using @namespaceName;
+
+namespace @namespaceName
+{
+    /// <summary>
+    /// Exports all rows from @schemaName.@tableName to a CSV file.
+    /// </summary>
+    public static class @(domainObj)Exporter
+    {
+        public static int Export(string outputPath)
+        {
+            var records = @(domainObj)Logic.Create().select<@(domainObj)>();
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+            };
+
+            using var writer = new StreamWriter(outputPath, append: false, encoding: System.Text.Encoding.UTF8);
+            using var csv = new CsvWriter(writer, config);
+
+            // Header row — column order matches the domain model attribute order
+@foreach (var attr in Model.Attributes)
+{
+<text>            csv.WriteField("@attr.Name");
+</text>
+}
+            csv.NextRecord();
+
+            // Data rows
+            foreach (var record in records)
+            {
+@foreach (var attr in Model.Attributes)
+{
+<text>                csv.WriteField(record.@attr.Name);
+</text>
+}
+                csv.NextRecord();
+            }
+
+            return records.Count;
+        }
+    }
+}

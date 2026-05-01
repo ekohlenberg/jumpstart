@@ -1,0 +1,18 @@
+COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
+tools export - project file,model,tools/dotnet/export/export.csproj.cshtml,./gen/tools/export,TRUE
+tools export - program entry point,model,tools/dotnet/export/Program.cs.cshtml,./gen/tools/export,TRUE
+tools export - per-object exporter,object,tools/dotnet/export/template.export.cs.cshtml,./gen/tools/export,TRUE
+tools export - makefile,model,tools/dotnet/export/makefile.cshtml,./gen/tools/export,TRUE
+tools export - appsettings (user-configured),model,tools/dotnet/export/appsettings.json.cshtml,./usr/tools/export,FALSE
+tools import - project file,model,tools/dotnet/import/import.csproj.cshtml,./gen/tools/import,TRUE
+tools import - program entry point,model,tools/dotnet/import/Program.cs.cshtml,./gen/tools/import,TRUE
+tools import - per-object importer,object,tools/dotnet/import/template.import.cs.cshtml,./gen/tools/import,TRUE
+tools import - makefile,model,tools/dotnet/import/makefile.cshtml,./gen/tools/import,TRUE
+tools import - appsettings (user-configured),model,tools/dotnet/import/appsettings.json.cshtml,./usr/tools/import,FALSE
+tools test-impexp - project file,model,tools/dotnet/test-impexp/test-impexp.csproj.cshtml,./gen/test/test-impexp,TRUE
+tools test-impexp - appsettings,model,tools/dotnet/test-impexp/appsettings.json.cshtml,./gen/test/test-impexp,TRUE
+tools test-impexp - makefile,model,tools/dotnet/test-impexp/makefile.cshtml,./gen/test/test-impexp,TRUE
+tools test-impexp - base class,model,tools/dotnet/test-impexp/BaseTestImpExp.generated.cs.cshtml,./gen/test/test-impexp,TRUE
+tools test-impexp - program,model,tools/dotnet/test-impexp/Program.cs.cshtml,./gen/test/test-impexp,TRUE
+tools test-impexp - data csv per object,object,tools/dotnet/test-impexp/template.data.csv.cshtml,./gen/test/test-impexp,TRUE
+tools test-impexp - test class per object,object,tools/dotnet/test-impexp/template.impexp.generated.cs.cshtml,./gen/test/test-impexp,TRUE

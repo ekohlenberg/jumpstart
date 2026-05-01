@@ -1,0 +1,40 @@
+using System;
+using System.IO;
+using @Model.Namespace;
+
+namespace @Model.Namespace
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Data CSV files are copied alongside the executable by the csproj Content item.
+            string dataDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Compare output CSVs are written to the same directory.
+            string compareDir = dataDir;
+
+            Logger.Info("=== Import/Export Tests ===");
+            Logger.Info($"Data directory: {dataDir}");
+
+            try
+            {
+@foreach (var obj in Model.Objects)
+{
+<text>
+                Logger.Info("--- Testing @obj.DomainObj ---");
+                @(obj.DomainObj)ImpExpTest.Run(dataDir, compareDir);
+</text>
+}
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Unhandled error during import/export tests: " + ex.Message);
+                if (ex.InnerException != null)
+                    Logger.Error("  Inner: " + ex.InnerException.Message);
+            }
+
+            BaseTestImpExp.PrintSummary();
+        }
+    }
+}

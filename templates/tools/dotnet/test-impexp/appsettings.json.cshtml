@@ -1,0 +1,22 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  },
+  "appsettings": {
+    "logwriters": "@(Model.Namespace).LogConsoleWriter",
+    "loglevel": "debug",
+    "namespace": "@Model.Namespace",
+    "datasources": {
+      "default": {
+        "dbtype": "postgresql",
+        "hostname": "localhost",
+        "port": "5432",
+        "database": "@Model.Namespace",
+        "username": "postgres",
+        "password": "password"
+      }
+    }
+  }
+}

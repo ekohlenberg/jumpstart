@@ -1,0 +1,94 @@
+@{
+    string namespaceName = Model.Namespace;
+    string domainObj     = Model.DomainObj;
+    string domainVar     = Model.DomainVar;
+    string tableName     = Model.TableName;
+    string schemaName    = Model.SchemaName;
+}
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using CsvHelper;
+using CsvHelper.Configuration;
+using @namespaceName;
+
+namespace @namespaceName
+{
+    /// <summary>
+    /// Imports rows from a CSV file into @schemaName.@tableName.
+    /// The 'id' column is skipped — the database assigns new IDs on insert.
+    /// Global audit columns (is_active, created_by, last_updated, last_updated_by, txn_id)
+    /// are not set from the CSV; the persist layer applies defaults.
+    /// </summary>
+    public static class @(domainObj)Importer
+    {
+        public static int Import(string inputPath)
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null,       // tolerate columns absent in the CSV
+                BadDataFound = null,             // skip malformed fields rather than throwing
+            };
+
+            int count = 0;
+
+            using var reader = new StreamReader(inputPath, System.Text.Encoding.UTF8);
+            using var csv = new CsvReader(reader, config);
+
+            csv.Read();
+            csv.ReadHeader();
+
+            while (csv.Read())
+            {
+                var @domainVar = new @(domainObj)();
+
+@foreach (var attr in Model.Attributes)
+{
+    // Skip the primary key — DB assigns on insert
+    if (attr.Name == "id") { continue; }
+    // Skip global audit columns — managed by the persist layer
+    if (attr.IsGlobal()) { continue; }
+
+    // Build a safe field-read expression appropriate for each .NET type.
+    // csv.GetField(name) returns null when the column is missing or blank.
+    string fieldExpr = $"csv.GetField(\"{attr.Name}\")";
+    string parseExpr;
+
+    if (attr.DotNetType == "string")
+    {
+        parseExpr = $"{fieldExpr} ?? string.Empty";
+    }
+    else if (attr.DotNetType == "Guid")
+    {
+        // ConvertMethod is "Guid.Parse" for uuid columns
+        parseExpr = $"Guid.Parse({fieldExpr} ?? Guid.Empty.ToString())";
+    }
+    else if (attr.IsNullable)
+    {
+        // DB column is nullable. Use `default` for the empty-string case so the expression
+        // type matches the domain property whether it is declared as T or T? in C#.
+        parseExpr = $"string.IsNullOrEmpty({fieldExpr}) ? default : Convert.{attr.ConvertMethod}({fieldExpr})";
+    }
+    else
+    {
+        // Non-nullable value type: convert directly. Empty string will throw at runtime —
+        // callers should provide a clean CSV (e.g. one produced by the export tool).
+        parseExpr = $"string.IsNullOrEmpty({fieldExpr}) ? default : Convert.{attr.ConvertMethod}({fieldExpr})";
+    }
+<text>
+                // @attr.Name  (@attr.SqlDataType → @attr.DotNetType)
+                if (csv.HeaderRecord != null && Array.IndexOf(csv.HeaderRecord, "@attr.Name") >= 0)
+                    @(domainVar).@attr.Name = @parseExpr;
+</text>
+}
+
+                @(domainObj)Logic.Create().insert(@domainVar);
+                count++;
+            }
+
+            return count;
+        }
+    }
+}

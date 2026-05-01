@@ -1,0 +1,82 @@
+using System;
+using System.Collections.Generic;
+using @Model.Namespace;
+
+namespace @Model.Namespace
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string table = null;
+            string input = null;
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "--table" && i + 1 < args.Length)
+                    table = args[++i];
+                else if (args[i] == "--input" && i + 1 < args.Length)
+                    input = args[++i];
+            }
+
+            if (string.IsNullOrEmpty(table) || string.IsNullOrEmpty(input))
+            {
+                PrintUsage();
+                Environment.Exit(1);
+            }
+
+            if (!Importers.TryGetValue(table, out var importer))
+            {
+                Console.Error.WriteLine($"Error: Unknown table '{table}'");
+                Console.Error.WriteLine();
+                PrintUsage();
+                Environment.Exit(1);
+            }
+
+            if (!System.IO.File.Exists(input))
+            {
+                Console.Error.WriteLine($"Error: Input file not found: {input}");
+                Environment.Exit(1);
+            }
+
+            try
+            {
+                int count = importer(input);
+                Console.WriteLine($"Imported {count} record(s) into '{table}' from {input}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error importing '{table}': {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.Error.WriteLine($"  {ex.InnerException.Message}");
+                Environment.Exit(1);
+            }
+        }
+
+        static void PrintUsage()
+        {
+            Console.WriteLine("Usage: import --table <tablename> --input <filepath>");
+            Console.WriteLine();
+            Console.WriteLine("  --table    The table to import into (required)");
+            Console.WriteLine("  --input    Input CSV file path (required)");
+            Console.WriteLine();
+            Console.WriteLine("Notes:");
+            Console.WriteLine("  - The 'id' column is ignored; the database assigns new IDs.");
+            Console.WriteLine("  - Global columns (is_active, created_by, etc.) are set to defaults.");
+            Console.WriteLine("  - CSV must have a header row with column names matching the table.");
+            Console.WriteLine();
+            Console.WriteLine("Available tables:");
+            foreach (var key in Importers.Keys)
+                Console.WriteLine($"  {key}");
+        }
+
+        static readonly Dictionary<string, Func<string, int>> Importers = new()
+        {
+@foreach (var obj in Model.Objects)
+{
+<text>            { "@obj.DomainVar", path => @(obj.DomainObj)Importer.Import(path) },
+</text>
+}
+        };
+    }
+}

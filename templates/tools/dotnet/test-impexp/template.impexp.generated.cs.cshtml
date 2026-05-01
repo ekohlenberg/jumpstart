@@ -1,0 +1,232 @@
+@{
+    // No LINQ on Model.Attributes — RazorLight exposes the model as dynamic,
+    // which rejects lambda arguments. Use explicit foreach + if guards throughout,
+    // exactly as every other template in the codebase does.
+    string namespaceName = Model.Namespace;
+    string domainObj     = Model.DomainObj;
+    string domainVar     = Model.DomainVar;
+    string tableName     = Model.TableName;
+    string schemaName    = Model.SchemaName;
+}
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using CsvHelper;
+using CsvHelper.Configuration;
+using @namespaceName;
+
+namespace @namespaceName
+{
+    /// <summary>
+    /// Import/export round-trip test for @schemaName.@tableName.
+    /// Steps:
+    ///   1. Import  @(domainObj).data.csv  into the database.
+    ///   2. Fetch only the rows just inserted (id > pre-import max).
+    ///   3. Export those rows to  @(domainVar).data.compare.csv.
+    ///   4. Compare every testable column; call Logger.Error on any mismatch.
+    /// Testable columns: all except id, global audit columns, and FK references.
+    /// </summary>
+    public static class @(domainObj)ImpExpTest
+    {
+        private const string DataFileName    = "@(domainObj).data.csv";
+        private const string CompareFileName = "@(domainVar).data.compare.csv";
+
+        // Generated list of columns that appear in the test data CSV.
+        private static readonly string[] TestColumns = new string[]
+        {
+@foreach (var attr in Model.Attributes)
+{
+    if ((string)attr.Name == "id") continue;
+    if (attr.IsGlobal()) continue;
+    if (!string.IsNullOrEmpty((string)attr.FkObject)) continue;
+<text>            "@attr.Name",
+</text>
+}
+        };
+
+        // -----------------------------------------------------------------------
+        // Entry point
+        // -----------------------------------------------------------------------
+
+        public static void Run(string dataDir, string compareDir)
+        {
+            string importPath  = Path.Combine(dataDir,    DataFileName);
+            string comparePath = Path.Combine(compareDir, CompareFileName);
+
+            if (!File.Exists(importPath))
+            {
+                Logger.Info($"@(domainObj): No data file at {importPath} — skipping.");
+                return;
+            }
+
+            if (TestColumns.Length == 0)
+            {
+                Logger.Info("@(domainObj): No testable columns (all are id/global/FK) — skipping.");
+                return;
+            }
+
+            // Snapshot highest existing id so we can identify freshly inserted rows.
+            // Use inline SQL — named queries require the core.sql table which may not exist
+            // on a fresh/empty database used for import/export testing.
+            var snapshot  = DBPersist.select<@(domainObj)>("SELECT * FROM @(schemaName).@(tableName) WHERE is_active = 1");
+            long maxIdBefore = snapshot.Count > 0 ? snapshot.Max(r => r.id) : 0;
+
+            // Step 1 — Import
+            int imported = ImportRows(importPath);
+            Logger.Info($"@(domainObj): Inserted {imported} row(s).");
+
+            if (imported == 0)
+            {
+                Logger.Error("@(domainObj): Import produced 0 rows — aborting compare.");
+                return;
+            }
+
+            // Step 2 — Isolate and export only the new rows
+            var allRecords = DBPersist.select<@(domainObj)>("SELECT * FROM @(schemaName).@(tableName) WHERE is_active = 1");
+            var newRecords = allRecords
+                .Where(r => r.id > maxIdBefore)
+                .OrderBy(r => r.id)
+                .ToList();
+
+            if (newRecords.Count != imported)
+                Logger.Error($"@(domainObj): Expected {imported} new record(s), found {newRecords.Count}.");
+
+            ExportRows(newRecords, comparePath);
+            Logger.Info($"@(domainObj): Exported {newRecords.Count} row(s) to {comparePath}");
+
+            // Step 3 — Compare
+            var importRows = BaseTestImpExp.ReadCsvRows(importPath);
+            int rowCount   = Math.Min(importRows.Count, newRecords.Count);
+
+            for (int i = 0; i < rowCount; i++)
+                CompareRow(i + 1, importRows[i], newRecords[i]);
+        }
+
+        // -----------------------------------------------------------------------
+        // Import — read the data CSV and insert one @(domainObj) per row
+        // -----------------------------------------------------------------------
+
+        private static int ImportRows(string inputPath)
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord  = true,
+                MissingFieldFound = null,
+                BadDataFound     = null,
+            };
+
+            int count = 0;
+
+            using var reader = new StreamReader(inputPath, System.Text.Encoding.UTF8);
+            using var csv    = new CsvReader(reader, config);
+
+            csv.Read();
+            csv.ReadHeader();
+
+            while (csv.Read())
+            {
+                var @domainVar = new @(domainObj)();
+
+@foreach (var attr in Model.Attributes)
+{
+    if ((string)attr.Name == "id") continue;
+    if (attr.IsGlobal()) continue;
+    if (!string.IsNullOrEmpty((string)attr.FkObject)) continue;
+
+    string fieldExpr = $"csv.GetField(\"{attr.Name}\")";
+    string parseExpr;
+
+    if ((string)attr.DotNetType == "string")
+        parseExpr = $"{fieldExpr} ?? string.Empty";
+    else if ((string)attr.DotNetType == "Guid")
+        parseExpr = $"Guid.Parse({fieldExpr} ?? Guid.Empty.ToString())";
+    else
+        parseExpr = $"string.IsNullOrEmpty({fieldExpr}) ? default : Convert.{(string)attr.ConvertMethod}({fieldExpr})";
+<text>
+                if (csv.HeaderRecord != null && Array.IndexOf(csv.HeaderRecord, "@attr.Name") >= 0)
+                    @(domainVar).@attr.Name = @parseExpr;
+</text>
+}
+
+                @(domainObj)Logic.Unsafe().insert(@domainVar);
+                count++;
+            }
+
+            return count;
+        }
+
+        // -----------------------------------------------------------------------
+        // Export — write TestColumns from the supplied records to a CSV file
+        // -----------------------------------------------------------------------
+
+        private static void ExportRows(List<@(domainObj)> records, string outputPath)
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true };
+
+            using var writer = new StreamWriter(outputPath, append: false, encoding: System.Text.Encoding.UTF8);
+            using var csv    = new CsvWriter(writer, config);
+
+            // Header
+@foreach (var attr in Model.Attributes)
+{
+    if ((string)attr.Name == "id") continue;
+    if (attr.IsGlobal()) continue;
+    if (!string.IsNullOrEmpty((string)attr.FkObject)) continue;
+<text>            csv.WriteField("@attr.Name");
+</text>
+}
+            csv.NextRecord();
+
+            // Data rows
+            foreach (var record in records)
+            {
+@foreach (var attr in Model.Attributes)
+{
+    if ((string)attr.Name == "id") continue;
+    if (attr.IsGlobal()) continue;
+    if (!string.IsNullOrEmpty((string)attr.FkObject)) continue;
+<text>                csv.WriteField(record.@attr.Name);
+</text>
+}
+                csv.NextRecord();
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        // Compare — field-by-field check with type-appropriate helpers
+        // -----------------------------------------------------------------------
+
+        private static void CompareRow(int rowNum, Dictionary<string, string> importRow, @(domainObj) record)
+        {
+@foreach (var attr in Model.Attributes)
+{
+    if ((string)attr.Name == "id") continue;
+    if (attr.IsGlobal()) continue;
+    if (!string.IsNullOrEmpty((string)attr.FkObject)) continue;
+
+    string compareMethod;
+    if ((string)attr.DotNetType == "string" || (string)attr.DotNetType == "Guid")
+        compareMethod = "CompareString";
+    else if ((string)attr.DotNetType == "DateTime")
+        compareMethod = "CompareDateTime";
+    else if ((string)attr.DotNetType == "bool")
+        compareMethod = "CompareBool";
+    else
+        compareMethod = "CompareNumeric";
+<text>
+            if (importRow.ContainsKey("@attr.Name"))
+            {
+                string importVal = importRow["@attr.Name"];
+                string exportVal = BaseTestImpExp.ToStr(record.@attr.Name);
+                bool ok = BaseTestImpExp.@(compareMethod)(importVal, exportVal);
+                BaseTestImpExp.RecordResult(ok);
+                if (!ok)
+                    Logger.Error($"@(domainObj) row {rowNum}: '@attr.Name' mismatch — imported='{importVal}' exported='{exportVal}'");
+            }
+</text>
+}
+        }
+    }
+}

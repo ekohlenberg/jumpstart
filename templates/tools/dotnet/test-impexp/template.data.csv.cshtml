@@ -1,0 +1,72 @@
+@{
+    // -------------------------------------------------------------------
+    // Pure-string helper functions — no dynamic, no lambdas.
+    // All existing templates in the codebase avoid LINQ on Model.Attributes
+    // because RazorLight exposes the model as dynamic, which rejects lambdas.
+    // -------------------------------------------------------------------
+
+    string StripPrecision(string sqlType)
+    {
+        int p = sqlType.IndexOf('(');
+        return (p > 0 ? sqlType.Substring(0, p) : sqlType).Trim().ToUpper();
+    }
+
+    string TestValue(string sqlDataType, string colName, int row)
+    {
+        return StripPrecision(sqlDataType) switch
+        {
+            "VARCHAR" or "CHAR" or "TEXT" or "NVARCHAR" or "NCHAR"
+                => $"test_{colName}_{row}",
+            "INTEGER" or "INT" or "SMALLINT" or "SERIAL"
+                => (row * 100).ToString(),
+            "BIGINT" or "BIGSERIAL"
+                => (row * 100).ToString(),
+            "NUMERIC" or "DECIMAL" or "MONEY"
+                => $"{row}.50",
+            "REAL" or "FLOAT" or "DOUBLE PRECISION"
+                => $"{row}.5",
+            "BOOLEAN" or "BIT"
+                => (row % 2 == 1) ? "true" : "false",
+            "DATE"
+                => $"2024-01-0{row}",
+            "TIMESTAMP" or "TIMESTAMPTZ"
+            or "TIMESTAMP WITH TIME ZONE" or "TIMESTAMP WITHOUT TIME ZONE"
+            or "DATETIME" or "DATETIME2"
+                => $"2024-01-0{row} 00:00:00",
+            "UUID" or "UNIQUEIDENTIFIER"
+                => $"00000000-0000-0000-0000-00000000000{row}",
+            _   => $"test_{colName}_{row}"
+        };
+    }
+
+    // Build the header row using an explicit loop — no LINQ lambdas.
+    var headerSb = new System.Text.StringBuilder();
+    bool firstCol = true;
+    foreach (var attr in Model.Attributes)
+    {
+        if ((string)attr.Name == "id") continue;
+        if (attr.IsGlobal()) continue;
+        if (!string.IsNullOrEmpty((string)attr.FkObject)) continue;
+
+        if (!firstCol) headerSb.Append(',');
+        headerSb.Append((string)attr.Name);
+        firstCol = false;
+    }
+}
+@headerSb.ToString()
+@for (int row = 1; row <= 3; row++)
+{
+    var rowSb = new System.Text.StringBuilder();
+    bool firstVal = true;
+    foreach (var attr in Model.Attributes)
+    {
+        if ((string)attr.Name == "id") continue;
+        if (attr.IsGlobal()) continue;
+        if (!string.IsNullOrEmpty((string)attr.FkObject)) continue;
+
+        if (!firstVal) rowSb.Append(',');
+        rowSb.Append(TestValue((string)attr.SqlDataType, (string)attr.Name, row));
+        firstVal = false;
+    }
+@:@rowSb.ToString()
+}
