@@ -6,8 +6,20 @@
     }
   },
   "AllowedHosts": "*",
-	"appsettings": {
-		"logwriters": "@(Model.Name).LogFileWriter,@(Model.Name).LogTableWriter,@(Model.Name).LogConsoleWriter",
-		"loglevel": "debug" 
-	}
+  "appsettings": {
+    "logwriters": "@(Model.Name).LogFileWriter,@(Model.Name).LogTableWriter,@(Model.Name).LogConsoleWriter",
+    "loglevel": "debug"
+  },
+  "Auth0": {
+    "Domain":   "@(Model.Auth0Domain)",
+    "Audience": "https://@(Model.Name)-scheduler"
+  },
+  "M2MClients": {
+    "ScriptAgent": {
+      "TokenEndpoint": "https://@(Model.Auth0Domain)/oauth/token",
+      "ClientId":      "SCHEDULER_M2M_CLIENT_ID",
+      "ClientSecret":  "SCHEDULER_M2M_CLIENT_SECRET",
+      "Audience":      "https://@(Model.Name)-scriptagent"
+    }
+  }
 }
