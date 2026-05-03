@@ -89,6 +89,11 @@ var registrationTask = Task.Run(async () =>
 var dispatcherThread = new @(Model.Namespace).DispatcherThread();
 dispatcherThread.Start();
 
+// Start Quartz-based scheduler thread — reads workflow schedules from the database
+// and fires SchedulerLogic.execute() when a cron trigger is due.
+var quartzSchedulerThread = new @(Model.Namespace).core.QuartzSchedulerThread();
+quartzSchedulerThread.Start();
+
 // Start health monitor thread
 var healthMonitorThread = new @(Model.Namespace).HealthMonitorThread(TimeSpan.FromSeconds(30));
 healthMonitorThread.Start();
@@ -112,6 +117,9 @@ app.Lifetime.ApplicationStopping.Register(() =>
 {
     Console.WriteLine("Application stopping - completing pending jobs...");
     
+    // Stop Quartz scheduler thread
+    quartzSchedulerThread.Stop();
+
     // Stop health monitor
     healthMonitorThread.Stop();
     

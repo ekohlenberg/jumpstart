@@ -41,7 +41,7 @@ namespace @Model.Namespace
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj) API insert: " + @(Model.DomainVar).ToString());
                 var created@(Model.DomainObj) = await PostAsyncReturn("@(Model.DomainObj)", @(Model.DomainVar));
-                BaseTest.addLastId("@(Model.DomainVar)", created@(Model.DomainObj).id);
+                BaseTest.addLastId("@(Model.DomainObj)", created@(Model.DomainObj).id);
             </text>
             }
         }
@@ -83,14 +83,14 @@ namespace @Model.Namespace
             <text>
                 Console.WriteLine("Testing @(Model.DomainObj) API insert (RWK only): " + @(Model.DomainVar).ToString());
                 var created@(Model.DomainObj) = await PostAsyncReturn("@(Model.DomainObj)", @(Model.DomainVar));
-                BaseTest.addLastId("@(Model.DomainVar)", created@(Model.DomainObj).id);
+                BaseTest.addLastId("@(Model.DomainObj)", created@(Model.DomainObj).id);
             </text>
             }
         }
 
         public static async Task testUpdate()
         {
-            long lastId = BaseTest.getLastId("@(Model.DomainVar)");
+            long lastId = BaseTest.getLastId("@(Model.DomainObj)");
             var @(Model.DomainVar)View = await GetByIdAsync<@(Model.DomainObj)View>("@(Model.DomainObj)", lastId);
             var @(Model.DomainVar) = new @(Model.DomainObj)(@(Model.DomainVar)View);
 
@@ -129,7 +129,7 @@ namespace @Model.Namespace
 
         public static async Task testPut()
         {
-            long lastId = BaseTest.getLastId("@(Model.DomainVar)");
+            long lastId = BaseTest.getLastId("@(Model.DomainObj)");
             var @(Model.DomainVar)View = await GetByIdAsync<@(Model.DomainObj)View>("@(Model.DomainObj)", lastId);
             var @(Model.DomainVar) = new @(Model.DomainObj)(@(Model.DomainVar)View);
 
@@ -202,7 +202,7 @@ namespace @Model.Namespace
                     }
                     
                     // Store the first record for potential use in other tests
-                    BaseTest.addLastId("@(Model.TableName)", @(Model.DomainVar)List[0].id);
+                    BaseTest.addLastId("@(Model.DomainObj)", @(Model.DomainVar)List[0].id);
                 }
                 else
                 {
