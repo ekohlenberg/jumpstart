@@ -79,14 +79,12 @@ dotnet server templates-scriptagent,model,server/dotnet/scriptagent/makefile.csh
 dotnet server templates-scriptagent,model,server/dotnet/scriptagent/scriptagent.csproj.cshtml,./gen/server/scriptagent,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/BaseTest.generated.cs.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,object,server/dotnet/test-persist/template.test.generated.cs.cshtml,./gen/test/test-persist,TRUE
-dotnet server templates-test-persist,object,server/dotnet/test-persist/template.test.user.cs.cshtml,./usr/test/test-persist,FALSE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/Program.cs.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/makefile.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/appsettings.json.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/test.csproj.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/BaseTest.generated.cs.cshtml,./gen/test/test-api,TRUE
 dotnet server templates-test-api,object,server/dotnet/test-api/template.test.generated.cs.cshtml,./gen/test/test-api,TRUE
-dotnet server templates-test-api,object,server/dotnet/test-api/template.test.user.cs.cshtml,./usr/test/test-api,FALSE
 dotnet server templates-test-api,model,server/dotnet/test-api/Program.cs.cshtml,./gen/test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/makefile.cshtml,./gen/test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/appsettings.json.cshtml,./gen/test/test-api,TRUE

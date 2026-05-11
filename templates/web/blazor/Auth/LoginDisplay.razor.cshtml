@@ -3,11 +3,11 @@
 
 <AuthorizeView>
     <Authorized>
-        <span class="me-3 text-light small">@@context.User.Identity?.Name</span>
-        <button class="btn btn-sm btn-outline-light" @@onclick="BeginLogout">Log out</button>
+        <span class="me-3 text-secondary small">@@context.User.Identity?.Name</span>
+        <button class="btn btn-sm btn-outline-secondary" @@onclick="BeginLogout">Log out</button>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/login" class="btn btn-sm btn-outline-light">Log in</a>
+        <a href="authentication/login" class="btn btn-sm btn-outline-secondary">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
 
