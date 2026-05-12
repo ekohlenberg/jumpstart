@@ -119,6 +119,25 @@ app.UseCors("AllowBlazorClient");
 //app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+// ── Propagate JWT identity into the logic-layer authorization check ───────────
+// Runs after UseAuthentication so context.User is already populated from the JWT.
+// Prefers email (human-readable, matches principal.username); falls back to
+// Auth0 subject claim (sub) if email wasn't included in the token scope.
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        // Auth0 puts email in a namespaced custom claim on access tokens.
+        // Fall back to the standard email claim, then the Auth0 subject (sub).
+        var username = context.User.FindFirst("https://claims/email")?.Value
+                    ?? context.User.FindFirst("email")?.Value
+                    ?? context.User.FindFirst("sub")?.Value;
+        OpRoleMemberLogic.SetCurrentUser(username);
+    }
+    await next();
+});
+
 app.UseAuthorization();
 
 app.MapControllers();
