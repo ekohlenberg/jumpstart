@@ -122,17 +122,26 @@ app.UseAuthentication();
 
 // ── Propagate JWT identity into the logic-layer authorization check ───────────
 // Runs after UseAuthentication so context.User is already populated from the JWT.
-// Prefers email (human-readable, matches principal.username); falls back to
+// Prefers email (human-readable, matches principal.email); falls back to
 // Auth0 subject claim (sub) if email wasn't included in the token scope.
 app.Use(async (context, next) =>
 {
     if (context.User.Identity?.IsAuthenticated == true)
     {
-        // Auth0 puts email in a namespaced custom claim on access tokens.
-        // Fall back to the standard email claim, then the Auth0 subject (sub).
+        // Diagnostic: log all claims so we can see exactly what Auth0 is sending.
+        // Remove this block once the correct claim name is confirmed.
+        foreach (var claim in context.User.Claims)
+        {
+            Console.WriteLine($"[JWT Claim] {claim.Type} = {claim.Value}");
+        }
+
         var username = context.User.FindFirst("https://claims/email")?.Value
                     ?? context.User.FindFirst("email")?.Value
-                    ?? context.User.FindFirst("sub")?.Value;
+                    ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                    ?? context.User.FindFirst("sub")?.Value
+                    ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        Console.WriteLine($"[JWT] SetCurrentUser -> {username ?? "(null)"}");
         OpRoleMemberLogic.SetCurrentUser(username);
     }
     await next();

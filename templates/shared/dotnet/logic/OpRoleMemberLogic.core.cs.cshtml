@@ -16,6 +16,7 @@ namespace @Model.Namespace
 
         public static void SetCurrentUser(string? username)
         {
+            Logger.Debug($"Setting current user to {username}");
             _currentUser.Value = username;
         }
 
@@ -56,12 +57,13 @@ inner join core.""principal"" p on
 where
     op.objectname = '^(objectname)' and
     op.methodname = '^(methodname)' and
-    p.email = '^(email)'";
+    (p.email = '^(email)' OR p.username = '^(username)')";
 
                     BaseObject filter = new();
                     filter["objectname"] = objectName;
                     filter["methodname"] = methodName;
                     filter["email"] = email;
+                    filter["username"] = CurrentUser;
 
                     void authCallback(System.Data.Common.DbDataReader rdr)
                     {
