@@ -1,6 +1,8 @@
 -- =====================================
 -- 1) Create Account for Current OS Principal
+-- admin_email is passed in from load.ps1 via: sqlcmd -v admin_email=user@example.com
 -- =====================================
+DECLARE @@admin_email NVARCHAR(200) = '$(admin_email)';
 DECLARE @@os_user NVARCHAR(50) =
     CASE
         WHEN CHARINDEX('\', SYSTEM_USER) > 0
@@ -30,7 +32,7 @@ VALUES (
     'Current',
     'Principal',
     @@os_user,
-    @@os_user + '@@mydomain.com',
+    @@admin_email,
     GETDATE(),
     null,
     1,
@@ -39,12 +41,12 @@ VALUES (
     'system'
 );
 
-SELECT @@password_id = NEXT VALUE FOR sec.principal_password_identity;
+SELECT @@password_id = NEXT VALUE FOR core.principal_password_identity;
 
 WITH os_user_principal_id AS (
-    SELECT id FROM core.principal WHERE username = @@os_user AND is_active = 1
+    SELECT id FROM core.principal WHERE email = @@admin_email AND is_active = 1
 )
-INSERT INTO sec.principal_password(
+INSERT INTO core.principal_password(
     id, txn_id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by)
 SELECT @@password_id,
     @@password_id,
@@ -62,18 +64,18 @@ FROM os_user_principal_id;
 
 -- =====================================
 -- 2) Map os_user Principal to Administrator Role
---    Using sub-selects on core.principal (by username)
---    and sec.op_role (by name)
+--    Using sub-selects on core.principal (by email)
+--    and core.op_role (by name)
 -- =====================================
-SELECT @@role_member_id = NEXT VALUE FOR sec.op_role_member_identity;
+SELECT @@role_member_id = NEXT VALUE FOR core.op_role_member_identity;
 
 WITH os_user_principal_id AS (
-    SELECT id FROM core.principal WHERE username = @@os_user AND is_active = 1
+    SELECT id FROM core.principal WHERE email = @@admin_email AND is_active = 1
 ),
 os_user_role_id AS (
-    SELECT id FROM sec.op_role WHERE name = 'Administrator' AND is_active = 1
+    SELECT id FROM core.op_role WHERE name = 'Administrator' AND is_active = 1
 )
-INSERT INTO sec.op_role_member(
+INSERT INTO core.op_role_member(
     id,
     txn_id,
     principal_id,

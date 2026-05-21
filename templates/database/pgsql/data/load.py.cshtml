@@ -82,7 +82,7 @@ def load_config():
     
     return config
 
-def run_psql(config, sql_file):
+def run_psql(config, sql_file, variables=None):
     """Execute a SQL file using psql"""
     cmd = [
         'psql',
@@ -90,29 +90,59 @@ def run_psql(config, sql_file):
         f"--port={config['port']}",
         f"--dbname={config['database']}",
         f"--username={config['username']}",
-        f"--file={sql_file}"
     ]
-    
+
+    for key, value in (variables or {}).items():
+        cmd += ['--variable', f"{key}={value}"]
+
+    cmd.append(f"--file={sql_file}")
+
     env = os.environ.copy()
     if config['password']:
         env['PGPASSWORD'] = config['password']
-    
+
     print(f"Loading: {sql_file}")
     result = subprocess.run(cmd, env=env)
-    
+
     if result.returncode != 0:
         print(f"Failed to load: {sql_file}", file=sys.stderr)
         sys.exit(result.returncode)
+
+def prompt_admin_email():
+    """Prompt for the initial admin user's email address"""
+    print()
+    print("-" * 60)
+    print("Initial Admin User Setup")
+    print("-" * 60)
+    print("Enter the email address for the first administrator account.")
+    print("This must match the email used to log in via Auth0.")
+    print()
+    while True:
+        email = input("Admin email address: ").strip()
+        if not email:
+            print("Email address cannot be empty. Please try again.")
+            continue
+        if '@' not in email or '.' not in email.split('@')[-1]:
+            print("That does not look like a valid email address. Please try again.")
+            continue
+        confirm = input(f"Confirm '{email}' [y/N]: ").strip().lower()
+        if confirm == 'y':
+            return email
+        print("Cancelled - please enter the email address again.")
 
 def main():
     """Main load script"""
     # Load configuration
     config = load_config()
-    
+
     print(f"Connecting to PostgreSQL: {config['hostname']}:{config['port']}")
     print(f"Database: {config['database']}")
     print(f"Username: {config['username']}")
-    
+
+    # Prompt for the initial admin email before touching the database
+    admin_email = prompt_admin_email()
+    variables = {'admin_email': admin_email}
+
     # Load all data files
     data_files = [
 @foreach( string sourceFile in Model.sourceFiles) {
@@ -120,21 +150,22 @@ def main():
         @("        './" + sourceFile + "',\n")
     }
 }    ]
-    
+
     if not data_files:
         print("No data files to load.")
         return
-    
+
     print(f"\nLoading {len(data_files)} data files...")
-    
+
     for sql_file in data_files:
         if not os.path.exists(sql_file):
             print(f"Warning: File not found, skipping: {sql_file}")
             continue
-            
-        run_psql(config, sql_file)
-    
+
+        run_psql(config, sql_file, variables)
+
     print("\nData loading completed successfully!")
+    print(f"Admin account created for: {admin_email}")
 
 if __name__ == '__main__':
     main()
