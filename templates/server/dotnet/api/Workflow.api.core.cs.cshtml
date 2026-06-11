@@ -16,6 +16,7 @@ namespace @(Model.Namespace).Controllers
         [HttpGet("run/{id}")]
         public async Task<IActionResult> Run(long id)
         {
+            Logger.Debug($"WorkflowController.Run: id={id}");
             var workflowCoreLogic = WorkflowCoreLogic.Create();
 
             try
