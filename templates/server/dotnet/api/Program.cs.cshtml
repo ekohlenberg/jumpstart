@@ -44,11 +44,45 @@ if (boundPort == 0)
     Environment.Exit(1);
 }
 
+// ── Auth0 M2M token provider (outbound calls to Scheduler) ──────────────────
+M2MTokenProvider.Initialize(builder.Configuration);
+
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name         = "Authorization",
+        Type         = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme       = "bearer",
+        BearerFormat = "JWT",
+        In           = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description  = "Enter your Auth0 JWT token."
+    });
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                    { Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// ── Auth0 JWT Bearer validation (inbound requests) ───────────────────────────
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+        options.Audience  =  builder.Configuration["Auth0:Audience"];
+    });
+builder.Services.AddAuthorization();
 
 // Add SignalR services
 builder.Services.AddSignalR();
@@ -84,7 +118,36 @@ app.UseCors("AllowBlazorClient");
 
 //app.UseHttpsRedirection();
 
-//app.UseAuthorization();
+app.UseAuthentication();
+
+// ── Propagate JWT identity into the logic-layer authorization check ───────────
+// Runs after UseAuthentication so context.User is already populated from the JWT.
+// Prefers email (human-readable, matches principal.email); falls back to
+// Auth0 subject claim (sub) if email wasn't included in the token scope.
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        // Diagnostic: log all claims so we can see exactly what Auth0 is sending.
+        // Remove this block once the correct claim name is confirmed.
+        foreach (var claim in context.User.Claims)
+        {
+            Console.WriteLine($"[JWT Claim] {claim.Type} = {claim.Value}");
+        }
+
+        var username = context.User.FindFirst("https://claims/email")?.Value
+                    ?? context.User.FindFirst("email")?.Value
+                    ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                    ?? context.User.FindFirst("sub")?.Value
+                    ?? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        Console.WriteLine($"[JWT] SetCurrentUser -> {username ?? "(null)"}");
+        OpRoleMemberLogic.SetCurrentUser(username);
+    }
+    await next();
+});
+
+app.UseAuthorization();
 
 app.MapControllers();
 

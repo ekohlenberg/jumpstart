@@ -22,7 +22,12 @@ namespace @Model.Namespace
                 throw new Exception("ScriptAgent URL is not set for server node " + _serverNode.id);
             }
 
-            _httpClient = new HttpClient
+            // Attach M2M Bearer token if provider is configured
+            // (covers both interactive API calls and autonomous Scheduler thread invocations)
+            var handler = M2MTokenProvider.Instance != null
+                ? (HttpMessageHandler) new M2MAuthHandler(M2MTokenProvider.Instance, "ScriptAgent")
+                : new HttpClientHandler();
+            _httpClient = new HttpClient(handler)
             {
                 BaseAddress = new Uri(_serverNode.url),
                 Timeout = TimeSpan.FromSeconds(30)

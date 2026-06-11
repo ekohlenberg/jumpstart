@@ -16,6 +16,7 @@ namespace jumpstart {
             string modelPath = string.Empty;
             List<string> templDefNames = new List<string>();
             string homePath = string.Empty;
+            Auth0Config auth0Config = new Auth0Config();   // populated from JSON config if present
             try
             {
                 if (args.Length == 2)
@@ -79,7 +80,8 @@ namespace jumpstart {
                     }
 
                     templDefNames = jumpStartParams.templatedefs ?? new List<string>();
-                    
+                    auth0Config = jumpStartParams.auth0 ?? new Auth0Config();
+
                     if (templDefNames.Count == 0)
                     {
                         Console.WriteLine("Error: No template definitions specified in JSON file");
@@ -99,6 +101,11 @@ namespace jumpstart {
                 // infer the namespace based on the model filename
                 string _namespace = Path.GetFileNameWithoutExtension(modelPath);
                 var metaModel = new MetaModel(_namespace);
+
+                // Wire Auth0 config into the model so templates can reference it
+                metaModel.Auth0Domain   = auth0Config.domain;
+                metaModel.Auth0ClientId = auth0Config.clientId;
+                metaModel.Auth0Audience = auth0Config.audience;
 
                 // Create an instance of the CSVLoader
                 var csvLoader = new CSVLoader();

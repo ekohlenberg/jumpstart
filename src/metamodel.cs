@@ -797,7 +797,19 @@ public class ViewRelationship
             return GlobalAttributes.Any(attr => attr.Name == name);
         }
         public MetaBuild build = new MetaBuild();
-        
+
+        // ── Auth0 settings (populated from ~/.jumpstart.json) ────────────────
+        // Templates reference these as @Model.Auth0Domain, @Model.Auth0ClientId, etc.
+
+        /// <summary>Auth0 tenant domain, e.g. "your-tenant.auth0.com"</summary>
+        public string Auth0Domain { get; set; } = string.Empty;
+
+        /// <summary>Auth0 SPA client ID from the Blazor application registration</summary>
+        public string Auth0ClientId { get; set; } = string.Empty;
+
+        /// <summary>Auth0 API audience, e.g. "https://your-api-identifier"</summary>
+        public string Auth0Audience { get; set; } = string.Empty;
+
         public MetaModel(string _namespace)
         {
             Name = _namespace;

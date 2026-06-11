@@ -42,6 +42,7 @@ dotnet server templates-logic,model,shared/dotnet/logic/SchedulerLogic.core.cs.c
 dotnet server templates-logic,model,shared/dotnet/logic/ScriptAgentLogic.core.cs.cshtml,./gen/shared/logic,TRUE
 dotnet server templates-logic,model,shared/dotnet/logic/DispatcherThread.core.cs.cshtml,./gen/shared/logic,TRUE
 dotnet server templates-logic,model,shared/dotnet/logic/HealthMonitorThread.core.cs.cshtml,./gen/shared/logic,TRUE
+dotnet server templates-logic,model,shared/dotnet/logic/M2MTokenProvider.core.cs.cshtml,./gen/shared/logic,TRUE
 dotnet server templates-logic,model,shared/dotnet/logic/SchedulerClient.core.cs.cshtml,./gen/shared/logic,TRUE
 dotnet server templates-logic,model,shared/dotnet/logic/ScriptAgentClient.core.cs.cshtml,./gen/shared/logic,TRUE
 dotnet server templates-logic,model,shared/dotnet/logic/WorkflowLogic.core.cs.cshtml,./gen/shared/logic,TRUE
@@ -50,6 +51,7 @@ dotnet server templates-logic,object,shared/dotnet/logic/templateLogic.user.cs.c
 dotnet server templates-logic,model,shared/dotnet/logic/logic.csproj.cshtml,./gen/shared/logic,TRUE
 dotnet server templates-api,object,server/dotnet/api/template.api.generated.cs.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/Program.cs.cshtml,./gen/server/api,TRUE
+dotnet server templates-api,model,server/dotnet/api/Auth0Config.cs.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/NavMenu.api.core.cs.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/Workflow.api.core.cs.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/EventAggregator.core.cs.cshtml,./gen/server/api,TRUE
@@ -60,6 +62,8 @@ dotnet server templates-api,model,server/dotnet/api/appsettings.Development.json
 dotnet server templates-api,model,server/dotnet/api/Properties/launchSettings.json.cshtml,./usr/server/api/Properties,FALSE
 dotnet server templates-api,model,server/dotnet/api/makefile.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/api.csproj.cshtml,./gen/server/api,TRUE
+dotnet server templates-api,model,server/dotnet/api/api.sh.cshtml,./gen/server/api,TRUE
+dotnet server templates-api,model,server/dotnet/api/api.cmd.cshtml,./gen/server/api,TRUE
 dotnet server templates-scheduler,model,server/dotnet/scheduler/scheduler.api.core.cs.cshtml,./gen/server/scheduler,TRUE
 dotnet server templates-scheduler,model,server/dotnet/scheduler/QuartzSchedulerThread.core.cs.cshtml,./gen/server/scheduler,TRUE
 dotnet server templates-scheduler,model,server/dotnet/scheduler/Program.cs.cshtml,./gen/server/scheduler,TRUE
@@ -68,6 +72,8 @@ dotnet server templates-scheduler,model,server/dotnet/scheduler/appsettings.Deve
 dotnet server templates-scheduler,model,server/dotnet/scheduler/Properties/launchSettings.json.cshtml,./usr/server/scheduler/Properties,FALSE
 dotnet server templates-scheduler,model,server/dotnet/scheduler/makefile.cshtml,./gen/server/scheduler,TRUE
 dotnet server templates-scheduler,model,server/dotnet/scheduler/scheduler.csproj.cshtml,./gen/server/scheduler,TRUE
+dotnet server templates-scheduler,model,server/dotnet/scheduler/scheduler.sh.cshtml,./gen/server/scheduler,TRUE
+dotnet server templates-scheduler,model,server/dotnet/scheduler/scheduler.cmd.cshtml,./gen/server/scheduler,TRUE
 dotnet server templates-scriptagent,model,server/dotnet/scriptagent/scriptagent.api.core.cs.cshtml,./gen/server/scriptagent,TRUE
 dotnet server templates-scriptagent,model,server/dotnet/scriptagent/Program.cs.cshtml,./gen/server/scriptagent,TRUE
 dotnet server templates-scriptagent,model,server/dotnet/scriptagent/appsettings.json.cshtml,./usr/server/scriptagent,FALSE
@@ -75,16 +81,16 @@ dotnet server templates-scriptagent,model,server/dotnet/scriptagent/appsettings.
 dotnet server templates-scriptagent,model,server/dotnet/scriptagent/Properties/launchSettings.json.cshtml,./usr/server/scriptagent/Properties,FALSE
 dotnet server templates-scriptagent,model,server/dotnet/scriptagent/makefile.cshtml,./gen/server/scriptagent,TRUE
 dotnet server templates-scriptagent,model,server/dotnet/scriptagent/scriptagent.csproj.cshtml,./gen/server/scriptagent,TRUE
+dotnet server templates-scriptagent,model,server/dotnet/scriptagent/scriptagent.sh.cshtml,./gen/server/scriptagent,TRUE
+dotnet server templates-scriptagent,model,server/dotnet/scriptagent/scriptagent.cmd.cshtml,./gen/server/scriptagent,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/BaseTest.generated.cs.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,object,server/dotnet/test-persist/template.test.generated.cs.cshtml,./gen/test/test-persist,TRUE
-dotnet server templates-test-persist,object,server/dotnet/test-persist/template.test.user.cs.cshtml,./usr/test/test-persist,FALSE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/Program.cs.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/makefile.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/appsettings.json.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-persist,model,server/dotnet/test-persist/test.csproj.cshtml,./gen/test/test-persist,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/BaseTest.generated.cs.cshtml,./gen/test/test-api,TRUE
 dotnet server templates-test-api,object,server/dotnet/test-api/template.test.generated.cs.cshtml,./gen/test/test-api,TRUE
-dotnet server templates-test-api,object,server/dotnet/test-api/template.test.user.cs.cshtml,./usr/test/test-api,FALSE
 dotnet server templates-test-api,model,server/dotnet/test-api/Program.cs.cshtml,./gen/test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/makefile.cshtml,./gen/test/test-api,TRUE
 dotnet server templates-test-api,model,server/dotnet/test-api/appsettings.json.cshtml,./gen/test/test-api,TRUE

@@ -7,10 +7,13 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>api</AssemblyName>
     <OutputPath>..\..\..\bin\api</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <!-- Auth0 JWT Bearer validation -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>

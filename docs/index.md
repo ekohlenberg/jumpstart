@@ -58,6 +58,7 @@ From a single CSV metadata file, Jumpstart generates:
 - [Getting Started](getting-started.md) -- Install, configure, and generate your first application
 - [Metadata Specification](metadata.md) -- CSV format reference, column definitions, relationship types
 - [Generator](generator.md) -- How the code generator works: MetaModel, templates, RazorLight
+- [Auth0 Setup](auth0-setup.md) -- Configure Auth0 for browser login, API JWT validation, and email claims
 - **Generated Application**
   - [Overview](generated-application/) -- Output structure and layer diagram
   - [Database](generated-application/database.md) -- Naming conventions, table design, keys, indexes, foreign keys, history
