@@ -122,7 +122,7 @@ def prompt_admin_email():
         if not email:
             print("Email address cannot be empty. Please try again.")
             continue
-        if '@' not in email or '.' not in email.split('@')[-1]:
+        if '&at;' not in email or '.' not in email.split('&at;')[-1]:
             print("That does not look like a valid email address. Please try again.")
             continue
         confirm = input(f"Confirm '{email}' [y/N]: ").strip().lower()

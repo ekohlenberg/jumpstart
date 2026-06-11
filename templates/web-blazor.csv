@@ -11,7 +11,7 @@ dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cs
 dotnet server templates-common,model,shared/dotnet/common/BaseObject.core.cs.cshtml,./gen/web/common,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./gen/web/domain,TRUE
 dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./gen/web/domain,FALSE
-Blazor wasm content,model,web/blazor/wwwroot/appsettings.json.cshtml,./gen/web/wwwroot,FALSE
+Blazor wasm content,model,web/blazor/wwwroot/appsettings.json.cshtml,./usr/web/wwwroot,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/index.html.cshtml,./gen/web/wwwroot,TRUE
 Blazor wasm content,model,web/blazor/wwwroot/css/app.css,./gen/web/wwwroot/css,FALSE
 Blazor wasm content,model,web/blazor/wwwroot/icon-192.png,./gen/web/wwwroot,FALSE
@@ -88,3 +88,6 @@ Blazor wasm content,model,web/blazor/Auth/LoginDisplay.razor.cshtml,./gen/web/Au
 Blazor wasm content,model,web/blazor/Auth/RedirectToLogin.razor.cshtml,./gen/web/Auth,TRUE
 Blazor wasm content,model,web/blazor/Auth/Authentication.razor.cshtml,./gen/web/Auth,TRUE
 Blazor wasm content,model,web/blazor/Program.cs.cshtml,./gen/web,TRUE
+Blazor wasm content,model,web/blazor/makefile.cshtml,./gen/web,TRUE
+Blazor wasm content,model,web/blazor/web.sh.cshtml,./bin,TRUE
+Blazor wasm content,model,web/blazor/web.cmd.cshtml,./bin,TRUE

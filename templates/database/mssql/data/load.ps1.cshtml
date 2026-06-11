@@ -93,7 +93,7 @@ while ($true) {
         Write-Warning "Email address cannot be empty. Please try again."
         continue
     }
-    if ($adminEmail -notmatch '^[^@]+@[^@]+\.[^@]+$') {
+    if ($adminEmail -notmatch '^[^&at;]+&at;[^&at;]+\.[^&at;]+$') {
         Write-Warning "That does not look like a valid email address. Please try again."
         continue
     }
