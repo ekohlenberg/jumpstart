@@ -1,0 +1,4 @@
+{%- set rwk_cols = obj.attributes | selectattr("rwk", "equalto", "1") | map(attribute="name") | list -%}
+{% if rwk_cols %}
+CREATE INDEX rwk_{{ obj.schema_name }}_{{ obj.table_name }} ON {{ obj.schema_name }}.{{ obj.table_name }} ({{ rwk_cols | join(", ") }});
+{% endif %}

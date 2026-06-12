@@ -1,0 +1,3 @@
+CREATE SCHEMA IF NOT EXISTS {{ schema.name }};
+GRANT USAGE ON SCHEMA {{ schema.name }} TO {{ schema.namespace }};
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA {{ schema.name }} TO {{ schema.namespace }};
