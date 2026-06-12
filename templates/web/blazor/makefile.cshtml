@@ -1,11 +1,14 @@
-TARGETDIR=./bin/Debug/net9.0
+TARGETDIR=../../bin/web
 
 default: build
 
 build:
 	@@dotnet restore
 	@@dotnet build
-	@@cp -r -f ./appsettings.json $(TARGETDIR)
+	@@mkdir -p $(TARGETDIR)/wwwroot
+	@@cp -r -f . $(TARGETDIR)
+	@@cp -f ../../usr/web/wwwroot/appsettings.json $(TARGETDIR)/wwwroot
+
 
 clean:
 	@@rm -rf ./bin

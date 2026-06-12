@@ -2,6 +2,7 @@
     string namespaceName = @Model.Namespace; 
 }
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using @(namespaceName).core;
 
 namespace @(namespaceName).Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SchedulerController : ControllerBase

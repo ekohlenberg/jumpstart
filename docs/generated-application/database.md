@@ -166,8 +166,8 @@ What gets generated:
 Map relationships define many-to-many associations via junction tables.
 
 ```csv
-,app,principal_org,,,org_id,Organization ID,map,org,...
-,app,principal_org,,,principal_id,Principal ID,map,principal,...
+,core,principal_org,,,org_id,Organization ID,map,org,...
+,core,principal_org,,,principal_id,Principal ID,map,principal,...
 ```
 
 Map FKs identify the junction table's composite key. The two `map` columns together form the unique constraint that prevents duplicate associations.
@@ -176,18 +176,13 @@ Map FKs identify the junction table's composite key. The two `map` columns toget
 
 Jumpstart includes a built-in core data model in `templates/core/core.csv` that provides framework infrastructure:
 
-### Application Tables (`app` schema)
+### Application & Security Tables (`core` schema)
 
 | Table | Purpose |
 |-------|---------|
 | `org` | Organizations |
 | `principal` | Users/principals (username, email, name) |
 | `principal_org` | User-to-organization mapping (many-to-many) |
-
-### Security Tables (`sec` schema)
-
-| Table | Purpose |
-|-------|---------|
 | `principal_password` | Password hashes and expiry |
 | `operation` | Named operations (objectname + methodname) |
 | `op_role` | Authorization roles |

@@ -335,12 +335,12 @@ Principal (User)
 
 | Table | Schema | Purpose |
 |-------|--------|---------|
-| `principal` | `app` | User accounts (username, email) |
-| `principal_password` | `sec` | Password hashes |
-| `operation` | `sec` | Named operations (`objectname` + `methodname`) |
-| `op_role` | `sec` | Named roles |
-| `op_role_map` | `sec` | Maps operations to roles |
-| `op_role_member` | `sec` | Maps users to roles |
+| `principal` | `core` | User accounts (username, email) |
+| `principal_password` | `core` | Password hashes |
+| `operation` | `core` | Named operations (`objectname` + `methodname`) |
+| `op_role` | `core` | Named roles |
+| `op_role_map` | `core` | Maps operations to roles |
+| `op_role_member` | `core` | Maps users to roles |
 
 ### Authorization Check
 
@@ -348,11 +348,11 @@ Authorization is performed by `OpRoleMemberLogic.Authorized()`, which is called 
 
 ```sql
 SELECT 1 FROM
-    sec.operation op
-    INNER JOIN sec.op_role_map orm ON orm.op_id = op.id
-    INNER JOIN sec.op_role r ON r.id = orm.op_role_id
-    INNER JOIN sec.op_role_member m ON m.op_role_id = r.id
-    INNER JOIN app.principal p ON p.id = m.principal_id
+    core.operation op
+    INNER JOIN core.op_role_map orm ON orm.op_id = op.id
+    INNER JOIN core.op_role r ON r.id = orm.op_role_id
+    INNER JOIN core.op_role_member m ON m.op_role_id = r.id
+    INNER JOIN core."principal" p ON p.id = m.principal_id
 WHERE
     op.objectname = '{objectName}'
     AND op.methodname = '{methodName}'

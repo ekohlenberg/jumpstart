@@ -60,7 +60,19 @@ builder.Services.AddCors(options =>
 
 });
 
+// ── Auth0 JWT Bearer validation (inbound requests from Scheduler) ────────────
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
+        options.Audience  =  builder.Configuration["Auth0:Audience"];
+    });
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Register notification callback
 NotificationRegistrar.Register();

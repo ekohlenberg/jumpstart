@@ -16,3 +16,5 @@ tools test-impexp - base class,model,tools/dotnet/test-impexp/BaseTestImpExp.gen
 tools test-impexp - program,model,tools/dotnet/test-impexp/Program.cs.cshtml,./gen/test/test-impexp,TRUE
 tools test-impexp - data csv per object,object,tools/dotnet/test-impexp/template.data.csv.cshtml,./gen/test/test-impexp,TRUE
 tools test-impexp - test class per object,object,tools/dotnet/test-impexp/template.impexp.generated.cs.cshtml,./gen/test/test-impexp,TRUE
+tools setup-auth0 - project file,model,tools/setup-auth0/setup-auth0.csproj.cshtml,./gen/tools/setup-auth0,TRUE
+tools setup-auth0 - program entry point,model,tools/setup-auth0/Program.cs.cshtml,./gen/tools/setup-auth0,TRUE

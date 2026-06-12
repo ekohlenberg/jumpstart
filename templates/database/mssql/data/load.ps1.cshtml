@@ -77,6 +77,31 @@ if ($port -and $port -ne "1433") {
 Write-Host "Connecting to SQL Server: $connectionString"
 Write-Host "Database: $database"
 
+# Prompt for the initial admin email before touching the database
+Write-Host ""
+Write-Host ("-" * 60)
+Write-Host "Initial Admin User Setup"
+Write-Host ("-" * 60)
+Write-Host "Enter the email address for the first administrator account."
+Write-Host "This must match the email used to log in via Auth0."
+Write-Host ""
+
+$adminEmail = ""
+while ($true) {
+    $adminEmail = (Read-Host "Admin email address").Trim()
+    if (-not $adminEmail) {
+        Write-Warning "Email address cannot be empty. Please try again."
+        continue
+    }
+    if ($adminEmail -notmatch '^[^&at;]+&at;[^&at;]+\.[^&at;]+$') {
+        Write-Warning "That does not look like a valid email address. Please try again."
+        continue
+    }
+    $confirm = (Read-Host "Confirm '$adminEmail' [y/N]").Trim().ToLower()
+    if ($confirm -eq 'y') { break }
+    Write-Host "Cancelled - please enter the email address again."
+}
+
 # Build sqlcmd authentication parameters
 $authParams = @@()
 if ($username -and $password) {
@@ -106,7 +131,7 @@ if (-not (Test-Path $sqlFile)) {
     continue
 }
 
-sqlcmd -S $connectionString -d $database @@authParams -i "$sqlFile"
+sqlcmd -S $connectionString -d $database @@authParams -v "admin_email=$adminEmail" -i "$sqlFile"
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to load: $sqlFile"
     Write-Error "Check the SQL file for syntax errors and ensure the database connection is working."

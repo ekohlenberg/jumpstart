@@ -7,12 +7,15 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>scheduler</AssemblyName>
     <OutputPath>..\..\..\bin\scheduler</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Quartz" Version="3.13.1" />
     <PackageReference Include="CronExpressionDescriptor" Version="2.27.0" />
+    <!-- Auth0 JWT Bearer validation (inbound) -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>

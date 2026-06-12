@@ -9,3 +9,24 @@ packages
 CLAUDE.md
 # Claude Code worktrees (local-only, not for version control)
 .claude/worktrees/
+
+# ── Auth0 credentials & generated config files ───────────────────────────────
+# These files contain secrets (M2M client IDs/secrets) or environment-specific
+# Auth0 settings. Keep them local; never commit to source control.
+
+# Output from the setup-auth0 tool — contains all client IDs and secrets
+credentials-*.json
+
+# Generated server appsettings — contain M2M ClientId/ClientSecret values
+gen/server/api/appsettings.json
+gen/server/scheduler/appsettings.json
+gen/server/scriptagent/appsettings.json
+
+# Generated Blazor WASM appsettings — environment-specific Auth0 settings
+gen/web/wwwroot/appsettings.json
+
+# User-area appsettings (same files, alternate output path)
+usr/server/api/appsettings.json
+usr/server/scheduler/appsettings.json
+usr/server/scriptagent/appsettings.json
+.DS_Store

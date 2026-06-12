@@ -82,19 +82,19 @@
 ,core,workflow,,,last_end_time,LastEnd Time,,,,10,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
 ,core,workflow,,,schedule_id,Schedule,enum,schedule,,11,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
 ,core,workflow,,,on_failure_action_id,On Failure,enum,on_failure,,12,NULL,0,YES,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
-,core,server_node,Server Node,System,id,Server Node ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,1
-,core,server_node,,,server_node_type_id,Server Node Type,enum,server_node_type,,2,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,1
-,core,server_node,,,hostname,Hostname,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,ip_address,Address,,,,4,NULL,0,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,port,Port,,,,5,NULL,1,YES,INTEGER,int,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,1
-,core,server_node,,,username,Username,,,,6,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,url,URL,,,,7,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,user_domain,User Domain,,,,8,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,os_name,OS Name,,,,9,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,os_version,OS Version,,,,10,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,architecture,Architecture,,,,11,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
-,core,server_node,,,registered_at,Registered At,,,,12,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,1
-,core,server_node,,,server_node_status_id,Status,enum,server_node_status,,13,NULL,0,YES,BIGINT,bigint,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,1
+,core,server_node,Server Node,System,id,Server Node ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
+,core,server_node,,,server_node_type_id,Server Node Type,enum,server_node_type,,2,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
+,core,server_node,,,hostname,Hostname,,,,3,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,ip_address,Address,,,,4,NULL,0,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,port,Port,,,,5,NULL,1,YES,INTEGER,int,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
+,core,server_node,,,username,Username,,,,6,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,url,URL,,,,7,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,user_domain,User Domain,,,,8,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,os_name,OS Name,,,,9,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,os_version,OS Version,,,,10,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,architecture,Architecture,,,,11,NULL,0,YES,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,0
+,core,server_node,,,registered_at,Registered At,,,,12,NULL,0,YES,TIMESTAMP,datetime,NULL,NULL,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
+,core,server_node,,,server_node_status_id,Status,enum,server_node_status,,13,NULL,0,YES,BIGINT,bigint,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,0
 ,core,sql,Query,System,id,Query ID,,,,1,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,1
 ,core,sql,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255,510,NULL,NULL,NULL,NULL,NULL,NULL,UNICODE,NULL,NULL,SQL_Latin1_General_CP1_CI_AS,NULL,NULL,NULL,,1
 ,core,sql,,,data_source_id,Data Source ID,enum,data_source,,2,NULL,0,NO,BIGINT,bigint,NULL,NULL,19,10,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,,1
