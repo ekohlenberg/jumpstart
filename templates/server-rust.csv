@@ -1,0 +1,23 @@
+COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
+rust server templates-common,model,shared/rust/common/Cargo.toml.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/lib.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/attributes.core.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/base_object.core.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/config.core.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/logger.core.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/util.core.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/session_info.core.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/json_helper.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/enum_helper.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/db_provider.core.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/postgres_provider.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/sqlserver_provider.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/db_provider_factory.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-domain,object,shared/rust/domain/template.generated.rs.cshtml,./gen/shared/domain,TRUE
+rust server templates-domain,object,shared/rust/domain/template.user.rs.cshtml,./usr/shared/domain,FALSE
+rust server templates-domain,model,shared/rust/domain/lib.generated.rs.cshtml,./gen/shared/domain,TRUE
+rust server templates-domain,model,shared/rust/domain/Cargo.toml.cshtml,./gen/shared/domain,TRUE
+rust server templates-domain,model,shared/rust/domain/Workflow.core.rs.cshtml,./gen/shared/domain,TRUE
+rust server templates-domain,model,shared/rust/domain/Execution.core.rs.cshtml,./gen/shared/domain,TRUE
+rust server templates-domain,model,shared/rust/domain/Script.core.rs.cshtml,./gen/shared/domain,TRUE
+rust server templates-domain,model,shared/rust/domain/ServerNode.core.rs.cshtml,./gen/shared/domain,TRUE
