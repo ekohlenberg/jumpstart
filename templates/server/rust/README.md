@@ -10,8 +10,8 @@ migration is being landed layer by layer; the template registry is
 |-------|-------------|----------------|-------|
 | Common | `shared/dotnet/common` | `shared/rust/common` | Done |
 | Domain | `shared/dotnet/domain` | `shared/rust/domain` | Done |
-| Persist | `shared/dotnet/persist` | `shared/rust/persist` | TODO |
-| Logic | `shared/dotnet/logic` | `shared/rust/logic` | TODO |
+| Persist | `shared/dotnet/persist` | `shared/rust/persist` | Done |
+| Logic | `shared/dotnet/logic` | `shared/rust/logic` | Foundation done |
 | API | `server/dotnet/api` | `server/rust/api` | TODO |
 | Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | TODO |
 | Script agent | `server/dotnet/scriptagent` | `server/rust/scriptagent` | TODO |
@@ -37,3 +37,47 @@ migration is being landed layer by layer; the template registry is
 - **DB dialect** lives in the `DatabaseProvider` trait (Postgres `$N` params,
   SQL Server `@PN` params); connection/pool handling belongs to the persist
   layer (sqlx / tokio-postgres / tiberius), not the provider.
+
+## Persist-layer notes
+
+- `insert`/`update` dispatch to the audit or basic strategy on
+  `BaseObject.is_audited`, just like the .NET `DBPersist.GetPersist`. The
+  shared `put`/`get`/SQL builders sit on `DBPersist`; the divergent
+  `insert`/`update` live in `db_persist_audit` / `db_persist_basic` as free
+  functions (Rust trait objects can't hold the generic methods).
+- **Columns, not reflection.** `insert_sql` enumerates `T::columns()` instead of
+  reflecting over `ColumnInfoAttribute`.
+- **Literal SQL.** Values are rendered as escaped SQL literals via
+  `DatabaseProvider::format_value` (the approach the .NET update/filter path
+  already used). This sidesteps per-type `ToSql` binding and round-trips the
+  string-backed timestamp/decimal/uuid values. A future hardening pass can move
+  inserts to bound `$N` parameters.
+- **Connection.** `db_connection` is new (ADO.NET supplied this in .NET). It
+  wraps the synchronous `postgres` driver to match the sync API; opens one
+  connection per operation as the .NET layer did. SQL Server (tiberius, async)
+  is deferred — `DbConnection::open` returns `Unsupported` for it.
+
+## Logic-layer notes
+
+- **AOP without reflection.** .NET used a `DispatchProxy` to intercept every
+  interface method. Rust trait objects can't carry generic methods and there is
+  no reflection, so each generated `<Obj>LogicProxy` wraps an inner
+  `Box<dyn I<Obj>Logic>` and calls `proxy::run_before` / `run_after` around each
+  method explicitly. The shared before/after hook registry and the default
+  wiring live in `proxy.core.rs`.
+- **Default hooks wired:** structured logging and authorization
+  (`OpRoleMemberLogic::authorized`). The pre/post **event-service** hooks are
+  deferred because `EventServiceLogic` needs the script-execution engine
+  (C#/PowerShell/Python), which was intentionally not ported into `common`.
+- **Object-safe trait surface.** `I<Obj>Logic` exposes the concretely-typed
+  methods the API calls (`select`, `get`, `view`, `history`, `children`,
+  `insert`, `update`, `put`, `delete`). The generic `select_query<T>` stays an
+  inherent method on the concrete type. `children` returns `Vec<BaseObject>`.
+- **`current_user`** uses a thread-local with an OS-user fallback (the .NET
+  `AsyncLocal`), set by API middleware once that layer exists.
+- **Deferred logic modules** (need un-ported infra — script engine, HTTP,
+  SignalR, Quartz, Auth0): `EventServiceLogic`, `WorkflowLogic`,
+  `SchedulerLogic`, `ScriptAgentLogic`, `SchedulerClient`, `ScriptAgentClient`,
+  `DispatcherThread`, `HealthMonitorThread`, `M2MTokenProvider`,
+  `NotificationRegistrar`. These come online with the api/scheduler/scriptagent
+  layers.
