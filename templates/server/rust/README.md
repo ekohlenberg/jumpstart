@@ -15,10 +15,12 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
 | Domain | `shared/dotnet/domain` | `shared/rust/domain` | Done |
 | Persist | `shared/dotnet/persist` | `shared/rust/persist` | Done |
 | Logic | `shared/dotnet/logic` | `shared/rust/logic` | Foundation done |
+| Scripting | `shared/dotnet/common` (ScriptHost / providers) | `shared/rust/script` | Done (Rhai) |
 | API | `server/dotnet/api` | `server/rust/api` | TODO |
 | Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | TODO |
 | Script agent | `server/dotnet/scriptagent` | `server/rust/scriptagent` | TODO |
 | Tests (persist) | `test/dotnet/test-persist` | `test/rust/test-persist` | Done |
+| Tests (script) | `test/dotnet/test-script` | `test/rust/test-script` | Done (Rhai) |
 | Tests (api/scheduler/scriptagent) | `test/dotnet/test-*` | `test/rust/test-*` | TODO |
 
 ## Design notes carried across all layers
@@ -102,3 +104,28 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   works unchanged.
 - The unused per-object `last<Obj>`/`map<Obj>` collections from the .NET
   `BaseTest` are omitted.
+
+## Scripting notes (`shared/rust/script`)
+
+- The .NET in-process script engine (Roslyn C# / PowerShell / Python) is
+  replaced by **Rhai**, an embedded, sandboxed scripting language. No runtime
+  toolchain, instant execution, and scripts can do nothing the host doesn't
+  register. `ScriptProviderFactory` keeps the door open for other engines.
+- Same shape as .NET: `ScriptContext`, `ScriptProvider` trait,
+  `ScriptProviderFactory`, `ScriptHost::invoke(ctx, script_row)` (reads
+  `source` / `name` / `script_type_id` off a `core.script` record).
+- **Capabilities registered** on the engine: `log_info/debug/error`;
+  `http_get(url)` / `http_post(url, body)` (blocking, via `ureq`);
+  `db_get/db_select/db_put/db_update/db_delete`; and the triggering record as a
+  mutable `ctx` plus inputs as `args`. Sandbox caps (max ops / call depth /
+  string + array sizes) guard against runaway scripts.
+- **DB access goes through the Logic layer**, not raw SQL. `logic_bridge.generated.rs`
+  is a generated name→`<Obj>Logic` dispatch (Rust has no reflection), and every
+  call uses `<Obj>Logic::create()` (the proxied logic), so scripts inherit
+  authorization (`OpRoleMemberLogic`) and audit stamping for free.
+- Errors percolate: a failed host call surfaces as a Rhai eval error →
+  `ScriptError` → the caller; a non-zero `ret_code` is also an error.
+- **Deferred:** wiring `ScriptHost` into the proxy's pre/post **event-service**
+  hooks. `EventServiceLogic` lives in `logic`, but `script` depends on `logic`,
+  so calling scripts from `logic` would be a dependency cycle — that hook needs
+  a small callback-registry indirection, to be added with the event layer.

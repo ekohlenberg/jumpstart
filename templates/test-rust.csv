@@ -5,3 +5,7 @@ rust test templates-test-persist,model,test/rust/test-persist/main.generated.rs.
 rust test templates-test-persist,model,test/rust/test-persist/Cargo.toml.cshtml,./gen/test/test-persist,TRUE
 rust test templates-test-persist,model,test/rust/test-persist/appsettings.json.cshtml,./gen/test/test-persist,TRUE
 rust test templates-test-persist,model,test/rust/test-persist/makefile.cshtml,./gen/test/test-persist,TRUE
+rust test templates-test-script,model,test/rust/test-script/main.generated.rs.cshtml,./gen/test/test-script,TRUE
+rust test templates-test-script,model,test/rust/test-script/Cargo.toml.cshtml,./gen/test/test-script,TRUE
+rust test templates-test-script,model,test/rust/test-script/appsettings.json.cshtml,./gen/test/test-script,TRUE
+rust test templates-test-script,model,test/rust/test-script/makefile.cshtml,./gen/test/test-script,TRUE
