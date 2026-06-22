@@ -23,18 +23,19 @@ pub use @(obj.TableName)::*;
 }
 
 // ---- core enum modules ------------------------------------------------------
+// These enums (WorkflowType, ExecStatus, ScriptType, ServerNodeType,
+// ServerNodeStatus, OnFailureAction) share names with the lookup-table domain
+// objects (e.g. the `workflow_type` table -> `WorkflowType` struct), so they
+// are NOT glob-re-exported at the crate root to avoid ambiguity. Reference them
+// by module path, e.g. `domain::workflow_core::WorkflowType`.
 #[path = "Workflow.core.rs"]
 pub mod workflow_core;
-pub use workflow_core::*;
 
 #[path = "Execution.core.rs"]
 pub mod execution_core;
-pub use execution_core::*;
 
 #[path = "Script.core.rs"]
 pub mod script_core;
-pub use script_core::*;
 
 #[path = "ServerNode.core.rs"]
 pub mod server_node_core;
-pub use server_node_core::*;

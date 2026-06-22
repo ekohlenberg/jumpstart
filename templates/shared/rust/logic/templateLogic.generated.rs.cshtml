@@ -19,7 +19,7 @@ use crate::base_logic::LogicError;
 use crate::proxy;
 
 /// CRUD + view/history/children contract for `@(domainObj)`. Object-safe so it
-/// can be wrapped by the AOP proxy as `Box<dyn I@(domainObj)Logic>`.
+/// can be wrapped by the AOP proxy behind a boxed trait object.
 pub trait I@(domainObj)Logic {
     fn select(&self) -> Result<Vec<@(domainObj)>, LogicError>;
     fn get(&self, id: i64) -> Result<Option<@(domainObj)>, LogicError>;
@@ -40,7 +40,7 @@ impl @(domainObj)Logic {
     }
 
     /// Proxied instance: logging + authorization (+ events, when ported).
-    pub fn create() -> Box<dyn I@(domainObj)Logic> {
+    pub fn create() -> Box&lt;dyn I@(domainObj)Logic&gt; {
         proxy::initialize();
         Box::new(@(domainObj)LogicProxy {
             inner: Box::new(@(domainObj)Logic::new()),
@@ -166,7 +166,7 @@ impl I@(domainObj)Logic for @(domainObj)Logic {
 /// delegating to an inner `I@(domainObj)Logic` (parity with the .NET
 /// DispatchProxy interception).
 pub struct @(domainObj)LogicProxy {
-    inner: Box<dyn I@(domainObj)Logic>,
+    inner: Box&lt;dyn I@(domainObj)Logic&gt;,
     domain_obj: String,
 }
 

@@ -1,8 +1,11 @@
 # Rust server templates
 
 This tree is the Rust counterpart to `templates/server/dotnet`. The Rust
-migration is being landed layer by layer; the template registry is
-`templates/server-rust.csv`.
+migration is being landed layer by layer. Server/shared templates are
+inventoried in `templates/server-rust.csv`; the test projects are managed
+separately under `templates/test/rust` and inventoried in
+`templates/test-rust.csv` (the .NET tests likewise live in `templates/test/dotnet`
+with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
 
 ## Status
 
@@ -15,7 +18,8 @@ migration is being landed layer by layer; the template registry is
 | API | `server/dotnet/api` | `server/rust/api` | TODO |
 | Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | TODO |
 | Script agent | `server/dotnet/scriptagent` | `server/rust/scriptagent` | TODO |
-| Tests | `server/dotnet/test-*` | `server/rust/test-*` | TODO |
+| Tests (persist) | `test/dotnet/test-persist` | `test/rust/test-persist` | Done |
+| Tests (api/scheduler/scriptagent) | `test/dotnet/test-*` | `test/rust/test-*` | TODO |
 
 ## Design notes carried across all layers
 
@@ -81,3 +85,20 @@ migration is being landed layer by layer; the template registry is
   `DispatcherThread`, `HealthMonitorThread`, `M2MTokenProvider`,
   `NotificationRegistrar`. These come online with the api/scheduler/scriptagent
   layers.
+
+## Test-persist notes
+
+- A binary crate (`[[bin]]`) whose root is `main.generated.rs`; it wires in
+  `base_test` and each per-object `<Obj>Test` module, then runs the persistence
+  smoke test (seed admin role/principal, then insert/update each non-core
+  object twice) — the `Program.cs` logic.
+- **Test data as `Value`.** `BaseTest::get_test_data` returns `serde_json::Value`
+  written straight into the object's backing map via `base.set(...)`, matching
+  the dictionary-backed design (the .NET version used typed setters +
+  `Convert.*`).
+- **No `rand` dependency.** A small inline xorshift PRNG replaces
+  `System.Random`. `TestDataType` keeps the .NET (non-PascalCase) variant names
+  so the `TestDataType::<set>` substitution from the CSV `TEST_DATA_SET` column
+  works unchanged.
+- The unused per-object `last<Obj>`/`map<Obj>` collections from the .NET
+  `BaseTest` are omitted.

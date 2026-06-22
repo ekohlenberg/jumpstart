@@ -10,26 +10,27 @@ Jumpstart applications are defined by CSV metadata files. Each row describes a s
 
 ## CSV Column Reference
 
-| Column | Required | Description |
-|--------|----------|-------------|
-| `TABLE_CATALOG` | First row | Application namespace (e.g., `myapp`). Set on the first row of the first table. |
-| `TABLE_SCHEMA` | First row | Database schema name: `app`, `core`, `sec` |
-| `TABLE_NAME` | First row | Table name in snake_case (e.g., `customer`, `order_item`) |
-| `TABLE_LABEL` | First row | Display name for UI (e.g., `Customer`, `Order Items`) |
-| `NAV_MENU` | First row | Navigation menu group (e.g., `Admin`, `Sales`, `System`) |
-| `COLUMN_NAME` | Yes | Column name in snake_case (e.g., `id`, `first_name`, `org_id`) |
-| `COLUMN_LABEL` | Yes | Display label for the column (e.g., `First Name`) |
-| `FK_TYPE` | No | Foreign key type: `enum`, `parent`, `map`, or empty |
-| `FK_TABLE` | No | Referenced table name (when FK_TYPE is set) |
-| `TEST_DATA_SET` | No | Test data group name for seeding (e.g., `companies`, `emailAddresses`) |
-| `ORDINAL_POSITION` | No | Display order of the column |
-| `COLUMN_DEFAULT` | No | SQL default value (e.g., `NULL`, `(getdate())`) |
-| `RWK` | Yes | Real World Key flag: `0` or `1`. Columns with `1` appear in list views and form a unique index. |
-| `IS_NULLABLE` | Yes | `YES`/`NO` or `1`/`0` |
-| `DATA_TYPE` | Yes | PostgreSQL data type (e.g., `BIGINT`, `VARCHAR`, `TIMESTAMP`) |
-| `MSSQL_DATA_TYPE` | No | SQL Server equivalent (e.g., `bigint`, `nvarchar`, `datetime`) |
-| `CHARACTER_MAXIMUM_LENGTH` | No | String length (e.g., `255`, `50`) |
-| `URI` | No | Custom URL path for routing (e.g., `core/workflow`) |
+| Column                     | Required  | Description                                                                                                 |
+| -------------------------- | --------- | ----------------------------------------------------------------------------------------------------------- |
+| `TABLE_CATALOG`            | First row | Application namespace (e.g., `myapp`). Set on the first row of the first table.                             |
+| `TABLE_SCHEMA`             | First row | Database schema name: `app`, `core`, `sec`                                                                  |
+| `TABLE_NAME`               | First row | Table name in snake_case (e.g., `customer`, `order_item`)                                                   |
+| `TABLE_LABEL`              | First row | Display name for UI (e.g., `Customer`, `Order Items`)                                                       |
+| `NAV_MENU`                 | First row | Navigation menu group (e.g., `Admin`, `Sales`, `System`)                                                    |
+| `COLUMN_NAME`              | Yes       | Column name in snake_case (e.g., `id`, `first_name`, `org_id`)                                              |
+| `COLUMN_LABEL`             | Yes       | Display label for the column (e.g., `First Name`)                                                           |
+| `FK_TYPE`                  | No        | Foreign key type: `enum`, `parent`, `map`, or empty                                                         |
+| `FK_TABLE`                 | No        | Referenced table name (when FK_TYPE is set)                                                                 |
+| `TEST_DATA_SET`            | No        | Test data group name for seeding (e.g., `companies`, `emailAddresses`)                                      |
+| `ORDINAL_POSITION`         | No        | Display order of the column                                                                                 |
+| `COLUMN_DEFAULT`           | No        | SQL default value (e.g., `NULL`, `(getdate())`)                                                             |
+| `RWK`                      | Yes       | Real World Key flag: `0` or `1`. Columns with `1` appear in list views and form a unique index.             |
+| `IS_NULLABLE`              | Yes       | `YES`/`NO` or `1`/`0`                                                                                       |
+| `DATA_TYPE`                | Yes       | PostgreSQL data type (e.g., `BIGINT`, `VARCHAR`, `TIMESTAMP`)                                               |
+| `MSSQL_DATA_TYPE`          | No        | SQL Server equivalent (e.g., `bigint`, `nvarchar`, `datetime`)                                              |
+| `CHARACTER_MAXIMUM_LENGTH` | No        | String length (e.g., `255`, `50`)                                                                           |
+| `URI`                      | No        | Custom URL path for routing (e.g., `core/workflow`)                                                         |
+| IS_AUDITIED                | YES       | 1 indicates if the table uses built-in audit tracking design;  0 indicates the table is simple, un-audited. |
 
 ## Table Definition Pattern
 

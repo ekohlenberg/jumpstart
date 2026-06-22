@@ -13,14 +13,18 @@
 pub mod base_logic;
 #[path = "proxy.core.rs"]
 pub mod proxy;
+
+// Partial-class extensions for the `op_role_member` / `nav_menu` tables. The
+// tables already generate `OpRoleMemberLogic` / `NavMenuLogic` in their
+// per-object modules below; these add methods via inherent `impl` blocks that
+// target the type by full path (an inherent impl may live in any module of the
+// defining crate), so there is no name collision.
 #[path = "op_role_member_logic.core.rs"]
-pub mod op_role_member_logic;
+pub mod op_role_member_logic_core;
 #[path = "nav_menu_logic.core.rs"]
-pub mod nav_menu_logic;
+pub mod nav_menu_logic_core;
 
 pub use base_logic::{BaseLogic, LogicError};
-pub use nav_menu_logic::NavMenuLogic;
-pub use op_role_member_logic::OpRoleMemberLogic;
 pub use proxy::ProxyAction;
 
 // ---- per-object logic modules ----------------------------------------------

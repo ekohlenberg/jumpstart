@@ -1,0 +1,7 @@
+COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
+rust test templates-test-persist,model,test/rust/test-persist/base_test.generated.rs.cshtml,./gen/test/test-persist,TRUE
+rust test templates-test-persist,object,test/rust/test-persist/template.test.generated.rs.cshtml,./gen/test/test-persist,TRUE
+rust test templates-test-persist,model,test/rust/test-persist/main.generated.rs.cshtml,./gen/test/test-persist,TRUE
+rust test templates-test-persist,model,test/rust/test-persist/Cargo.toml.cshtml,./gen/test/test-persist,TRUE
+rust test templates-test-persist,model,test/rust/test-persist/appsettings.json.cshtml,./gen/test/test-persist,TRUE
+rust test templates-test-persist,model,test/rust/test-persist/makefile.cshtml,./gen/test/test-persist,TRUE

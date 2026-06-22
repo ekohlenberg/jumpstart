@@ -11,7 +11,7 @@
 
 use std::collections::HashMap;
 
-use common::{Config, Logger};
+use common::Config;
 use serde_json::Value;
 
 /// A single database row, column name -> JSON value. Mirrors the shape the
@@ -38,7 +38,16 @@ impl std::error::Error for PersistError {}
 
 impl From<postgres::Error> for PersistError {
     fn from(e: postgres::Error) -> Self {
-        PersistError::Db(e.to_string())
+        // `postgres::Error`'s own Display is just "db error" — the useful detail
+        // (SQLSTATE + server message, e.g. column / type / constraint) lives in
+        // the embedded DbError or the source chain. Surface it.
+        if let Some(db) = e.as_db_error() {
+            return PersistError::Db(format!("{}: {}", db.code().code(), db.message()));
+        }
+        match std::error::Error::source(&e) {
+            Some(src) => PersistError::Db(format!("{}: {}", e, src)),
+            None => PersistError::Db(e.to_string()),
+        }
     }
 }
 
@@ -81,45 +90,81 @@ fn row_to_map(row: &postgres::Row) -> Row {
     let mut map: Row = HashMap::new();
     for (i, col) in row.columns().iter().enumerate() {
         let name = col.name().to_string();
-        let value = pg_value_to_json(row, i, col.type_().name());
+        let value = pg_value_to_json(row, i, &name, col.type_().name());
         map.insert(name, value);
     }
     map
 }
 
-fn pg_value_to_json(row: &postgres::Row, i: usize, type_name: &str) -> Value {
+fn pg_value_to_json(row: &postgres::Row, i: usize, col_name: &str, type_name: &str) -> Value {
+    // A genuine deserialization / type-mapping failure panics (see `read`): at
+    // this stage a loud crash is preferred over a silently-Null'd column. A SQL
+    // NULL still maps to Value::Null (that is not an error). Temporal / decimal /
+    // uuid columns are stringified to match the generated typed accessors; a
+    // `date` becomes a midnight timestamp string so it round-trips through the
+    // domain's NaiveDateTime getter.
+    const TS_FMT: &str = "%Y-%m-%dT%H:%M:%S%.f";
     match type_name {
-        "int2" => json_opt(row.get::<_, Option<i16>>(i).map(|v| v as i64)),
-        "int4" => json_opt(row.get::<_, Option<i32>>(i).map(|v| v as i64)),
-        "int8" => json_opt(row.get::<_, Option<i64>>(i)),
-        "float4" => json_opt(row.get::<_, Option<f32>>(i).map(|v| v as f64)),
-        "float8" => json_opt(row.get::<_, Option<f64>>(i)),
-        "bool" => json_opt(row.get::<_, Option<bool>>(i)),
-        "numeric" => {
-            let v: Option<rust_decimal::Decimal> = row.get(i);
-            json_opt(v.map(|d| d.to_string()))
-        }
-        "timestamp" => {
-            let v: Option<chrono::NaiveDateTime> = row.get(i);
-            json_opt(v.map(|t| t.format("%Y-%m-%dT%H:%M:%S%.f").to_string()))
-        }
-        "timestamptz" => {
-            let v: Option<chrono::DateTime<chrono::Utc>> = row.get(i);
-            json_opt(v.map(|t| t.naive_utc().format("%Y-%m-%dT%H:%M:%S%.f").to_string()))
-        }
-        "uuid" => {
-            let v: Option<uuid::Uuid> = row.get(i);
-            json_opt(v.map(|u| u.to_string()))
-        }
-        "json" | "jsonb" => row.get::<_, Option<Value>>(i).unwrap_or(Value::Null),
+        "int2" => num(read::<i16>(row, i, col_name, type_name).map(|v| v as i64)),
+        "int4" => num(read::<i32>(row, i, col_name, type_name).map(|v| v as i64)),
+        "int8" => num(read::<i64>(row, i, col_name, type_name)),
+        "float4" => read::<f32>(row, i, col_name, type_name)
+            .map(|v| serde_json::json!(v as f64))
+            .unwrap_or(Value::Null),
+        "float8" => read::<f64>(row, i, col_name, type_name)
+            .map(|v| serde_json::json!(v))
+            .unwrap_or(Value::Null),
+        "bool" => read::<bool>(row, i, col_name, type_name)
+            .map(Value::Bool)
+            .unwrap_or(Value::Null),
+        "numeric" => str_val(
+            read::<rust_decimal::Decimal>(row, i, col_name, type_name).map(|d| d.to_string()),
+        ),
+        "date" => str_val(
+            read::<chrono::NaiveDate>(row, i, col_name, type_name)
+                .and_then(|d| d.and_hms_opt(0, 0, 0))
+                .map(|dt| dt.format(TS_FMT).to_string()),
+        ),
+        "timestamp" => str_val(
+            read::<chrono::NaiveDateTime>(row, i, col_name, type_name)
+                .map(|t| t.format(TS_FMT).to_string()),
+        ),
+        "timestamptz" => str_val(
+            read::<chrono::DateTime<chrono::Utc>>(row, i, col_name, type_name)
+                .map(|t| t.naive_utc().format(TS_FMT).to_string()),
+        ),
+        "uuid" => str_val(read::<uuid::Uuid>(row, i, col_name, type_name).map(|u| u.to_string())),
+        "json" | "jsonb" => read::<Value>(row, i, col_name, type_name).unwrap_or(Value::Null),
         // varchar / text / bpchar / name / char and anything else -> string
-        _ => json_opt(row.get::<_, Option<String>>(i)),
+        _ => str_val(read::<String>(row, i, col_name, type_name)),
     }
 }
 
-fn json_opt<T: Into<Value>>(v: Option<T>) -> Value {
-    match v {
-        Some(x) => x.into(),
-        None => Value::Null,
-    }
+/// Read an optional typed value, panicking with full context on a real
+/// deserialization error. A SQL NULL returns None and is not treated as an
+/// error.
+fn read<'a, T: postgres::types::FromSql<'a>>(
+    row: &'a postgres::Row,
+    i: usize,
+    col_name: &str,
+    type_name: &str,
+) -> Option<T> {
+    row.try_get::<_, Option<T>>(i).unwrap_or_else(|e| {
+        panic!(
+            "error deserializing column {} '{}' (postgres type '{}') as {}: {}",
+            i,
+            col_name,
+            type_name,
+            std::any::type_name::<T>(),
+            e
+        )
+    })
+}
+
+fn num(v: Option<i64>) -> Value {
+    v.map(Value::from).unwrap_or(Value::Null)
+}
+
+fn str_val(v: Option<String>) -> Value {
+    v.map(Value::String).unwrap_or(Value::Null)
 }
