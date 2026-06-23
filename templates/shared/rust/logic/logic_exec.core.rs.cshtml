@@ -65,4 +65,25 @@ impl LogicExec {
         let proof = ExecProof(());
         target.dispatch(method, ctx, &proof)
     }
+
+    /// Run an arbitrary closure through the same before/after pipeline (logging,
+    /// authorization, events) as a built-in operation. Use this to wrap a
+    /// custom operation defined in a user file so it is authorized and audited
+    /// under the given (`domain`, `method`) name — without modifying any
+    /// generated file.
+    pub fn call_with<F>(
+        domain: &str,
+        method: &str,
+        ctx: &mut LogicContext,
+        op: F,
+    ) -> Result<Value, LogicError>
+    where
+        F: FnOnce(&mut LogicContext) -> Result<Value, LogicError>,
+    {
+        proxy::initialize();
+        proxy::run_before(domain, method, ctx)?;
+        let result = op(ctx);
+        proxy::run_after(domain, method, ctx, result.as_ref().ok())?;
+        result
+    }
 }
