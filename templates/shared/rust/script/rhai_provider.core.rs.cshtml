@@ -13,7 +13,8 @@
 
 use std::collections::HashMap;
 
-use common::Logger;
+use common::{BaseObject, Logger};
+use logic::LogicContext;
 use rhai::serde::{from_dynamic, to_dynamic};
 use rhai::{Dynamic, Engine, EvalAltResult, Map, Scope};
 use serde_json::Value;
@@ -78,6 +79,16 @@ fn to_err<E: std::fmt::Display>(e: E) -> Box<EvalAltResult> {
     e.to_string().into()
 }
 
+/// Build a BaseObject record from a Rhai object map argument.
+fn record_from_dynamic(fields: &Dynamic) -> Result<BaseObject, Box<EvalAltResult>> {
+    let map: HashMap<String, Value> = from_dynamic(fields)?;
+    let mut record = BaseObject::new();
+    for (k, v) in map {
+        record.set(&k, v);
+    }
+    Ok(record)
+}
+
 fn build_engine() -> Engine {
     let mut engine = Engine::new();
     // Sandbox limits: keep a runaway script from hanging or exhausting memory.
@@ -106,30 +117,40 @@ fn build_engine() -> Engine {
         },
     );
 
-    // ── database (through the generated Logic bridge) ───────────────────
+    // ── database (through the generated Logic bridge -> <Obj>Logic::exec,
+    //    which runs authorization + audit + events) ───────────────────────
     engine.register_fn("db_get", |obj: &str, id: i64| -> Result<Dynamic, Box<EvalAltResult>> {
-        match logic_bridge::get(obj, id).map_err(to_err)? {
-            Some(map) => to_dynamic(&map),
-            None => Ok(Dynamic::UNIT),
+        let mut ctx = LogicContext::for_id(id);
+        let v = logic_bridge::exec(obj, "get", &mut ctx).map_err(to_err)?;
+        if v.is_null() {
+            Ok(Dynamic::UNIT)
+        } else {
+            to_dynamic(&v)
         }
     });
     engine.register_fn("db_select", |obj: &str| -> Result<Dynamic, Box<EvalAltResult>> {
-        let rows = logic_bridge::select(obj).map_err(to_err)?;
-        to_dynamic(&rows)
+        let mut ctx = LogicContext::new();
+        let v = logic_bridge::exec(obj, "select", &mut ctx).map_err(to_err)?;
+        to_dynamic(&v)
     });
-    engine.register_fn("db_put", |obj: &str, fields: Dynamic| -> Result<(), Box<EvalAltResult>> {
-        let map: HashMap<String, Value> = from_dynamic(&fields)?;
-        logic_bridge::put(obj, map).map_err(to_err)
+    engine.register_fn("db_put", |obj: &str, fields: Dynamic| -> Result<Dynamic, Box<EvalAltResult>> {
+        let mut ctx = LogicContext::for_record(record_from_dynamic(&fields)?);
+        let v = logic_bridge::exec(obj, "put", &mut ctx).map_err(to_err)?;
+        to_dynamic(&v)
     });
     engine.register_fn(
         "db_update",
-        |obj: &str, id: i64, fields: Dynamic| -> Result<(), Box<EvalAltResult>> {
-            let map: HashMap<String, Value> = from_dynamic(&fields)?;
-            logic_bridge::update(obj, id, map).map_err(to_err)
+        |obj: &str, id: i64, fields: Dynamic| -> Result<Dynamic, Box<EvalAltResult>> {
+            let mut ctx = LogicContext::for_record(record_from_dynamic(&fields)?);
+            ctx.set_arg("id", Value::from(id));
+            let v = logic_bridge::exec(obj, "update", &mut ctx).map_err(to_err)?;
+            to_dynamic(&v)
         },
     );
     engine.register_fn("db_delete", |obj: &str, id: i64| -> Result<(), Box<EvalAltResult>> {
-        logic_bridge::delete(obj, id).map_err(to_err)
+        let mut ctx = LogicContext::for_id(id);
+        logic_bridge::exec(obj, "delete", &mut ctx).map_err(to_err)?;
+        Ok(())
     });
 
     engine

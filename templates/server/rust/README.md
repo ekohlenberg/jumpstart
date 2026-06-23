@@ -14,7 +14,7 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
 | Common | `shared/dotnet/common` | `shared/rust/common` | Done |
 | Domain | `shared/dotnet/domain` | `shared/rust/domain` | Done |
 | Persist | `shared/dotnet/persist` | `shared/rust/persist` | Done |
-| Logic | `shared/dotnet/logic` | `shared/rust/logic` | Foundation done |
+| Logic | `shared/dotnet/logic` | `shared/rust/logic` | Done (dispatch + AOP) |
 | Scripting | `shared/dotnet/common` (ScriptHost / providers) | `shared/rust/script` | Done (Rhai) |
 | API | `server/dotnet/api` | `server/rust/api` | TODO |
 | Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | TODO |
@@ -65,22 +65,35 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
 
 ## Logic-layer notes
 
-- **AOP without reflection.** .NET used a `DispatchProxy` to intercept every
-  interface method. Rust trait objects can't carry generic methods and there is
-  no reflection, so each generated `<Obj>LogicProxy` wraps an inner
-  `Box<dyn I<Obj>Logic>` and calls `proxy::run_before` / `run_after` around each
-  method explicitly. The shared before/after hook registry and the default
-  wiring live in `proxy.core.rs`.
-- **Default hooks wired:** structured logging and authorization
-  (`OpRoleMemberLogic::authorized`). The pre/post **event-service** hooks are
-  deferred because `EventServiceLogic` needs the script-execution engine
-  (C#/PowerShell/Python), which was intentionally not ported into `common`.
-- **Object-safe trait surface.** `I<Obj>Logic` exposes the concretely-typed
-  methods the API calls (`select`, `get`, `view`, `history`, `children`,
-  `insert`, `update`, `put`, `delete`). The generic `select_query<T>` stays an
-  inherent method on the concrete type. `children` returns `Vec<BaseObject>`.
+- **AOP via a dispatch chokepoint (not reflection).** .NET used a reflective
+  `DispatchProxy`. Rust has no reflection, so interception is centralised in
+  `LogicExec::call` (`logic_exec.core.rs`): it runs the before hooks → a
+  generated `dispatch` → the after hooks. Each logic type implements
+  `LogicDispatch` with a generated `match method { ... }` that routes a method
+  name to a normal `pub(crate)` operation (`select`/`get`/`insert`/...). The
+  business logic lives in those methods; the match is just the string→method
+  router that reflection gave .NET for free. The before/after hook registry and
+  default wiring (logging + authorization) live in `proxy.core.rs`.
+- **Uniform context.** Every call carries a `LogicContext` (the record +
+  args), threaded through `LogicExec` → `dispatch` → the hooks — so auth,
+  logging, and (once wired) event scripts all see the transaction. Call sites
+  use `<Obj>Logic::exec("insert", &mut ctx)`; results come back as
+  `serde_json::Value`. `<Obj>Logic::exec_unchecked` is the explicit auth bypass
+  (import/export, tests).
+- **Authorization can't be bypassed accidentally.** `dispatch` requires an
+  `ExecProof` whose constructor is private to `logic_exec`, and the raw
+  operations are `pub(crate)`. So external crates can only reach logic through
+  `LogicExec` (which runs the auth hook) — there's no way to call a raw method
+  and skip authorization except the named `_unchecked` path.
+- **User operations.** Hand-written methods go in `<Obj>Logic.user.rs` and are
+  surfaced to dispatch (and thus to auth/events/scripts) by adding a `match` arm
+  in `dispatch_user` (the generated `dispatch` routes unknown names there).
 - **`current_user`** uses a thread-local with an OS-user fallback (the .NET
   `AsyncLocal`), set by API middleware once that layer exists.
+- **Pre/post event-service hooks** are still a TODO, but now unblocked: the
+  hooks carry the `LogicContext`, so an event hook can build an `EventContext`
+  from `ctx.transaction` and run scripts via the `script` crate's `ScriptHost`
+  (pending the callback-registry indirection, since `script` depends on `logic`).
 - **Deferred logic modules** (need un-ported infra — script engine, HTTP,
   SignalR, Quartz, Auth0): `EventServiceLogic`, `WorkflowLogic`,
   `SchedulerLogic`, `ScriptAgentLogic`, `SchedulerClient`, `ScriptAgentClient`,

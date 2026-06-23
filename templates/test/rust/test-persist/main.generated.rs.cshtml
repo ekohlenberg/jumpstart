@@ -25,6 +25,7 @@ pub use @(obj.TableName)_test::*;
 use common::*;
 use domain::*;
 use logic::*;
+use serde_json::Value;
 
 use base_test::BaseTest;
 
@@ -32,6 +33,23 @@ fn os_user() -> String {
     std::env::var("USER")
         .or_else(|_| std::env::var("USERNAME"))
         .unwrap_or_else(|_| "unknown".to_string())
+}
+
+/// Run a `select` through a logic type's dispatch entry and return the rows.
+fn select_rows(
+    exec: fn(&str, &mut LogicContext) -> Result<Value, LogicError>,
+) -> Result<Vec<Value>, LogicError> {
+    let mut ctx = LogicContext::new();
+    let result = exec("select", &mut ctx)?;
+    Ok(result.as_array().cloned().unwrap_or_default())
+}
+
+fn field_str(row: &Value, key: &str) -> String {
+    row.get(key).and_then(|v| v.as_str()).unwrap_or_default().to_string()
+}
+
+fn field_i64(row: &Value, key: &str) -> i64 {
+    row.get(key).and_then(|v| v.as_i64()).unwrap_or_default()
 }
 
 fn main() {
@@ -43,15 +61,17 @@ fn main() {
 }
 
 fn run() -> Result<(), LogicError> {
-    let op_roles = OpRoleLogic::create().select()?;
-    let admin_role = op_roles.iter().find(|r| r.name() == "Administrator");
+    let op_roles = select_rows(OpRoleLogic::exec)?;
+    let admin_role = op_roles
+        .iter()
+        .find(|r| field_str(r, "name") == "Administrator");
     if let Some(role) = admin_role {
-        BaseTest::add_last_id("op_role", role.id());
+        BaseTest::add_last_id("op_role", field_i64(role, "id"));
     }
 
-    let principals = PrincipalLogic::create().select()?;
+    let principals = select_rows(PrincipalLogic::exec)?;
     let user = os_user();
-    let current = principals.iter().find(|p| p.username() == user);
+    let current = principals.iter().find(|p| field_str(p, "username") == user);
 
     match current {
         None => {
@@ -60,15 +80,16 @@ fn run() -> Result<(), LogicError> {
             OpRoleMemberTest::test_insert()?;
         }
         Some(cp) => {
-            BaseTest::add_last_id("principal", cp.id());
+            let cp_id = field_i64(cp, "id");
+            BaseTest::add_last_id("principal", cp_id);
 
-            let op_role_members = OpRoleMemberLogic::create().select()?;
-            let admin_id = admin_role.map(|r| r.id()).unwrap_or_default();
-            let membership = op_role_members
-                .iter()
-                .find(|m| m.principal_id() == cp.id() && m.op_role_id() == admin_id);
+            let op_role_members = select_rows(OpRoleMemberLogic::exec)?;
+            let admin_id = admin_role.map(|r| field_i64(r, "id")).unwrap_or_default();
+            let has_membership = op_role_members.iter().any(|m| {
+                field_i64(m, "principal_id") == cp_id && field_i64(m, "op_role_id") == admin_id
+            });
 
-            if membership.is_none() {
+            if !has_membership {
                 OpRoleMemberTest::test_insert()?;
             }
         }
