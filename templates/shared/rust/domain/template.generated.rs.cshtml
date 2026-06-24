@@ -40,7 +40,7 @@
         "double" => $"{recv}.get(\"{key}\").as_f64().unwrap_or_default()",
         "string" => $"{recv}.get(\"{key}\").as_str().unwrap_or_default().to_string()",
         "DateTime" => $"{recv}.get(\"{key}\").as_str().and_then(|s| chrono::NaiveDateTime::parse_from_str(s, \"%Y-%m-%dT%H:%M:%S%.f\").ok()).unwrap_or_else(|| chrono::DateTime::from_timestamp(0, 0).unwrap().naive_utc())",
-        "decimal" => $"{recv}.get(\"{key}\").as_str().and_then(|s| s.parse::<rust_decimal::Decimal>().ok()).unwrap_or_default()",
+        "decimal" => $"serde_json::from_value::<rust_decimal::Decimal>({recv}.get(\"{key}\")).unwrap_or_default()",
         "Guid" => $"{recv}.get(\"{key}\").as_str().and_then(|s| uuid::Uuid::parse_str(s).ok()).unwrap_or_default()",
         "byte[]" => $"serde_json::from_value::<Vec<u8>>({recv}.get(\"{key}\")).unwrap_or_default()",
         _ => $"{recv}.get(\"{key}\")"
@@ -123,7 +123,7 @@ impl DomainObject for @className {
 @foreach (var attr in Model.Attributes)
 {
             <text>
-            ColumnInfo::new("@attr.Name", "@attr.Label", "@attr.FkObject", "@attr.FkType", "@attr.FkTable", "@attr.FkVar"),
+            ColumnInfo::new("@attr.Name", "@attr.Label", "@attr.FkObject", "@attr.FkType", "@attr.FkTable", "@attr.FkVar", "@(attr.SqlDataType.ToLower())"),
             </text>
 }
         ]

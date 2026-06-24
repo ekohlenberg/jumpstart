@@ -16,7 +16,7 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
 | Persist | `shared/dotnet/persist` | `shared/rust/persist` | Done |
 | Logic | `shared/dotnet/logic` | `shared/rust/logic` | Done (dispatch + AOP) |
 | Scripting | `shared/dotnet/common` (ScriptHost / providers) | `shared/rust/script` | Done (Rhai) |
-| API | `server/dotnet/api` | `server/rust/api` | TODO |
+| API | `server/dotnet/api` | `server/rust/api` | Done (rouille; REST parity) |
 | Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | TODO |
 | Script agent | `server/dotnet/scriptagent` | `server/rust/scriptagent` | TODO |
 | Tests (persist) | `test/dotnet/test-persist` | `test/rust/test-persist` | Done |
@@ -94,6 +94,33 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   hooks carry the `LogicContext`, so an event hook can build an `EventContext`
   from `ctx.transaction` and run scripts via the `script` crate's `ScriptHost`
   (pending the callback-registry indirection, since `script` depends on `logic`).
+
+## API-layer notes (`server/rust/api`)
+
+- The REST interface is byte-for-byte the .NET contract, but implemented as a
+  **single generic router** instead of generated per-object controllers — every
+  route maps onto `logic::object_exec(obj, method, ctx)`. The web framework is
+  **rouille** (synchronous, thread-per-request), which fits the synchronous
+  persist layer and the thread-local `current_user`.
+- **Routes** (object name matched case-insensitively against the domain or table
+  name): `GET /api/<obj>` (list), `/{id}` (get), `/view/{id}`, `/enum`,
+  `POST /api/<obj>`, `PUT /api/<obj>/{id}`, `DELETE /api/<obj>/{id}`,
+  `/{id}/history`, `/{id}/<child>_<role>` (children), plus
+  `GET /api/NavMenu/byparent`, `POST /api/Notification/publish`,
+  `GET /api/Workflow/run/{id}`.
+- **JSON parity.** Responses serialize the object's data map. `numeric`/`decimal`
+  columns — stored internally as strings for precision — are coerced back to JSON
+  numbers via `common::to_typed_json` + per-column `ColumnInfo.data_type`, so the
+  wire format matches the .NET serializer. (Child-collection rows, which have no
+  static type at the call site, are the one place numerics aren't coerced.)
+- **Auth.** Auth0 / JWT validation is removed. An optional `X-User` request
+  header sets the principal for the (still enforced) logic-layer authorization
+  check; absent it, the OS user is used — matching .NET running without Auth0.
+- **Deferred:** the SignalR `/notificationHub` (real-time, not REST — the
+  `POST /api/Notification/publish` route is accepted as a no-op so the interface
+  is preserved), the `EventAggregator`, Auth0 M2M, and the outbound ServerNode
+  self-registration. `GET /api/Workflow/run/{id}` returns 503 until the workflow
+  engine (scheduler) is ported.
 - **Deferred logic modules** (need un-ported infra — script engine, HTTP,
   SignalR, Quartz, Auth0): `EventServiceLogic`, `WorkflowLogic`,
   `SchedulerLogic`, `ScriptAgentLogic`, `SchedulerClient`, `ScriptAgentClient`,

@@ -49,9 +49,21 @@ impl LogicExec {
         proxy::initialize();
         let proof = ExecProof(());
 
-        proxy::run_before(T::DOMAIN, method, ctx)?;
+        // The `enum` operation is a read-only projection of `select` (it returns
+        // id + display-string pairs for dropdowns). The .NET enum endpoint called
+        // the proxied `select` logic method, so authorization was keyed on
+        // `select` — not `enum`, which is not a seeded operation. Mirror that:
+        // authorize and audit `enum` under `select` while the dispatch target
+        // still sees the real `enum` method name.
+        let hook_method = if method.eq_ignore_ascii_case("enum") {
+            "select"
+        } else {
+            method
+        };
+
+        proxy::run_before(T::DOMAIN, hook_method, ctx)?;
         let result = target.dispatch(method, ctx, &proof);
-        proxy::run_after(T::DOMAIN, method, ctx, result.as_ref().ok())?;
+        proxy::run_after(T::DOMAIN, hook_method, ctx, result.as_ref().ok())?;
         result
     }
 

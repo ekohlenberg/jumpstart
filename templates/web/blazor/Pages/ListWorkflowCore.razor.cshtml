@@ -38,7 +38,8 @@ else
 
 @@code {
     protected  WorkflowView[]? workflowList;
-    private HubConnection? _hubConnection;
+    //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+    // private HubConnection? _hubConnection;
     private string _domainObjectName = "Workflow";
     private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
     private List<DataTableContextMenu.ContextMenuItem> _workflowContextMenuItems = new();
@@ -65,11 +66,13 @@ else
             Console.WriteLine($"ListWorkflowCore: First item type: {workflowList[0].GetType().Name}");
         }
 
-        // Initialize SignalR connection for real-time updates
-        await InitializeSignalRConnection();
+        //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+        // await InitializeSignalRConnection();
         await InitEnumData();
     }
 
+    //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+    /*
     private async Task InitializeSignalRConnection()
     {
         try
@@ -107,6 +110,7 @@ else
             Console.WriteLine($"ListWorkflowCore: Error initializing SignalR connection: {ex.Message}");
         }
     }
+    */
 
     private async Task InitEnumData()
     {
@@ -235,6 +239,8 @@ else
 
     public async ValueTask DisposeAsync()
     {
+        //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+        /*
         if (_hubConnection is not null)
         {
             try
@@ -253,6 +259,8 @@ else
                 Console.WriteLine($"ListWorkflowCore: Error disposing SignalR connection: {ex.Message}");
             }
         }
+        */
+        await Task.CompletedTask;
     }
 
     // Message structure for property update notifications (matches server-side PropertyUpdateMessage)

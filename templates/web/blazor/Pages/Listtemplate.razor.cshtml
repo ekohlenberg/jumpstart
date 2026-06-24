@@ -36,7 +36,8 @@ else
 
 @@code {
     protected  @(Model.DomainObj)View[]? @(Model.DomainVar)List;
-    private HubConnection? _hubConnection;
+    //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+    // private HubConnection? _hubConnection;
     private string _domainObjectName = "@(Model.DomainObj)";
     private Dictionary<string, Dictionary<long, string>> enumData = new Dictionary<string, Dictionary<long, string>>();
 
@@ -52,11 +53,13 @@ else
             Console.WriteLine($"ListTemplate: First item type: {@(Model.DomainVar)List[0].GetType().Name}");
         }
 
-        // Initialize SignalR connection for real-time updates
-        await InitializeSignalRConnection();
+        //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+        // await InitializeSignalRConnection();
         await InitEnumData();
     }
 
+    //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+    /*
     private async Task InitializeSignalRConnection()
     {
         try
@@ -65,7 +68,7 @@ else
             var remoteClient = ClientFactory.CreateClient("RemoteAPI");
             var baseAddress = remoteClient.BaseAddress?.ToString() ?? "http://localhost:5200";
             var hubUrl = $"{baseAddress.TrimEnd('/')}/notificationHub";
-            
+
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(hubUrl)
                 .Build();
@@ -74,7 +77,7 @@ else
             _hubConnection.On<PropertyUpdateMessage>("PropertyUpdated", async (message) =>
             {
                 Console.WriteLine($"ListTemplate: Received update notification for {message.DomainObjectName}[{message.InstanceId}]");
-                
+
                 if (message.DomainObjectName == _domainObjectName)
                 {
                     await HandlePropertyUpdate(message);
@@ -94,6 +97,7 @@ else
             Console.WriteLine($"ListTemplate: Error initializing SignalR connection: {ex.Message}");
         }
     }
+    */
 
     private async Task InitEnumData()
     {
@@ -207,6 +211,8 @@ else
 
     public async ValueTask DisposeAsync()
     {
+        //TODO: publish/subscribe (SignalR real-time updates) disabled until the notification hub is ported to the API server
+        /*
         if (_hubConnection is not null)
         {
             try
@@ -214,7 +220,7 @@ else
                 // Unsubscribe from domain object updates
                 await _hubConnection.InvokeAsync("UnsubscribeFromDomainObject", _domainObjectName);
                 Console.WriteLine($"ListTemplate: Unsubscribed from {_domainObjectName} updates");
-                
+
                 // Stop the connection
                 await _hubConnection.StopAsync();
                 await _hubConnection.DisposeAsync();
@@ -225,6 +231,8 @@ else
                 Console.WriteLine($"ListTemplate: Error disposing SignalR connection: {ex.Message}");
             }
         }
+        */
+        await Task.CompletedTask;
     }
 
     // Message structure for property update notifications (matches server-side PropertyUpdateMessage)

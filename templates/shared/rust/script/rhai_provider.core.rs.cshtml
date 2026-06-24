@@ -14,13 +14,12 @@
 use std::collections::HashMap;
 
 use common::{BaseObject, Logger};
-use logic::LogicContext;
+use logic::{object_exec, LogicContext};
 use rhai::serde::{from_dynamic, to_dynamic};
 use rhai::{Dynamic, Engine, EvalAltResult, Map, Scope};
 use serde_json::Value;
 
 use crate::i_script_provider::{ScriptError, ScriptProvider};
-use crate::logic_bridge;
 use crate::script_context::ScriptContext;
 
 #[derive(Debug, Default, Clone)]
@@ -121,7 +120,7 @@ fn build_engine() -> Engine {
     //    which runs authorization + audit + events) ───────────────────────
     engine.register_fn("db_get", |obj: &str, id: i64| -> Result<Dynamic, Box<EvalAltResult>> {
         let mut ctx = LogicContext::for_id(id);
-        let v = logic_bridge::exec(obj, "get", &mut ctx).map_err(to_err)?;
+        let v = object_exec(obj, "get", &mut ctx).map_err(to_err)?;
         if v.is_null() {
             Ok(Dynamic::UNIT)
         } else {
@@ -130,12 +129,12 @@ fn build_engine() -> Engine {
     });
     engine.register_fn("db_select", |obj: &str| -> Result<Dynamic, Box<EvalAltResult>> {
         let mut ctx = LogicContext::new();
-        let v = logic_bridge::exec(obj, "select", &mut ctx).map_err(to_err)?;
+        let v = object_exec(obj, "select", &mut ctx).map_err(to_err)?;
         to_dynamic(&v)
     });
     engine.register_fn("db_put", |obj: &str, fields: Dynamic| -> Result<Dynamic, Box<EvalAltResult>> {
         let mut ctx = LogicContext::for_record(record_from_dynamic(&fields)?);
-        let v = logic_bridge::exec(obj, "put", &mut ctx).map_err(to_err)?;
+        let v = object_exec(obj, "put", &mut ctx).map_err(to_err)?;
         to_dynamic(&v)
     });
     engine.register_fn(
@@ -143,13 +142,13 @@ fn build_engine() -> Engine {
         |obj: &str, id: i64, fields: Dynamic| -> Result<Dynamic, Box<EvalAltResult>> {
             let mut ctx = LogicContext::for_record(record_from_dynamic(&fields)?);
             ctx.set_arg("id", Value::from(id));
-            let v = logic_bridge::exec(obj, "update", &mut ctx).map_err(to_err)?;
+            let v = object_exec(obj, "update", &mut ctx).map_err(to_err)?;
             to_dynamic(&v)
         },
     );
     engine.register_fn("db_delete", |obj: &str, id: i64| -> Result<(), Box<EvalAltResult>> {
         let mut ctx = LogicContext::for_id(id);
-        logic_bridge::exec(obj, "delete", &mut ctx).map_err(to_err)?;
+        object_exec(obj, "delete", &mut ctx).map_err(to_err)?;
         Ok(())
     });
 
