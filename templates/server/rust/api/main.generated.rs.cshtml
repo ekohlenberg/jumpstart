@@ -21,7 +21,9 @@
 //
 // Auth0 JWT validation is removed; an optional `X-User` request header sets the
 // principal for the logic-layer authorization check (otherwise the OS user is
-// used). SignalR notifications and outbound server registration are deferred.
+// used). SignalR notifications are deferred; on startup the server registers
+// itself in core.server_node (see `register_api_server`), mirroring the .NET
+// API server's RegisterApiServer task.
 // </auto-generated>
 #![allow(dead_code)]
 #![allow(clippy::all)]
@@ -29,9 +31,12 @@
 use std::io::Read;
 use std::net::TcpListener;
 
-use common::{to_typed_json, BaseObject, DomainObject, Logger};
+use common::{to_typed_json, BaseObject, DomainObject, Logger, SessionInfo, Util};
+use domain::server_node_core::{ServerNodeStatus, ServerNodeType};
 use domain::NavMenu;
-use logic::{object_exec, LogicContext, LogicError, NavMenuLogic, OpRoleMemberLogic};
+use logic::{
+    object_exec, LogicContext, LogicError, NavMenuLogic, OpRoleMemberLogic, ServerNodeLogic,
+};
 use rouille::{Request, Response};
 use serde_json::Value;
 
@@ -50,6 +55,11 @@ fn main() {
     println!("API Server listening on http://{}", addr);
     Logger::info(format!("API server listening on http://{}", addr));
 
+    // Self-register this node in core.server_node, mirroring the .NET API
+    // server's background RegisterApiServer task. Spawned on its own thread so a
+    // slow or unavailable database never blocks the server from serving requests.
+    std::thread::spawn(move || register_api_server(port));
+
     rouille::start_server(addr, move |request| {
         // Identity (Auth0 removed): set the principal from an optional X-User
         // header, clearing it otherwise so a reused worker thread can't leak a
@@ -66,6 +76,71 @@ fn main() {
 
 fn find_port(start: u16, end: u16) -> Option<u16> {
     (start..=end).find(|&p| TcpListener::bind(("0.0.0.0", p)).is_ok())
+}
+
+/// Register this running API server as a `core.server_node` row, exactly as the
+/// .NET API server does on startup. Uses the unchecked logic path because there
+/// is no security principal at startup — the server is acting on its own behalf,
+/// not handling a user request — so the authorization hook would otherwise deny
+/// the write.
+fn register_api_server(port: u16) {
+    Util::populate_session_info();
+
+    let computer_name = SessionInfo::get_value("ComputerName", Some("unknown")).unwrap_or_default();
+    // Bound to all interfaces (IPAddress.Any in the .NET version); the concrete
+    // address is resolved by the client when it connects.
+    let ip_address = "0.0.0.0".to_string();
+    let url = format!("http://{}:{}", computer_name, port);
+    let username = SessionInfo::get_value("UserName", Some("")).unwrap_or_default();
+    let user_domain = SessionInfo::get_value("UserDomain", Some("")).unwrap_or_default();
+    let os_name = SessionInfo::get_value("OSName", Some("")).unwrap_or_default();
+    let os_version = SessionInfo::get_value("OSVersion", Some("")).unwrap_or_default();
+    let architecture = SessionInfo::get_value("Architecture", Some("")).unwrap_or_default();
+
+    println!("==============================================");
+    println!("API Server Registration");
+    println!("==============================================");
+    println!("API Server ID: {}:{}", computer_name, port);
+    println!("Computer Name: {}", computer_name);
+    println!("Port:          {}", port);
+    println!("URL:           {}", url);
+    println!("User:          {}@@{}", username, user_domain);
+    println!("OS:            {} {} ({})", os_name, os_version, architecture);
+    println!("==============================================");
+
+    let mut record = BaseObject::new();
+    record.set("hostname", serde_json::json!(computer_name));
+    record.set(
+        "server_node_type_id",
+        serde_json::json!(ServerNodeType::ApiServer as i64),
+    );
+    record.set("ip_address", serde_json::json!(ip_address));
+    record.set("port", serde_json::json!(port));
+    record.set("url", serde_json::json!(url));
+    record.set("username", serde_json::json!(username));
+    record.set("user_domain", serde_json::json!(user_domain));
+    record.set("os_name", serde_json::json!(os_name));
+    record.set("os_version", serde_json::json!(os_version));
+    record.set("architecture", serde_json::json!(architecture));
+    record.set("registered_at", serde_json::json!(Util::now_timestamp()));
+    record.set(
+        "server_node_status_id",
+        serde_json::json!(ServerNodeStatus::Online as i64),
+    );
+    record.set("is_active", serde_json::json!(1));
+    record.set("created_by", serde_json::json!(username));
+
+    let mut ctx = LogicContext::for_record(record);
+    match ServerNodeLogic::exec_unchecked("put", &mut ctx) {
+        Ok(_) => {
+            let id = ctx.transaction.get("id").as_i64().unwrap_or_default();
+            Logger::info(format!(
+                "API server registered as ServerNode id {} ({})",
+                id, url
+            ));
+        }
+        Err(e) => Logger::error(format!("API server registration failed: {}", e)),
+    }
 }
 
 fn with_cors(request: &Request, response: Response) -> Response {

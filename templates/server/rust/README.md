@@ -116,11 +116,16 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
 - **Auth.** Auth0 / JWT validation is removed. An optional `X-User` request
   header sets the principal for the (still enforced) logic-layer authorization
   check; absent it, the OS user is used — matching .NET running without Auth0.
+- **Self-registration.** On startup the server registers itself in
+  `core.server_node` (type `ApiServer`, status `Online`) via `register_api_server`,
+  mirroring the .NET `RegisterApiServer` task. It runs on a spawned thread (so a
+  slow DB never blocks serving) and writes through `ServerNodeLogic::exec_unchecked`
+  — the unchecked path is correct here because there is no security principal at
+  startup. Host/user/OS fields come from `Util::populate_session_info`.
 - **Deferred:** the SignalR `/notificationHub` (real-time, not REST — the
   `POST /api/Notification/publish` route is accepted as a no-op so the interface
-  is preserved), the `EventAggregator`, Auth0 M2M, and the outbound ServerNode
-  self-registration. `GET /api/Workflow/run/{id}` returns 503 until the workflow
-  engine (scheduler) is ported.
+  is preserved), the `EventAggregator`, and Auth0 M2M. `GET /api/Workflow/run/{id}`
+  returns 503 until the workflow engine (scheduler) is ported.
 - **Deferred logic modules** (need un-ported infra — script engine, HTTP,
   SignalR, Quartz, Auth0): `EventServiceLogic`, `WorkflowLogic`,
   `SchedulerLogic`, `ScriptAgentLogic`, `SchedulerClient`, `ScriptAgentClient`,
