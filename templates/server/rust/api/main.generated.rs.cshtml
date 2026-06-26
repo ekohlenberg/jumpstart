@@ -21,29 +21,35 @@
 //
 // Auth0 JWT validation is removed; an optional `X-User` request header sets the
 // principal for the logic-layer authorization check (otherwise the OS user is
-// used). SignalR notifications are deferred; on startup the server registers
-// itself in core.server_node (see `register_api_server`), mirroring the .NET
-// API server's RegisterApiServer task.
+// used). On startup the server registers itself in core.server_node (see
+// `register_api_server`), mirroring the .NET API server's RegisterApiServer task.
+// Real-time notifications use Server-Sent Events (GET /api/notification/stream +
+// POST /api/Notification/publish) instead of SignalR, so the same Blazor client
+// can consume updates from either the .NET or Rust backend.
 // </auto-generated>
 #![allow(dead_code)]
 #![allow(clippy::all)]
 
-use std::io::Read;
+use std::io::{Read, Write};
 use std::net::TcpListener;
+use std::sync::mpsc::{Receiver, Sender};
+use std::sync::{Mutex, OnceLock};
+use std::time::Duration;
 
-use common::{to_typed_json, BaseObject, DomainObject, Logger, SessionInfo, Util};
+use common::{to_typed_json, BaseObject, DomainObject, LogLevel, Logger, SessionInfo, Util};
 use domain::server_node_core::{ServerNodeStatus, ServerNodeType};
 use domain::NavMenu;
 use logic::{
     object_exec, LogicContext, LogicError, NavMenuLogic, OpRoleMemberLogic, ServerNodeLogic,
 };
-use rouille::{Request, Response};
+use rouille::{Request, Response, ResponseBody, Upgrade};
 use serde_json::Value;
 
 const START_PORT: u16 = 5200;
 const END_PORT: u16 = 5300;
 
 fn main() {
+    init_logging();
     let port = match find_port(START_PORT, END_PORT) {
         Some(p) => p,
         None => {
@@ -59,6 +65,9 @@ fn main() {
     // server's background RegisterApiServer task. Spawned on its own thread so a
     // slow or unavailable database never blocks the server from serving requests.
     std::thread::spawn(move || register_api_server(port));
+
+    // Keep SSE notification streams alive and prune disconnected clients.
+    start_sse_heartbeat();
 
     rouille::start_server(addr, move |request| {
         // Identity (Auth0 removed): set the principal from an optional X-User
@@ -78,6 +87,22 @@ fn find_port(start: u16, end: u16) -> Option<u16> {
     (start..=end).find(|&p| TcpListener::bind(("0.0.0.0", p)).is_ok())
 }
 
+/// Set the log level from the `JUMPSTART_LOG` env var (error|warning|info|debug).
+/// Defaults to the Logger's built-in Info level when unset. Logs go to stderr
+/// and to `api.log` in the working directory.
+fn init_logging() {
+    if let Ok(level) = std::env::var("JUMPSTART_LOG") {
+        let level = match level.trim().to_ascii_lowercase().as_str() {
+            "debug" => LogLevel::Debug,
+            "warning" | "warn" => LogLevel::Warning,
+            "error" => LogLevel::Error,
+            _ => LogLevel::Info,
+        };
+        Logger::set_level(level);
+        Logger::info(format!("log level set to {:?} from JUMPSTART_LOG", level));
+    }
+}
+
 /// Register this running API server as a `core.server_node` row, exactly as the
 /// .NET API server does on startup. Uses the unchecked logic path because there
 /// is no security principal at startup — the server is acting on its own behalf,
@@ -91,6 +116,16 @@ fn register_api_server(port: u16) {
     // address is resolved by the client when it connects.
     let ip_address = "0.0.0.0".to_string();
     let url = format!("http://{}:{}", computer_name, port);
+
+    // Deliver this node's own notifications straight to the local SSE registry
+    // (no loopback HTTP, so it works regardless of whether `url`'s hostname
+    // resolves). The cross-node HTTP fan-out will skip this `url`.
+    logic::notification::set_local_delivery(
+        &url,
+        Box::new(|domain: &str, id: i64, json: &str| {
+            sse_publish_property_update(domain, id, json)
+        }),
+    );
     let username = SessionInfo::get_value("UserName", Some("")).unwrap_or_default();
     let user_domain = SessionInfo::get_value("UserDomain", Some("")).unwrap_or_default();
     let os_name = SessionInfo::get_value("OSName", Some("")).unwrap_or_default();
@@ -171,6 +206,8 @@ fn handle(request: &Request) -> Response {
             let (obj, seg) = (rest[0], rest[1]);
             if seg.eq_ignore_ascii_case("enum") {
                 exec_response(obj, "enum", LogicContext::new())
+            } else if obj.eq_ignore_ascii_case("notification") && seg.eq_ignore_ascii_case("stream") {
+                sse_stream()
             } else if obj.eq_ignore_ascii_case("navmenu") && seg.eq_ignore_ascii_case("byparent") {
                 nav_menu_by_parent(request)
             } else if let Ok(id) = seg.parse::<i64>() {
@@ -290,12 +327,123 @@ fn nav_menu_by_parent(request: &Request) -> Response {
 }
 
 fn notification_publish(request: &Request) -> Response {
-    //TODO: publish/subscribe (real-time notifications) is disabled until the
-    //      SignalR-equivalent hub is ported. The REST route is kept and accepts
-    //      the request as a no-op so the interface matches .NET; wire it up to a
-    //      real broadcast mechanism when pub/sub comes back online.
-    let _ = read_json(request);
+    // A node's logic layer POSTs {DomainObjectName, InstanceId, JsonData} here
+    // (see logic::notification). We stamp it with a timestamp and fan it out to
+    // every connected SSE client as a PropertyUpdated event — the SSE analogue
+    // of the .NET EventAggregator broadcasting over SignalR.
+    if let Some(mut body) = read_json(request) {
+        if let Value::Object(ref mut map) = body {
+            map.insert("Timestamp".to_string(), Value::String(Util::now_iso8601()));
+            sse_broadcast("PropertyUpdated", &body.to_string());
+        }
+    }
     Response::text("").with_status_code(200)
+}
+
+// ── Server-Sent Events: real-time object-change notifications ────────────────
+// Connected web clients hold open a `GET /api/notification/stream` response.
+// `notification_publish` pushes a PropertyUpdated event to every client; the
+// client filters by domain object name. This replaces the .NET SignalR hub with
+// a transport that both the .NET and Rust servers can serve and one Blazor
+// client can consume.
+
+fn sse_clients() -> &'static Mutex<Vec<Sender<Vec<u8>>>> {
+    static CLIENTS: OnceLock<Mutex<Vec<Sender<Vec<u8>>>>> = OnceLock::new();
+    CLIENTS.get_or_init(|| Mutex::new(Vec::new()))
+}
+
+/// Push a pre-formatted SSE payload to every client, dropping any whose receiver
+/// has gone away (the client disconnected).
+fn sse_send_raw(payload: Vec<u8>) {
+    let mut clients = sse_clients().lock().unwrap();
+    clients.retain(|tx| tx.send(payload.clone()).is_ok());
+}
+
+/// Broadcast a named SSE event with one JSON data line.
+fn sse_broadcast(event: &str, data: &str) {
+    let count = sse_clients().lock().unwrap().len();
+    Logger::info(format!("SSE broadcast '{}' to {} client(s)", event, count));
+    sse_send_raw(format!("event: {}\ndata: {}\n\n", event, data).into_bytes());
+}
+
+/// Build a PropertyUpdateMessage and broadcast it as a `PropertyUpdated` event.
+/// Shared by the in-process delivery sink (logic::notification) and the HTTP
+/// `notification_publish` handler so both produce an identical wire message.
+fn sse_publish_property_update(domain: &str, instance_id: i64, json_data: &str) {
+    let msg = serde_json::json!({
+        "DomainObjectName": domain,
+        "InstanceId": instance_id,
+        "JsonData": json_data,
+        "Timestamp": Util::now_iso8601(),
+    });
+    sse_broadcast("PropertyUpdated", &msg.to_string());
+}
+
+/// Open an SSE stream. The response body is fed by a channel; this request's
+/// worker thread blocks writing it until the client disconnects.
+fn sse_stream() -> Response {
+    let (tx, rx) = std::sync::mpsc::channel::<Vec<u8>>();
+    {
+        let mut clients = sse_clients().lock().unwrap();
+        clients.push(tx);
+        Logger::info(format!("SSE client connected (total {})", clients.len()));
+    }
+
+    // rouille buffers reader-backed bodies (it computes Content-Length up front),
+    // which never completes for an open-ended stream — so a plain streamed
+    // response sends nothing, not even headers. Instead we take ownership of the
+    // raw socket via the upgrade mechanism and write/flush SSE frames ourselves.
+    Response {
+        status_code: 200,
+        headers: vec![
+            ("Content-Type".into(), "text/event-stream".into()),
+            ("Cache-Control".into(), "no-cache".into()),
+            ("X-Accel-Buffering".into(), "no".into()),
+        ],
+        data: ResponseBody::empty(),
+        upgrade: Some(Box::new(SseUpgrade { rx: Some(rx) })),
+    }
+}
+
+/// Takes ownership of the client socket and streams SSE frames to it from the
+/// channel, flushing after each write so events reach the browser immediately
+/// (bypassing rouille/tiny_http's response buffering). Runs on its own thread —
+/// one per connection — so it never holds a rouille worker thread.
+struct SseUpgrade {
+    rx: Option<Receiver<Vec<u8>>>,
+}
+
+impl Upgrade for SseUpgrade {
+    fn build(&mut self, socket: Box<dyn rouille::ReadWrite + Send>) {
+        let rx = match self.rx.take() {
+            Some(r) => r,
+            None => return,
+        };
+        std::thread::spawn(move || {
+            let mut socket = socket;
+            // Open the stream immediately.
+            if socket.write_all(b": connected\n\n").is_err() || socket.flush().is_err() {
+                return;
+            }
+            // Write each broadcast frame and flush so it is sent at once. A write
+            // error means the client disconnected; the dropped receiver then lets
+            // the next broadcast prune this client from the registry.
+            while let Ok(bytes) = rx.recv() {
+                if socket.write_all(&bytes).is_err() || socket.flush().is_err() {
+                    break;
+                }
+            }
+        });
+    }
+}
+
+/// Periodically push an SSE comment so disconnected clients are detected (the
+/// send fails once the receiver is gone) and intermediaries keep the stream open.
+fn start_sse_heartbeat() {
+    std::thread::spawn(|| loop {
+        std::thread::sleep(Duration::from_secs(20));
+        sse_send_raw(b": keepalive\n\n".to_vec());
+    });
 }
 
 fn workflow_run(id: i64) -> Response {

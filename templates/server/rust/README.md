@@ -107,7 +107,7 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   `POST /api/<obj>`, `PUT /api/<obj>/{id}`, `DELETE /api/<obj>/{id}`,
   `/{id}/history`, `/{id}/<child>_<role>` (children), plus
   `GET /api/NavMenu/byparent`, `POST /api/Notification/publish`,
-  `GET /api/Workflow/run/{id}`.
+  `GET /api/Notification/stream` (SSE), `GET /api/Workflow/run/{id}`.
 - **JSON parity.** Responses serialize the object's data map. `numeric`/`decimal`
   columns — stored internally as strings for precision — are coerced back to JSON
   numbers via `common::to_typed_json` + per-column `ColumnInfo.data_type`, so the
@@ -122,15 +122,28 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   slow DB never blocks serving) and writes through `ServerNodeLogic::exec_unchecked`
   — the unchecked path is correct here because there is no security principal at
   startup. Host/user/OS fields come from `Util::populate_session_info`.
-- **Deferred:** the SignalR `/notificationHub` (real-time, not REST — the
-  `POST /api/Notification/publish` route is accepted as a no-op so the interface
-  is preserved), the `EventAggregator`, and Auth0 M2M. `GET /api/Workflow/run/{id}`
-  returns 503 until the workflow engine (scheduler) is ported.
+- **Real-time notifications (SSE).** Replaces SignalR. The logic proxy's
+  after-hook fires on `insert`/`update`/`put` and calls `logic::notification::publish`
+  with `{DomainObjectName, InstanceId, JsonData}`. Delivery has two paths: the API
+  server registers an in-process sink (`set_local_delivery`) at startup, so its own
+  notifications go **straight to the local SSE registry** — no loopback HTTP, so it
+  works regardless of whether the registered hostname resolves. Any *other* online
+  API server in `core.server_node` (e.g. a separate scheduler/scriptagent that made
+  the change) is reached over HTTP at `POST /api/Notification/publish`, and the
+  fan-out skips this node's own URL to avoid double-delivery. Clients connect to
+  `GET /api/Notification/stream` and receive `PropertyUpdated` Server-Sent Events;
+  the Blazor `EventSource` client filters by domain object name. Same publish
+  contract/distribution model as the .NET version — only the browser transport
+  changed from SignalR to SSE, so one client works against both backends.
+  Connections are pruned via a 20s heartbeat; cross-instance scale-out would move
+  fan-out to Postgres `LISTEN`/`NOTIFY` or a message bus.
+- **Deferred:** Auth0 M2M. `GET /api/Workflow/run/{id}` returns 503 until the
+  workflow engine (scheduler) is ported.
 - **Deferred logic modules** (need un-ported infra — script engine, HTTP,
-  SignalR, Quartz, Auth0): `EventServiceLogic`, `WorkflowLogic`,
+  Quartz, Auth0): `EventServiceLogic`, `WorkflowLogic`,
   `SchedulerLogic`, `ScriptAgentLogic`, `SchedulerClient`, `ScriptAgentClient`,
-  `DispatcherThread`, `HealthMonitorThread`, `M2MTokenProvider`,
-  `NotificationRegistrar`. These come online with the api/scheduler/scriptagent
+  `DispatcherThread`, `HealthMonitorThread`, `M2MTokenProvider`.
+  These come online with the api/scheduler/scriptagent
   layers.
 
 ## Test-persist notes

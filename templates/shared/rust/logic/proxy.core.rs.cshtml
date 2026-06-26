@@ -105,6 +105,22 @@ pub fn initialize() {
             Ok(())
         }));
 
+        // Real-time notification after action: on a data change, publish the
+        // object so the SSE layer can push it to subscribed web clients (parity
+        // with the .NET NotificationRegistrar, which published on insert/update).
+        // `publish` returns immediately and does its HTTP fan-out on a background
+        // thread, so it never blocks the hook chain or holds the registry lock.
+        ProxyAction::add_after_action(Box::new(|domain_obj, method, ctx, result| {
+            if matches!(method, "insert" | "update" | "put") {
+                let id = ctx.transaction.get("id").as_i64().unwrap_or_default();
+                let json_data = result
+                    .map(|v| v.to_string())
+                    .unwrap_or_else(|| ctx.transaction.to_json());
+                crate::notification::publish(domain_obj, id, json_data);
+            }
+            Ok(())
+        }));
+
         // TODO: pre/post event-service hooks. Now that the hooks carry the
         // LogicContext, an event hook can build an EventContext from
         // `ctx.transaction` and run scripts via the `script` crate's ScriptHost.

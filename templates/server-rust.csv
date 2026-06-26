@@ -37,6 +37,7 @@ rust server templates-logic,model,shared/rust/logic/base_logic.core.rs.cshtml,./
 rust server templates-logic,model,shared/rust/logic/logic_context.core.rs.cshtml,./gen/shared/logic,TRUE
 rust server templates-logic,model,shared/rust/logic/logic_exec.core.rs.cshtml,./gen/shared/logic,TRUE
 rust server templates-logic,model,shared/rust/logic/proxy.core.rs.cshtml,./gen/shared/logic,TRUE
+rust server templates-logic,model,shared/rust/logic/notification.core.rs.cshtml,./gen/shared/logic,TRUE
 rust server templates-logic,model,shared/rust/logic/object_exec.generated.rs.cshtml,./gen/shared/logic,TRUE
 rust server templates-logic,model,shared/rust/logic/op_role_member_logic.core.rs.cshtml,./gen/shared/logic,TRUE
 rust server templates-logic,model,shared/rust/logic/nav_menu_logic.core.rs.cshtml,./gen/shared/logic,TRUE

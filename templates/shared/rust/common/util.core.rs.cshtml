@@ -40,6 +40,16 @@ impl Util {
             .format("%Y-%m-%d %H:%M:%S")
             .to_string()
     }
+
+    /// Current UTC timestamp in ISO 8601 (`T` separator, fractional seconds).
+    /// Used on the wire for JSON timestamps so a .NET `DateTime` deserializes it
+    /// without a custom format.
+    pub fn now_iso8601() -> String {
+        chrono::Utc::now()
+            .naive_utc()
+            .format("%Y-%m-%dT%H:%M:%S%.f")
+            .to_string()
+    }
 }
 
 fn host_name() -> String {
