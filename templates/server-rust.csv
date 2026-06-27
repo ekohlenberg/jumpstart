@@ -52,3 +52,11 @@ rust server templates-api,model,server/rust/api/main.generated.rs.cshtml,./gen/s
 rust server templates-api,model,server/rust/api/Cargo.toml.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/makefile.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/appsettings.json.cshtml,./gen/server/api,TRUE
+rust server templates-scriptagent,model,server/rust/scriptagent/main.generated.rs.cshtml,./gen/server/scriptagent,TRUE
+rust server templates-scriptagent,model,server/rust/scriptagent/Cargo.toml.cshtml,./gen/server/scriptagent,TRUE
+rust server templates-scriptagent,model,server/rust/scriptagent/makefile.cshtml,./gen/server/scriptagent,TRUE
+rust server templates-scriptagent,model,server/rust/scriptagent/appsettings.json.cshtml,./gen/server/scriptagent,TRUE
+rust server templates-scheduler,model,server/rust/scheduler/main.generated.rs.cshtml,./gen/server/scheduler,TRUE
+rust server templates-scheduler,model,server/rust/scheduler/Cargo.toml.cshtml,./gen/server/scheduler,TRUE
+rust server templates-scheduler,model,server/rust/scheduler/makefile.cshtml,./gen/server/scheduler,TRUE
+rust server templates-scheduler,model,server/rust/scheduler/appsettings.json.cshtml,./gen/server/scheduler,TRUE

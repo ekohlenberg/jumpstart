@@ -9,3 +9,11 @@ rust test templates-test-script,model,test/rust/test-script/main.generated.rs.cs
 rust test templates-test-script,model,test/rust/test-script/Cargo.toml.cshtml,./gen/test/test-script,TRUE
 rust test templates-test-script,model,test/rust/test-script/appsettings.json.cshtml,./gen/test/test-script,TRUE
 rust test templates-test-script,model,test/rust/test-script/makefile.cshtml,./gen/test/test-script,TRUE
+rust test templates-test-scriptagent,model,test/rust/test-scriptagent/main.generated.rs.cshtml,./gen/test/test-scriptagent,TRUE
+rust test templates-test-scriptagent,model,test/rust/test-scriptagent/Cargo.toml.cshtml,./gen/test/test-scriptagent,TRUE
+rust test templates-test-scriptagent,model,test/rust/test-scriptagent/appsettings.json.cshtml,./gen/test/test-scriptagent,TRUE
+rust test templates-test-scriptagent,model,test/rust/test-scriptagent/makefile.cshtml,./gen/test/test-scriptagent,TRUE
+rust test templates-test-scheduler,model,test/rust/test-scheduler/main.generated.rs.cshtml,./gen/test/test-scheduler,TRUE
+rust test templates-test-scheduler,model,test/rust/test-scheduler/Cargo.toml.cshtml,./gen/test/test-scheduler,TRUE
+rust test templates-test-scheduler,model,test/rust/test-scheduler/appsettings.json.cshtml,./gen/test/test-scheduler,TRUE
+rust test templates-test-scheduler,model,test/rust/test-scheduler/makefile.cshtml,./gen/test/test-scheduler,TRUE

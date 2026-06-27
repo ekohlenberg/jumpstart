@@ -36,3 +36,32 @@ pub fn object_exec(
         _ => Err(LogicError::Event(format!("unknown object '{}'", domain_obj))),
     }
 }
+
+/// Run `method` against the named object, bypassing the authorization/hook
+/// chain. For trusted internal processes that have no security principal — e.g.
+/// the script agent reading/updating workflow/process/script rows while running
+/// a job. Like `LogicExec::call_unchecked`, this is a deliberate, named bypass.
+pub fn object_exec_unchecked(
+    domain_obj: &str,
+    method: &str,
+    ctx: &mut LogicContext,
+) -> Result<Value, LogicError> {
+    match domain_obj.to_ascii_lowercase().as_str() {
+@foreach (var obj in Model.Objects)
+{
+    if (obj.DomainVar == obj.TableName)
+    {
+        <text>
+        "@(obj.DomainVar)" => crate::@(obj.DomainObj)Logic::exec_unchecked(method, ctx),
+        </text>
+    }
+    else
+    {
+        <text>
+        "@(obj.DomainVar)" | "@(obj.TableName)" => crate::@(obj.DomainObj)Logic::exec_unchecked(method, ctx),
+        </text>
+    }
+}
+        _ => Err(LogicError::Event(format!("unknown object '{}'", domain_obj))),
+    }
+}

@@ -17,11 +17,14 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
 | Logic | `shared/dotnet/logic` | `shared/rust/logic` | Done (dispatch + AOP) |
 | Scripting | `shared/dotnet/common` (ScriptHost / providers) | `shared/rust/script` | Done (Rhai) |
 | API | `server/dotnet/api` | `server/rust/api` | Done (rouille; REST parity) |
-| Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | TODO |
-| Script agent | `server/dotnet/scriptagent` | `server/rust/scriptagent` | TODO |
+| Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | Done (cron crate; dispatches) |
+| Script agent | `server/dotnet/scriptagent` | `server/rust/scriptagent` | Done (rouille; runs scripts) |
 | Tests (persist) | `test/dotnet/test-persist` | `test/rust/test-persist` | Done |
 | Tests (script) | `test/dotnet/test-script` | `test/rust/test-script` | Done (Rhai) |
-| Tests (api/scheduler/scriptagent) | `test/dotnet/test-*` | `test/rust/test-*` | TODO |
+| Tests (scriptagent) | `test/dotnet/test-scriptagent` | `test/rust/test-scriptagent` | Done (drives /execute) |
+| Tests (scheduler) | `test/dotnet/test-scheduler` | `test/rust/test-scheduler` | Done (workflow trees) |
+| Tools (import/export) | `tools/dotnet/{import,export}` | `tools/rust/{import,export}` (`tools-rust.csv`) | Done (CSV ↔ DB) |
+| Tests (api) | `test/dotnet/test-*` | `test/rust/test-*` | TODO |
 
 ## Design notes carried across all layers
 
@@ -139,12 +142,67 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   fan-out to Postgres `LISTEN`/`NOTIFY` or a message bus.
 - **Deferred:** Auth0 M2M. `GET /api/Workflow/run/{id}` returns 503 until the
   workflow engine (scheduler) is ported.
-- **Deferred logic modules** (need un-ported infra — script engine, HTTP,
-  Quartz, Auth0): `EventServiceLogic`, `WorkflowLogic`,
-  `SchedulerLogic`, `ScriptAgentLogic`, `SchedulerClient`, `ScriptAgentClient`,
-  `DispatcherThread`, `HealthMonitorThread`, `M2MTokenProvider`.
-  These come online with the api/scheduler/scriptagent
-  layers.
+- **Deferred logic modules** (need un-ported infra — HTTP, Auth0):
+  `EventServiceLogic`, `WorkflowLogic`, `HealthMonitorThread`, `M2MTokenProvider`.
+  The `SchedulerLogic`/`ScriptAgentClient` dispatch and cron handling are folded
+  into the scheduler/agent servers below.
+
+## Scheduler (`server/rust/scheduler`)
+
+The cron engine: it fires workflows on schedule and dispatches them to agents.
+
+- **Self-registration.** Binds the first free port in **5000-5100** and registers
+  as a `Scheduler` node (status `Online`); `ctrlc` marks it `Offline` on shutdown.
+- **Cron thread** (port of `QuartzSchedulerThread`). Loads every active workflow
+  whose `core.schedule` has its cron component FKs populated (the same JOIN query),
+  assembles a cron expression from the parts — applying the `Every`/`Exactly`
+  modifier (`ApplyEvery`) and the Quartz dom/dow reconciliation (`ReconcileDomDow`)
+  — and parses it with the `cron` crate (Quartz-style `sec min hour dom month dow
+  year`). When a schedule is due it calls `execute(workflow_id)`. Schedules reload
+  every 5 minutes. Quartz's separate seconds field is fixed at `0`; `?` is mapped
+  to `*` after reconciliation (the `cron` crate ANDs dom/dow, and reconciliation
+  leaves at most one restricted, so the firing days match).
+- **Dispatch** (port of `SchedulerLogic.execute` / `ExecuteWorkflowInternal`).
+  Expands a `Folder` workflow into its child workflows recursively (via `parent_id`),
+  groups them by `seq`, and in seq order dispatches each `Process` child to its
+  agent's `/api/scriptagent/execute`; a `Folder` child is re-queued to the
+  scheduler. Each workflow is set to `Dispatched` first (and `Failed` on a dispatch
+  error), and every change is published so the web UI updates live.
+- **REST surface.** `POST /api/scheduler/execute` (body = workflow id),
+  `cancel`/`abort`/`status` (stubs, as in .NET), `register`/`unregister`, plus
+  `ping`/`health`.
+- **Caveats.** Numeric day-of-week values are assumed Quartz-compatible (1-7,
+  Sun=1), which the `cron` crate shares; the `cron_*` lookup data should match.
+  `cancel`/`abort` and the health-monitor thread are not yet ported.
+
+## Script agent (`server/rust/scriptagent`)
+
+A standalone node that runs workflow scripts, structurally a sibling of the API
+server.
+
+- **Self-registration.** Binds the first free port in **5100-5200** and registers
+  in `core.server_node` as type `Agent`, status `Online` (reusing the API server's
+  registration pattern). On SIGINT/SIGTERM a `ctrlc` handler marks the node
+  `Offline` — the equivalent of the .NET `ApplicationStopping` unregister.
+- **REST surface.** The full `ScriptAgentController` route set under
+  `/api/scriptagent/...` (stop/kill/restart/pause/resume, status/heartbeat/report,
+  capabilities, ping/health/diagnose, execution CRUD, …). As in .NET, most are
+  stubs returning the same placeholder shapes; the load-bearing route is
+  `POST /api/scriptagent/execute` (body = workflow id), which queues the id.
+- **Execution engine.** A single background thread drains the queue and runs
+  `execute_workflow` (port of `ScriptAgentLogic.ExecuteWorkflow`): load the
+  workflow → its process → its script, run the script through the shared `script`
+  crate's `ScriptHost` (Rhai), then write `exec_status` back (`Executing` →
+  `Completed`/`Failed`) and set the node `Busy`/`Online` around the run.
+- **Auth.** The agent runs as a trusted process with no security principal, so its
+  reads/writes use `logic::object_exec_unchecked`. Because that bypasses the
+  proxy's notification hook, the agent calls `logic::notification::publish`
+  explicitly after a status change, so web clients watching `Workflow` update live
+  (the agent fans out over HTTP to the registered API servers). Auth0 inbound
+  validation is removed, as on the API.
+- **Not yet ported:** the process-control verbs (stop/kill/pause/…) are stubs, as
+  they are in .NET; and scripts that perform DB access run through the *checked*
+  logic path, so they need a seeded principal to be authorized.
 
 ## Test-persist notes
 

@@ -21,6 +21,19 @@ use common::Logger;
 use domain::server_node_core::{ServerNodeStatus, ServerNodeType};
 use persist::DBPersist;
 
+// TODO(scalability): the cross-node fan-out is point-to-point HTTP — every change
+// queries core.server_node and POSTs to each online API server. That is fine for a
+// handful of nodes but is O(nodes) per change, depends on each node's registered
+// URL being reachable, and goes stale if a node dies without deregistering. For
+// real scale, replace this with a shared broker so publishers don't need to know
+// the consumers:
+//   - Postgres LISTEN/NOTIFY: the persist layer NOTIFYs on change; every API server
+//     LISTENs and fans out to its own SSE clients. No server_node lookup, no
+//     node-to-node HTTP, and it reuses the existing database (no new infra).
+//   - or a real message bus (NATS / Redis pub-sub / RabbitMQ) if delivery
+//     guarantees, replay, or cross-datacenter routing are needed.
+// Pair either with a heartbeat that marks nodes Offline so the registry self-heals.
+
 /// In-process delivery callback: (domain_object, instance_id, json_data).
 pub type LocalSink = Box<dyn Fn(&str, i64, &str) + Send + Sync>;
 

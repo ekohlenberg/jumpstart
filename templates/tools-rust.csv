@@ -1,0 +1,9 @@
+COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
+rust tools export - program,model,tools/rust/export/main.generated.rs.cshtml,./gen/tools/export,TRUE
+rust tools export - cargo,model,tools/rust/export/Cargo.toml.cshtml,./gen/tools/export,TRUE
+rust tools export - makefile,model,tools/rust/export/makefile.cshtml,./gen/tools/export,TRUE
+rust tools export - appsettings,model,tools/rust/export/appsettings.json.cshtml,./gen/tools/export,TRUE
+rust tools import - program,model,tools/rust/import/main.generated.rs.cshtml,./gen/tools/import,TRUE
+rust tools import - cargo,model,tools/rust/import/Cargo.toml.cshtml,./gen/tools/import,TRUE
+rust tools import - makefile,model,tools/rust/import/makefile.cshtml,./gen/tools/import,TRUE
+rust tools import - appsettings,model,tools/rust/import/appsettings.json.cshtml,./gen/tools/import,TRUE

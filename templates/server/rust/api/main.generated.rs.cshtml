@@ -347,6 +347,15 @@ fn notification_publish(request: &Request) -> Response {
 // a transport that both the .NET and Rust servers can serve and one Blazor
 // client can consume.
 
+// TODO(scalability): SSE fan-out is a single in-process registry, and each open
+// connection holds a dedicated OS thread (the upgrade socket loop) plus a rouille
+// worker. That caps concurrent clients per server at roughly the thread budget and
+// keeps state process-local. To scale: (1) source events from a shared broker
+// (Postgres LISTEN/NOTIFY or a message bus — see logic::notification) so any server
+// can serve any client; (2) move the connection model to async I/O (e.g. an axum
+// SSE endpoint on a tokio runtime) so thousands of idle streams cost almost nothing
+// instead of a thread each; (3) put the API behind a load balancer with sticky or
+// broker-backed routing. Until then this is fine for a modest number of clients.
 fn sse_clients() -> &'static Mutex<Vec<Sender<Vec<u8>>>> {
     static CLIENTS: OnceLock<Mutex<Vec<Sender<Vec<u8>>>>> = OnceLock::new();
     CLIENTS.get_or_init(|| Mutex::new(Vec::new()))
