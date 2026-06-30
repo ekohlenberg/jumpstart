@@ -1,0 +1,15 @@
+default: build
+
+build:
+	@cargo build
+	@mkdir -p ../../../bin
+	@cp -f target/debug/api ../../../bin/api
+	@cp -f api.sh ../../../bin/api.sh
+	@cp -f api.cmd ../../../bin/api.cmd
+	@chmod +x ../../../bin/api ../../../bin/api.sh
+
+run:
+	@cargo run
+
+clean:
+	@cargo clean

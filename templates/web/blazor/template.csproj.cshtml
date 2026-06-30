@@ -14,4 +14,12 @@
 
   </ItemGroup>
 
+  <!-- Hand-written custom pages live outside the generated tree, under
+       <app>/usr/web/pages. Compile and route them with the generated client.
+       Each .razor there must declare its own @@using directives (it does not
+       inherit the generated _Imports.razor). -->
+  <ItemGroup>
+    <RazorComponent Include="..\..\usr\web\pages\**\*.razor" />
+  </ItemGroup>
+
 </Project>

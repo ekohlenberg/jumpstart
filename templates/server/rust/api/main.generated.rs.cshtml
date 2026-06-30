@@ -45,6 +45,13 @@ use logic::{
 use rouille::{Request, Response, ResponseBody, Upgrade};
 use serde_json::Value;
 
+// Hand-written custom routes (FORCE=FALSE; created once under usr/server/api).
+// Any request the generated router does not match is offered to
+// `user_api::handle`, which returns Some(Response) to handle it or None to 404.
+mod user_api {
+    include!("../../../usr/server/api/user_api.rs");
+}
+
 const START_PORT: u16 = 5200;
 const END_PORT: u16 = 5300;
 
@@ -101,6 +108,11 @@ fn init_logging() {
         Logger::set_level(level);
         Logger::info(format!("log level set to {:?} from JUMPSTART_LOG", level));
     }
+
+    // Make the database log writer available. It is invoked only when the
+    // `database` writer is enabled via the `logwriters` config entry; the level
+    // and active writers themselves are read from config inside the Logger.
+    logic::register_db_log_writer();
 }
 
 /// Register this running API server as a `core.server_node` row, exactly as the
@@ -255,7 +267,8 @@ fn handle(request: &Request) -> Response {
             }
         }
 
-        _ => Response::empty_404(),
+        // Unmatched: offer the request to hand-written custom routes, else 404.
+        _ => user_api::handle(request).unwrap_or_else(Response::empty_404),
     }
 }
 

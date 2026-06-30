@@ -87,6 +87,11 @@ fn init_logging() {
         };
         Logger::set_level(level);
     }
+
+    // Make the database log writer available. It is invoked only when the
+    // `database` writer is enabled via the `logwriters` config entry; the level
+    // and active writers themselves are read from config inside the Logger.
+    logic::register_db_log_writer();
 }
 
 fn with_cors(request: &Request, response: Response) -> Response {

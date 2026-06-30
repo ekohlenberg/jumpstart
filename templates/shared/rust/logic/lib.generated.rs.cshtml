@@ -38,6 +38,45 @@ pub use logic_exec::{ExecProof, LogicDispatch, LogicExec};
 pub use object_exec::{object_exec, object_exec_unchecked};
 pub use proxy::ProxyAction;
 
+/// Register the database log writer with the `common` Logger.
+///
+/// The `common` crate (where the Logger lives) is the lowest in the stack and
+/// cannot depend on `persist`, so the database writer is supplied here as a
+/// sink callback. Each record becomes a `core.log` INSERT executed via
+/// `DBPersist`. The Logger only invokes this sink when the `database` writer is
+/// enabled in configuration (`logwriters`), and guards against the sink's own
+/// SQL logging recursing back into the database writer.
+///
+/// Call once at startup, after logging is initialized (e.g. from each server's
+/// `init_logging`). It is a no-op for programs that never enable the database
+/// writer.
+pub fn register_db_log_writer() {
+    use common::{DatabaseProviderFactory, LogRecord, Logger};
+    use serde_json::Value;
+
+    Logger::set_db_writer(|rec: &LogRecord| {
+        let provider = DatabaseProviderFactory::create_provider("default");
+        let table = provider.format_table_name("core.log");
+        let lit = |s: &str| provider.format_value(&Value::String(s.to_string()));
+        // Columns: timestamp, level, principalname, program, filepath,
+        // linenumber, membername, message. The Rust facade has no caller
+        // file/line/member, so those are empty / 0.
+        let sql = format!(
+            "insert into {} (timestamp, level, principalname, program, filepath, linenumber, membername, message) \
+             values ({}, {}, {}, {}, {}, 0, {}, {});",
+            table,
+            lit(&rec.timestamp),
+            lit(&rec.level),
+            lit(&rec.principal),
+            lit(&rec.program),
+            lit(""),
+            lit(""),
+            lit(&rec.message),
+        );
+        let _ = persist::DBPersist::exec_cmd(&sql, "default");
+    });
+}
+
 // ---- per-object logic modules ----------------------------------------------
 @foreach (var obj in Model.Objects)
 {

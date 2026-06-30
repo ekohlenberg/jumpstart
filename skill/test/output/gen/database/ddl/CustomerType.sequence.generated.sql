@@ -1,2 +1,0 @@
-CREATE SEQUENCE app.customer_type_identity AS BIGINT START WITH 1000 INCREMENT BY 1;
-GRANT USAGE, SELECT ON SEQUENCE app.customer_type_identity TO model;

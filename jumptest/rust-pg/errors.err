@@ -1,0 +1,25 @@
+   Compiling common v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/common)
+   Compiling persist v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/persist)
+   Compiling domain v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/domain)
+   Compiling logic v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/logic)
+   Compiling api v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/server/api)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.76s
+warning: the following packages contain code that will be rejected by a future version of Rust: buf_redux v0.8.4, multipart v0.18.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+   Compiling common v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/common)
+   Compiling domain v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/domain)
+   Compiling persist v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/persist)
+   Compiling logic v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/logic)
+   Compiling scheduler v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/server/scheduler)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.35s
+warning: the following packages contain code that will be rejected by a future version of Rust: buf_redux v0.8.4, multipart v0.18.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+   Compiling common v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/common)
+   Compiling domain v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/domain)
+   Compiling persist v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/persist)
+   Compiling logic v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/logic)
+   Compiling script v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/shared/script)
+   Compiling scriptagent v0.1.0 (/Users/erickohlenberg/src/jumpstart/jumptest/rust-pg/gen/server/scriptagent)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.22s
+warning: the following packages contain code that will be rejected by a future version of Rust: buf_redux v0.8.4, multipart v0.18.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
