@@ -5,9 +5,12 @@ default: build
 build:
 	@@dotnet restore
 	@@dotnet build
-	@@mkdir -p $(TARGETDIR)/wwwroot
+	@@mkdir -p $(TARGETDIR)
 	@@cp -r -f . $(TARGETDIR)
-	@@cp -f ../../usr/web/wwwroot/appsettings.json $(TARGETDIR)/wwwroot
+	@@# Copy hand-written web assets from usr/web into the deployed bin/web.
+	@@# (Custom pages under usr/web/pages are compiled into the build above;
+	@@#  this copies static files served at runtime, e.g. usr/web/wwwroot.)
+	@@cp -r -f ../../usr/web/. $(TARGETDIR)
 
 
 clean:

@@ -173,9 +173,13 @@ namespace jumpstart {
             {
                 generatedCode = await razorEngine.CompileRenderStringAsync<T>(td.templateFile, template, model);
             }
+            catch (RazorLight.Generation.TemplateGenerationException ex)
+            {
+                throw new Exception($"TemplateGenerationException: Error compiling template {td.templateFile}: {ex.Message} {ex.Diagnostics}", ex);
+            }
             catch (Exception ex)
             {
-                throw new Exception($"Error compiling template {td.templateFile}: {ex.Message}", ex);
+                throw new Exception($"{ex.GetType().Name}: Error compiling template {td.templateFile}: {ex.Message}", ex);
             }
 
             if (generatedCode.Length > 0)

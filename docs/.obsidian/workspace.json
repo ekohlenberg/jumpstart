@@ -11,10 +11,14 @@
             "id": "8a6fb12eb70cbc09",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "generated-application/index.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "index"
             }
           }
         ]
@@ -109,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "generated-application/index.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from index"
             }
           },
           {
@@ -180,11 +185,17 @@
   },
   "active": "8a6fb12eb70cbc09",
   "lastOpenFiles": [
+    "rust-test-cases.csv",
+    "rust/logic-dispatch.md",
+    "rust/scripting.md",
+    "generated-application/index.md",
+    "rust/index.md",
+    "metadata.md",
+    "rust",
     "auth0-setup.md",
     "auth0-m2m.md",
     "getting-started.md",
     "generator.md",
-    "generated-application/index.md",
     "generated-application/database.md",
     "index.md"
   ]

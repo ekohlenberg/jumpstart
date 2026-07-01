@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
 using @Model.Namespace;
-using @(Model.Namespace).Hubs;
 
 // Configuration for dynamic port binding
 const int StartPort = 5200;
@@ -84,11 +83,9 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer
     });
 builder.Services.AddAuthorization();
 
-// Add SignalR services
-builder.Services.AddSignalR();
-
-// Register EventAggregator service
-builder.Services.AddSingleton<IEventAggregator, EventAggregator>();
+// Register the SSE notification service (replaces SignalR + the SignalR-backed
+// EventAggregator). Real-time updates are delivered over Server-Sent Events.
+builder.Services.AddSingleton<SseNotificationService>();
 
 builder.Services.AddCors(options =>
 {
@@ -150,9 +147,8 @@ app.Use(async (context, next) =>
 app.UseAuthorization();
 
 app.MapControllers();
-
-// Map SignalR hub
-app.MapHub<NotificationHub>("/notificationHub");
+// Real-time notifications are served by NotificationController's SSE endpoint
+// (GET api/Notification/stream); no SignalR hub mapping is needed.
 
 // Register API server after app is built but before it runs
 _ = Task.Run(async () =>

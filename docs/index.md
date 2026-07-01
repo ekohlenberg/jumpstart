@@ -65,6 +65,10 @@ From a single CSV metadata file, Jumpstart generates:
   - [Application Server](generated-application/application-server.md) -- API, logic, persistence, proxy/AOP, auth
   - [Scheduling Server](generated-application/scheduling-server.md) -- Workflow orchestration and dispatch
   - [Agent Server](generated-application/agent-server.md) -- Script execution and real-time notifications
+- **Rust Runtime**
+  - [Overview](rust/) -- Crate layout, the dictionary-backed object model, type mapping, build
+  - [Logic & the Dispatch Model](rust/logic-dispatch.md) -- Interception, authorization, and extending the model from `usr/` code
+  - [Scripting with Rhai](rust/scripting.md) -- In-process database-stored scripts and sample calls
 
 ## Technology Stack
 
@@ -76,3 +80,7 @@ From a single CSV metadata file, Jumpstart generates:
 | Frontend | Blazor WebAssembly |
 | Real-time | SignalR |
 | Scripting | C#, PowerShell, Python |
+| Rust runtime (alternative backend) | Rust, `postgres`, `rust_decimal`/`chrono`/`uuid`, Rhai scripting |
+
+The backend can be generated as Rust crates instead of .NET — see the
+[Rust Runtime](rust/) documentation.

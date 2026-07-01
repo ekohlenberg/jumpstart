@@ -1,99 +1,102 @@
-using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using @Model.Namespace;
-using @(Model.Namespace).Hubs;
 
 namespace @(Model.Namespace)
 {
     /// <summary>
-    /// Interface for event aggregation service
+    /// Interface for the object-update event aggregation service.
     /// </summary>
     public interface IEventAggregator
     {
         /// <summary>
-        /// Publishes an object update event to all subscribed clients
+        /// Publishes an object update event to all connected clients.
         /// </summary>
-        /// <param name="domainObjectName">Domain object name (e.g., "Execution", "Workflow", "Agent")</param>
-        /// <param name="instanceId">Instance ID of the domain object</param>
-        /// <param name="jsonData">JSON string representation of the entire updated BaseObject</param>
         global::System.Threading.Tasks.Task PublishAsync(string domainObjectName, long instanceId, string jsonData);
     }
 
     /// <summary>
-    /// Event aggregator service that routes property updates to SignalR clients
+    /// Routes object-update notifications to connected web clients over
+    /// Server-Sent Events. This replaces the SignalR EventAggregator + Hub with a
+    /// transport the Blazor client consumes via the browser's EventSource and
+    /// that both the .NET and Rust API servers serve identically. Each connected
+    /// client holds an unbounded channel; Publish writes the serialized message
+    /// to every channel and the stream endpoint drains it to the socket.
     /// </summary>
-    public class EventAggregator : IEventAggregator
+    public class SseNotificationService : IEventAggregator
     {
-        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly ConcurrentDictionary<Guid, Channel<string>> _clients = new();
 
-        public EventAggregator(IHubContext<NotificationHub> hubContext)
+        /// <summary>
+        /// Registers a new SSE client and returns its id (for removal on
+        /// disconnect) and the read side of its message channel.
+        /// </summary>
+        public (Guid id, ChannelReader<string> reader) AddClient()
         {
-            _hubContext = hubContext;
+            var channel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = false
+            });
+            var id = Guid.NewGuid();
+            _clients[id] = channel;
+            Logger.Info($"SSE client connected ({_clients.Count} total)");
+            return (id, channel.Reader);
         }
 
         /// <summary>
-        /// Publishes an object update event to all clients subscribed to the domain object type
+        /// Removes a disconnected client and completes its channel.
         /// </summary>
-        public async global::System.Threading.Tasks.Task PublishAsync(string domainObjectName, long instanceId, string jsonData)
+        public void RemoveClient(Guid id)
         {
-            try
+            if (_clients.TryRemove(id, out var channel))
             {
-                if (string.IsNullOrWhiteSpace(domainObjectName))
-                {
-                    throw new ArgumentException("Domain object name cannot be null or empty", nameof(domainObjectName));
-                }
-
-                if (string.IsNullOrWhiteSpace(jsonData))
-                {
-                    throw new ArgumentException("JSON data cannot be null or empty", nameof(jsonData));
-                }
-
-                var message = new PropertyUpdateMessage
-                {
-                    DomainObjectName = domainObjectName,
-                    InstanceId = instanceId,
-                    JsonData = jsonData,
-                    Timestamp = DateTime.UtcNow
-                };
-
-                // Broadcast to all clients in the domain object group
-                await _hubContext.Clients.Group(domainObjectName).SendAsync("PropertyUpdated", message);
-
-                Logger.Info($"Published object update: {domainObjectName}[{instanceId}]");
+                channel.Writer.TryComplete();
+                Logger.Info($"SSE client disconnected ({_clients.Count} remaining)");
             }
-            catch (Exception ex)
+        }
+
+        /// <summary>
+        /// Serializes a PropertyUpdateMessage and pushes it to every connected
+        /// client. The client filters by domain object name on arrival.
+        /// </summary>
+        public global::System.Threading.Tasks.Task PublishAsync(string domainObjectName, long instanceId, string jsonData)
+        {
+            if (string.IsNullOrWhiteSpace(domainObjectName))
             {
-                Logger.Error($"Error publishing event: {ex.Message}", ex);
-                throw;
+                throw new ArgumentException("Domain object name cannot be null or empty", nameof(domainObjectName));
             }
+
+            var message = JsonSerializer.Serialize(new PropertyUpdateMessage
+            {
+                DomainObjectName = domainObjectName,
+                InstanceId = instanceId,
+                JsonData = jsonData,
+                Timestamp = DateTime.UtcNow
+            });
+
+            foreach (var kv in _clients)
+            {
+                kv.Value.Writer.TryWrite(message);
+            }
+
+            Logger.Info($"Published object update: {domainObjectName}[{instanceId}] to {_clients.Count} client(s)");
+            return global::System.Threading.Tasks.Task.CompletedTask;
         }
     }
 
     /// <summary>
-    /// Message structure for object update notifications
+    /// Message structure for object update notifications (serialized into the SSE
+    /// data field; the Blazor client deserializes the same shape).
     /// </summary>
     public class PropertyUpdateMessage
     {
-        /// <summary>
-        /// Domain object name (e.g., "Execution", "Workflow", "Agent")
-        /// </summary>
         public string DomainObjectName { get; set; }
-
-        /// <summary>
-        /// Instance ID of the domain object
-        /// </summary>
         public long InstanceId { get; set; }
-
-        /// <summary>
-        /// JSON string representation of the entire updated BaseObject
-        /// </summary>
         public string JsonData { get; set; }
-
-        /// <summary>
-        /// Timestamp when the update occurred
-        /// </summary>
         public DateTime Timestamp { get; set; }
     }
 }
-

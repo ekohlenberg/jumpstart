@@ -415,14 +415,20 @@ else
 	}
 }
 	
-	// Method to identify if a property is an enum foreign key
+	// A foreign key renders as an rwk-string dropdown (display = rwk string,
+	// value = referenced id) for both "enum" lookups and "parent" relationships.
+	// Any other fkType falls through to a plain input.
 	private bool IsEnumForeignKey(System.Reflection.PropertyInfo propInfo)
 	{
 		var columnInfo = propInfo.GetCustomAttribute<ColumnInfoAttribute>();
-		return columnInfo != null && 
-			   !string.IsNullOrEmpty(columnInfo.fkObject) && 
-			   !string.IsNullOrEmpty(columnInfo.fkType) &&
-			   columnInfo.fkType.ToLower() == "enum";
+		if (columnInfo == null ||
+			string.IsNullOrEmpty(columnInfo.fkObject) ||
+			string.IsNullOrEmpty(columnInfo.fkType))
+		{
+			return false;
+		}
+		var fkType = columnInfo.fkType.ToLower();
+		return fkType == "enum" || fkType == "parent";
 	}
 
 	// Load enum data for dropdowns

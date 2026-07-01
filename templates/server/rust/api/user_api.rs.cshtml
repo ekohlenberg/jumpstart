@@ -1,0 +1,24 @@
+// <user-extension>
+// Custom API routes for this app. Created once (FORCE=FALSE) and never
+// overwritten by the generator — hand-edit it freely.
+//
+// The generated API server calls `user_api::handle(request)` for any route it
+// does not match itself. Return `Some(Response)` to handle the request, or
+// `None` to let the server fall through to a 404.
+//
+// This file is compiled inside the `api` crate (via `mod user_api`), so the
+// crate dependencies are available: `rouille`, `serde_json`, `common`,
+// `domain`, and `logic` (use fully-qualified paths, e.g. `logic::SomeLogic`).
+//
+// Example:
+//   pub fn handle(request: &rouille::Request) -> Option<rouille::Response> {
+//       let path = request.url();
+//       if request.method() == "POST" && path == "/api/something/custom" {
+//           return Some(rouille::Response::text("ok"));
+//       }
+//       None
+//   }
+#[allow(unused_variables)]
+pub fn handle(request: &rouille::Request) -> Option<rouille::Response> {
+    None
+}

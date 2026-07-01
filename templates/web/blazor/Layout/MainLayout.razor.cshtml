@@ -1,13 +1,9 @@
-﻿@@inherits LayoutComponentBase
-@@implements IDisposable
+@@inherits LayoutComponentBase
 @@inject NavigationManager NavigationManager
 @@using System.Net.Http;
+@@using System.Net.Http.Json;
 @@using Microsoft.Extensions.DependencyInjection;
-@@using Microsoft.AspNetCore.Components.Authorization;
-@@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-@@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
-@@inject AuthenticationStateProvider AuthStateProvider
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
 <div class="page">
     <div class="sidebar">
@@ -16,8 +12,8 @@
                 <a class="navbar-brand" href="">@Model.Name</a>
             </div>
         </div>
-        
-        
+
+
         <NavMenuLayout SelectedParentId="@@selectedParentId" />
     </div>
 
@@ -28,11 +24,7 @@
                 <button class="nav-link" @@onclick="@@(() => NavigationManager.NavigateTo("/"))">
                     <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
                 </button>
-                @@if (!isAuthenticated)
-                {
-                    <!-- not authenticated: menu hidden, LoginDisplay shows Log in button -->
-                }
-                else if (isMenuLoading)
+                @@if (isMenuLoading)
                 {
                     <p><em>Loading menu...</em></p>
                 }
@@ -52,8 +44,8 @@
                     }
                 }
             </nav>
-            
-            <LoginDisplay />
+
+            @@* Authentication disabled: <LoginDisplay /> removed until Auth0 is re-enabled. *@@
         </div>
 
         <article class="content px-4">
@@ -66,47 +58,23 @@
     private string? selectedParent = null;
     private long? selectedParentId = null;
     protected NavMenu[]? navMenuList;
-    private bool isAuthenticated = false;
     private bool isMenuLoading = false;
     private string? menuError = null;
 
     protected override async Task OnInitializedAsync()
     {
-        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
+        // Authentication disabled: load the menu unconditionally.
         await LoadMenuAsync();
-    }
-
-    private async void OnAuthStateChanged(Task<AuthenticationState> task)
-    {
-        var authState = await task;
-        isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
-        if (isAuthenticated && navMenuList == null)
-        {
-            await LoadMenuAsync();
-            await InvokeAsync(StateHasChanged);
-        }
-        else if (!isAuthenticated)
-        {
-            await InvokeAsync(StateHasChanged);
-        }
     }
 
     private async Task LoadMenuAsync()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
-        if (!isAuthenticated) return;
-
         isMenuLoading = true;
         menuError = null;
         try
         {
             var remoteClient = ClientFactory.CreateClient("RemoteAPI");
             navMenuList = await remoteClient.GetFromJsonAsync<NavMenu[]>("api/navmenu/byparent?parent_id=0&orderby=ordinal");
-        }
-        catch (AccessTokenNotAvailableException ex)
-        {
-            ex.Redirect();
         }
         catch (Exception ex)
         {
@@ -122,10 +90,5 @@
     {
         selectedParent = parent;
         selectedParentId = navMenuList?.FirstOrDefault(n => n.name == parent)?.id;
-    }
-
-    public void Dispose()
-    {
-        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
     }
 }

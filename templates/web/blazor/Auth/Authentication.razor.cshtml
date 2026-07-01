@@ -1,7 +1,11 @@
 @@page "/authentication/{action}"
-@@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-
-<RemoteAuthenticatorView Action="@@Action" />
+@@*
+   Authentication is DISABLED until the app stabilizes. The OIDC callback view is
+   inert. To re-enable, add the Microsoft.AspNetCore.Components.WebAssembly.Authentication
+   using and render a RemoteAuthenticatorView bound to the Action parameter
+   (see the .NET template / git history).
+*@@
+<p>Authentication is currently disabled.</p>
 
 @@code {
     [Parameter]
