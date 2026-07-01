@@ -9,11 +9,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// ── Auth0 OIDC authentication (DISABLED until the app stabilizes) ──────────────
-// To re-enable: uncomment the AddOidcAuthentication block below, and restore the
-// .AddHttpMessageHandler(...) call on the RemoteAPI client so the OIDC Bearer
-// token is attached again.
-/*
+// ── Auth0 OIDC authentication ─────────────────────────────────────────────────
 builder.Services.AddOidcAuthentication(options =>
 {
     builder.Configuration.Bind("Auth0", options.ProviderOptions);
@@ -23,27 +19,20 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.AdditionalProviderParameters.Add(
         "audience", builder.Configuration["Auth0:Audience"] ?? string.Empty);
 });
-*/
 
 // Read API base URL from wwwroot/appsettings.json (editable per deployment)
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5200";
 
-// Named client for the "Remote API". Authentication is disabled, so no Bearer
-// token is attached (the API server has its Auth0/JWT validation removed too).
+// Named client for the "Remote API" — automatically attaches the OIDC Bearer token
 builder.Services.AddHttpClient("RemoteAPI", client2 =>
 {
     client2.BaseAddress = new Uri(apiBaseUrl);
-});
-/* Re-enable with the OIDC token handler:
 }).AddHttpMessageHandler(sp =>
 {
     var handler = sp.GetRequiredService<AuthorizationMessageHandler>()
         .ConfigureHandler(authorizedUrls: new[] { apiBaseUrl });
     return handler;
 });
-*/
-        
-  
 
 await builder.Build().RunAsync();
 

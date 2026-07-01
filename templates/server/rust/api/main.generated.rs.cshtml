@@ -19,9 +19,14 @@
 //   POST   /api/Notification/publish      (accepted; SignalR not ported)
 //   GET    /api/Workflow/run/{id}         (503; workflow engine not ported)
 //
-// Auth0 JWT validation is removed; an optional `X-User` request header sets the
-// principal for the logic-layer authorization check (otherwise the OS user is
-// used). On startup the server registers itself in core.server_node (see
+// Inbound requests are authenticated with an Auth0 RS256 JWT (see auth0.rs and
+// docs/auth0-setup.md); the validated email/sub claim becomes the principal for
+// the logic-layer authorization check. Domain/Audience are read at runtime from
+// this app's own ~/.<namespace>.json (see common::Config::auth0_settings). If
+// that file has no `auth0` section, Auth0 is treated as unconfigured and the
+// server falls back to an optional `X-User` request header instead, so local
+// development and `jumptest` keep working without a real Auth0 tenant. On
+// startup the server registers itself in core.server_node (see
 // `register_api_server`), mirroring the .NET API server's RegisterApiServer task.
 // Real-time notifications use Server-Sent Events (GET /api/notification/stream +
 // POST /api/Notification/publish) instead of SignalR, so the same Blazor client
@@ -44,6 +49,9 @@ use logic::{
 };
 use rouille::{Request, Response, ResponseBody, Upgrade};
 use serde_json::Value;
+
+// Auth0 JWT (RS256) validation -- see auth0.rs.
+mod auth0;
 
 // Hand-written custom routes (FORCE=FALSE; created once under usr/server/api).
 // Any request the generated router does not match is offered to
@@ -77,14 +85,43 @@ fn main() {
     start_sse_heartbeat();
 
     rouille::start_server(addr, move |request| {
-        // Identity (Auth0 removed): set the principal from an optional X-User
-        // header, clearing it otherwise so a reused worker thread can't leak a
-        // previous request's user.
-        OpRoleMemberLogic::set_current_user(request.header("X-User"));
-
+        // CORS preflight requests never carry Authorization, so answer them
+        // before any auth check runs.
         if request.method().eq_ignore_ascii_case("OPTIONS") {
             return with_cors(request, Response::text(""));
         }
+
+        // Identity: validate the Auth0 bearer token (RS256 against the
+        // tenant's JWKS) and set the principal for the logic-layer
+        // authorization check. Cleared on every request (even failures) so a
+        // reused worker thread can't leak a previous request's user.
+        match auth0::authenticate(request.header("Authorization")) {
+            auth0::AuthOutcome::Authenticated(user) => {
+                OpRoleMemberLogic::set_current_user(Some(user.as_str()));
+            }
+            auth0::AuthOutcome::Unconfigured => {
+                // No `auth0` section in ~/.<namespace>.json (see
+                // docs/auth0-setup.md) -- fall back to the pre-Auth0 X-User
+                // header so local development / jumptest keep working.
+                OpRoleMemberLogic::set_current_user(request.header("X-User"));
+            }
+            auth0::AuthOutcome::Missing => {
+                OpRoleMemberLogic::set_current_user(None);
+                return with_cors(
+                    request,
+                    Response::text("missing bearer token").with_status_code(401),
+                );
+            }
+            auth0::AuthOutcome::Invalid(reason) => {
+                OpRoleMemberLogic::set_current_user(None);
+                Logger::warning(format!("JWT validation failed: {}", reason));
+                return with_cors(
+                    request,
+                    Response::text("invalid bearer token").with_status_code(401),
+                );
+            }
+        }
+
         let response = handle(request);
         with_cors(request, response)
     });

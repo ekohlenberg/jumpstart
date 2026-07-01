@@ -14,4 +14,8 @@ common = { path = "../../shared/common" }
 domain = { path = "../../shared/domain" }
 logic = { path = "../../shared/logic" }
 rouille = "3"
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+# Auth0 JWT (RS256) validation -- see auth0.rs.
+jsonwebtoken = "9"
+ureq = "2"

@@ -116,9 +116,17 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   numbers via `common::to_typed_json` + per-column `ColumnInfo.data_type`, so the
   wire format matches the .NET serializer. (Child-collection rows, which have no
   static type at the call site, are the one place numerics aren't coerced.)
-- **Auth.** Auth0 / JWT validation is removed. An optional `X-User` request
-  header sets the principal for the (still enforced) logic-layer authorization
-  check; absent it, the OS user is used — matching .NET running without Auth0.
+- **Auth.** Inbound requests are authenticated with an Auth0 RS256 JWT (`auth0.rs`
+  — JWKS-verified signature, audience, issuer, expiry; email/`sub` claim becomes
+  the principal), mirroring the .NET `AddJwtBearer` pipeline. `Domain`/`Audience`
+  are read at runtime from this app's own `~/.<namespace>.json` (an `auth0`
+  section alongside `datasources`/`loglevel`/`logwriters` — see
+  `common::Config::auth0_settings`), not baked in at generation time, since one
+  jumpstart install generates many applications from a single
+  `~/.jumpstart.json`. If that section is absent, Auth0 is treated as
+  unconfigured and the server falls back to an optional `X-User` request header
+  instead (absent that, the OS user is used) — matching .NET running without
+  Auth0, and keeping local development / `jumptest` working without a tenant.
 - **Self-registration.** On startup the server registers itself in
   `core.server_node` (type `ApiServer`, status `Online`) via `register_api_server`,
   mirroring the .NET `RegisterApiServer` task. It runs on a spawned thread (so a
@@ -140,9 +148,11 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   changed from SignalR to SSE, so one client works against both backends.
   Connections are pruned via a 20s heartbeat; cross-instance scale-out would move
   fan-out to Postgres `LISTEN`/`NOTIFY` or a message bus.
-- **Deferred:** Auth0 M2M. `GET /api/Workflow/run/{id}` returns 503 until the
-  workflow engine (scheduler) is ported.
-- **Deferred logic modules** (need un-ported infra — HTTP, Auth0):
+- **Deferred:** Auth0 M2M (service-to-service tokens between API/Scheduler/
+  ScriptAgent — see `docs/auth0-m2m.md`; user-facing JWT validation above is
+  done). `GET /api/Workflow/run/{id}` returns 503 until the workflow engine
+  (scheduler) is ported.
+- **Deferred logic modules** (need un-ported infra — M2M HTTP client):
   `EventServiceLogic`, `WorkflowLogic`, `HealthMonitorThread`, `M2MTokenProvider`.
   The `SchedulerLogic`/`ScriptAgentClient` dispatch and cron handling are folded
   into the scheduler/agent servers below.
@@ -198,8 +208,9 @@ server.
   reads/writes use `logic::object_exec_unchecked`. Because that bypasses the
   proxy's notification hook, the agent calls `logic::notification::publish`
   explicitly after a status change, so web clients watching `Workflow` update live
-  (the agent fans out over HTTP to the registered API servers). Auth0 inbound
-  validation is removed, as on the API.
+  (the agent fans out over HTTP to the registered API servers). Auth0 **M2M**
+  inbound validation (service-to-service tokens) is still deferred here, same as
+  the Scheduler — see `docs/auth0-m2m.md`.
 - **Not yet ported:** the process-control verbs (stop/kill/pause/…) are stubs, as
   they are in .NET; and scripts that perform DB access run through the *checked*
   logic path, so they need a seeded principal to be authorized.

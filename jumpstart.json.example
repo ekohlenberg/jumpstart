@@ -1,0 +1,9 @@
+{
+  "modelpath": "~/projects/myapp/model.csv",
+  "templatedefs": ["server-rust", "web-blazor", "database-pgsql"],
+  "auth0": {
+    "domain": "your-tenant.us.auth0.com",
+    "clientId": "YOUR_SPA_CLIENT_ID",
+    "audience": "https://my-app-api"
+  }
+}

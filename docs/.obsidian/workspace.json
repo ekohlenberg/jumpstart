@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "generated-application/index.md",
+                "file": "auth0-setup.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "index"
+              "title": "auth0-setup"
             }
           }
         ]
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "generated-application/index.md",
+                "file": "auth0-setup.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from index"
+              "title": "Outgoing links from auth0-setup"
             }
           },
           {
@@ -185,10 +185,11 @@
   },
   "active": "8a6fb12eb70cbc09",
   "lastOpenFiles": [
+    "generated-application/index.md",
+    "rust/migration-summary.md",
     "rust-test-cases.csv",
     "rust/logic-dispatch.md",
     "rust/scripting.md",
-    "generated-application/index.md",
     "rust/index.md",
     "metadata.md",
     "rust",

@@ -140,7 +140,14 @@ exports.onExecutePostLogin = async (event, api) => {
 
 ## Step 8 — Configure the Generated Application
 
-### Blazor WASM (`gen/web/wwwroot/appsettings.json`)
+Where these values live depends on which part of the app you're configuring:
+
+- The **Blazor** `ClientId`/`Authority`/`Audience` and the **.NET API**'s `Domain`/`Audience` are seeded once from `~/.jumpstart.json` (the `auth0` section the generator reads at generation time — see `src/Program.cs`) into per-app files that are then yours to hand-edit (see below). `~/.jumpstart.json` is the generator's own shared config — used across every application you generate — so treat that seed as a starting point, not the source of truth after the first run.
+- The **Rust API**'s `Domain`/`Audience` come from a different place entirely: this application's own `~/.<namespace>.json`, read at runtime (see the Rust subsection below). That file already holds this app's database connection, and — being per-namespace — is the correct place for per-application secrets like an Auth0 tenant, unlike the generator-wide `~/.jumpstart.json`.
+
+### Blazor WASM (`usr/web/wwwroot/appsettings.json`)
+
+This file is created once on first generation (`FORCE=FALSE` — see `web-blazor.csv`) and is yours to edit afterward; it is never overwritten by a later generation run.
 
 ```json
 {
@@ -157,7 +164,9 @@ exports.onExecutePostLogin = async (event, api) => {
 - **ClientId**: from the SPA application's Settings tab
 - **Audience**: the API Identifier you chose in Step 4
 
-### API Server (`usr/server/api/appsettings.json`)
+### API Server — .NET (`usr/server/api/appsettings.json`)
+
+Also created once (`FORCE=FALSE`) and safe to hand-edit thereafter.
 
 ```json
 {
@@ -172,6 +181,32 @@ exports.onExecutePostLogin = async (event, api) => {
 - **Audience**: must exactly match the API Identifier from Step 4
 
 > The API `Program.cs` constructs the JWT authority as `https://{Domain}/`. Including `https://` in the Domain value will break JWT validation.
+
+### API Server — Rust (`~/.<namespace>.json`)
+
+The Rust API server reads `Domain`/`Audience` at **runtime** from this application's own `~/.<namespace>.json` — the same per-app file that already holds the `datasources` used for the database connection (see the Rust migration's [Migration Summary](rust/migration-summary.md)) — rather than from a value baked in at generation time. Add an `auth0` section alongside `datasources`:
+
+```json
+{
+  "namespace": "my-app",
+  "datasources": {
+    "default": { "dbtype": "postgresql", "hostname": "localhost", "port": "5432", "database": "my_app" }
+  },
+  "auth0": {
+    "domain": "your-tenant.us.auth0.com",
+    "audience": "https://my-app-api"
+  }
+}
+```
+
+- **domain**: bare domain only — no `https://` prefix, no trailing slash
+- **audience**: must exactly match the API Identifier from Step 4
+
+`gen/server/api/appsettings.json` still shows an `Auth0` block for reference/parity with the .NET layout, but it plays no part in configuration — editing it has no effect. Set `domain`/`audience` in `~/.<namespace>.json` instead; no regeneration or restart-time file is needed since it's read fresh at startup.
+
+If `domain`/`audience` are absent (no `auth0` section, or either field left empty), the Rust API treats Auth0 as unconfigured and falls back to trusting an `X-User` request header, which keeps local development and the `jumptest` self-testing app working without a real Auth0 tenant. Once both are set, every request must carry a valid bearer token.
+
+This is deliberately **not** sourced from `~/.jumpstart.json`: that file is the generator's own shared config, used across every application you generate, so it's the wrong place for one specific app's Auth0 tenant.
 
 ---
 
@@ -200,4 +235,5 @@ Then assign them a role via `core.op_role_member`. See [Application Server](gene
 | `The logout was not initiated from within the page` | `SignOutSessionStateManager.SetSignOutState()` not called before logout | Already handled in generated `LoginDisplay.razor` |
 | `redirect_uri_mismatch` | Callback URL not registered in Auth0 | Add full callback URL path to Allowed Callback URLs |
 | JWT claims not reaching API | Email not in access token | Step 7 — add Post-Login Action |
-| `https://` in Auth0:Domain appsetting | Double-prefix breaks JWT authority | Use bare domain only in `usr/server/api/appsettings.json` |
+| `https://` in Auth0:Domain appsetting | Double-prefix breaks JWT authority | Use bare domain only in `usr/server/api/appsettings.json` (.NET) or the `auth0.domain` field of `~/.<namespace>.json` (Rust) |
+| Rust API always returns 401 with `X-User` set | `auth0.domain`/`auth0.audience` are non-empty in `~/.<namespace>.json` but no bearer token is sent | Once Auth0 is configured for the Rust API, `X-User` no longer works — send a real Auth0 bearer token, or remove the `auth0` section from `~/.<namespace>.json` to go back to `X-User`-only local development (no rebuild needed — it's read at startup) |

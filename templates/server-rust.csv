@@ -49,6 +49,7 @@ rust server templates-script,model,shared/rust/script/rhai_provider.core.rs.csht
 rust server templates-script,model,shared/rust/script/script_provider_factory.core.rs.cshtml,./gen/shared/script,TRUE
 rust server templates-script,model,shared/rust/script/script_host.core.rs.cshtml,./gen/shared/script,TRUE
 rust server templates-api,model,server/rust/api/main.generated.rs.cshtml,./gen/server/api,TRUE
+rust server templates-api,model,server/rust/api/auth0.rs.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/Cargo.toml.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/makefile.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/appsettings.json.cshtml,./gen/server/api,TRUE
