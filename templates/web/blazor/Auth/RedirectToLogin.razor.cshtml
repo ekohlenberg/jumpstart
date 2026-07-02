@@ -1,6 +1,10 @@
-@@*
-   Authentication is DISABLED until the app stabilizes. This component (which
-   redirected unauthenticated users to the Auth0 login) is intentionally inert.
-   To re-enable, restore the OnInitialized redirect to "authentication/login"
-   and reference <RedirectToLogin /> from App.razor's <NotAuthorized> again.
-*@@
+@@inject NavigationManager Navigation
+
+@@code {
+    protected override void OnInitialized()
+    {
+        // Preserve the current URL as the return target after login
+        var returnUrl = Uri.EscapeDataString(Navigation.Uri);
+        Navigation.NavigateTo($"authentication/login?returnUrl={returnUrl}");
+    }
+}

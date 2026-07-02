@@ -44,6 +44,28 @@ pub struct NamespaceConfig {
     /// .NET appsettings `logwriters` entry (which held writer class names).
     #[serde(default)]
     pub logwriters: Option<String>,
+    /// This application's Auth0 settings (API JWT validation) -- see
+    /// `Auth0Config`. Lives here, per-namespace, rather than in the
+    /// generator's own `~/.jumpstart.json`: one jumpstart install generates
+    /// many different applications, each with its own Auth0 tenant/audience,
+    /// so per-app secrets belong in the same per-app runtime file already
+    /// used for the database connection, not in shared generator config.
+    #[serde(default)]
+    pub auth0: Option<Auth0Config>,
+}
+
+/// This application's Auth0 settings, read from the `auth0` section of
+/// `~/.<namespace>.json`. Used by the API server to validate inbound JWTs
+/// (see `auth0.rs` in the api crate).
+#[derive(Debug, Clone, Deserialize, Default)]
+pub struct Auth0Config {
+    /// Auth0 tenant domain, e.g. "your-tenant.us.auth0.com" (bare domain --
+    /// no `https://` prefix, no trailing slash).
+    #[serde(default)]
+    pub domain: String,
+    /// Auth0 API identifier / audience, e.g. "https://my-app-api".
+    #[serde(default)]
+    pub audience: String,
 }
 
 /// Application namespace this config crate was generated for.
@@ -126,6 +148,18 @@ impl Config {
             }
         }
         (None, None)
+    }
+
+    /// This application's Auth0 settings (`Domain`/`Audience`) from the
+    /// `auth0` section of `~/.<namespace>.json`, if present and complete.
+    /// Returns `None` when the section is absent or either field is empty --
+    /// callers (the API server) should then treat Auth0 as unconfigured and
+    /// fall back to their pre-Auth0 behavior.
+    pub fn auth0_settings() -> Option<Auth0Config> {
+        let cfg = Self::load_namespace_config();
+        cfg.auth0
+            .clone()
+            .filter(|a| !a.domain.is_empty() && !a.audience.is_empty())
     }
 
     pub fn db_connection_for(data_source: &str) -> String {
@@ -213,6 +247,7 @@ fn parse_legacy(content: &str) -> NamespaceConfig {
         network_interface: None,
         loglevel: None,
         logwriters: None,
+        auth0: None,
     }
 }
 

@@ -26,7 +26,7 @@ pub mod db_provider_factory;
 // Flattened re-exports so domain/persist/logic/api can `use common::*`.
 pub use attributes::{to_typed_json, ClassInfo, ColumnInfo};
 pub use base_object::{BaseObject, DomainObject};
-pub use config::{Config, DataSourceConfig, NamespaceConfig, NAMESPACE};
+pub use config::{Auth0Config, Config, DataSourceConfig, NamespaceConfig, NAMESPACE};
 pub use db_provider::DatabaseProvider;
 pub use db_provider_factory::DatabaseProviderFactory;
 pub use enum_helper::EnumHelper;
