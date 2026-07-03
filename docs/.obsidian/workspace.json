@@ -185,6 +185,8 @@
   },
   "active": "8a6fb12eb70cbc09",
   "lastOpenFiles": [
+    "namespace.json.example",
+    "jumpstart.json.example",
     "generated-application/index.md",
     "rust/migration-summary.md",
     "rust-test-cases.csv",

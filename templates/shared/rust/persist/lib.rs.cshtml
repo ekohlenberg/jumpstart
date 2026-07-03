@@ -13,6 +13,8 @@ pub mod db_persist;
 pub mod db_persist_audit;
 #[path = "db_persist_basic.core.rs"]
 pub mod db_persist_basic;
+#[path = "db_persist_import.core.rs"]
+pub mod db_persist_import;
 
 pub use db_connection::{DbConnection, PersistError, Row};
 pub use db_persist::DBPersist;

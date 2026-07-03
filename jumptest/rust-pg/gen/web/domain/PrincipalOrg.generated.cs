@@ -365,5 +365,35 @@ namespace jumptest
                     this["principal_email"] = value;
                 }
             }
+            
+            [ColumnInfo("Principal ID Enabled", "", "", "", "")]
+            public int principal_enabled
+            {
+                get
+                {
+                    int _principal_enabled;
+
+                             _principal_enabled = default(int);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("principal_enabled"))
+                        {
+                        _principal_enabled = Convert.ToInt32(this["principal_enabled"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting principal_enabled: {e.Message}");
+                        _principal_enabled = default(int);
+                    }
+                    return _principal_enabled;
+                }
+                set
+                {
+                   
+                    this["principal_enabled"] = value;
+                }
+            }
                 }
         }

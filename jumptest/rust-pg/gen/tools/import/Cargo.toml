@@ -13,5 +13,6 @@ path = "main.generated.rs"
 common = { path = "../../shared/common" }
 domain = { path = "../../shared/domain" }
 logic = { path = "../../shared/logic" }
+persist = { path = "../../shared/persist" }
 serde_json = "1"
 csv = "1"

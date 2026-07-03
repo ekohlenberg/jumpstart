@@ -39,7 +39,7 @@ The runtime is a workspace of layered crates (lowest → highest):
 | Crate | Role | Depends on |
 |-------|------|-----------|
 | `common` | `BaseObject`, `DomainObject` trait, `Config`, `Logger`, DB providers, `Util`, attributes/column metadata | — |
-| `persist` | `DBPersist` (insert/update/put/get/select), audited vs basic strategies, `DbConnection` | `common` |
+| `persist` | `DBPersist` (insert/update/put/get/select), audited/basic/import strategies, `DbConnection` | `common` |
 | `domain` | One generated struct per table (`TestRun`, etc.) + `columns()` metadata | `common` |
 | `logic` | Per-object `…Logic` with dispatch, AOP proxy hooks, `LogicContext`, notifications | `common`, `persist`, `domain` |
 | `script` | Rhai scripting engine + host bridge | `common`, `persist`, `domain`, `logic` |
@@ -68,13 +68,22 @@ and event hooks — used by servers acting on their own behalf at startup (e.g.
 self-registration) and by internal logic that must not re-trigger hooks. An
 `ExecProof` token gates privileged calls.
 
-**Persistence.** `DBPersist::insert` dispatches to an audited or basic strategy
-on `is_audited`. **Audited tables version rows**, so their primary key is
-`txn_id`, not `id` (`id` carries only a non-unique index). Sequences are
-`<schema>.<table>_identity`, starting at 1000; static/seed data uses explicit
-ids `< 1000` to avoid collisions. Values are rendered as escaped SQL literals
-(Postgres casts quoted literals), which round-trips string-backed
+**Persistence.** `DBPersist::insert` normally dispatches to an audited or
+basic strategy on `is_audited`. **Audited tables version rows**, so their
+primary key is `txn_id`, not `id` (`id` carries only a non-unique index).
+Sequences are `<schema>.<table>_identity`, starting at 1000; static/seed data
+uses explicit ids `< 1000` to avoid collisions. Values are rendered as escaped
+SQL literals (Postgres casts quoted literals), which round-trips string-backed
 temporal/decimal/uuid values.
+
+A third strategy, **`Import`**, preserves a pre-assigned `id`/`txn_id` instead
+of minting a new one from the identity sequence — the `import` CLI's data
+files carry real pk values by design, and letting the normal audit/basic
+insert overwrite them was a bug (FK references baked into seed CSVs no longer
+resolved). `DBPersist::set_import_mode(true)` flips a process-wide flag that
+the `import` binary sets once at startup; while set, `insert`/`update` route
+to `db_persist_import` unconditionally, ahead of the `is_audited` check. No
+other generated binary calls the setter.
 
 **Connections are per-operation.** `DbConnection::open` calls
 `postgres::Client::connect` each time and drops it after — there is no pool.

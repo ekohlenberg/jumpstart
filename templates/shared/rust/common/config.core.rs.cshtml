@@ -44,10 +44,11 @@ pub struct NamespaceConfig {
     /// .NET appsettings `logwriters` entry (which held writer class names).
     #[serde(default)]
     pub logwriters: Option<String>,
-    /// This application's Auth0 settings (API JWT validation) -- see
-    /// `Auth0Config`. Lives here, per-namespace, rather than in the
+    /// This application's Auth0 settings (user JWT validation on the API, plus
+    /// M2M -- machine-to-machine -- auth between the API/Scheduler/ScriptAgent)
+    /// -- see `Auth0Config`. Lives here, per-namespace, rather than in the
     /// generator's own `~/.jumpstart.json`: one jumpstart install generates
-    /// many different applications, each with its own Auth0 tenant/audience,
+    /// many different applications, each with its own Auth0 tenant/audiences,
     /// so per-app secrets belong in the same per-app runtime file already
     /// used for the database connection, not in shared generator config.
     #[serde(default)]
@@ -55,16 +56,57 @@ pub struct NamespaceConfig {
 }
 
 /// This application's Auth0 settings, read from the `auth0` section of
-/// `~/.<namespace>.json`. Used by the API server to validate inbound JWTs
-/// (see `auth0.rs` in the api crate).
+/// `~/.<namespace>.json`. Shared by the API, Scheduler, and ScriptAgent
+/// servers (see `common::auth0`).
 #[derive(Debug, Clone, Deserialize, Default)]
 pub struct Auth0Config {
     /// Auth0 tenant domain, e.g. "your-tenant.us.auth0.com" (bare domain --
-    /// no `https://` prefix, no trailing slash).
+    /// no `https://` prefix, no trailing slash). Shared by every service --
+    /// there is one Auth0 tenant per application, not one per server.
     #[serde(default)]
     pub domain: String,
-    /// Auth0 API identifier / audience, e.g. "https://my-app-api".
+    /// Each service's own inbound audience -- the Auth0 API resource it
+    /// validates incoming bearer tokens against -- keyed by service name:
+    /// "api", "scheduler", "scriptagent". See docs/auth0-setup.md (user JWTs,
+    /// "api" only) and docs/auth0-m2m.md (M2M JWTs, all three).
     #[serde(default)]
+    pub audiences: HashMap<String, String>,
+    /// M2M (client-credentials) applications used for outbound service-to-
+    /// service calls, keyed by the *called* service: "scheduler" (used by the
+    /// API to call the Scheduler) and "scriptagent" (used by the Scheduler to
+    /// call a ScriptAgent). The target audience is looked up from `audiences`
+    /// rather than duplicated here, since it must match what that service
+    /// validates against. ScriptAgent has no entry -- it only receives M2M
+    /// calls, it never makes them (see docs/auth0-m2m.md).
+    #[serde(default)]
+    pub m2m_clients: HashMap<String, M2MClientConfig>,
+}
+
+/// Credentials for one M2M (client-credentials) Auth0 application, read from
+/// the `auth0.m2m_clients` section of `~/.<namespace>.json`.
+#[derive(Debug, Clone, Deserialize, Default)]
+pub struct M2MClientConfig {
+    #[serde(default)]
+    pub client_id: String,
+    #[serde(default)]
+    pub client_secret: String,
+}
+
+/// This service's resolved Auth0 settings for validating inbound bearer
+/// tokens -- returned by `Config::auth0_settings`.
+#[derive(Debug, Clone)]
+pub struct Auth0Settings {
+    pub domain: String,
+    pub audience: String,
+}
+
+/// Resolved settings for fetching an M2M (client-credentials) token to call
+/// another service -- returned by `Config::m2m_client_settings`.
+#[derive(Debug, Clone)]
+pub struct M2MClientSettings {
+    pub token_endpoint: String,
+    pub client_id: String,
+    pub client_secret: String,
     pub audience: String,
 }
 
@@ -150,16 +192,57 @@ impl Config {
         (None, None)
     }
 
-    /// This application's Auth0 settings (`Domain`/`Audience`) from the
-    /// `auth0` section of `~/.<namespace>.json`, if present and complete.
-    /// Returns `None` when the section is absent or either field is empty --
-    /// callers (the API server) should then treat Auth0 as unconfigured and
-    /// fall back to their pre-Auth0 behavior.
-    pub fn auth0_settings() -> Option<Auth0Config> {
+    /// This service's own inbound Auth0 settings (tenant domain + this
+    /// service's audience) from the `auth0` section of `~/.<namespace>.json`.
+    /// `service` is one of `"api"`, `"scheduler"`, `"scriptagent"`. Returns
+    /// `None` when the `auth0` section is absent, `domain` is empty, or there
+    /// is no (non-empty) entry for `service` in `audiences` -- callers should
+    /// then treat Auth0 as unconfigured and fall back to their pre-Auth0
+    /// behavior (e.g. the X-User header, or an unauthenticated outbound call).
+    pub fn auth0_settings(service: &str) -> Option<Auth0Settings> {
         let cfg = Self::load_namespace_config();
-        cfg.auth0
-            .clone()
-            .filter(|a| !a.domain.is_empty() && !a.audience.is_empty())
+        let auth0 = cfg.auth0.as_ref()?;
+        if auth0.domain.is_empty() {
+            return None;
+        }
+        let audience = auth0.audiences.get(service)?;
+        if audience.is_empty() {
+            return None;
+        }
+        Some(Auth0Settings {
+            domain: auth0.domain.clone(),
+            audience: audience.clone(),
+        })
+    }
+
+    /// M2M (client-credentials) settings for calling `target_service`
+    /// (`"scheduler"` or `"scriptagent"`), from the `auth0` section of
+    /// `~/.<namespace>.json`. Returns `None` if there is no `m2m_clients`
+    /// entry for `target_service` (or its id/secret are empty), or if
+    /// `target_service` has no registered audience -- callers should then
+    /// make the call unauthenticated, matching the .NET
+    /// `M2MTokenProvider.Instance == null` fallback used for local
+    /// development without Auth0.
+    pub fn m2m_client_settings(target_service: &str) -> Option<M2MClientSettings> {
+        let cfg = Self::load_namespace_config();
+        let auth0 = cfg.auth0.as_ref()?;
+        if auth0.domain.is_empty() {
+            return None;
+        }
+        let client = auth0.m2m_clients.get(target_service)?;
+        if client.client_id.is_empty() || client.client_secret.is_empty() {
+            return None;
+        }
+        let audience = auth0.audiences.get(target_service)?;
+        if audience.is_empty() {
+            return None;
+        }
+        Some(M2MClientSettings {
+            token_endpoint: format!("https://{}/oauth/token", auth0.domain),
+            client_id: client.client_id.clone(),
+            client_secret: client.client_secret.clone(),
+            audience: audience.clone(),
+        })
     }
 
     pub fn db_connection_for(data_source: &str) -> String {

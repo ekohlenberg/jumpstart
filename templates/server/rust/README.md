@@ -116,17 +116,20 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   numbers via `common::to_typed_json` + per-column `ColumnInfo.data_type`, so the
   wire format matches the .NET serializer. (Child-collection rows, which have no
   static type at the call site, are the one place numerics aren't coerced.)
-- **Auth.** Inbound requests are authenticated with an Auth0 RS256 JWT (`auth0.rs`
-  — JWKS-verified signature, audience, issuer, expiry; email/`sub` claim becomes
-  the principal), mirroring the .NET `AddJwtBearer` pipeline. `Domain`/`Audience`
-  are read at runtime from this app's own `~/.<namespace>.json` (an `auth0`
-  section alongside `datasources`/`loglevel`/`logwriters` — see
-  `common::Config::auth0_settings`), not baked in at generation time, since one
-  jumpstart install generates many applications from a single
-  `~/.jumpstart.json`. If that section is absent, Auth0 is treated as
-  unconfigured and the server falls back to an optional `X-User` request header
-  instead (absent that, the OS user is used) — matching .NET running without
-  Auth0, and keeping local development / `jumptest` working without a tenant.
+- **Auth.** Inbound requests are authenticated with an Auth0 RS256 JWT
+  (`common::auth0::authenticate_inbound("api", ...)` — JWKS-verified signature,
+  audience, issuer, expiry; email/`sub` claim becomes the principal), mirroring
+  the .NET `AddJwtBearer` pipeline. Domain/audience are read at runtime from
+  this app's own `~/.<namespace>.json` (an `auth0` section alongside
+  `datasources`/`loglevel`/`logwriters` — see `common::Config::auth0_settings`),
+  not baked in at generation time, since one jumpstart install generates many
+  applications from a single `~/.jumpstart.json`. If the "api" audience is
+  absent, Auth0 is treated as unconfigured and the server falls back to an
+  optional `X-User` request header instead (absent that, the OS user is used)
+  — matching .NET running without Auth0, and keeping local development /
+  `jumptest` working without a tenant. The API's own outbound call to the
+  Scheduler (below) attaches an M2M bearer token via
+  `common::auth0::m2m_token("scheduler")` — see docs/auth0-m2m.md.
 - **Self-registration.** On startup the server registers itself in
   `core.server_node` (type `ApiServer`, status `Online`) via `register_api_server`,
   mirroring the .NET `RegisterApiServer` task. It runs on a spawned thread (so a
@@ -148,14 +151,15 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   changed from SignalR to SSE, so one client works against both backends.
   Connections are pruned via a 20s heartbeat; cross-instance scale-out would move
   fan-out to Postgres `LISTEN`/`NOTIFY` or a message bus.
-- **Deferred:** Auth0 M2M (service-to-service tokens between API/Scheduler/
-  ScriptAgent — see `docs/auth0-m2m.md`; user-facing JWT validation above is
-  done). `GET /api/Workflow/run/{id}` returns 503 until the workflow engine
-  (scheduler) is ported.
-- **Deferred logic modules** (need un-ported infra — M2M HTTP client):
-  `EventServiceLogic`, `WorkflowLogic`, `HealthMonitorThread`, `M2MTokenProvider`.
-  The `SchedulerLogic`/`ScriptAgentClient` dispatch and cron handling are folded
-  into the scheduler/agent servers below.
+- **`GET /api/Workflow/run/{id}`.** Resolves an online `Scheduler` node from
+  `core.server_node` and POSTs the workflow id to its `/api/scheduler/execute`
+  (mirrors `SchedulerClient.ExecuteAsync`), attaching an M2M bearer token when
+  configured. Returns 503 if no Scheduler is registered, 502 if the dispatch
+  call itself fails.
+- **Deferred logic modules** (need un-ported infra): `EventServiceLogic`,
+  `WorkflowLogic`, `HealthMonitorThread`. The `SchedulerLogic`/`ScriptAgentClient`
+  dispatch and cron handling are folded into the scheduler/agent servers below;
+  `M2MTokenProvider` is folded into `common::auth0`.
 
 ## Scheduler (`server/rust/scheduler`)
 
@@ -175,12 +179,16 @@ The cron engine: it fires workflows on schedule and dispatches them to agents.
 - **Dispatch** (port of `SchedulerLogic.execute` / `ExecuteWorkflowInternal`).
   Expands a `Folder` workflow into its child workflows recursively (via `parent_id`),
   groups them by `seq`, and in seq order dispatches each `Process` child to its
-  agent's `/api/scriptagent/execute`; a `Folder` child is re-queued to the
-  scheduler. Each workflow is set to `Dispatched` first (and `Failed` on a dispatch
-  error), and every change is published so the web UI updates live.
+  agent's `/api/scriptagent/execute` (attaching an M2M bearer token via
+  `common::auth0::m2m_token("scriptagent")` when configured); a `Folder` child
+  is re-queued to the scheduler. Each workflow is set to `Dispatched` first
+  (and `Failed` on a dispatch error), and every change is published so the web
+  UI updates live.
 - **REST surface.** `POST /api/scheduler/execute` (body = workflow id),
   `cancel`/`abort`/`status` (stubs, as in .NET), `register`/`unregister`, plus
-  `ping`/`health`.
+  `ping`/`health`. Every route is gated by an M2M JWT against this app's
+  "scheduler" audience (`common::auth0::authenticate_inbound("scheduler", ...)`)
+  — unauthenticated if that audience isn't configured, see docs/auth0-m2m.md.
 - **Caveats.** Numeric day-of-week values are assumed Quartz-compatible (1-7,
   Sun=1), which the `cron` crate shares; the `cron_*` lookup data should match.
   `cancel`/`abort` and the health-monitor thread are not yet ported.
@@ -208,9 +216,12 @@ server.
   reads/writes use `logic::object_exec_unchecked`. Because that bypasses the
   proxy's notification hook, the agent calls `logic::notification::publish`
   explicitly after a status change, so web clients watching `Workflow` update live
-  (the agent fans out over HTTP to the registered API servers). Auth0 **M2M**
-  inbound validation (service-to-service tokens) is still deferred here, same as
-  the Scheduler — see `docs/auth0-m2m.md`.
+  (the agent fans out over HTTP to the registered API servers). Inbound requests
+  (from the Scheduler) are gated by an M2M JWT against this app's "scriptagent"
+  audience (`common::auth0::authenticate_inbound("scriptagent", ...)`) —
+  unauthenticated if that audience isn't configured. The agent never calls
+  another service, so it has no outbound M2M client of its own — see
+  `docs/auth0-m2m.md`.
 - **Not yet ported:** the process-control verbs (stop/kill/pause/…) are stubs, as
   they are in .NET; and scripts that perform DB access run through the *checked*
   logic path, so they need a seeded principal to be authorized.

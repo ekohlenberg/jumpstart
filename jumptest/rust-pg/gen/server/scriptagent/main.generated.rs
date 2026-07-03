@@ -13,7 +13,15 @@
 // (Rhai), then write the workflow's exec_status back and publish a notification
 // so the web UI updates live. Internal reads/writes use the unchecked logic path
 // (logic::object_exec_unchecked) because the agent runs as a trusted process with
-// no security principal. Auth0 inbound validation is removed (as on the API).
+// no security principal.
+//
+// Inbound requests (from the Scheduler) are gated by an Auth0 M2M bearer
+// token against this service's own "scriptagent" audience (see common::auth0
+// and docs/auth0-m2m.md); if `~/.<namespace>.json` has no "scriptagent"
+// audience configured, Auth0 is treated as unconfigured and every request is
+// allowed through unauthenticated (matching the .NET fallback for local
+// development). The ScriptAgent never calls another service, so it has no
+// outbound M2M client of its own -- see docs/auth0-m2m.md.
 // </auto-generated>
 #![allow(dead_code)]
 #![allow(clippy::all)]
@@ -25,7 +33,7 @@ use std::sync::atomic::{AtomicBool, AtomicI64, Ordering};
 use std::sync::{Mutex, OnceLock};
 use std::time::Duration;
 
-use common::{BaseObject, LogLevel, Logger, SessionInfo, Util};
+use common::{auth0, BaseObject, LogLevel, Logger, SessionInfo, Util};
 use domain::execution_core::ExecStatus;
 use domain::server_node_core::{ServerNodeStatus, ServerNodeType};
 use domain::workflow_core::WorkflowType;
@@ -65,8 +73,25 @@ fn main() {
     start_execution_thread();
 
     rouille::start_server(addr, move |request| {
-        let response = handle(request);
-        with_cors(request, response)
+        if request.method().eq_ignore_ascii_case("OPTIONS") {
+            return with_cors(request, Response::text(""));
+        }
+
+        // M2M gate: only the Scheduler (or anyone else holding a valid token
+        // for this tenant's "scriptagent" audience) may reach this agent.
+        match auth0::authenticate_inbound("scriptagent", request.header("Authorization")) {
+            auth0::AuthOutcome::Unconfigured | auth0::AuthOutcome::Authenticated(_) => {
+                let response = handle(request);
+                with_cors(request, response)
+            }
+            auth0::AuthOutcome::Missing => {
+                with_cors(request, Response::text("missing bearer token").with_status_code(401))
+            }
+            auth0::AuthOutcome::Invalid(reason) => {
+                Logger::warning(format!("scriptagent: JWT validation failed: {}", reason));
+                with_cors(request, Response::text("invalid bearer token").with_status_code(401))
+            }
+        }
     });
 }
 
@@ -117,10 +142,8 @@ fn install_shutdown_handler() {
 // ── REST routing ─────────────────────────────────────────────────────────────
 
 fn handle(request: &Request) -> Response {
-    if request.method().eq_ignore_ascii_case("OPTIONS") {
-        return Response::text("");
-    }
-
+    // OPTIONS and the auth gate are both handled in main()'s closure before
+    // handle() is called.
     let method = request.method().to_ascii_uppercase();
     let url = request.url();
     let path = url.trim_matches('/');

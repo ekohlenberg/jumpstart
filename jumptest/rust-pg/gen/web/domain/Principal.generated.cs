@@ -27,6 +27,8 @@ namespace jumptest
 
             rwk.Add("email");
             
+            rwk.Add("enabled");
+            
 
             _defaults["id"] = default(long);
             
@@ -37,6 +39,8 @@ namespace jumptest
             _defaults["username"] = default(string);
             
             _defaults["email"] = default(string);
+            
+            _defaults["enabled"] = default(int);
             
             _defaults["created_date"] = default(DateTime);
             
@@ -201,6 +205,36 @@ namespace jumptest
                 {
                    
                     this["email"] = value;
+                }
+            }
+            
+            [ColumnInfo("Enabled", "", "", "", "")]
+            public int enabled
+            {
+                get
+                {
+                    int _enabled;
+
+                             _enabled = default(int);
+                                                 
+                    try
+                    {
+                        if(this.ContainsKey("enabled"))
+                        {
+                        _enabled = Convert.ToInt32(this["enabled"].ToString());
+                        }
+                    }
+                    catch(Exception )
+                    {
+                        //Logger.Error($"Error getting enabled: {e.Message}");
+                        _enabled = default(int);
+                    }
+                    return _enabled;
+                }
+                set
+                {
+                   
+                    this["enabled"] = value;
                 }
             }
             

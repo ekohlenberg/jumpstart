@@ -13,9 +13,9 @@ path = "main.generated.rs"
 common = { path = "../../shared/common" }
 domain = { path = "../../shared/domain" }
 logic = { path = "../../shared/logic" }
+persist = { path = "../../shared/persist" }
 rouille = "3"
-serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-# Auth0 JWT (RS256) validation -- see auth0.rs.
-jsonwebtoken = "9"
+# Outbound call to the Scheduler (workflow_run) -- M2M bearer token attachment
+# and JWT validation of inbound requests both live in common::auth0.
 ureq = "2"

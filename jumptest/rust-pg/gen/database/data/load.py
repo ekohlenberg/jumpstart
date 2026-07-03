@@ -197,8 +197,6 @@ def main():
         './TestRun.children.generated.sql',
         './PrincipalOrg.query.generated.sql',
         './PrincipalOrg.children.generated.sql',
-        './PrincipalPassword.query.generated.sql',
-        './PrincipalPassword.children.generated.sql',
         './OpRoleMap.query.generated.sql',
         './OpRoleMap.children.generated.sql',
         './OpRoleMember.query.generated.sql',

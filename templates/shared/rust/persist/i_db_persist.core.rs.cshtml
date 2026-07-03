@@ -2,10 +2,12 @@
 // Rust port of IDBPersist.core.cs.
 //
 // The .NET interface was dispatched through a `dyn IDBPersist` reference chosen
-// by `isAudited`. Rust trait objects can't carry generic methods, so the two
-// strategies (audit / basic) live as free functions in their own modules and
-// `DBPersist` selects between them at call time. This trait documents the
-// contract those functions satisfy and is implemented by both strategy units.
+// by `isAudited`. Rust trait objects can't carry generic methods, so the
+// strategies (audit / basic / import) live as free functions in their own
+// modules and `DBPersist` selects between them at call time — normally on
+// `isAudited`, or unconditionally to `import` while import mode is active
+// (see `DBPersist::set_import_mode`). This trait documents the contract those
+// functions satisfy and is implemented by each strategy unit.
 // </auto-generated>
 
 use common::DomainObject;

@@ -1,0 +1,5 @@
+{
+  "modelpath": "~/projects/myapp/model.csv",
+  "templatedefs": ["server-rust", "web-blazor", "database-pgsql"],
+  }
+}

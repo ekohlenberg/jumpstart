@@ -13,6 +13,7 @@ rust server templates-common,model,shared/rust/common/db_provider.core.rs.cshtml
 rust server templates-common,model,shared/rust/common/postgres_provider.rs.cshtml,./gen/shared/common,TRUE
 rust server templates-common,model,shared/rust/common/sqlserver_provider.rs.cshtml,./gen/shared/common,TRUE
 rust server templates-common,model,shared/rust/common/db_provider_factory.rs.cshtml,./gen/shared/common,TRUE
+rust server templates-common,model,shared/rust/common/auth0.rs.cshtml,./gen/shared/common,TRUE
 rust server templates-domain,object,shared/rust/domain/template.generated.rs.cshtml,./gen/shared/domain,TRUE
 rust server templates-domain,object,shared/rust/domain/template.user.rs.cshtml,./usr/shared/domain,FALSE
 rust server templates-domain,model,shared/rust/domain/lib.generated.rs.cshtml,./gen/shared/domain,TRUE
@@ -49,7 +50,6 @@ rust server templates-script,model,shared/rust/script/rhai_provider.core.rs.csht
 rust server templates-script,model,shared/rust/script/script_provider_factory.core.rs.cshtml,./gen/shared/script,TRUE
 rust server templates-script,model,shared/rust/script/script_host.core.rs.cshtml,./gen/shared/script,TRUE
 rust server templates-api,model,server/rust/api/main.generated.rs.cshtml,./gen/server/api,TRUE
-rust server templates-api,model,server/rust/api/auth0.rs.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/Cargo.toml.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/makefile.cshtml,./gen/server/api,TRUE
 rust server templates-api,model,server/rust/api/appsettings.json.cshtml,./gen/server/api,TRUE

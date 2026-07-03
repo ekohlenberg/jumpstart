@@ -55,10 +55,9 @@ version = "0.1.0"
 dependencies = [
  "common",
  "domain",
- "jsonwebtoken",
  "logic",
+ "persist",
  "rouille",
- "serde",
  "serde_json",
  "ureq",
 ]
@@ -290,9 +289,11 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "jsonwebtoken",
  "rust_decimal",
  "serde",
  "serde_json",
+ "ureq",
  "uuid",
 ]
 

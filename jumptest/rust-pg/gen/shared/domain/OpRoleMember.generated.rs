@@ -256,6 +256,15 @@ impl OpRoleMemberView {
         self.inner.base.set("principal_email", serde_json::json!(value));
     }
                         
+    /// Username Enabled
+    pub fn principal_enabled(&self) -> i32 {
+        self.inner.base.get("principal_enabled").as_i64().unwrap_or_default() as i32
+    }
+
+    pub fn set_principal_enabled(&mut self, value: i32) {
+        self.inner.base.set("principal_enabled", serde_json::json!(value));
+    }
+                        
     /// Role
     pub fn op_role_name(&self) -> String {
         self.inner.base.get("op_role_name").as_str().unwrap_or_default().to_string()

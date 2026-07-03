@@ -1,0 +1,33 @@
+{
+  "namespace": "my-app",
+  "datasources": {
+    "default": {
+      "dbtype": "postgresql",
+      "hostname": "localhost",
+      "port": "5432",
+      "database": "my_app",
+      "username": "my_app_user",
+      "password": "change-me"
+    }
+  },
+  "loglevel": "debug",
+  "logwriters": "console,file",
+  "auth0": {
+    "domain": "your-tenant.us.auth0.com",
+    "audiences": {
+      "api": "https://my-app-api",
+      "scheduler": "https://my-app-scheduler",
+      "scriptagent": "https://my-app-scriptagent"
+    },
+    "m2m_clients": {
+      "scheduler": {
+        "client_id": "API_SERVER_M2M_CLIENT_ID",
+        "client_secret": "API_SERVER_M2M_CLIENT_SECRET"
+      },
+      "scriptagent": {
+        "client_id": "SCHEDULER_M2M_CLIENT_ID",
+        "client_secret": "SCHEDULER_M2M_CLIENT_SECRET"
+      }
+    }
+  }
+}

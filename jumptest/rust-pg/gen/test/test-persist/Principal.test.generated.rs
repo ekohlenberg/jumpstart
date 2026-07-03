@@ -27,6 +27,9 @@ impl PrincipalTest {
         let v = BaseTest::get_test_data(&record, "VARCHAR", "emailAddresses", "100");
         record.set("email", v);
         
+        let v = BaseTest::get_test_data(&record, "INTEGER", "enabled", "NULL");
+        record.set("enabled", v);
+        
         let v = BaseTest::get_test_data(&record, "TIMESTAMP", "random", "NULL");
         record.set("created_date", v);
         
@@ -62,6 +65,9 @@ impl PrincipalTest {
         
         let v = BaseTest::get_test_data(&record, "VARCHAR", "emailAddresses", "100");
         record.set("email", v);
+        
+        let v = BaseTest::get_test_data(&record, "INTEGER", "enabled", "NULL");
+        record.set("enabled", v);
         
         let v = BaseTest::get_test_data(&record, "TIMESTAMP", "random", "NULL");
         record.set("created_date", v);

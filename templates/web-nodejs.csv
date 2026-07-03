@@ -1,0 +1,30 @@
+COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
+Node web project files,model,web/nodejs/package.json.cshtml,./gen/web,FALSE
+Node web project files,model,web/nodejs/tsconfig.json.cshtml,./gen/web,FALSE
+Node web project files,model,web/nodejs/vite.config.ts.cshtml,./gen/web,FALSE
+Node web project files,model,web/nodejs/index.html.cshtml,./gen/web,TRUE
+Node web project files,model,web/nodejs/README.md.cshtml,./gen/web,TRUE
+Node web project files,model,web/nodejs/makefile.cshtml,./gen/web,TRUE
+Node web project files,model,web/nodejs/build.sh.cshtml,./gen/web,TRUE
+Node web project files,model,web/nodejs/build.cmd.cshtml,./gen/web,TRUE
+Node web project files,model,web/nodejs/web.sh.cshtml,./bin,TRUE
+Node web project files,model,web/nodejs/web.cmd.cshtml,./bin,TRUE
+Node web public assets,model,web/nodejs/public/config.json.cshtml,./usr/web/public,FALSE
+Node web public assets,model,web/nodejs/public/css/app.css,./gen/web/public/css,FALSE
+Node web public assets,model,web/nodejs/public/favicon.png,./gen/web/public,FALSE
+Node web public assets,model,web/nodejs/public/lib/bootstrap/dist/css/bootstrap.min.css,./gen/web/public/lib/bootstrap/dist/css,FALSE
+Node web public assets,model,web/nodejs/public/lib/bootstrap/dist/js/bootstrap.bundle.min.js,./gen/web/public/lib/bootstrap/dist/js,FALSE
+Node web app shell,model,web/nodejs/src/main.tsx.cshtml,./gen/web/src,TRUE
+Node web app shell,model,web/nodejs/src/App.tsx.cshtml,./gen/web/src,TRUE
+Node web app shell,model,web/nodejs/src/vite-env.d.ts,./gen/web/src,TRUE
+Node web app shell,model,web/nodejs/src/pages/Home.tsx,./gen/web/src/pages,TRUE
+Node web api client,model,web/nodejs/src/api/config.ts.cshtml,./gen/web/src/api,TRUE
+Node web api client,model,web/nodejs/src/api/apiClient.ts.cshtml,./gen/web/src/api,TRUE
+Node web types,model,web/nodejs/src/types/NavMenu.ts.cshtml,./gen/web/src/types,TRUE
+Node web auth,model,web/nodejs/src/auth/ProtectedRoute.tsx.cshtml,./gen/web/src/auth,TRUE
+Node web auth,model,web/nodejs/src/auth/LoginDisplay.tsx.cshtml,./gen/web/src/auth,TRUE
+Node web auth,model,web/nodejs/src/auth/AuthCallback.tsx.cshtml,./gen/web/src/auth,TRUE
+Node web layout,model,web/nodejs/src/layout/MainLayout.tsx.cshtml,./gen/web/src/layout,TRUE
+Node web layout,model,web/nodejs/src/layout/MainLayout.css,./gen/web/src/layout,TRUE
+Node web layout,model,web/nodejs/src/layout/NavMenu.tsx.cshtml,./gen/web/src/layout,TRUE
+Node web layout,model,web/nodejs/src/layout/NavMenu.css,./gen/web/src/layout,TRUE

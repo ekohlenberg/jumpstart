@@ -179,13 +179,6 @@ pub mod principal_org {
 }
 pub use principal_org::*;
     
-pub mod principal_password {
-    // `use common::*;` is provided by the included generated file.
-    include!("PrincipalPassword.generated.rs");
-    include!("../../../usr/shared/domain/PrincipalPassword.user.rs");
-}
-pub use principal_password::*;
-    
 pub mod op_role_map {
     // `use common::*;` is provided by the included generated file.
     include!("OpRoleMap.generated.rs");
