@@ -19,7 +19,7 @@ Node web app shell,model,web/nodejs/src/App.tsx.cshtml,./gen/web/src,TRUE
 Node web app shell,model,web/nodejs/src/vite-env.d.ts,./gen/web/src,TRUE
 Node web app shell,model,web/nodejs/src/pages/Home.tsx,./gen/web/src/pages,TRUE
 Node web api client,model,web/nodejs/src/api/config.ts.cshtml,./gen/web/src/api,TRUE
-Node web api client,model,web/nodejs/src/api/apiClient.ts.cshtml,./gen/web/src/api,TRUE
+Node web api client,model,web/nodejs/src/api/apiClient.tsx.cshtml,./gen/web/src/api,TRUE
 Node web types,model,web/nodejs/src/types/NavMenu.ts.cshtml,./gen/web/src/types,TRUE
 Node web auth,model,web/nodejs/src/auth/ProtectedRoute.tsx.cshtml,./gen/web/src/auth,TRUE
 Node web auth,model,web/nodejs/src/auth/LoginDisplay.tsx.cshtml,./gen/web/src/auth,TRUE
@@ -28,3 +28,10 @@ Node web layout,model,web/nodejs/src/layout/MainLayout.tsx.cshtml,./gen/web/src/
 Node web layout,model,web/nodejs/src/layout/MainLayout.css,./gen/web/src/layout,TRUE
 Node web layout,model,web/nodejs/src/layout/NavMenu.tsx.cshtml,./gen/web/src/layout,TRUE
 Node web layout,model,web/nodejs/src/layout/NavMenu.css,./gen/web/src/layout,TRUE
+Node web components,model,web/nodejs/src/components/DataTable.tsx.cshtml,./gen/web/src/components,TRUE
+Node web components,model,web/nodejs/src/components/DataTable.css,./gen/web/src/components,TRUE
+Node web pages,object,web/nodejs/src/pages/Listtemplate.tsx.cshtml,./gen/web/src/pages,TRUE
+Node web pages,object,web/nodejs/src/pages/Edittemplate.tsx.cshtml,./gen/web/src/pages,TRUE
+Node web components,model,web/nodejs/src/components/TabControl.tsx.cshtml,./gen/web/src/components,TRUE
+Node web components,model,web/nodejs/src/components/TabControl.css,./gen/web/src/components,TRUE
+Node web styles,model,web/nodejs/src/styles/editForm.css,./gen/web/src/styles,TRUE

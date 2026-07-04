@@ -33,6 +33,56 @@ namespace jumpstart {
             return dataType.ToLower().Trim();
         }
 
+        /// <summary>
+        /// Maps a MetaAttribute.DotNetType (e.g. "long", "string", "DateTime") to the
+        /// TypeScript type used in generated Node/React templates (web/nodejs). Kept as
+        /// a static method here -- rather than a lambda declared inline in a .cshtml
+        /// template -- because RazorLight chokes on local `Func&lt;string, string&gt;`
+        /// variables assigned via a multi-line lambda inside an `@{ }` block.
+        /// </summary>
+        public static string ToTsType(string dotNetType)
+        {
+            switch (dotNetType)
+            {
+                case "string": return "string";
+                case "bool": return "boolean";
+                case "long":
+                case "int":
+                case "short":
+                case "decimal":
+                case "double":
+                case "float":
+                    return "number";
+                default:
+                    return "string";
+            }
+        }
+
+        /// <summary>
+        /// Drives which HTML input widget a generated Node/React edit form renders for
+        /// a given MetaAttribute.DotNetType. Distinct from ToTsType above: an "enum"/FK
+        /// field is still a plain number on the wire (e.g. org_id), but needs a
+        /// &lt;select&gt; instead of a number input -- callers layer that FK check on
+        /// top of this before falling back to it for non-FK attributes.
+        /// </summary>
+        public static string ToFormKind(string dotNetType)
+        {
+            switch (dotNetType)
+            {
+                case "bool": return "boolean";
+                case "DateTime": return "date";
+                case "long":
+                case "int":
+                case "short":
+                case "decimal":
+                case "double":
+                case "float":
+                    return "number";
+                default:
+                    return "string";
+            }
+        }
+
         public static readonly Dictionary<string, string> DataTypeMap = new()
         {
             { "integer", "int" },
@@ -327,6 +377,30 @@ public class ViewRelationship
         public string NavMenu {get; set;}
         private string _uri = string.Empty;
         public string Uri { get { return string.IsNullOrEmpty(_uri) ? DomainVar : _uri; } }
+
+        /// <summary>
+        /// Names the TS row-type used by a generated Node/React Edit page's DataTable
+        /// for one of this object's child relationships (see
+        /// web/nodejs/src/pages/Edittemplate.tsx.cshtml). Self-referential children
+        /// (childObject == this, e.g. a "parent_id" pointing back at the same table)
+        /// reuse this object's own generated interface instead of a duplicate
+        /// "...Row" declaration. A method here (rather than a `Func&lt;MetaObject,
+        /// string&gt;` local declared in the template) sidesteps the same RazorLight
+        /// limitation ToTsType/ToFormKind above work around.
+        /// </summary>
+        public string ChildRowTypeName(MetaObject childObject)
+        {
+            return childObject.DomainObj == DomainObj ? DomainObj : childObject.DomainObj + "Row";
+        }
+
+        /// <summary>
+        /// Names the generated DataTableColumn[] const for one of this object's child
+        /// relationships, paired with ChildRowTypeName above.
+        /// </summary>
+        public string ChildColumnsConstName(MetaObject childObject)
+        {
+            return childObject.DomainObj == DomainObj ? "OWN_COLUMNS" : (childObject.DomainObj + "_COLUMNS").ToUpperInvariant();
+        }
 
         public MetaModel Model {get;set;}
         

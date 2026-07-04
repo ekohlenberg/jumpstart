@@ -1,0 +1,146 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useApiClient, type ApiClient } from "../api/apiClient";
+import DataTable, { type DataTableColumn } from "../components/DataTable";
+
+// Row shape returned by GET /api/sql and /api/sql/view/{id}
+// -- matches the SqlView class generated for the dotnet/rust servers.
+export interface SqlView {
+  id: number;
+  name: string;
+  data_source_id: number;
+  sql_text: string;
+  description: string;
+  is_active: number;
+  created_by: string;
+  last_updated: string;
+  last_updated_by: string;
+  txn_id: number;
+  data_source_name: string;
+}
+
+const DOMAIN_OBJECT_NAME = "Sql";
+
+const columns: DataTableColumn[] = [
+  { key: "id", label: "Query ID" },
+  { key: "name", label: "Name" },
+  { key: "sql_text", label: "SQL Text" },
+  { key: "description", label: "Description" },
+  { key: "is_active", label: "Active" },
+  { key: "created_by", label: "Created By" },
+  { key: "last_updated", label: "Last Updated" },
+  { key: "last_updated_by", label: "Last Updated By" },
+  { key: "data_source_name", label: "Data Source ID" },
+];
+
+// Matches the server's PropertyUpdateMessage (see
+// server/dotnet/api/EventAggregator.core.cs.cshtml and
+// shared/rust/logic/notification.core.rs.cshtml) -- PascalCase field names
+// and all, since it is serialized once and shared verbatim by every client,
+// Blazor included.
+interface PropertyUpdateMessage {
+  DomainObjectName: string;
+  InstanceId: number;
+  JsonData: string;
+  Timestamp: string;
+}
+
+async function fetchList(api: ApiClient): Promise<SqlView[]> {
+  return api.get<SqlView[]>("/api/sql");
+}
+
+export default function ListSql() {
+  const api = useApiClient();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [list, setList] = useState<SqlView[] | null>(null);
+  const sseRef = useRef<EventSource | null>(null);
+
+  // Mirrors the current `list` state so the SSE handler below (registered
+  // once per `api` change, not per render) always sees the latest data
+  // instead of the value captured when the effect first ran.
+  const listRef = useRef<SqlView[] | null>(null);
+  useEffect(() => {
+    listRef.current = list;
+  }, [list]);
+
+  const reloadList = useCallback(async () => {
+    try {
+      setList(await fetchList(api));
+    } catch (err) {
+      console.error("ListSql: error reloading list", err);
+    }
+  }, [api]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchList(api)
+      .then((data) => {
+        if (!cancelled) setList(data);
+      })
+      .catch((err) => console.error("ListSql: error loading list", err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [api]);
+
+  // Real-time updates arrive over Server-Sent Events -- the same
+  // GET /api/Notification/stream the Blazor client's notifications.js
+  // interop connects to. The browser's native EventSource needs no interop
+  // layer here and reconnects on its own; we just clean up on unmount.
+  useEffect(() => {
+    const source = new EventSource(`${api.baseUrl}/api/Notification/stream`);
+    sseRef.current = source;
+
+    source.addEventListener("PropertyUpdated", async (event: MessageEvent<string>) => {
+      try {
+        const message: PropertyUpdateMessage = JSON.parse(event.data);
+        if (message.DomainObjectName !== DOMAIN_OBJECT_NAME) return;
+
+        const index = (listRef.current ?? []).findIndex((item) => item.id === message.InstanceId);
+        if (index >= 0) {
+          const updated = await api.get<SqlView>(`/api/sql/view/${message.InstanceId}`);
+          setList((current) => {
+            if (!current) return current;
+            const next = [...current];
+            const i = next.findIndex((item) => item.id === message.InstanceId);
+            if (i >= 0) next[i] = updated;
+            return next;
+          });
+        } else {
+          await reloadList();
+        }
+      } catch (err) {
+        console.error("ListSql: error handling notification", err);
+      }
+    });
+
+    return () => {
+      source.close();
+      sseRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [api]);
+
+  function onAdd() {
+    const returnUrl = encodeURIComponent(location.pathname);
+    navigate(`/edit-sql?returnUrl=${returnUrl}`);
+  }
+
+  function onEdit(item: SqlView) {
+    const returnUrl = encodeURIComponent(location.pathname);
+    navigate(`/edit-sql/${item.id}?returnUrl=${returnUrl}`);
+  }
+
+  return (
+    <>
+      <h1>Query</h1>
+      <p>This page demonstrates fetching Query data from the server.</p>
+
+      <DataTable data={list} columns={columns} showActions showAddButton onEdit={onEdit} onAdd={onAdd} />
+    </>
+  );
+}

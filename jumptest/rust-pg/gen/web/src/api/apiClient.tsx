@@ -3,10 +3,15 @@
 // a single fetch wrapper, scoped to the app via React context, that prefixes
 // every call with the configured apiBaseUrl and attaches the Auth0 access
 // token as a Bearer header, the same way AuthorizationMessageHandler does.
+// (.tsx, not .ts: ApiClientProvider below renders JSX.)
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { useAuth0 } from "@@auth0/auth0-react";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export interface ApiClient {
+  // Mirrors HttpClient.BaseAddress -- exposed so callers (e.g. list pages
+  // opening the SSE notification stream) can build a full URL themselves
+  // instead of going through get/post/put/del.
+  readonly baseUrl: string;
   get<T>(path: string): Promise<T>;
   post<T>(path: string, body: unknown): Promise<T>;
   put<T>(path: string, body: unknown): Promise<T>;
@@ -37,6 +42,7 @@ function createApiClient(baseUrl: string, getAccessToken: () => Promise<string>)
   }
 
   return {
+    baseUrl,
     get: <T,>(path: string) => request<T>(path),
     post: <T,>(path: string, body: unknown) => request<T>(path, { method: "POST", body: JSON.stringify(body) }),
     put: <T,>(path: string, body: unknown) => request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
