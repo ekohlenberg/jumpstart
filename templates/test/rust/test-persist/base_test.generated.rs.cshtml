@@ -5,7 +5,10 @@
 // tests. Differences from .NET: values are produced as serde_json::Value (the
 // domain objects are dictionary-backed), a tiny inline xorshift PRNG replaces
 // System.Random (so the crate needs no `rand` dependency), and the unused
-// per-object last/map collections from the .NET template are omitted.
+// per-object last/map collections from the .NET template are omitted. New vs.
+// the .NET port: `assert_persisted` re-selects the row a test just wrote and
+// confirms the database actually has what was sent, since insert/update
+// mutate the in-memory object locally and never read back on their own.
 // </auto-generated>
 
 use std::collections::HashMap;
@@ -13,6 +16,7 @@ use std::sync::{Mutex, OnceLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use common::BaseObject;
+use logic::LogicError;
 use serde_json::Value;
 
 // The .NET `TestDataType` enum is replaced by a plain `&str` test-data-set key
@@ -192,6 +196,75 @@ impl BaseTest {
             .copied()
             .unwrap_or(0)
     }
+
+    /// Confirm that a freshly re-selected row (`persisted`, the JSON returned
+    /// by a `get` dispatch) carries the same values the test wrote (`expected`,
+    /// the `LogicContext::transaction` handed to `insert`/`update`), for each
+    /// column named in `fields`. Catches bugs where insert/update reports
+    /// success but the database ends up with different data than what was
+    /// sent (wrong column mapping, silent truncation, a write that never
+    /// actually committed, etc.) — the in-memory object alone can't tell you
+    /// that; only a separate read-back can.
+    pub fn assert_persisted(
+        label: &str,
+        expected: &BaseObject,
+        persisted: &Value,
+        fields: &[&str],
+    ) -> Result<(), LogicError> {
+        if persisted.is_null() {
+            return Err(LogicError::Event(format!(
+                "{}: row not found when re-selecting by id",
+                label
+            )));
+        }
+        for field in fields.iter().copied() {
+            let expected_value = expected.get(field);
+            let actual_value = persisted.get(field).cloned().unwrap_or(Value::Null);
+            if !values_match(&expected_value, &actual_value) {
+                return Err(LogicError::Event(format!(
+                    "{}: column '{}' mismatch — wrote {} but database has {}",
+                    label, field, expected_value, actual_value
+                )));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Loose equality between a value the test wrote and the value the database
+/// returned for the same column. Plain `==` is too strict here: NUMERIC
+/// columns round-trip as text on the way in but come back coerced to a JSON
+/// number, and float columns can lose a little precision in storage — neither
+/// is a persistence bug worth failing the test over.
+fn values_match(expected: &Value, actual: &Value) -> bool {
+    match (expected, actual) {
+        (Value::Null, Value::Null) => true,
+        (Value::Bool(a), Value::Bool(b)) => a == b,
+        (Value::Bool(a), Value::Number(b)) | (Value::Number(b), Value::Bool(a)) => {
+            *a == (b.as_i64().unwrap_or(0) != 0)
+        }
+        (Value::Number(a), Value::Number(b)) => match (a.as_i64(), b.as_i64()) {
+            (Some(ai), Some(bi)) => ai == bi,
+            _ => match (a.as_f64(), b.as_f64()) {
+                (Some(af), Some(bf)) => approx_eq(af, bf),
+                _ => a == b,
+            },
+        },
+        (Value::String(a), Value::String(b)) => a == b,
+        (Value::String(a), Value::Number(b)) | (Value::Number(b), Value::String(a)) => a
+            .parse::<f64>()
+            .ok()
+            .zip(b.as_f64())
+            .map(|(af, bf)| approx_eq(af, bf))
+            .unwrap_or(false),
+        _ => expected == actual,
+    }
+}
+
+/// Relative-tolerance float comparison (absolute below 1.0), generous enough
+/// to absorb float4/float8 storage rounding without masking a real mismatch.
+fn approx_eq(a: f64, b: f64) -> bool {
+    (a - b).abs() <= 1e-3 * a.abs().max(b.abs()).max(1.0)
 }
 
 fn gen_by_sql_type(base_dt: &str, limit: Option<usize>) -> Value {
