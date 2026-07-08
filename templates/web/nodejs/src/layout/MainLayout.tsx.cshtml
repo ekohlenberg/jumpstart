@@ -19,11 +19,17 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const { isAuthenticated } = useAuth0();
   const api = useApiClient();
 
-  const [navMenuList, setNavMenuList] = useState<NavMenuItem[] | null>(null);
+  // Typed via the initial value's "as" cast rather than useState<T>(...) --
+  // a bare `Identifier<...>` outside a `<text>`-wrapped code region can make
+  // RazorLight's markup parser mistake it for an HTML/JSX tag opening, which
+  // silently breaks evaluation of the @(Model.Name) expression further down
+  // in this file (this template has no `@{ }` code block, so it's all
+  // "markup" mode from RazorLight's point of view).
+  const [navMenuList, setNavMenuList] = useState(null as NavMenuItem[] | null);
   const [isMenuLoading, setIsMenuLoading] = useState(false);
-  const [menuError, setMenuError] = useState<string | null>(null);
-  const [selectedParent, setSelectedParent] = useState<string | null>(null);
-  const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
+  const [menuError, setMenuError] = useState(null as string | null);
+  const [selectedParent, setSelectedParent] = useState(null as string | null);
+  const [selectedParentId, setSelectedParentId] = useState(null as number | null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -33,9 +39,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
     setMenuError(null);
 
     api
-      .get<NavMenuItem[]>("/api/navmenu/byparent?parent_id=0&orderby=ordinal")
+      .get("/api/navmenu/byparent?parent_id=0&orderby=ordinal")
       .then((data) => {
-        if (!cancelled) setNavMenuList(data);
+        if (!cancelled) setNavMenuList(data as NavMenuItem[]);
       })
       .catch((err: Error) => {
         if (!cancelled) setMenuError(`Menu error: ${err.message}`);

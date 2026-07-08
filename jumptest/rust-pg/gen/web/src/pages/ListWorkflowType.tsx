@@ -48,7 +48,11 @@ export default function ListWorkflowType() {
   const location = useLocation();
 
   const [list, setList] = useState<WorkflowTypeView[] | null>(null);
-  const sseRef = useRef<EventSource | null>(null);
+  // Typed via the initial value's "as" cast (rather than useRef<EventSource
+  // | null>(...)) -- a bare `Identifier<...>` outside a `<text>`-wrapped code
+  // region can make RazorLight's markup parser mistake it for an HTML/JSX
+  // tag opening.
+  const sseRef = useRef(null as EventSource | null);
 
   // Mirrors the current `list` state so the SSE handler below (registered
   // once per `api` change, not per render) always sees the latest data
@@ -88,7 +92,10 @@ export default function ListWorkflowType() {
     const source = new EventSource(`${api.baseUrl}/api/Notification/stream`);
     sseRef.current = source;
 
-    source.addEventListener("PropertyUpdated", async (event: MessageEvent<string>) => {
+    // MessageEvent's generic parameter defaults to `any` when omitted, so
+    // this stays a bare `MessageEvent` rather than `MessageEvent<string>`
+    // (same reasoning as the sseRef declaration above).
+    source.addEventListener("PropertyUpdated", async (event: MessageEvent) => {
       try {
         const message: PropertyUpdateMessage = JSON.parse(event.data);
         if (message.DomainObjectName !== DOMAIN_OBJECT_NAME) return;

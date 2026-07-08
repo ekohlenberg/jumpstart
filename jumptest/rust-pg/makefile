@@ -48,6 +48,11 @@ cleanusr:
 cleanbin:
 	@rm -rf ./bin
 
+cleanweb:
+	@rm -rf ./gen/web
+	@rm -rf ./usr/web
+	@rm -rf ./bin/web*
+
 cleanall:
 	@rm -rf ./bin
 	@rm -rf ./usr

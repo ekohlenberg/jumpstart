@@ -219,6 +219,17 @@ Right-click a plan on the **ListTestPlan** page → **Generate** →
 - **`build.py` runs the monolithic `…database.create.generated.sql`**, which is
   where `core.log` (and other core tables) are actually created — individual
   `*.table.generated.sql` files don't include the core schema.
+- **Apple Silicon code-signing (`Killed: 9`).** A server binary that runs fine
+  under the debugger but dies instantly with no output when launched directly
+  (e.g. from `bin/api.sh`) has a stale/invalid ad-hoc code signature: the
+  debugger's `com.apple.security.cs.debugger` entitlement lets it launch such a
+  binary, but a direct exec is SIGKILLed by the kernel *before `main`* — so
+  there's no panic, no stdout, and no log file. Byte-identical build output and
+  copied binary is the tell (it's the launch method, not the copy). Root cause
+  is usually a non-Apple linker (lld/zld/mold) in `~/.cargo/config.toml` that
+  emits a signature the kernel rejects. The server makefiles now ad-hoc re-sign
+  the deployed `bin/<name>` copy on macOS (`codesign --force --sign -`) right
+  after `cp`; a one-off fix is `codesign --force --sign - bin/api`.
 
 ---
 

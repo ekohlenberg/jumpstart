@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEventHandler, type ReactNode } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useApiClient, type ApiClient } from "../api/apiClient";
+import { useApiClient } from "../api/apiClient";
 import DataTable, { type DataTableColumn } from "../components/DataTable";
 import TabControl, { type TabItem } from "../components/TabControl";
 import "../styles/editForm.css";
@@ -137,33 +137,40 @@ function defaultValueForKind(kind: FormField["kind"]): string | number | boolean
 }
 
 function createEmptyTestPlan(): TestPlan {
-  const obj: Record<string, unknown> = {};
+  // Plain index-signature object type here (rather than Record<string,
+  // unknown>) -- RazorLight's markup parser can mistake a bare
+  // `Identifier<...>` for the start of an HTML/JSX tag when it appears
+  // outside a `<text>`-wrapped code region, so every such generic in this
+  // file is written to avoid a bare `<` following an identifier.
+  const obj: { [key: string]: unknown } = {};
   for (const field of FORM_FIELDS) {
     obj[field.key] = defaultValueForKind(field.kind);
   }
   return obj as unknown as TestPlan;
 }
 
-function chunk<T>(items: T[], size: number): T[][] {
-  const rows: T[][] = [];
+// Not generic (only ever called with FORM_FIELDS below) -- a bare `<T>`
+// here trips the same RazorLight tag-detection issue as Record<...> above.
+function chunkFormFields(items: FormField[], size: number): FormField[][] {
+  const rows: FormField[][] = [];
   for (let i = 0; i < items.length; i += size) {
     rows.push(items.slice(i, i + size));
   }
   return rows;
 }
 
-export default function Edit@(domainObj)() {
+export default function EditTestPlan() {
   const api = useApiClient();
   const navigate = useNavigate();
   const location = useLocation();
-  const params = useParams<{ id?: string }>();
+  const params = useParams();
   const id = params.id ? Number(params.id) : null;
 
   const returnUrl = useMemo(() => new URLSearchParams(location.search).get("returnUrl"), [location.search]);
 
   const [formData, setFormData] = useState<TestPlan>(() => createEmptyTestPlan());
   const [historyList, setHistoryList] = useState<TestPlanHistory[] | null>(null);
-  const [enumOptions, setEnumOptions] = useState<Record<string, EnumOption[]>>({});
+  const [enumOptions, setEnumOptions] = useState({} as { [key: string]: EnumOption[] });
   const [activeTab, setActiveTab] = useState(0);
   const [activeChildTab, setActiveChildTab] = useState(0);
   const [testcase_test_planList, set_testcase_test_planList] = useState<TestCaseRow[] | null>(null);
@@ -230,7 +237,7 @@ export default function Edit@(domainObj)() {
 
     Promise.all(
       FORM_FIELDS.filter((f) => f.kind === "enum").map(async (field) => {
-        const options = await api.get<EnumOption[]>(`/api/${field.fkVar}/enum`);
+        const options = (await api.get(`/api/${field.fkVar}/enum`)) as EnumOption[];
         return [field.key, options] as const;
       }),
     )
@@ -248,7 +255,10 @@ export default function Edit@(domainObj)() {
     setFormData((current) => ({ ...current, [key]: value }));
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  // Typed via the FormEventHandler variable annotation (using its default
+  // type parameter) rather than an inline `(e: FormEvent<HTMLFormElement>)`
+  // parameter annotation -- same bare-generic issue as elsewhere in this file.
+  const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
     try {
       if (id == null) {
@@ -260,7 +270,7 @@ export default function Edit@(domainObj)() {
       console.error("EditTestPlan: error saving testplan", err);
     }
     navigate(returnUrl ?? "/testplan");
-  }
+  };
 
   function handleCancel() {
     navigate(returnUrl ?? "/testplan");
@@ -270,8 +280,8 @@ export default function Edit@(domainObj)() {
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
 
-  const fieldRows = chunk(FORM_FIELDS, 3);
-  const values = formData as unknown as Record<string, unknown>;
+  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  const values = formData as unknown as { [key: string]: unknown };
 
   const editTabContent: ReactNode = (
     <form onSubmit={handleSubmit}>
