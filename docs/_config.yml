@@ -1,5 +1,5 @@
 title: Jumpstart Documentation
-description: Enterprise-grade code generation framework for full-stack .NET applications
+description: Metadata-driven code generation framework for full-stack applications — .NET or Rust backends, Blazor or React frontends
 theme: jekyll-theme-cayman
 baseurl: "/jumpstart"
 
@@ -9,3 +9,5 @@ header_pages:
   - metadata.md
   - generator.md
   - generated-application/index.md
+  - testing.md
+  - operations.md

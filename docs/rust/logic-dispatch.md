@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Logic & the Dispatch Model
-parent: Rust Runtime
+parent: Rust Backend
 nav_order: 1
 ---
 
@@ -9,11 +9,11 @@ nav_order: 1
 
 The logic layer is where Jumpstart enforces **aspect-oriented interception** —
 logging, authorization, and (pluggably) event triggering — around every business
-operation. In .NET this was done with a reflection-based `DispatchProxy` that
-intercepted every interface method. Rust has no reflection and its trait objects
-cannot carry generic methods, so the Rust runtime replaces the reflective proxy
-with an explicit **dispatch model**: a single interception chokepoint plus a
-generated string→method router.
+operation. The .NET backend does this with a reflection-based `DispatchProxy`
+that intercepts every interface method. Rust has no reflection and its trait
+objects cannot carry generic methods, so the Rust backend implements the same
+pipeline as an explicit **dispatch model**: a single interception chokepoint
+plus a generated string→method router.
 
 ## The pieces
 

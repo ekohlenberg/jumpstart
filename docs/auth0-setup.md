@@ -16,7 +16,7 @@ The generated application uses two Auth0 application types:
 
 | Type | Purpose |
 |------|---------|
-| **Single Page Application (SPA)** | Browser-based OIDC login for the Blazor WASM front end |
+| **Single Page Application (SPA)** | Browser-based OIDC login for the web front end (Blazor WASM or React) |
 | **Machine to Machine (M2M)** | Server-to-server JWT tokens between the API, Scheduler, and ScriptAgent |
 
 This guide covers the SPA setup. M2M setup is covered in [M2M Authentication](auth0-m2m.md).
@@ -43,7 +43,7 @@ The `.us.` regional segment is important. Make sure to use the full domain inclu
 4. Select **Single Page Application** as the application type
 5. Click **Create**
 
-> ⚠️ **Application type matters.** Selecting "Regular Web Application" or "Native" will cause login to fail. The Blazor WASM OIDC library requires the SPA type to use the Authorization Code + PKCE flow.
+> ⚠️ **Application type matters.** Selecting "Regular Web Application" or "Native" will cause login to fail. Both generated frontends (the Blazor WASM OIDC library and `@auth0/auth0-react`) require the SPA type to use the Authorization Code + PKCE flow.
 
 ---
 
@@ -164,6 +164,10 @@ This file is created once on first generation (`FORCE=FALSE` — see `web-blazor
 - **ClientId**: from the SPA application's Settings tab
 - **Audience**: the API Identifier you chose in Step 4
 
+### React (`usr/web/public/config.json`)
+
+The React frontend's equivalent file, also created once (`FORCE=FALSE` — see `web-nodejs.csv`) and yours to edit. It carries the same values: the API base URL and the Auth0 domain, client ID, and audience.
+
 ### API Server — .NET (`usr/server/api/appsettings.json`)
 
 Also created once (`FORCE=FALSE`) and safe to hand-edit thereafter.
@@ -184,7 +188,7 @@ Also created once (`FORCE=FALSE`) and safe to hand-edit thereafter.
 
 ### API Server — Rust (`~/.<namespace>.json`)
 
-The Rust API server reads `Domain`/`Audience` at **runtime** from this application's own `~/.<namespace>.json` — the same per-app file that already holds the `datasources` used for the database connection (see the Rust migration's [Migration Summary](rust/migration-summary.md)) — rather than from a value baked in at generation time. Add an `auth0` section alongside `datasources`:
+The Rust API server reads `Domain`/`Audience` at **runtime** from this application's own `~/.<namespace>.json` — the same per-app file that already holds the `datasources` used for the database connection (see [Operations Notes](operations.md)) — rather than from a value baked in at generation time. Add an `auth0` section alongside `datasources`:
 
 ```json
 {

@@ -47,6 +47,19 @@ function rowId(row: Record<string, unknown>): number {
   return typeof value === "number" ? value : Number(value ?? 0);
 }
 
+// Normalize an image-column value to a root-relative asset URL. Values like
+// "images/exec-status-1.png" (the exec_status.image RWK) come from the shared
+// core data and are relative -- Blazor resolves them against its <base href="/">,
+// but this SPA has no <base>, so a bare relative src would resolve against the
+// current route (e.g. /core/images/...) and 404. Anchor it at the site root,
+// matching how the app references its other public assets (/css, /lib, ...).
+// Absolute URLs and data: URIs are passed through untouched.
+function assetSrc(value: unknown): string {
+  const src = String(value ?? "");
+  if (src === "" || /^(https?:\/\/|\/|data:)/i.test(src)) return src;
+  return "/" + src;
+}
+
 export default function DataTableContextMenu<T>({
   data,
   columns,
@@ -108,7 +121,7 @@ export default function DataTableContextMenu<T>({
                       <td key={column.key}>
                         {column.imageKey && row[column.imageKey] ? (
                           <img
-                            src={String(row[column.imageKey])}
+                            src={assetSrc(row[column.imageKey])}
                             alt={formatValue(row[column.key])}
                             title={formatValue(row[column.key])}
                             style={{ height: "24px" }}

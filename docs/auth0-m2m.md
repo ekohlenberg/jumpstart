@@ -12,7 +12,7 @@ This guide covers machine-to-machine (M2M) authentication between the generated 
 
 ## Overview
 
-> **Simplified model (recommended).** All server components — API, Scheduler, ScriptAgent — share **one audience** and **one M2M application**. Every server validates inbound tokens against the single audience, and every server-to-server call (API → Scheduler, Scheduler → ScriptAgent, and notification publishing → API) requests a token for that same audience using that same client. This is the shape the Rust runtime now uses; the per-service model below is still supported as a fallback but is no longer necessary.
+> **Simplified model (recommended).** All server components — API, Scheduler, ScriptAgent — share **one audience** and **one M2M application**. Every server validates inbound tokens against the single audience, and every server-to-server call (API → Scheduler, Scheduler → ScriptAgent, and notification publishing → API) requests a token for that same audience using that same client. This is the shape the Rust backend uses; the per-service model below is still supported as a fallback but is no longer necessary.
 
 **One Auth0 resource server (audience)** for the whole application:
 
@@ -26,7 +26,7 @@ This guide covers machine-to-machine (M2M) authentication between the generated 
 | -------------------------- | ------------------------------ | ------------------- |
 | `{AppName}-m2m-{env}`      | API, Scheduler, ScriptAgent    | `https://{AppName}` |
 
-Every server-to-server direction — API → Scheduler, Scheduler → ScriptAgent, and **real-time notification publishing** (any process POSTs data changes to `POST /api/Notification/publish` on each online API node, which fans them out to browsers over SSE — see [Rust Runtime](rust/index.md)) — is authenticated with a token for this one audience. Because the audience and client are shared, there is nothing to key per service: the same credentials work everywhere.
+Every server-to-server direction — API → Scheduler, Scheduler → ScriptAgent, and **real-time notification publishing** (any process POSTs data changes to `POST /api/Notification/publish` on each online API node, which fans them out to browsers over SSE — see [Application Server](generated-application/application-server.md)) — is authenticated with a token for this one audience. Because the audience and client are shared, there is nothing to key per service: the same credentials work everywhere.
 
 <details>
 <summary><strong>Legacy per-service model</strong> (still supported)</summary>

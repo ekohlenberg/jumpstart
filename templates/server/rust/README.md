@@ -1,59 +1,55 @@
 # Rust server templates
 
-This tree is the Rust counterpart to `templates/server/dotnet`. The Rust
-migration is being landed layer by layer. Server/shared templates are
-inventoried in `templates/server-rust.csv`; the test projects are managed
-separately under `templates/test/rust` and inventoried in
-`templates/test-rust.csv` (the .NET tests likewise live in `templates/test/dotnet`
-with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
+This tree generates the Rust backend — the full peer of `templates/server/dotnet`. Server/shared templates are inventoried in `templates/server-rust.csv`; test projects live under `templates/test/rust` (`test-rust.csv`) and tools under `templates/tools/rust` (`tools-rust.csv`). The .NET equivalents follow the same split (`server-dotnet.csv`, `test-dotnet.csv`, `tools-dotnet.csv`).
 
-## Status
+User-facing documentation for the Rust backend is in `docs/rust/`; this file records template-level design notes.
 
-| Layer | .NET source | Rust templates | State |
-|-------|-------------|----------------|-------|
-| Common | `shared/dotnet/common` | `shared/rust/common` | Done |
-| Domain | `shared/dotnet/domain` | `shared/rust/domain` | Done |
-| Persist | `shared/dotnet/persist` | `shared/rust/persist` | Done |
-| Logic | `shared/dotnet/logic` | `shared/rust/logic` | Done (dispatch + AOP) |
-| Scripting | `shared/dotnet/common` (ScriptHost / providers) | `shared/rust/script` | Done (Rhai) |
-| API | `server/dotnet/api` | `server/rust/api` | Done (rouille; REST parity) |
-| Scheduler | `server/dotnet/scheduler` | `server/rust/scheduler` | Done (cron crate; dispatches) |
-| Script agent | `server/dotnet/scriptagent` | `server/rust/scriptagent` | Done (rouille; runs scripts) |
-| Tests (persist) | `test/dotnet/test-persist` | `test/rust/test-persist` | Done |
-| Tests (script) | `test/dotnet/test-script` | `test/rust/test-script` | Done (Rhai) |
-| Tests (scriptagent) | `test/dotnet/test-scriptagent` | `test/rust/test-scriptagent` | Done (drives /execute) |
-| Tests (scheduler) | `test/dotnet/test-scheduler` | `test/rust/test-scheduler` | Done (workflow trees) |
-| Tools (import/export) | `tools/dotnet/{import,export}` | `tools/rust/{import,export}` (`tools-rust.csv`) | Done (CSV ↔ DB) |
-| Tests (api) | `test/dotnet/test-*` | `test/rust/test-*` | TODO |
+## Coverage
+
+| Layer | Templates | Notes |
+|-------|-----------|-------|
+| Common | `shared/rust/common` | Config, BaseObject, Logger, DB providers, Auth0 |
+| Domain | `shared/rust/domain` | per-table structs + core enums |
+| Persist | `shared/rust/persist` | audited / basic / import strategies |
+| Logic | `shared/rust/logic` | dispatch + interception (AOP) |
+| Scripting | `shared/rust/script` | Rhai engine + logic bridge |
+| API | `server/rust/api` | rouille; full REST parity |
+| Scheduler | `server/rust/scheduler` | cron crate; dispatches to agents |
+| Script agent | `server/rust/scriptagent` | runs scripts via ScriptHost |
+| Tests | `test/rust/test-{persist,script,scriptagent,scheduler}` | `test-api` port is still TODO |
+| Tools | `tools/rust/{import,export}` | CSV ↔ DB |
 
 ## Design notes carried across all layers
 
-- **Dictionary-backed objects.** `BaseObject` keeps the .NET design: a
+- **Dictionary-backed objects.** `BaseObject` keeps the shared design: a
   `HashMap<String, serde_json::Value>` plus metadata. Generated domain types
   add statically typed accessors over it, so the persistence contract is
-  unchanged (every value round-trips through `data`).
+  identical to .NET (every value round-trips through `data`).
 - **No runtime reflection.** `ColumnInfoAttribute` / `ClassInfoAttribute`
   become explicit `ColumnInfo` / `ClassInfo` metadata emitted by the generator
   and exposed via `DomainObject::columns()` / `class_label()`.
-- **Partial classes → split modules.** A `<Obj>.generated.rs` (FORCE=TRUE) and a
-  `<Obj>.user.rs` (FORCE=FALSE) are `include!`d into one module by the crate
-  root `lib.generated.rs`, giving the generated + hand-editable pair.
+- **Partial classes → split modules.** A `<Obj>.generated.rs` (FORCE=TRUE, in
+  `gen/`) and a `<Obj>.user.rs` (FORCE=FALSE, in `usr/`) are `include!`d into
+  one module by the crate root `lib.generated.rs`, giving the generated +
+  hand-editable pair.
 - **Type mapping** (`DotNetType` → Rust): `int`→`i32`, `long`→`i64`,
   `short`→`i16`, `bool`→`bool`, `float`→`f32`, `double`→`f64`,
   `decimal`→`rust_decimal::Decimal`, `DateTime`→`chrono::NaiveDateTime`,
   `Guid`→`uuid::Uuid`, `string`→`String`, `byte[]`→`Vec<u8>`, else
   `serde_json::Value`.
 - **DB dialect** lives in the `DatabaseProvider` trait (Postgres `$N` params,
-  SQL Server `@PN` params); connection/pool handling belongs to the persist
-  layer (sqlx / tokio-postgres / tiberius), not the provider.
+  SQL Server `@PN` params); connection handling belongs to the persist layer.
 
 ## Persist-layer notes
 
 - `insert`/`update` dispatch to the audit or basic strategy on
-  `BaseObject.is_audited`, just like the .NET `DBPersist.GetPersist`. The
-  shared `put`/`get`/SQL builders sit on `DBPersist`; the divergent
-  `insert`/`update` live in `db_persist_audit` / `db_persist_basic` as free
-  functions (Rust trait objects can't hold the generic methods).
+  `BaseObject.is_audited`, matching the .NET `DBPersist.GetPersist`. The shared
+  `put`/`get`/SQL builders sit on `DBPersist`; the divergent `insert`/`update`
+  live in `db_persist_audit` / `db_persist_basic` as free functions (Rust trait
+  objects can't hold the generic methods). A third strategy,
+  `db_persist_import`, preserves pre-assigned `id`/`txn_id` values; it is
+  enabled process-wide by `DBPersist::set_import_mode(true)` and used only by
+  the `import` tool.
 - **Columns, not reflection.** `insert_sql` enumerates `T::columns()` instead of
   reflecting over `ColumnInfoAttribute`.
 - **Literal SQL.** Values are rendered as escaped SQL literals via
@@ -61,42 +57,40 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   already used). This sidesteps per-type `ToSql` binding and round-trips the
   string-backed timestamp/decimal/uuid values. A future hardening pass can move
   inserts to bound `$N` parameters.
-- **Connection.** `db_connection` is new (ADO.NET supplied this in .NET). It
-  wraps the synchronous `postgres` driver to match the sync API; opens one
-  connection per operation as the .NET layer did. SQL Server (tiberius, async)
-  is deferred — `DbConnection::open` returns `Unsupported` for it.
+- **Connection.** `db_connection` wraps the synchronous `postgres` driver to
+  match the sync API; opens one connection per operation as the .NET layer
+  does. SQL Server (tiberius, async) is deferred — `DbConnection::open` returns
+  `Unsupported` for it.
 
 ## Logic-layer notes
 
-- **AOP via a dispatch chokepoint (not reflection).** .NET used a reflective
+- **AOP via a dispatch chokepoint (not reflection).** .NET uses a reflective
   `DispatchProxy`. Rust has no reflection, so interception is centralised in
   `LogicExec::call` (`logic_exec.core.rs`): it runs the before hooks → a
   generated `dispatch` → the after hooks. Each logic type implements
   `LogicDispatch` with a generated `match method { ... }` that routes a method
   name to a normal `pub(crate)` operation (`select`/`get`/`insert`/...). The
-  business logic lives in those methods; the match is just the string→method
-  router that reflection gave .NET for free. The before/after hook registry and
-  default wiring (logging + authorization) live in `proxy.core.rs`.
-- **Uniform context.** Every call carries a `LogicContext` (the record +
-  args), threaded through `LogicExec` → `dispatch` → the hooks — so auth,
-  logging, and (once wired) event scripts all see the transaction. Call sites
-  use `<Obj>Logic::exec("insert", &mut ctx)`; results come back as
+  before/after hook registry and default wiring (logging + authorization) live
+  in `proxy.core.rs`.
+- **Uniform context.** Every call carries a `LogicContext` (the record + args),
+  threaded through `LogicExec` → `dispatch` → the hooks. Call sites use
+  `<Obj>Logic::exec("insert", &mut ctx)`; results come back as
   `serde_json::Value`. `<Obj>Logic::exec_unchecked` is the explicit auth bypass
-  (import/export, tests).
+  (import/export, tests, server self-registration).
 - **Authorization can't be bypassed accidentally.** `dispatch` requires an
   `ExecProof` whose constructor is private to `logic_exec`, and the raw
-  operations are `pub(crate)`. So external crates can only reach logic through
-  `LogicExec` (which runs the auth hook) — there's no way to call a raw method
-  and skip authorization except the named `_unchecked` path.
+  operations are `pub(crate)`. External crates can only reach logic through
+  `LogicExec` (which runs the auth hook); the only bypass is the named
+  `_unchecked` path.
 - **User operations.** Hand-written methods go in `<Obj>Logic.user.rs` and are
-  surfaced to dispatch (and thus to auth/events/scripts) by adding a `match` arm
-  in `dispatch_user` (the generated `dispatch` routes unknown names there).
+  surfaced to dispatch (and thus to auth/events/scripts) via the `dispatch_user`
+  hook (the generated `dispatch` routes unknown names there).
 - **`current_user`** uses a thread-local with an OS-user fallback (the .NET
-  `AsyncLocal`), set by API middleware once that layer exists.
-- **Pre/post event-service hooks** are still a TODO, but now unblocked: the
-  hooks carry the `LogicContext`, so an event hook can build an `EventContext`
-  from `ctx.transaction` and run scripts via the `script` crate's `ScriptHost`
-  (pending the callback-registry indirection, since `script` depends on `logic`).
+  `AsyncLocal`), set by API middleware per request.
+- **Pre/post event-service hooks** are plumbed but not yet wired: the hooks
+  carry the `LogicContext`, so an event hook can build an `EventContext` from
+  `ctx.transaction` and run scripts via the `script` crate's `ScriptHost` —
+  pending a callback-registry indirection, since `script` depends on `logic`.
 
 ## API-layer notes (`server/rust/api`)
 
@@ -111,6 +105,9 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   `/{id}/history`, `/{id}/<child>_<role>` (children), plus
   `GET /api/NavMenu/byparent`, `POST /api/Notification/publish`,
   `GET /api/Notification/stream` (SSE), `GET /api/Workflow/run/{id}`.
+  Unmatched routes fall through to the `usr/server/api/user_api.rs` hook
+  (a `FORCE=FALSE` stub), which returns `Some(Response)` to handle a custom
+  route or `None` to 404.
 - **JSON parity.** Responses serialize the object's data map. `numeric`/`decimal`
   columns — stored internally as strings for precision — are coerced back to JSON
   numbers via `common::to_typed_json` + per-column `ColumnInfo.data_type`, so the
@@ -120,37 +117,41 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   (`common::auth0::authenticate_inbound("api", ...)` — JWKS-verified signature,
   audience, issuer, expiry; email/`sub` claim becomes the principal), mirroring
   the .NET `AddJwtBearer` pipeline. Domain/audience are read at runtime from
-  this app's own `~/.<namespace>.json` (an `auth0` section alongside
+  the app's own `~/.<namespace>.json` (an `auth0` section alongside
   `datasources`/`loglevel`/`logwriters` — see `common::Config::auth0_settings`),
   not baked in at generation time, since one jumpstart install generates many
   applications from a single `~/.jumpstart.json`. If the "api" audience is
   absent, Auth0 is treated as unconfigured and the server falls back to an
-  optional `X-User` request header instead (absent that, the OS user is used)
-  — matching .NET running without Auth0, and keeping local development /
-  `jumptest` working without a tenant. The API's own outbound call to the
-  Scheduler (below) attaches an M2M bearer token via
-  `common::auth0::m2m_token("scheduler")` — see docs/auth0-m2m.md.
+  optional `X-User` request header (absent that, the OS user) — matching .NET
+  running without Auth0, and keeping local development / `jumptest` working
+  without a tenant. The API's own outbound call to the Scheduler attaches an
+  M2M bearer token via `common::auth0::m2m_token("scheduler")` — see
+  docs/auth0-m2m.md.
 - **Self-registration.** On startup the server registers itself in
   `core.server_node` (type `ApiServer`, status `Online`) via `register_api_server`,
   mirroring the .NET `RegisterApiServer` task. It runs on a spawned thread (so a
   slow DB never blocks serving) and writes through `ServerNodeLogic::exec_unchecked`
   — the unchecked path is correct here because there is no security principal at
   startup. Host/user/OS fields come from `Util::populate_session_info`.
-- **Real-time notifications (SSE).** Replaces SignalR. The logic proxy's
-  after-hook fires on `insert`/`update`/`put` and calls `logic::notification::publish`
-  with `{DomainObjectName, InstanceId, JsonData}`. Delivery has two paths: the API
-  server registers an in-process sink (`set_local_delivery`) at startup, so its own
-  notifications go **straight to the local SSE registry** — no loopback HTTP, so it
-  works regardless of whether the registered hostname resolves. Any *other* online
-  API server in `core.server_node` (e.g. a separate scheduler/scriptagent that made
-  the change) is reached over HTTP at `POST /api/Notification/publish`, and the
-  fan-out skips this node's own URL to avoid double-delivery. Clients connect to
-  `GET /api/Notification/stream` and receive `PropertyUpdated` Server-Sent Events;
-  the Blazor `EventSource` client filters by domain object name. Same publish
-  contract/distribution model as the .NET version — only the browser transport
-  changed from SignalR to SSE, so one client works against both backends.
-  Connections are pruned via a 20s heartbeat; cross-instance scale-out would move
-  fan-out to Postgres `LISTEN`/`NOTIFY` or a message bus.
+- **Real-time notifications (SSE).** The logic proxy's after-hook fires on
+  `insert`/`update`/`put` and calls `logic::notification::publish` with
+  `{DomainObjectName, InstanceId, JsonData}`. Delivery has two paths: the API
+  server registers an in-process sink (`set_local_delivery`) at startup, so its
+  own notifications go **straight to the local SSE registry** — no loopback
+  HTTP, so it works regardless of whether the registered hostname resolves. Any
+  *other* online API server in `core.server_node` (e.g. a change made by the
+  scheduler/scriptagent) is reached over HTTP at `POST /api/Notification/publish`,
+  and the fan-out skips this node's own URL to avoid double-delivery. Clients
+  connect to `GET /api/Notification/stream` and receive `PropertyUpdated`
+  Server-Sent Events; both web clients filter by domain object name with the
+  browser `EventSource`. Connections are pruned via a 20s heartbeat;
+  cross-instance scale-out would move fan-out to Postgres `LISTEN`/`NOTIFY` or a
+  message bus.
+- **SSE + rouille gotcha:** rouille buffers reader-backed response bodies (it
+  computes `Content-Length` by reading to EOF, which never comes for a stream),
+  so `ResponseBody::from_reader` cannot stream. The stream endpoint uses
+  rouille's `Upgrade` trait to take over the socket and write/flush event frames
+  manually on a per-connection thread.
 - **`GET /api/Workflow/run/{id}`.** Resolves an online `Scheduler` node from
   `core.server_node` and POSTs the workflow id to its `/api/scheduler/execute`
   (mirrors `SchedulerClient.ExecuteAsync`), attaching an M2M bearer token when
@@ -158,7 +159,7 @@ with `templates/test-dotnet.csv`). Test output still lands under `gen/test/`.
   call itself fails.
 - **Deferred logic modules** (need un-ported infra): `EventServiceLogic`,
   `WorkflowLogic`, `HealthMonitorThread`. The `SchedulerLogic`/`ScriptAgentClient`
-  dispatch and cron handling are folded into the scheduler/agent servers below;
+  dispatch and cron handling are folded into the scheduler/agent servers;
   `M2MTokenProvider` is folded into `common::auth0`.
 
 ## Scheduler (`server/rust/scheduler`)
@@ -218,10 +219,9 @@ server.
   explicitly after a status change, so web clients watching `Workflow` update live
   (the agent fans out over HTTP to the registered API servers). Inbound requests
   (from the Scheduler) are gated by an M2M JWT against this app's "scriptagent"
-  audience (`common::auth0::authenticate_inbound("scriptagent", ...)`) —
-  unauthenticated if that audience isn't configured. The agent never calls
-  another service, so it has no outbound M2M client of its own — see
-  `docs/auth0-m2m.md`.
+  audience — unauthenticated if that audience isn't configured. The agent never
+  calls another service, so it has no outbound M2M client of its own — see
+  docs/auth0-m2m.md.
 - **Not yet ported:** the process-control verbs (stop/kill/pause/…) are stubs, as
   they are in .NET; and scripts that perform DB access run through the *checked*
   logic path, so they need a seeded principal to be authorized.
@@ -231,10 +231,10 @@ server.
 - A binary crate (`[[bin]]`) whose root is `main.generated.rs`; it wires in
   `base_test` and each per-object `<Obj>Test` module, then runs the persistence
   smoke test (seed admin role/principal, then insert/update each non-core
-  object twice) — the `Program.cs` logic.
+  object twice, selecting the data back after each write to verify it).
 - **Test data as `Value`.** `BaseTest::get_test_data` returns `serde_json::Value`
   written straight into the object's backing map via `base.set(...)`, matching
-  the dictionary-backed design (the .NET version used typed setters +
+  the dictionary-backed design (the .NET version uses typed setters +
   `Convert.*`).
 - **No `rand` dependency.** A small inline xorshift PRNG replaces
   `System.Random`. `TestDataType` keeps the .NET (non-PascalCase) variant names
@@ -245,10 +245,10 @@ server.
 
 ## Scripting notes (`shared/rust/script`)
 
-- The .NET in-process script engine (Roslyn C# / PowerShell / Python) is
-  replaced by **Rhai**, an embedded, sandboxed scripting language. No runtime
-  toolchain, instant execution, and scripts can do nothing the host doesn't
-  register. `ScriptProviderFactory` keeps the door open for other engines.
+- Where the .NET in-process script engine hosts Roslyn C# / PowerShell / Python,
+  the Rust backend embeds **Rhai** — sandboxed, no runtime toolchain, instant
+  execution, and scripts can do nothing the host doesn't register.
+  `ScriptProviderFactory` keeps the door open for other engines.
 - Same shape as .NET: `ScriptContext`, `ScriptProvider` trait,
   `ScriptProviderFactory`, `ScriptHost::invoke(ctx, script_row)` (reads
   `source` / `name` / `script_type_id` off a `core.script` record).
@@ -263,7 +263,5 @@ server.
   authorization (`OpRoleMemberLogic`) and audit stamping for free.
 - Errors percolate: a failed host call surfaces as a Rhai eval error →
   `ScriptError` → the caller; a non-zero `ret_code` is also an error.
-- **Deferred:** wiring `ScriptHost` into the proxy's pre/post **event-service**
-  hooks. `EventServiceLogic` lives in `logic`, but `script` depends on `logic`,
-  so calling scripts from `logic` would be a dependency cycle — that hook needs
-  a small callback-registry indirection, to be added with the event layer.
+- **Deferred:** wiring `ScriptHost` into the pre/post **event-service** hooks
+  (see Logic-layer notes above).

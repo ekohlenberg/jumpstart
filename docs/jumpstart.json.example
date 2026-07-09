@@ -1,5 +1,9 @@
 {
-  "modelpath": "~/projects/myapp/model.csv",
-  "templatedefs": ["server-rust", "web-blazor", "database-pgsql"],
+  "modelpath": "~/projects/myapp/myapp.csv",
+  "templatedefs": ["database-pgsql", "server-rust", "web-nodejs", "test-rust", "tools-rust"],
+  "auth0": {
+    "domain": "your-tenant.us.auth0.com",
+    "clientId": "YOUR_SPA_CLIENT_ID",
+    "audience": "https://myapp"
   }
 }

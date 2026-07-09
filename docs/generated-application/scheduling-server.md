@@ -7,7 +7,7 @@ nav_order: 3
 
 # Scheduling Server
 
-The Scheduler is a standalone .NET service that orchestrates workflow execution across distributed agents.
+The Scheduler is a standalone service — a .NET worker or a Rust binary, depending on the backend you generate — that fires workflows on cron schedules and orchestrates their execution across distributed agents.
 
 ## Architecture
 
@@ -15,155 +15,81 @@ The Scheduler is a standalone .NET service that orchestrates workflow execution 
 API Server                    Scheduler                     Agent(s)
     |                            |                             |
     |  POST /scheduler/execute   |                             |
-    |-------------------------->|                             |
-    |                            |  Queue workflow              |
-    |                            |  DispatcherThread            |
-    |                            |      |                      |
-    |                            |      | Load child workflows  |
-    |                            |      | Group by sequence     |
-    |                            |      |                      |
-    |                            |      | POST /agent/execute   |
-    |                            |      |--------------------->|
-    |                            |      |                      | Execute script
-    |                            |      |                      |
-    |                            |      |  Status: Completed   |
-    |                            |      |<---------------------|
-    |                            |      |                      |
-    |  200 OK (executionId)      |      | Next sequence...     |
-    |<--------------------------|      |                      |
+    |--------------------------->|                             |
+    |                            |  Expand child workflows     |
+    |                            |  Group by sequence          |
+    |                            |                             |
+    |                            |  POST /scriptagent/execute  |
+    |                            |---------------------------->|
+    |                            |                             | Execute script
+    |                            |   status → DB + notify      |
+    |                            |<----------------------------|
+    |                            |  Next sequence...           |
 ```
 
 ## Startup
 
-The scheduler service:
+The scheduler:
 
-1. **Binds to a dynamic port** in the range 5000-5100
-2. **Registers itself** as a `ServerNode` in the database with `server_node_type_id = Scheduler`
-3. **Starts the DispatcherThread** for processing the job queue
-4. **Starts the HealthMonitorThread** for periodic system checks
-5. **Sets status to Online** when ready to accept work
+1. **Binds the first free port** in the range **5000-5100**
+2. **Registers itself** in `core.server_node` with type `Scheduler`, status `Online`
+3. **Starts the dispatcher** that processes the job queue
+4. **Starts the cron thread** that fires scheduled workflows
+5. On shutdown (SIGINT/SIGTERM), sets its status to **Offline**
 
-On shutdown, it sets its status to **Offline** and waits for in-flight jobs to complete.
+## Cron Scheduling
+
+Schedules are data, not code: each `core.schedule` row references the cron component lookup tables (`cron_minute`, `cron_hour`, `cron_dom`, `cron_month`, `cron_dow`, `cron_every`). The cron thread:
+
+1. Loads every active workflow whose schedule has its cron component FKs populated
+2. Assembles a Quartz-style 7-field expression (`sec min hour dom month dow year`), applying the `Every`/`Exactly` modifier and reconciling day-of-month vs day-of-week
+3. Computes the next fire time (Quartz scheduling on .NET; the `cron` crate on Rust) and calls `execute(workflow_id)` when due
+4. Reloads schedules every 5 minutes
+
+Day-of-week numbering is Quartz-compatible (1-7, Sun=1).
 
 ## Scheduler API
 
+All routes are gated by an M2M JWT when an audience is configured (see [M2M Authentication](../auth0-m2m.md)); unauthenticated otherwise.
+
 | Method | Route | Description |
 |--------|-------|-------------|
-| `POST` | `/api/scheduler/execute` | Queue a workflow for immediate execution |
-| `POST` | `/api/scheduler/schedule` | Schedule a workflow |
-| `POST` | `/api/scheduler/cancel/{id}` | Cancel a queued/running workflow |
-| `POST` | `/api/scheduler/abort/{id}` | Abort execution immediately |
-| `POST` | `/api/scheduler/pause/{id}` | Pause a running workflow |
-| `POST` | `/api/scheduler/resume/{id}` | Resume a paused workflow |
-| `POST` | `/api/scheduler/retry/{id}` | Retry a failed workflow |
-| `GET` | `/api/scheduler/status/{id}` | Get execution status |
-| `GET` | `/api/scheduler/health` | Health check |
-| `POST` | `/api/scheduler/register` | Register scheduler instance |
-| `POST` | `/api/scheduler/unregister/{id}` | Unregister on shutdown |
+| `POST` | `/api/scheduler/execute` | Queue a workflow for immediate execution (body = workflow id) |
+| `POST` | `/api/scheduler/cancel/{id}` / `abort/{id}` | Cancel/abort (stubs in both backends) |
+| `GET` | `/api/scheduler/status/{id}` | Execution status |
+| `POST` | `/api/scheduler/register` / `unregister/{id}` | Instance registration |
+| `GET` | `/api/scheduler/ping` / `health` | Liveness checks |
 
-## SchedulerLogic
+## Dispatch
 
-The core orchestration engine managing workflow dispatch.
+`execute(workflowId)` implements the orchestration:
 
-### Job Queue
-
-```csharp
-ConcurrentQueue<long> + ManualResetEventSlim
-```
-
-- Thread-safe concurrent queue for workflow IDs
-- `ManualResetEventSlim` for efficient signaling when new jobs arrive
-- The DispatcherThread blocks on the signal when the queue is empty
-
-### Execution Flow
-
-`ExecuteWorkflowInternal(workflowId)`:
-
-1. **Load parent workflow** from database
-2. **Collect child workflows** recursively
-3. **Group children by sequence number** -- children with the same sequence run in parallel
-4. **For each sequence group** (in order):
-   - Execute all workflows in the group concurrently
-   - Wait for all to complete before advancing to the next sequence
-5. **Handle failures** according to `on_failure_action_id`:
-   - **Stop** -- abort remaining sequences
-   - **Continue** -- proceed to next sequence despite failures
-
-### Workflow Types
-
-| Type | Behavior |
-|------|----------|
-| **Process** | Dispatched to an Agent via `AgentClient.ExecuteAsync()` |
-| **Folder** | Contains child workflows; dispatched back to Scheduler for recursive execution |
+1. **Load the workflow.** A `Process` workflow is dispatched directly; a `Folder` workflow is expanded into its child workflows recursively (via `parent_id`).
+2. **Group children by sequence number** — children sharing a `seq` value run in parallel; groups run in order.
+3. **Dispatch each `Process` child** to an online agent's `POST /api/scriptagent/execute`, attaching an M2M bearer token when configured. A `Folder` child is re-queued to the scheduler.
+4. **Track status.** Each workflow is set to `Dispatched` before the call and `Failed` on a dispatch error; every change is published so the web UI updates live over SSE.
+5. **Handle failures** per the workflow's `on_failure` action: stop remaining sequences, or continue.
 
 ### Status Transitions
 
 ```
-Idle  -->  Dispatched  -->  Executing  -->  Completed
-                                       -->  Failed
-                                       -->  Cancelled
-                                       -->  Timeout
-                                       -->  Interrupted
-                                       -->  Suspended
+Idle --> Dispatched --> Executing --> Completed
+                                  --> Failed / Cancelled / Timeout / Interrupted / Suspended
 ```
-
-## DispatcherThread
-
-A background thread that processes the job queue:
-
-```csharp
-BlockingCollection<long> Queue
-```
-
-- Consumes workflow IDs from the blocking collection
-- Calls `ProcessJob(jobId)` for each item
-- Handles errors without stopping the thread
-- Supports graceful shutdown via `Queue.CompleteAdding()`
-
-## HealthMonitorThread
-
-A periodic monitoring thread that runs every 30 seconds:
-
-- **Memory check**: Warns if process memory exceeds 1000 MB
-- **Thread pool check**: Warns if fewer than 10% of worker threads are available
-- **Queue status**: Reports on pending jobs
-- Continues monitoring even if individual checks fail
-- Stops gracefully via volatile `_running` flag
-
-## SchedulerClient
-
-The `SchedulerClient` is a REST client used by the API server (and other services) to communicate with the scheduler:
-
-```csharp
-var serverNode = /* query for online Scheduler node */;
-using var client = new SchedulerClient(serverNode);
-var executionId = await client.ExecuteAsync(workflowId);
-```
-
-The client reads the scheduler's URL from the `ServerNode` record and uses `HttpClient` with a 30-second timeout.
-
-### Advanced Operations
-
-Beyond basic execution, the `SchedulerClient` supports:
-
-| Category | Methods |
-|----------|---------|
-| **Job Control** | Cancel, Abort, Pause, Resume, Retry |
-| **Scheduling** | Schedule, Queue, Repeat |
-| **Workflow Patterns** | Chain, Fork, Join, Batch |
-| **Resource Management** | Allocate, Deallocate, Balance, Scale |
-| **Lifecycle** | Migrate, Configure, Validate |
 
 ## Server Node Discovery
 
-The API server locates an available scheduler by querying the database:
+The API server finds a scheduler (and the scheduler finds agents) by querying the registry:
 
 ```sql
 SELECT * FROM core.server_node
-WHERE server_node_type_id = 2       -- Scheduler
+WHERE server_node_type_id = 2       -- Scheduler (1 = Agent, 3 = ApiServer)
   AND server_node_status_id = 2     -- Online
   AND is_active = 1
-ORDER BY registered_at DESC
 ```
 
-The most recently registered online scheduler is selected. This pattern supports multiple scheduler instances for high availability.
+`GET /api/Workflow/run/{id}` on the API server resolves an online scheduler this way and POSTs to its execute route — returning 503 if none is registered, 502 if dispatch fails. Multiple scheduler instances can register for high availability.
+
+## Not Yet Ported (Rust)
+
+`cancel`/`abort` remain stubs (as in .NET), and the .NET `HealthMonitorThread` (periodic memory/thread-pool checks) has no Rust equivalent yet.
