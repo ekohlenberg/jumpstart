@@ -425,9 +425,9 @@ fn execute_child_workflow(child: &Value) {
     publish_workflow_change(id, &obj);
 
     if wtype == WorkflowType::Process as i64 {
-        let agent_id = jval_i64(child, "server_node_id");
-        match agent_url(agent_id) {
-            Some(url) => {
+        let assigned_id = jval_i64(child, "server_node_id");
+        match resolve_agent(assigned_id) {
+            Some((agent_id, url)) => {
                 let endpoint = format!("{}/api/scriptagent/execute", url.trim_end_matches('/'));
                 let mut req = ureq::post(&endpoint).set("Content-Type", "application/json");
                 match auth0::m2m_token("scriptagent") {
@@ -440,8 +440,8 @@ fn execute_child_workflow(child: &Value) {
                 }
                 match req.send_string(&id.to_string()) {
                     Ok(_) => Logger::info(format!(
-                        "scheduler: dispatched process workflow {} to agent {}",
-                        id, agent_id
+                        "scheduler: dispatched process workflow {} to agent {} ({})",
+                        id, agent_id, url
                     )),
                     Err(e) => {
                         Logger::error(format!("scheduler: dispatch of workflow {} failed: {}", id, e));
@@ -451,8 +451,8 @@ fn execute_child_workflow(child: &Value) {
             }
             None => {
                 Logger::error(format!(
-                    "scheduler: no agent url for node {} (workflow {})",
-                    agent_id, id
+                    "scheduler: no online ScriptAgent available to run workflow {} (assigned node {})",
+                    id, assigned_id
                 ));
                 fail_workflow(id, &obj);
             }
@@ -558,10 +558,41 @@ fn update_object(object: &str, id: i64, record: &BaseObject) -> Result<Value, St
     object_exec_unchecked(object, "update", &mut ctx).map_err(|e| format!("{}", e))
 }
 
-fn agent_url(server_node_id: i64) -> Option<String> {
-    let sql = format!("select url from core.server_node where id = {}", server_node_id);
+/// Resolve which ScriptAgent to dispatch a Process workflow to, returning
+/// `(server_node_id, url)`. Only **online ScriptAgent** nodes are eligible, so a
+/// Process is never dispatched to the API or Scheduler node. The workflow's
+/// assigned `server_node_id` is preferred when it is one of those online agents;
+/// otherwise dispatch falls back to the most recently registered online agent.
+/// This keeps dispatch working when the stored `server_node_id` is stale (agents
+/// re-register on new ports, so their ids drift) or points at the wrong node
+/// type — the cause of a `POST .../api/scriptagent/execute` 404 against a
+/// non-agent URL.
+fn resolve_agent(preferred_id: i64) -> Option<(i64, String)> {
+    let sql = format!(
+        "SELECT id, url FROM core.server_node \
+         WHERE server_node_type_id = {} AND server_node_status_id = {} AND is_active = 1 \
+         ORDER BY registered_at DESC",
+        ServerNodeType::Agent as i64,
+        ServerNodeStatus::Online as i64
+    );
     let rows = DBPersist::select(&sql, "default").ok()?;
-    rows.first().map(|r| row_str(r, "url")).filter(|u| !u.is_empty())
+    let agents: Vec<(i64, String)> = rows
+        .iter()
+        .map(|r| (row_i64(r, "id"), row_str(r, "url")))
+        .filter(|(_, url)| !url.is_empty())
+        .collect();
+    if agents.is_empty() {
+        return None;
+    }
+    if let Some(agent) = agents.iter().find(|(agent_id, _)| *agent_id == preferred_id) {
+        return Some(agent.clone());
+    }
+    Logger::warning(format!(
+        "scheduler: assigned server_node {} is not an online ScriptAgent; \
+         falling back to agent {} ({})",
+        preferred_id, agents[0].0, agents[0].1
+    ));
+    Some(agents[0].clone())
 }
 
 fn base_object_from_value(value: &Value) -> BaseObject {

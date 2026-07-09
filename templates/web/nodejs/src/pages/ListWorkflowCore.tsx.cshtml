@@ -1,0 +1,254 @@
+@using System.Collections.Generic;
+@using System.Linq;
+@using jumpstart;
+@{
+    // Mirrors web/blazor/Pages/ListWorkflowCore.razor.cshtml: a custom list
+    // page for the "workflow" core table, linked from the nav menu via its
+    // own MetaObject.Uri ("core/workflow") instead of the default
+    // "/{domainVar}" every other object gets (see MetaObject.Uri in
+    // src/metamodel.cs). Unlike Listtemplate.tsx.cshtml (TEMPLATE_TYPE
+    // "object", one MetaObject handed in as Model per generated file), this
+    // is TEMPLATE_TYPE "model" -- generated once, with the whole MetaModel
+    // as Model -- since it's a one-off page for one specific table, not a
+    // pattern applied to every domain object. So the first thing this does
+    // is look up the "Workflow" MetaObject itself.
+    //
+    // The standard EditWorkflow.tsx (generated normally by
+    // Edittemplate.tsx.cshtml, since "workflow" is an ordinary MetaObject
+    // like any other) is reused as-is for add/edit -- only the list page is
+    // custom here, same as Blazor's version navigates to "edit-workflow".
+    // Plain foreach+break rather than Model.Objects.FirstOrDefault(lambda)
+    // -- Model's members resolve dynamically in RazorLight, and a lambda
+    // can't be passed to a dynamically dispatched call without an explicit
+    // delegate/expression-tree cast, the same reason every other template
+    // in this project uses foreach instead of LINQ over Model.* here.
+    MetaObject workflowObj = null;
+    foreach (var obj in Model.Objects)
+    {
+        if (obj.DomainObj == "Workflow") { workflowObj = obj; break; }
+    }
+
+    // Same FK -> RWK column synthesis Listtemplate.tsx.cshtml performs (see
+    // there for the general explanation), just applied to one specific
+    // object instead of "whichever object this template was generated
+    // for". exec_status has *two* RWK columns (name, image) -- see
+    // templates/core/core.csv -- so this naturally produces both
+    // "exec_status_name" and "exec_status_image" the same way any other FK
+    // with multiple RWK columns would.
+    var fkViewColumns = new List<(string Key, string Label, string TsType)>();
+    var usedAliases = new HashSet<string>();
+    foreach (var fk in workflowObj.Attributes)
+    {
+        if (string.IsNullOrEmpty(fk.FkObject)) { continue; }
+
+        MetaObject fkObject = null;
+        foreach (var obj in Model.Objects)
+        {
+            if (obj.TableName == fk.FkTable) { fkObject = obj; break; }
+        }
+        if (fkObject == null) { continue; }
+
+        var aliasBase = fk.Name.EndsWith("_id") ? fk.Name.Substring(0, fk.Name.Length - 3) : fk.Name;
+        var alias = aliasBase;
+        var counter = 1;
+        while (usedAliases.Contains(alias)) { alias = aliasBase + "_" + counter; counter++; }
+        usedAliases.Add(alias);
+
+        foreach (var rwkAttr in fkObject.Attributes)
+        {
+            if (rwkAttr.RWK != "1") { continue; }
+            var key = alias + "_" + rwkAttr.Name;
+            var colLabel = fk.Label + (rwkAttr.Name.ToLower().StartsWith("name") ? "" : " " + rwkAttr.Label);
+            fkViewColumns.Add((key, colLabel, TypeMapping.ToTsType(rwkAttr.DotNetType)));
+        }
+    }
+
+    // Display columns = every attribute except raw FK id columns, plus the
+    // synthesized FK-view columns -- same filter Listtemplate.tsx.cshtml
+    // applies -- except "exec_status_image", which is hidden from the
+    // visible column list and only used as the image src for
+    // "exec_status_name" below (mirrors Blazor's ListWorkflowCore
+    // HiddenColumns/ImageColumns, hardcoded there the same way).
+    var displayColumns = new List<(string Key, string Label, string ImageKey)>();
+    foreach (var attr in workflowObj.Attributes)
+    {
+        if (attr.Name.EndsWith("_id")) { continue; }
+        displayColumns.Add((attr.Name, attr.Label, null));
+    }
+    foreach (var col in fkViewColumns)
+    {
+        if (col.Key == "exec_status_image") { continue; }
+        string imageKey = col.Key == "exec_status_name" ? "exec_status_image" : null;
+        displayColumns.Add((col.Key, col.Label, imageKey));
+    }
+}
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useApiClient, type ApiClient } from "../api/apiClient";
+import DataTableContextMenu, { type DataTableContextMenuColumn, type ContextMenuItem } from "../components/DataTableContextMenu";
+
+// Row shape returned by GET /api/workflow and /api/workflow/view/{id} --
+// matches the WorkflowView class generated for the dotnet/rust servers.
+// exec_status_image is included here (even though it's not one of the
+// visible `columns` below) since DataTableContextMenu reads it off the row
+// at render time to build the "exec_status_name" column's <img src>.
+export interface WorkflowView {
+@foreach (var attr in workflowObj.Attributes)
+{
+<text>  @(attr.Name): @(TypeMapping.ToTsType(attr.DotNetType));
+</text>
+}
+@foreach (var col in fkViewColumns)
+{
+<text>  @(col.Key): @(col.TsType);
+</text>
+}
+}
+
+const DOMAIN_OBJECT_NAME = "Workflow";
+
+const columns: DataTableContextMenuColumn[] = [
+@foreach (var col in displayColumns)
+{
+if (col.ImageKey == null)
+{
+<text>  { key: "@(col.Key)", label: "@(col.Label)" },
+</text>
+}
+else
+{
+<text>  { key: "@(col.Key)", label: "@(col.Label)", imageKey: "@(col.ImageKey)" },
+</text>
+}
+}
+];
+
+// Matches the server's PropertyUpdateMessage (see
+// server/dotnet/api/EventAggregator.core.cs.cshtml and
+// shared/rust/logic/notification.core.rs.cshtml).
+interface PropertyUpdateMessage {
+  DomainObjectName: string;
+  InstanceId: number;
+  JsonData: string;
+  Timestamp: string;
+}
+
+// No explicit `: Promise<WorkflowView[]>` return type here -- a bare
+// `Identifier<...>` outside a `<text>`-wrapped code region can make
+// RazorLight's markup parser mistake it for an HTML/JSX tag opening, same
+// as everywhere else in this file. TypeScript infers the return type fine
+// from the `as WorkflowView[]` cast below.
+async function fetchWorkflowList(api: ApiClient) {
+  return (await api.get("/api/@(workflowObj.DomainVar)")) as WorkflowView[];
+}
+
+export default function ListWorkflowCore() {
+  const api = useApiClient();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [list, setList] = useState(null as WorkflowView[] | null);
+  // Typed via the initial value's "as" cast (rather than useRef<EventSource
+  // | null>(...)) -- a bare `Identifier<...>` outside a `<text>`-wrapped code
+  // region can make RazorLight's markup parser mistake it for an HTML/JSX
+  // tag opening.
+  const sseRef = useRef(null as EventSource | null);
+  const listRef = useRef(null as WorkflowView[] | null);
+  useEffect(() => {
+    listRef.current = list;
+  }, [list]);
+
+  const reloadList = useCallback(async () => {
+    try {
+      setList(await fetchWorkflowList(api));
+    } catch (err) {
+      console.error("ListWorkflowCore: error reloading list", err);
+    }
+  }, [api]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchWorkflowList(api)
+      .then((data) => {
+        if (!cancelled) setList(data);
+      })
+      .catch((err) => console.error("ListWorkflowCore: error loading list", err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [api]);
+
+  // Real-time updates, same SSE stream every other list page uses.
+  useEffect(() => {
+    const source = new EventSource(`${api.baseUrl}/api/Notification/stream`);
+    sseRef.current = source;
+
+    source.addEventListener("PropertyUpdated", async (event: MessageEvent) => {
+      try {
+        const message: PropertyUpdateMessage = JSON.parse(event.data);
+        if (message.DomainObjectName !== DOMAIN_OBJECT_NAME) return;
+
+        const index = (listRef.current ?? []).findIndex((item) => item.id === message.InstanceId);
+        if (index >= 0) {
+          const updated = (await api.get(`/api/@(workflowObj.DomainVar)/view/${message.InstanceId}`)) as WorkflowView;
+          setList((current) => {
+            if (!current) return current;
+            const next = [...current];
+            const i = next.findIndex((item) => item.id === message.InstanceId);
+            if (i >= 0) next[i] = updated;
+            return next;
+          });
+        } else {
+          await reloadList();
+        }
+      } catch (err) {
+        console.error("ListWorkflowCore: error handling notification", err);
+      }
+    });
+
+    return () => {
+      source.close();
+      sseRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [api]);
+
+  // Fire-and-forget, same as Blazor's RunWorkflow (no result to show --
+  // progress/status shows up via the SSE-driven exec_status update above).
+  function runWorkflow(id: number) {
+    api.get(`/api/@(workflowObj.DomainVar)/run/${id}`).catch((err) => {
+      console.error("ListWorkflowCore: error running workflow", err);
+    });
+  }
+
+  const contextMenuItems: ContextMenuItem[] = [{ label: "Run", action: runWorkflow }];
+
+  function onAdd() {
+    const returnUrl = encodeURIComponent(location.pathname);
+    navigate(`/edit-@(workflowObj.DomainVar)?returnUrl=${returnUrl}`);
+  }
+
+  function onEdit(item: WorkflowView) {
+    const returnUrl = encodeURIComponent(location.pathname);
+    navigate(`/edit-@(workflowObj.DomainVar)/${item.id}?returnUrl=${returnUrl}`);
+  }
+
+  return (
+    <>
+      <h1>@(workflowObj.Label)</h1>
+      <p>This page demonstrates fetching @(workflowObj.Label) data from the server.</p>
+
+      <DataTableContextMenu
+        data={list}
+        columns={columns}
+        showActions
+        showAddButton
+        onEdit={onEdit}
+        onAdd={onAdd}
+        contextMenuItems={contextMenuItems}
+      />
+    </>
+  );
+}

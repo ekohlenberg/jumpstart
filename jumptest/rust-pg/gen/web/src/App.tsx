@@ -9,6 +9,12 @@ import MainLayout from "./layout/MainLayout";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import AuthCallback from "./auth/AuthCallback";
 import Home from "./pages/Home";
+// Custom list page for the "workflow" core table -- linked from the nav
+// menu via its own MetaObject.Uri ("core/workflow") instead of the default
+// "/{domainVar}" every other object gets (see
+// src/pages/ListWorkflowCore.tsx.cshtml). Registered as a static route
+// below rather than through the per-object loop, since it isn't one.
+import ListWorkflowCore from "./pages/ListWorkflowCore";
 import ListTestResultStatus from "./pages/ListTestResultStatus";
 import EditTestResultStatus from "./pages/EditTestResultStatus";
 import ListTestPlan from "./pages/ListTestPlan";
@@ -91,6 +97,7 @@ export default function App() {
             <MainLayout>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/core/workflow" element={<ListWorkflowCore />} />
           
                 <Route path="/testresultstatus" element={<ListTestResultStatus />} />
                 <Route path="/edit-testresultstatus" element={<EditTestResultStatus />} />

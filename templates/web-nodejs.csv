@@ -34,4 +34,7 @@ Node web pages,object,web/nodejs/src/pages/Listtemplate.tsx.cshtml,./gen/web/src
 Node web pages,object,web/nodejs/src/pages/Edittemplate.tsx.cshtml,./gen/web/src/pages,TRUE
 Node web components,model,web/nodejs/src/components/TabControl.tsx.cshtml,./gen/web/src/components,TRUE
 Node web components,model,web/nodejs/src/components/TabControl.css,./gen/web/src/components,TRUE
+Node web components,model,web/nodejs/src/components/DataTableContextMenu.tsx.cshtml,./gen/web/src/components,TRUE
+Node web components,model,web/nodejs/src/components/DataTableContextMenu.css,./gen/web/src/components,TRUE
+Node web pages,model,web/nodejs/src/pages/ListWorkflowCore.tsx.cshtml,./gen/web/src/pages,TRUE
 Node web styles,model,web/nodejs/src/styles/editForm.css,./gen/web/src/styles,TRUE

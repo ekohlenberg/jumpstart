@@ -65,19 +65,26 @@ pub struct Auth0Config {
     /// there is one Auth0 tenant per application, not one per server.
     #[serde(default)]
     pub domain: String,
-    /// Each service's own inbound audience -- the Auth0 API resource it
-    /// validates incoming bearer tokens against -- keyed by service name:
-    /// "api", "scheduler", "scriptagent". See docs/auth0-setup.md (user JWTs,
-    /// "api" only) and docs/auth0-m2m.md (M2M JWTs, all three).
+    /// The single shared audience for the whole application. Every server
+    /// validates inbound bearer tokens against this one Auth0 API resource, and
+    /// every server-to-server M2M call requests a token for it. One API + one
+    /// M2M application covers the entire app (see docs/auth0-m2m.md).
+    #[serde(default)]
+    pub audience: String,
+    /// The single shared M2M (client-credentials) application used for every
+    /// server-to-server call (API -> Scheduler, Scheduler -> ScriptAgent, and
+    /// notification publishing to the API). One set of credentials for all
+    /// components.
+    #[serde(default)]
+    pub m2m_client: Option<M2MClientConfig>,
+
+    // ── Legacy per-service maps (optional, honored only as a fallback) ──────
+    // Older configs keyed the audience and M2M credentials by service name.
+    // These are still read when the shared `audience` / `m2m_client` above are
+    // absent, so existing deployments keep working, but the shared fields are
+    // the supported shape going forward.
     #[serde(default)]
     pub audiences: HashMap<String, String>,
-    /// M2M (client-credentials) applications used for outbound service-to-
-    /// service calls, keyed by the *called* service: "scheduler" (used by the
-    /// API to call the Scheduler) and "scriptagent" (used by the Scheduler to
-    /// call a ScriptAgent). The target audience is looked up from `audiences`
-    /// rather than duplicated here, since it must match what that service
-    /// validates against. ScriptAgent has no entry -- it only receives M2M
-    /// calls, it never makes them (see docs/auth0-m2m.md).
     #[serde(default)]
     pub m2m_clients: HashMap<String, M2MClientConfig>,
 }
@@ -205,13 +212,21 @@ impl Config {
         if auth0.domain.is_empty() {
             return None;
         }
-        let audience = auth0.audiences.get(service)?;
+        // Prefer the single shared audience; fall back to the legacy per-service
+        // map so older configs still resolve. `service` is only consulted for
+        // that fallback -- with the shared field set, every service validates
+        // against the same audience.
+        let audience = if !auth0.audience.is_empty() {
+            auth0.audience.clone()
+        } else {
+            auth0.audiences.get(service).cloned().unwrap_or_default()
+        };
         if audience.is_empty() {
             return None;
         }
         Some(Auth0Settings {
             domain: auth0.domain.clone(),
-            audience: audience.clone(),
+            audience,
         })
     }
 
@@ -229,11 +244,21 @@ impl Config {
         if auth0.domain.is_empty() {
             return None;
         }
-        let client = auth0.m2m_clients.get(target_service)?;
+        // Prefer the single shared M2M client + shared audience; fall back to the
+        // legacy per-target maps. With the shared fields set, every outbound call
+        // uses the same credentials for the same audience regardless of target.
+        let client = auth0
+            .m2m_client
+            .as_ref()
+            .or_else(|| auth0.m2m_clients.get(target_service))?;
         if client.client_id.is_empty() || client.client_secret.is_empty() {
             return None;
         }
-        let audience = auth0.audiences.get(target_service)?;
+        let audience = if !auth0.audience.is_empty() {
+            auth0.audience.clone()
+        } else {
+            auth0.audiences.get(target_service).cloned().unwrap_or_default()
+        };
         if audience.is_empty() {
             return None;
         }
@@ -241,7 +266,7 @@ impl Config {
             token_endpoint: format!("https://{}/oauth/token", auth0.domain),
             client_id: client.client_id.clone(),
             client_secret: client.client_secret.clone(),
-            audience: audience.clone(),
+            audience,
         })
     }
 
