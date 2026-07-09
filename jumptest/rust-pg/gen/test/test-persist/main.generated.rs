@@ -110,10 +110,6 @@ pub use test_run_test::*;
 mod principal_org_test;
 pub use principal_org_test::*;
     
-#[path = "PrincipalPassword.test.generated.rs"]
-mod principal_password_test;
-pub use principal_password_test::*;
-    
 #[path = "OpRoleMap.test.generated.rs"]
 mod op_role_map_test;
 pub use op_role_map_test::*;

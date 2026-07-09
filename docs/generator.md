@@ -39,6 +39,7 @@ The Jumpstart generator reads CSV metadata, builds an in-memory model, and rende
 
 ### Loading Sequence
 
+0. The application **namespace** is inferred from the model filename (`myapp.csv` → `myapp`), and any `auth0` settings in `~/.jumpstart.json` are wired into the MetaModel for templates to reference
 1. **CSVLoader** reads your application's metadata CSV into `MetaModel`
 2. **CoreLoader** reads `templates/core/core.csv`, adding built-in system tables
 3. **GlobalCSVLoader** reads `templates/core/global.csv`, adding audit columns to every table
@@ -149,8 +150,8 @@ Template definitions are CSV files that declare which templates to run and where
 
 ```csv
 COMMENT,TEMPLATE_TYPE,TEMPLATE_PATH,OUTPUT_DIR,FORCE
-dotnet server templates-domain,object,shared/dotnet/domain/template.generated.cs.cshtml,./shared/domain,TRUE
-dotnet server templates-domain,object,shared/dotnet/domain/template.user.cs.cshtml,./shared/domain,FALSE
+rust server templates-domain,object,shared/rust/domain/template.generated.rs.cshtml,./gen/shared/domain,TRUE
+rust server templates-domain,object,shared/rust/domain/template.user.rs.cshtml,./usr/shared/domain,FALSE
 ```
 
 | Column | Description |
@@ -181,16 +182,18 @@ Examples:
 
 Note: Files without "template" in their name keep their original name (minus `.cshtml`).
 
-### FORCE Flag
+### FORCE Flag and the gen/ vs usr/ Split
 
-The FORCE flag controls overwrite behavior:
+The FORCE flag controls overwrite behavior, and by convention it pairs with the output directory:
 
-- **FORCE=TRUE** -- File is always regenerated. Used for generated code that should never be hand-edited (e.g., `*.generated.cs`).
-- **FORCE=FALSE** -- File is only created if it doesn't exist. Used for user-customizable files (e.g., `*.user.cs`, `appsettings.json`).
+- **FORCE=TRUE** -- File is always regenerated. These templates write under **`./gen/`** and must never be hand-edited (e.g., `*.generated.cs`, `*.generated.rs`, `*.core.*`).
+- **FORCE=FALSE** -- File is only created if it doesn't exist. These templates write under **`./usr/`** (or `./bin` for launchers) and are yours to edit (e.g., `*.user.cs`, `*.user.rs`, `appsettings.json`, `user_api.rs`).
 
-This pattern enables the **generated + user partial class** convention:
-- `Customer.generated.cs` (FORCE=TRUE) -- regenerated every time
-- `Customer.user.cs` (FORCE=FALSE) -- created once, then hand-editable
+This enables the **generated + user** extension convention in both backends:
+- `Customer.generated.cs` / `Customer.generated.rs` (FORCE=TRUE, in `gen/`) -- regenerated every time
+- `Customer.user.cs` / `Customer.user.rs` (FORCE=FALSE, in `usr/`) -- created once, then hand-editable
+
+In C# the two halves are `partial class`es; in Rust the crate root `include!`s both files into one module. Corollary: anything *generated* code calls must be defined in *generated* code, because the generator cannot retroactively update an existing `usr/` file.
 
 ### Template Syntax
 
@@ -216,40 +219,54 @@ Templates use RazorLight, a Razor-based templating engine. Key syntax:
 
 ### Template Registries
 
-#### server-dotnet.csv (Server Templates)
+There are ten template registries. Server, web, test, and tools registries come in matched pairs -- one per language target -- that produce structurally equivalent output.
 
-The server template registry defines ~100 templates across these layers:
+| Registry | Target | Contents |
+|----------|--------|----------|
+| `database-pgsql.csv` / `database-mssql.csv` | PostgreSQL / SQL Server | DDL (schema, table, sequence, rwkindex, views), seed data, nav menus, named queries, build/load scripts |
+| `server-dotnet.csv` | .NET 9 | common, domain, persist, logic, API, scheduler, script agent |
+| `server-rust.csv` | Rust | the same layers as Cargo crates, plus the `script` crate (Rhai) |
+| `web-blazor.csv` | Blazor WASM | pages, components, layout, auth, assets |
+| `web-nodejs.csv` | React + Vite | pages, components, layout, auth, API client, assets |
+| `test-dotnet.csv` / `test-rust.csv` | tests | test-persist, test-script, test-scheduler, test-scriptagent (+ test-api on .NET) |
+| `tools-dotnet.csv` / `tools-rust.csv` | tools | CSV import and export utilities (+ test-impexp and setup-auth0 on .NET) |
 
-| Layer | Key Templates | Type |
-|-------|--------------|------|
-| **Common** | Config, BaseObject, Logger, DatabaseProviders, ScriptHost | model |
-| **Domain** | `template.generated.cs`, `template.user.cs` | object |
-| **Domain Core** | Workflow, Execution, Script, ServerNode enums | model |
-| **Persist** | DBPersist, persist.csproj | model |
-| **Logic** | `templateLogic.generated.cs`, `templateLogic.user.cs` | object |
-| **Logic Core** | BaseLogic, Proxy, Scheduler/Agent/Workflow logic | model |
-| **API** | `template.api.generated.cs`, Program.cs, NotificationHub | object/model |
-| **Scheduler** | scheduler.api.core.cs, Program.cs | model |
-| **Agent** | agent.api.core.cs, Program.cs | model |
-| **Tests** | test-persist, test-api, test-agent, test-scheduler | object/model |
+#### server-dotnet.csv / server-rust.csv (Server Templates)
 
-#### web-blazor.csv (Web Templates)
+Each server registry defines the full backend across these layers:
 
-| Layer | Key Templates | Type |
-|-------|--------------|------|
-| **Pages** | `Listtemplate.razor`, `Edittemplate.razor` | object |
-| **Pages Core** | ListWorkflowCore.razor | model |
-| **Components** | DataTable, DataTableContextMenu, TabControl | model |
-| **Layout** | MainLayout, NavMenuLayout | model |
-| **Root** | App.razor, _Imports.razor, Program.cs | model |
-| **Assets** | index.html, CSS, Bootstrap | model |
+| Layer | .NET Templates | Rust Templates | Type |
+|-------|----------------|----------------|------|
+| **Common** | Config, BaseObject, Logger, DB providers, ScriptHost | config, base_object, logger, db providers, auth0 | model |
+| **Domain** | `template.generated.cs` / `template.user.cs` | `template.generated.rs` / `template.user.rs` | object |
+| **Domain Core** | Workflow, Execution, Script, ServerNode enums | same, as Rust modules | model |
+| **Persist** | DBPersist + audit/basic strategies | db_persist + audit/basic/import strategies | model |
+| **Logic** | `templateLogic.generated.cs` / `.user.cs` | `templateLogic.generated.rs` / `.user.rs` | object |
+| **Logic Core** | BaseLogic, Proxy (DispatchProxy AOP) | logic_exec, proxy, dispatch (see [Rust reference](rust/logic-dispatch.md)) | model |
+| **Script** | CSharpCompiler, PowerShell/Python providers (in common) | `script` crate: RhaiProvider, ScriptHost, logic_bridge | model |
+| **API** | per-object controllers + Program.cs | generic router `main.generated.rs` + `user_api.rs` hook | object/model |
+| **Scheduler** | Program.cs, QuartzSchedulerThread | main.generated.rs (cron crate) | model |
+| **Script agent** | Program.cs, scriptagent.api.core.cs | main.generated.rs | model |
+
+#### web-blazor.csv / web-nodejs.csv (Web Templates)
+
+| Layer | Blazor | React | Type |
+|-------|--------|-------|------|
+| **Pages** | `Listtemplate.razor`, `Edittemplate.razor` | `Listtemplate.tsx`, `Edittemplate.tsx` | object |
+| **Pages Core** | ListWorkflowCore.razor | ListWorkflowCore.tsx | model |
+| **Components** | DataTable, DataTableContextMenu, TabControl | same, as .tsx + .css | model |
+| **Layout** | MainLayout, NavMenuLayout | MainLayout, NavMenu | model |
+| **Auth** | Authentication.razor, LoginDisplay, RedirectToLogin | ProtectedRoute, LoginDisplay, AuthCallback (auth0-react) | model |
+| **Root** | App.razor, _Imports.razor, Program.cs | main.tsx, App.tsx, apiClient, vite.config | model |
+| **Assets** | index.html, CSS, Bootstrap | index.html, public/, config.json | model |
 
 #### database-pgsql.csv / database-mssql.csv (Database Templates)
 
 | Layer | Key Templates | Type |
 |-------|--------------|------|
-| **DDL** | table, sequence, rwkindex, view, audit, schema | model/object |
-| **Data** | static data, nav_menu, admin, queries | model |
+| **DDL** | database.create, schema, table, sequence, rwkindex, views | model/schema/object |
+| **Data** | static data, nav_menu, current user, named queries, children queries | model/object |
+| **Build** | build.sh / build.py / build.ps1, load.sh / load.py | build |
 
 ## Relationship Processing
 

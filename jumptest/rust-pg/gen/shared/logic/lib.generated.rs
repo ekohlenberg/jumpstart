@@ -223,12 +223,6 @@ pub mod principal_org_logic {
 }
 pub use principal_org_logic::*;
     
-pub mod principal_password_logic {
-    include!("PrincipalPasswordLogic.generated.rs");
-    include!("../../../usr/shared/logic/PrincipalPasswordLogic.user.rs");
-}
-pub use principal_password_logic::*;
-    
 pub mod op_role_map_logic {
     include!("OpRoleMapLogic.generated.rs");
     include!("../../../usr/shared/logic/OpRoleMapLogic.user.rs");

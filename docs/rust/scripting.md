@@ -1,14 +1,14 @@
 ---
 layout: default
 title: Scripting with Rhai
-parent: Rust Runtime
+parent: Rust Backend
 nav_order: 2
 ---
 
 # Scripting with Rhai
 
-The .NET runtime executed database-stored scripts in process using Roslyn (C#),
-PowerShell, and Python. The Rust runtime replaces that with **[Rhai](https://rhai.rs)**,
+The .NET backend executes database-stored scripts in process using Roslyn (C#),
+PowerShell, and Python. The Rust backend uses **[Rhai](https://rhai.rs)**,
 an embedded scripting language written in Rust. Rhai is compiled into the
 binary, needs no external toolchain, runs instantly (it is interpreted), and is
 **sandboxed**: a script can do nothing the host does not explicitly grant it.

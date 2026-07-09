@@ -7,7 +7,7 @@ nav_order: 1
 
 # Database
 
-Jumpstart generates complete database DDL scripts for both PostgreSQL and SQL Server.
+Jumpstart generates complete database DDL scripts for both PostgreSQL and SQL Server. The design is identical regardless of which backend (.NET or Rust) consumes it.
 
 ## Naming Conventions
 
@@ -15,24 +15,21 @@ All database identifiers use **snake_case**:
 
 | Element | Convention | Example |
 |---------|-----------|---------|
-| Schemas | lowercase | `app`, `core`, `sec`, `history` |
+| Schemas | lowercase | `app`, `core`, `sec` |
 | Tables | snake_case | `principal_org`, `exec_log` |
 | Columns | snake_case | `first_name`, `workflow_type_id` |
-| Sequences | `{schema}_{table}_identity` | `app.customer_identity` |
+| Sequences | `{schema}.{table}_identity` | `app.customer_identity` |
 | Indexes | `rwk_{schema}_{table}` | `rwk_app_customer` |
 | Views | `{table}_view` | `customer_view` |
-| History tables | `history.{schema}_{table}` | `history.app_customer` |
 
 ### Schemas
-
-Generated applications use these database schemas:
 
 | Schema | Purpose |
 |--------|---------|
 | `app` | Application domain tables (your business entities) |
-| `core` | System framework tables (workflows, scripts, server nodes) |
-| `sec` | Security tables (operations, roles, role members) |
-| `history` | Audit trail tables (one per regular table) |
+| `core` | Framework tables: users, security, workflows, scripts, server nodes, log |
+
+Schemas come from the metadata's `TABLE_SCHEMA` column, so your model can define additional schemas.
 
 ## Table Design
 
@@ -40,62 +37,68 @@ Every table follows a consistent structure:
 
 ```sql
 CREATE TABLE app.customer (
-    id BIGINT PRIMARY KEY,
+    id BIGINT,
     name VARCHAR(255),
     email VARCHAR(100),
     created_date TIMESTAMP,
-    -- Global audit columns (auto-added):
+    -- Global columns (auto-added from global.csv):
     is_active INTEGER,
     created_by VARCHAR(50),
     last_updated TIMESTAMP,
     last_updated_by VARCHAR(50),
-    version INTEGER
+    txn_id BIGINT PRIMARY KEY
 );
+CREATE INDEX ON app.customer (id, is_active);
 ```
 
 Key conventions:
-- Every table has an `id` column as its primary key
-- All audit columns are automatically added from `global.csv`
+- Every table has an `id` column identifying the *logical record*
+- `txn_id` identifies the *row version* and is the physical primary key of audited tables
+- Global columns are automatically added from `global.csv`
 - Foreign key columns follow the pattern `{referenced_table}_id`
 
-## Primary Keys
+## Audited Tables and Row-Versioning
 
-Every table uses a `BIGINT` primary key named `id`. The value is generated from a per-table sequence (not auto-increment), which allows the application to obtain the ID before the INSERT.
+Tables marked `IS_AUDITED=1` in the metadata keep their full history **in place** — there is no separate audit store. The persistence layer implements this in both backends (`DBPersistAudit` in .NET, `db_persist_audit` in Rust):
 
-```sql
-CREATE TABLE app.customer (
-    id BIGINT PRIMARY KEY,
-    ...
-);
-```
+- **Insert** — assigns a fresh identity value used as both `id` and `txn_id`, stamps the audit columns, and inserts with `is_active=1`.
+- **Update** — marks the current row `is_active=0`, then inserts a **new row** with the same `id`, a fresh `txn_id`, and updated audit columns.
+- **History** — `SELECT ... WHERE id = ? ORDER BY txn_id DESC` returns every version of the record, newest first. This backs the `/api/{entity}/{id}/history` endpoint and the History tab in the UI.
+- **Current version** — reads filter on `is_active=1`; the `(id, is_active)` index keeps this fast.
 
-## Data Types
+Because `id` is not unique on an audited table, idempotent seed scripts must use `ON CONFLICT (txn_id)` — not `(id)`.
 
-Jumpstart uses PostgreSQL as the canonical type system and maps to SQL Server equivalents:
+Tables marked `IS_AUDITED=0` are simple: `insert` and `update` behave conventionally (update-in-place), via the basic persistence strategy.
 
-| PostgreSQL | SQL Server | .NET | Description |
-|-----------|-----------|------|-------------|
-| `BIGINT` | `BIGINT` | `long` | 64-bit integer (PKs, FKs) |
-| `INTEGER` | `INT` | `int` | 32-bit integer |
-| `SMALLINT` | `SMALLINT` | `short` | 16-bit integer |
-| `VARCHAR(n)` | `VARCHAR(n)` | `string` | Variable-length string |
-| `TEXT` | `NVARCHAR(MAX)` | `string` | Unlimited text |
-| `TIMESTAMP` | `DATETIME2` | `DateTime` | Date and time |
-| `NUMERIC` | `DECIMAL(18,4)` | `decimal` | Fixed-point decimal |
-| `BOOLEAN` | `BIT` | `bool` | True/false |
-| `UUID` | `UNIQUEIDENTIFIER` | `Guid` | Globally unique identifier |
-| `JSON` | `NVARCHAR(MAX)` | `string` | JSON data |
+A third strategy, **import**, is used only by the generated `import` tool: it preserves pre-assigned `id`/`txn_id` values from the data files instead of minting new ones, so foreign key references baked into seed CSVs stay valid. See [Testing & Tools](../testing.md).
 
-## Sequences
+## Primary Keys and Sequences
 
-Each non-view table gets a dedicated identity sequence:
+Identity values come from a per-table sequence (not auto-increment), which lets the application obtain the ID before the INSERT:
 
 ```sql
 CREATE SEQUENCE app.customer_identity AS BIGINT START WITH 1000 INCREMENT BY 1;
 GRANT USAGE, SELECT ON SEQUENCE app.customer_identity TO myapp;
 ```
 
-The persistence layer calls `nextval()` (PostgreSQL) or equivalent to obtain the next ID before insert. Starting at 1000 reserves low IDs for seed/static data.
+Sequences start at 1000: IDs below 1000 are reserved for seed/static data, so generated lookup rows never collide with runtime inserts.
+
+## Data Types
+
+Jumpstart uses PostgreSQL as the canonical type system and maps to SQL Server and both language targets:
+
+| PostgreSQL | SQL Server | .NET | Rust | Description |
+|-----------|-----------|------|------|-------------|
+| `BIGINT` | `BIGINT` | `long` | `i64` | 64-bit integer (ids, FKs) |
+| `INTEGER` | `INT` | `int` | `i32` | 32-bit integer |
+| `SMALLINT` | `SMALLINT` | `short` | `i16` | 16-bit integer |
+| `VARCHAR(n)` | `VARCHAR(n)` | `string` | `String` | Variable-length string |
+| `TEXT` | `NVARCHAR(MAX)` | `string` | `String` | Unlimited text |
+| `TIMESTAMP` | `DATETIME2` | `DateTime` | `chrono::NaiveDateTime` | Date and time |
+| `NUMERIC` | `DECIMAL(18,4)` | `decimal` | `rust_decimal::Decimal` | Fixed-point decimal |
+| `BOOLEAN` | `BIT` | `bool` | `bool` | True/false |
+| `UUID` | `UNIQUEIDENTIFIER` | `Guid` | `uuid::Uuid` | Globally unique identifier |
+| `JSON` | `NVARCHAR(MAX)` | `string` | `String` | JSON data |
 
 ## Real World Keys (RWK)
 
@@ -106,23 +109,9 @@ Columns marked with `RWK=1` in the metadata CSV are **Real World Keys** -- the h
 3. **Enum display**: When a table is referenced as an `enum` FK, its RWK column provides the display name
 4. **View synthesis**: RWK columns from referenced tables are automatically pulled into views
 
-Example:
-```csv
-,app,customer,,,name,Name,,,,2,NULL,1,NO,VARCHAR,nvarchar,255
-,app,customer,,,email,Email,,,,3,NULL,1,NO,VARCHAR,nvarchar,100
-```
-
-Both `name` and `email` have `RWK=1`, so they appear in list views and together form a unique constraint.
-
-## Unique Index
-
-A composite unique index is generated from all RWK columns on each table:
-
 ```sql
 CREATE UNIQUE INDEX rwk_app_customer ON app.customer (name, email);
 ```
-
-This ensures that the combination of business-meaningful columns is unique across the table.
 
 ## Foreign Keys
 
@@ -130,13 +119,9 @@ Jumpstart supports three types of foreign key relationships, each producing diff
 
 ### Enum
 
-Enum relationships reference static lookup tables. These are small tables with an `id` and a display `name`.
+Enum relationships reference static lookup tables (small tables with an `id` and a display `name`).
 
 ```csv
-# Lookup table
-,core,workflow_type,Workflow Type,,id,...
-,core,workflow_type,,,name,Name,,,,2,NULL,1,NO,VARCHAR,...
-
 # FK reference
 ,core,workflow,,,workflow_type_id,Workflow Type,enum,workflow_type,...
 ```
@@ -157,7 +142,7 @@ Parent relationships define one-to-many hierarchies where a child record belongs
 
 What gets generated:
 - The parent object (`Workflow`) gains a `Children` collection containing `ExecLog`
-- A **`/api/workflow/children/{id}?child=execlog`** endpoint
+- A **children endpoint** on the parent's API
 - **Tab** in the parent's edit page showing child records
 - Topological ordering ensures parent DDL is generated before child DDL
 
@@ -176,78 +161,46 @@ Map FKs identify the junction table's composite key. The two `map` columns toget
 
 Jumpstart includes a built-in core data model in `templates/core/core.csv` that provides framework infrastructure:
 
-### Application & Security Tables (`core` schema)
+All core tables live in the `core` schema.
+
+### Users & Security
 
 | Table | Purpose |
 |-------|---------|
 | `org` | Organizations |
 | `principal` | Users/principals (username, email, name) |
 | `principal_org` | User-to-organization mapping (many-to-many) |
-| `principal_password` | Password hashes and expiry |
 | `operation` | Named operations (objectname + methodname) |
 | `op_role` | Authorization roles |
 | `op_role_map` | Which operations belong to which roles |
 | `op_role_member` | Which users belong to which roles |
 
-### Core Framework Tables (`core` schema)
+### Workflow & Framework
 
 | Table | Purpose |
 |-------|---------|
 | `workflow` | Workflow definitions with type, schedule, server assignment |
 | `process` | Individual process steps within workflows |
 | `exec_log` | Execution history (start/end times, status) |
-| `script` | Executable scripts (C#, PowerShell, Python source) |
+| `script` | Executable scripts (source + script type) |
 | `event_service` | Event-driven script triggers (pre/post method hooks) |
-| `schedule` | Scheduling configuration |
-| `server_node` | Registered scheduler and agent instances |
+| `schedule` | Scheduling configuration (references the `cron_*` component tables) |
+| `server_node` | Registered API server, scheduler, and agent instances |
 | `nav_menu` | Navigation menu hierarchy (parent/child structure) |
 | `data_source` | Named database connections |
-| `sql` | Named SQL query templates |
+| `sql` | Named SQL query templates (including the generated get/select/history queries) |
+| `log` | Database log sink for the `database` log writer (created by the monolithic database-create script) |
 
 ### Lookup/Enum Tables
 
-`exec_status`, `agent_status`, `on_failure`, `script_type`, `server_node_type`, `workflow_type`, `server_node_status`
+`exec_status`, `agent_status`, `on_failure`, `script_type`, `server_node_type`, `server_node_status`, `workflow_type`, and the cron component lookups: `cron_minute`, `cron_hour`, `cron_dom`, `cron_month`, `cron_dow`, `cron_every`
 
-## History Schema
+## Build and Load Scripts
 
-Every regular (non-view) table has a corresponding audit table in the `history` schema:
+The `database-*` template definitions also generate build tooling into `gen/database/`:
 
-```sql
-CREATE SCHEMA history;
+- **`ddl/build.sh` / `build.py` / `build.ps1`** — create the database, schemas, tables, sequences, indexes, and views. The monolithic `<namespace>.database.create.generated.sql` is what actually creates the core schema tables (including `core.log`); the per-table files cover only your application tables.
+- **`data/load.sh` / `load.py`** — load generated seed data: static lookup rows, navigation menus, the current user's admin bootstrap, and named queries.
+- **Hand-written seed data** belongs in `usr/database/data` with its own `load-usr.sh` — the generated loader only loads generated files. Wire it into your project makefile (see `jumptest/rust-pg/makefile`, targets `database` and `seed`).
 
-CREATE TABLE history.app_customer (
-    id BIGINT PRIMARY KEY,
-    customer_id BIGINT,          -- FK back to original record
-    name VARCHAR(255),
-    email VARCHAR(100),
-    created_date TIMESTAMP,
-    is_active INTEGER,
-    created_by VARCHAR(50),
-    last_updated TIMESTAMP,
-    last_updated_by VARCHAR(50),
-    version INTEGER
-);
-```
-
-Key differences from the source table:
-- The original `id` column is renamed to `{table}_id` (e.g., `customer_id`)
-- The history table gets its own `id` primary key
-- Every insert and update to the source table automatically writes a history record
-
-The history log table is also created:
-
-```sql
-CREATE TABLE history.log (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    timestamp TIMESTAMPTZ NOT NULL,
-    level TEXT NOT NULL,
-    principalname TEXT NOT NULL,
-    program TEXT NOT NULL,
-    filepath TEXT NOT NULL,
-    linenumber INTEGER NOT NULL,
-    membername TEXT NOT NULL,
-    message TEXT NOT NULL
-);
-```
-
-This provides a complete audit trail for regulatory compliance, debugging, and change tracking.
+Connection parameters for all scripts come from `~/.<namespace>.json`.

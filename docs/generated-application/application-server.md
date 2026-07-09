@@ -7,367 +7,218 @@ nav_order: 2
 
 # Application Server
 
-The application server is an ASP.NET Core 9 application composed of three layers: API, Logic, and Persistence.
+The application server is composed of three layers — API, Logic, and Persistence — generated for either backend:
 
-## API Layer
+| | .NET | Rust |
+|---|------|------|
+| Web framework | ASP.NET Core 9 | rouille (synchronous, thread-per-request) |
+| API shape | one generated controller per object | one generic router over string dispatch |
+| Interception | reflective `DispatchProxy` | `LogicExec` dispatch chokepoint |
+| Persistence | ADO.NET (Npgsql / SqlClient) | `postgres` driver |
 
-The API layer generates REST controllers for each domain object with full CRUD operations plus specialized endpoints.
+The REST contract, security model, audit behavior, and notification protocol are identical — clients cannot tell the backends apart.
 
-### Generated Controller
-
-Each domain object produces a partial class controller:
-
-```csharp
-[Route("api/[controller]")]
-[ApiController]
-public partial class CustomerController : ControllerBase
-{
-    // GET api/customer
-    [HttpGet]
-    public IEnumerable<CustomerView> Get() { ... }
-
-    // GET api/customer/{id}
-    [HttpGet("{id}")]
-    public Customer Get(long id) { ... }
-
-    // GET api/customer/view/{id}
-    [HttpGet("view/{id}")]
-    public CustomerView View(long id) { ... }
-
-    // GET api/customer/enum
-    [HttpGet("enum")]
-    public List<EnumHelper> GetEnum() { ... }
-
-    // POST api/customer
-    [HttpPost]
-    public void Post([FromBody] Customer customer) { ... }
-
-    // PUT api/customer/{id}
-    [HttpPut("{id}")]
-    public void Put(long id, [FromBody] Customer customer) { ... }
-
-    // DELETE api/customer/{id}
-    [HttpDelete("{id}")]
-    public void Delete(long id) { ... }
-
-    // GET api/customer/history/{id}
-    [HttpGet("history/{id}")]
-    public List<CustomerHistory> GetHistory(long id) { ... }
-
-    // GET api/customer/children/{id}?child=order
-    [HttpGet("children/{id}")]
-    public object GetChildren(long id, [FromQuery] string child) { ... }
-}
-```
-
-### Endpoints
+## REST API Contract
 
 | Method | Route | Description |
 |--------|-------|-------------|
-| `GET` | `/api/{entity}` | List all (returns View objects with resolved enums) |
+| `GET` | `/api/{entity}` | List all (View objects with resolved enum names) |
 | `GET` | `/api/{entity}/{id}` | Get by ID (raw domain object) |
 | `GET` | `/api/{entity}/view/{id}` | Get view by ID (with resolved FK display values) |
-| `GET` | `/api/{entity}/enum` | Get enum list `[{id, rwkString}]` for dropdowns |
+| `GET` | `/api/{entity}/enum` | Enum list `[{id, rwkString}]` for dropdowns |
 | `POST` | `/api/{entity}` | Create new record |
 | `PUT` | `/api/{entity}/{id}` | Update existing record |
-| `DELETE` | `/api/{entity}/{id}` | Delete record |
-| `GET` | `/api/{entity}/history/{id}` | Get audit history |
-| `GET` | `/api/{entity}/children/{id}?child={name}` | Get child records |
+| `DELETE` | `/api/{entity}/{id}` | Delete (soft-delete) record |
+| `GET` | `/api/{entity}/{id}/history` | All row versions of an audited record, newest first |
+| `GET` | `/api/{entity}/{id}/{child}_{role}` | Child records (parent FK relationships) |
+| `GET` | `/api/NavMenu/byparent` | Navigation menu tree |
+| `GET` | `/api/Notification/stream` | Server-Sent Events stream (real-time updates) |
+| `POST` | `/api/Notification/publish` | Cross-node notification fan-in |
+| `GET` | `/api/Workflow/run/{id}` | Dispatch a workflow to the Scheduler |
 
-### Custom API Endpoints
+Entity names are matched case-insensitively against the domain name (`Customer`) or table name (`customer`).
 
-Since controllers are `partial class`, you can add custom endpoints without modifying generated code. Core API extensions follow the `{DomainObj}.api.core.cs.cshtml` naming pattern:
+### .NET implementation
 
-```csharp
-// Workflow.api.core.cs -- custom endpoint added to WorkflowController
-public partial class WorkflowController
-{
-    [HttpGet("run/{id}")]
-    public async Task<IActionResult> Run(long id) { ... }
-}
-```
+Each domain object generates a partial controller (`Customer.api.generated.cs`) with the routes above; core extensions like `Workflow.api.core.cs` add object-specific endpoints to the same partial class.
 
-### Notification Publishing
+### Rust implementation
 
-When records are created, updated, or deleted, the API publishes real-time notifications through SignalR:
+The API is a **single generic router** (`main.generated.rs`): every route is parsed to `(object, method, ctx)` and forwarded to `logic::object_exec(...)`, which maps the object name to the right `<Obj>Logic`. Responses serialize the object's backing data map; `numeric`/`decimal` columns (stored internally as strings for precision) are coerced back to JSON numbers using the generated `ColumnInfo` metadata, so the wire format matches the .NET serializer.
 
-```csharp
-// In the generated Post/Put methods:
-EventAggregator.PublishAsync(domainObjectName, instanceId, jsonData);
-```
+## Custom API Endpoints
 
-Blazor clients subscribe to these notifications for live list updates.
+- **.NET** — controllers are `partial class`; add endpoints in a user partial file without touching generated code.
+- **Rust** — the generated router falls through to `usr/server/api/user_api.rs` (`FORCE=FALSE` stub): return `Some(Response)` to handle a route, `None` to 404. Example: `jumptest` adds `POST /api/testplan/generate/{id}` this way.
 
 ## Logic Layer
 
-The logic layer provides business operations for each domain object, wrapped in a proxy for cross-cutting concerns.
+Every business operation on every domain object flows through an interception pipeline that applies logging, authorization, and (pluggable) event hooks. The standard operations are `select`, `get`, `view`, `history`, `children`, `insert`, `update`, `put`, and `delete`.
 
-### Generated Logic
+### Pipeline (both backends)
 
-Each domain object generates an interface and implementation:
-
-```csharp
-public interface ICustomerLogic
-{
-    List<Customer> select();
-    List<TBaseObject> select<TBaseObject>() where TBaseObject : BaseObject, new();
-    List<TBaseObject> select<TBaseObject>(string queryName) where TBaseObject : BaseObject, new();
-    Customer get(long id);
-    List<TBaseObject> children<TBaseObject>(long id, string childSuffix) where TBaseObject : BaseObject, new();
-    List<CustomerHistory> history(long id);
-    void insert(Customer customer);
-    void update(long id, Customer customer);
-    void put(Customer customer);
-    void delete(long id);
-    CustomerView view(long id);
-}
-
-public partial class CustomerLogic : BaseLogic, ICustomerLogic
-{
-    public static ICustomerLogic Create()
-    {
-        var customer = new CustomerLogic();
-        var proxy = DispatchProxy.Create<ICustomerLogic, Proxy<ICustomerLogic>>();
-        ((Proxy<ICustomerLogic>)proxy).Initialize();
-        ((Proxy<ICustomerLogic>)proxy).Target = customer;
-        ((Proxy<ICustomerLogic>)proxy).DomainObj = "Customer";
-        return proxy;
-    }
-
-    public virtual List<Customer> select() { ... }
-    public virtual Customer get(long id) { ... }
-    public virtual void insert(Customer customer) { ... }
-    public virtual void update(long id, Customer customer) { ... }
-    public virtual void delete(long id) { ... }
-    // ...
-}
+```
+Caller
+  |
+  v
+Interception entry point            .NET: proxy.Invoke()   Rust: LogicExec::call
+  |
+  +---> Before hooks (in order):
+  |       1. Logging
+  |       2. Authorization (RBAC) — throws/short-circuits if denied
+  |       3. Pre-event scripts (core.event_service)
+  |
+  +---> The operation itself        CustomerLogic.insert(...)
+  |
+  +---> After hooks:
+  |       1. Logging
+  |       2. Notification publish (on insert/update/put) → SSE
+  |       3. Post-event scripts
+  v
+Result
 ```
 
-### Logic Factory Pattern
+### .NET: DispatchProxy
 
-Logic classes are always obtained through the `Create()` factory method:
+Logic classes are obtained through a factory that wraps them in a reflective proxy:
 
 ```csharp
-var logic = CustomerLogic.Create();  // Returns a proxied instance
+var logic = CustomerLogic.Create();   // DispatchProxy-wrapped ICustomerLogic
 var customers = logic.select<CustomerView>();
 ```
 
-The factory creates a `DispatchProxy` wrapper around the real logic class, enabling the proxy/AOP pipeline.
+`ProxyAction.AddBeforeAction(...)` / `AddAfterAction(...)` register additional cross-cutting hooks.
 
-### User Logic Extension
+### Rust: the dispatch model
 
-The user partial class (`CustomerLogic.user.cs`, FORCE=FALSE) allows overriding any virtual method:
+Rust has no reflection, so interception is centralized in a single chokepoint plus a generated string→method router:
+
+```rust
+let mut ctx = LogicContext::for_id(42);
+let customer = CustomerLogic::exec("get", &mut ctx)?;   // hooks + dispatch
+```
+
+`LogicExec::call` runs the before hooks, then the generated `dispatch` match, then the after hooks. An `ExecProof` capability token (mintable only inside `logic_exec`) makes it impossible to reach an operation without going through the pipeline. The explicit bypass — `exec_unchecked` — exists for contexts with no security principal (server self-registration, import/export, tests) and is deliberately named to stand out in review. See [Logic & the Dispatch Model](../rust/logic-dispatch.md) for the full treatment.
+
+## Custom Business Operations
+
+Custom methods are first-class: they run through the same authorization and audit pipeline as generated CRUD.
+
+### .NET
+
+Override any virtual operation, or add new ones, in the user partial class:
 
 ```csharp
+// usr: CustomerLogic.user.cs
 public partial class CustomerLogic
 {
     public override void insert(Customer customer)
     {
-        // Custom pre-insert logic
+        // pre-work
         base.insert(customer);
-        // Custom post-insert logic
+        // post-work
     }
 }
 ```
 
-### Named Queries
+### Rust
 
-The logic layer supports named SQL queries stored in the `core.sql` table:
+Add methods in `usr/shared/logic/CustomerLogic.user.rs`. To make one authorized and audited under its own name, wrap the body in `LogicExec::call_with`:
 
-```csharp
-// Uses the query registered as "core.workflow-select"
-var workflows = logic.select<WorkflowView>("core.workflow-select");
+```rust
+impl CustomerLogic {
+    pub fn recalculate(&self, ctx: &mut LogicContext) -> Result<Value, LogicError> {
+        LogicExec::call_with("Customer", "recalculate", ctx, |ctx| {
+            // runs only if the principal is authorized for Customer.recalculate
+            /* ... reuse self.get / self.put / DBPersist ... */
+            Ok(Value::Null)
+        })
+    }
+}
 ```
+
+To reach a custom operation *by name* (from the API or a script), implement the `dispatch_user` hook in the user file — the generated `dispatch` routes unknown method names there.
+
+### Authorizing a custom operation
+
+Identical in both backends: insert an `operation` row (`objectname` = domain, `methodname` = your method), map it to a role via `op_role_map`, and membership does the rest.
 
 ## Persistence Layer
 
-### DBPersist
+`DBPersist` is the central data access component in both backends.
 
-The `DBPersist` class is the central data access component. All database operations flow through it.
+### Core operations
 
-#### Core Operations
+`select` (list, by named query, or by filter), `get`, `insert`, `update`, `put` (insert-or-update), `delete` (soft), `exec_cmd` (raw SQL), plus a named-query cache backed by the `core.sql` table.
 
-```csharp
-// Select with callback
-DBPersist.select(callback, sql);
+### Strategies
 
-// Select returning typed list
-List<T> results = DBPersist.select<T>(sql);
+`insert`/`update` dispatch on the object's `is_audited` flag:
 
-// Select with template substitution
-DBPersist.select(callback, sqlTemplate, filterObject);
+| Strategy | Tables | Behavior |
+|----------|--------|----------|
+| **Audited** | `IS_AUDITED=1` | insert assigns `id` + `txn_id`; update soft-deletes the current row and inserts a new version (see [Database](database.md#audited-tables-and-row-versioning)) |
+| **Basic** | `IS_AUDITED=0` | conventional insert / update-in-place |
+| **Import** | (import tool only) | preserves pre-assigned `id`/`txn_id` from data files; enabled process-wide by `set_import_mode(true)` |
 
-// Insert (auto-assigns id, audit columns, writes history)
-long id = DBPersist.insert(baseObject);
+Both strategies stamp `created_by`, `last_updated`, and `last_updated_by` automatically.
 
-// Update by id (auto-updates audit columns, writes history)
-DBPersist.update(baseObject);
+### Column metadata
 
-// Update by filter (bulk update matching filter criteria)
-DBPersist.update(baseObject, filterObject);
+- **.NET** — `autoAssign` maps result-set columns to properties by reflecting over `ColumnInfoAttribute`.
+- **Rust** — no reflection: the generator emits `T::columns() -> Vec<ColumnInfo>`, which the SQL builders and JSON typing use.
 
-// Execute raw SQL
-DBPersist.execCmd(sql);
-DBPersist.execCmd(filterObject, sqlTemplate);
-```
+### Database providers
 
-#### Insert Behavior
+A provider abstraction handles dialect differences (PostgreSQL vs SQL Server), selected by the datasource's `dbtype` in `~/.<namespace>.json`:
 
-Every `insert` call automatically:
-1. Obtains the next sequence ID via `identity()`
-2. Sets `version` via `version()`
-3. Sets `created_by` to `Environment.UserName`
-4. Sets `last_updated` to `DateTime.UtcNow`
-5. Sets `last_updated_by` to `Environment.UserName`
-6. Executes the INSERT
-7. Writes an audit record to the history table
+| | PostgreSQL | SQL Server |
+|---|-----------|-----------|
+| .NET | `PostgreSQLProvider` (Npgsql) | `SqlServerProvider` (Microsoft.Data.SqlClient) |
+| Rust | `postgres_provider` (`postgres` crate) | `sqlserver_provider` (connection open currently unsupported) |
 
-#### Update Behavior
+Connections are opened per operation (no pool) in both backends.
 
-Every `update` call automatically:
-1. Increments `version`
-2. Sets `last_updated` and `last_updated_by`
-3. Executes the UPDATE
-4. Writes an audit record to the history table
+## Authentication
 
-#### Database Provider Abstraction
+Inbound API requests are authenticated with **Auth0 RS256 JWTs**: signature (JWKS), audience, issuer, and expiry are verified, and the token's email/`sub` claim becomes the current principal for authorization. Setup is covered in [Auth0 Setup](../auth0-setup.md); server-to-server tokens in [M2M Authentication](../auth0-m2m.md).
 
-DBPersist uses `IDatabaseProvider` to abstract database differences:
+Auth0 settings are read at runtime from `~/.<namespace>.json` (an `auth0` section), not baked in at generation time. If no API audience is configured, Auth0 is treated as disabled and the server falls back to an optional `X-User` header (then the OS user) — which keeps local development and test harnesses working without a tenant.
 
-```csharp
-IDatabaseProvider provider = DatabaseProviderFactory.CreateProvider(connectionName);
-```
+The current principal is carried per-request (an `AsyncLocal` in .NET, a thread-local in Rust) and consumed by the authorization hook.
 
-| Provider | Class | Description |
-|----------|-------|-------------|
-| PostgreSQL | `PostgreSQLProvider` | Uses Npgsql |
-| SQL Server | `SqlServerProvider` | Uses Microsoft.Data.SqlClient |
-
-The provider is selected via the `db.type` setting in `appsettings.json` (`pgsql` or `mssql`).
-
-#### Auto-Assign
-
-`DBPersist.autoAssign(reader, baseObject)` uses reflection to map database columns to domain object properties, handling type conversion automatically.
-
-## Proxy Aspect
-
-The proxy layer implements aspect-oriented programming (AOP) using .NET's `DispatchProxy`. Every logic method call passes through the proxy pipeline.
-
-### Pipeline
+## Authorization (RBAC)
 
 ```
-Client Code
-    |
-    v
-Proxy.Invoke()
-    |
-    +---> Before Actions (in order):
-    |       1. Logging: "Invoking Customer.insert"
-    |       2. Authorization: Check RBAC permissions
-    |       3. Pre-Event Service: Run "pre" event scripts
-    |
-    +---> Target Method: CustomerLogic.insert()
-    |
-    +---> After Actions (in order):
-    |       1. Logging: "After invoking insert"
-    |       2. Post-Event Service: Run "post" event scripts
-    |
-    v
-Result
+Principal (user)
+    └── op_role_member ── op_role ── op_role_map ── operation (objectname + methodname)
 ```
 
-### Before Actions
-
-Three built-in before actions execute before every logic method:
-
-1. **Logging** -- Logs the domain object and method name
-2. **Authorization** -- Calls `OpRoleMemberLogic.Authorized(domainObj, methodName)` to verify RBAC permissions. Throws an exception if unauthorized.
-3. **Pre-Event Service** -- Executes any scripts registered in `core.event_service` with matching `event_type="pre"`, `objectname_filter`, and `methodname_filter`
-
-### After Actions
-
-Two built-in after actions execute after every logic method:
-
-1. **Logging** -- Logs completion
-2. **Post-Event Service** -- Executes any scripts registered with `event_type="post"`
-
-### ProxyAction
-
-The `ProxyAction` static class manages the before/after action collections using `ConcurrentBag` for thread safety:
-
-```csharp
-// Add custom before action
-ProxyAction.AddBeforeAction((domainObj, method, args) =>
-{
-    // Custom cross-cutting logic
-});
-
-// Add custom after action
-ProxyAction.AddAfterAction((domainObj, method, result, args) =>
-{
-    // Custom post-processing
-});
-```
-
-### Initialization
-
-`ProxyCallbackInitializer.Initialize()` registers the default before/after actions. This is called once per application via a thread-safe `Interlocked.CompareExchange` guard.
-
-## Auth
-
-Jumpstart generates a complete role-based access control (RBAC) system.
-
-### Security Model
-
-```
-Principal (User)
-    |
-    +---> OpRoleMember (membership)
-              |
-              +---> OpRole (role)
-                       |
-                       +---> OpRoleMap (assignment)
-                                 |
-                                 +---> Operation (objectname + methodname)
-```
-
-### Database Tables
-
-| Table | Schema | Purpose |
-|-------|--------|---------|
-| `principal` | `core` | User accounts (username, email) |
-| `principal_password` | `core` | Password hashes |
-| `operation` | `core` | Named operations (`objectname` + `methodname`) |
-| `op_role` | `core` | Named roles |
-| `op_role_map` | `core` | Maps operations to roles |
-| `op_role_member` | `core` | Maps users to roles |
-
-### Authorization Check
-
-Authorization is performed by `OpRoleMemberLogic.Authorized()`, which is called by the proxy's before action on every logic method:
+The authorization hook runs on every logic call and checks the principal against this join:
 
 ```sql
-SELECT 1 FROM
-    core.operation op
-    INNER JOIN core.op_role_map orm ON orm.op_id = op.id
-    INNER JOIN core.op_role r ON r.id = orm.op_role_id
-    INNER JOIN core.op_role_member m ON m.op_role_id = r.id
-    INNER JOIN core."principal" p ON p.id = m.principal_id
-WHERE
-    op.objectname = '{objectName}'
-    AND op.methodname = '{methodName}'
-    AND p.username = '{currentUser}'
+SELECT 1 FROM core.operation op
+  JOIN core.op_role_map orm  ON orm.op_id = op.id
+  JOIN core.op_role r        ON r.id = orm.op_role_id
+  JOIN core.op_role_member m ON m.op_role_id = r.id
+  JOIN core.principal p      ON p.id = m.principal_id
+WHERE op.objectname = '{domain}' AND op.methodname = '{method}'
+  AND p.username = '{currentUser}'
 ```
 
-If the query returns a row, the user is authorized. Results are cached in a thread-safe dictionary to avoid repeated database lookups.
+Results are cached per (user, operation). The seed data bootstraps an admin role with full access for the installing user.
 
-### Configuration
+## Real-Time Notifications (SSE)
 
-To authorize operations:
+Record changes propagate to browsers over **Server-Sent Events** — the same protocol in both backends (this replaced the original SignalR design):
 
-1. Create an `operation` record for each object/method pair
-2. Create an `op_role` record
-3. Map operations to roles via `op_role_map`
-4. Assign users to roles via `op_role_member`
+- The after-hook on `insert`/`update`/`put` publishes `{DomainObjectName, InstanceId, JsonData}`.
+- The API server delivers its own notifications directly to its in-process SSE registry; changes made by *other* nodes (scheduler, agent, another API instance) arrive via `POST /api/Notification/publish`, fanned out across the online API servers registered in `core.server_node` (skipping self to avoid double delivery).
+- Browsers connect to `GET /api/Notification/stream` with `EventSource` and receive `PropertyUpdated` events, filtered client-side by domain object name.
+- Stale connections are pruned by a heartbeat. Cross-instance scale-out would move fan-out to `LISTEN/NOTIFY` or a message bus.
 
-The admin user created by the seed data scripts has full access by default.
+Code paths that use the unchecked logic path (agent, scheduler) bypass the after-hook, so they publish explicitly after status changes.
+
+## Self-Registration
+
+On startup each API server registers a `core.server_node` row (type `ApiServer`, status `Online`) on a background thread, and marks itself `Offline` on shutdown. This registry drives scheduler/agent discovery and notification fan-out. Port ranges: API 5200-5300, agent 5100-5200, scheduler 5000-5100.

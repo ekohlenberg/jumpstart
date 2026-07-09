@@ -29,8 +29,8 @@ Jumpstart applications are defined by CSV metadata files. Each row describes a s
 | `DATA_TYPE`                | Yes       | PostgreSQL data type (e.g., `BIGINT`, `VARCHAR`, `TIMESTAMP`)                                               |
 | `MSSQL_DATA_TYPE`          | No        | SQL Server equivalent (e.g., `bigint`, `nvarchar`, `datetime`)                                              |
 | `CHARACTER_MAXIMUM_LENGTH` | No        | String length (e.g., `255`, `50`)                                                                           |
-| `URI`                      | No        | Custom URL path for routing (e.g., `core/workflow`)                                                         |
-| IS_AUDITIED                | YES       | 1 indicates if the table uses built-in audit tracking design;  0 indicates the table is simple, un-audited. |
+| `URI`                      | No        | Custom URL path for routing (e.g., `core/workflow`, `usr/testplan`)                                         |
+| `IS_AUDITED`               | Yes       | `1` = row-versioned audit tracking (every change keeps the prior version); `0` = simple, un-audited table. See [Database](generated-application/database.md#audited-tables-and-row-versioning). |
 
 ## Table Definition Pattern
 
@@ -100,31 +100,30 @@ Map FKs are used to generate:
 
 ## Core CSV
 
-Jumpstart includes `templates/core/core.csv` which defines built-in system tables. These are automatically merged with your application model:
+Jumpstart includes `templates/core/core.csv` which defines built-in system tables, all in the `core` schema. These are automatically merged with your application model:
 
-| Schema | Table | Purpose |
-|--------|-------|---------|
-| `app` | `org` | Organizations |
-| `app` | `principal` | Users/principals |
-| `app` | `principal_org` | User-to-org mapping |
-| `sec` | `principal_password` | Password credentials |
-| `sec` | `operation` | Permissioned operations |
-| `sec` | `op_role` | Authorization roles |
-| `sec` | `op_role_map` | Operation-to-role mapping |
-| `sec` | `op_role_member` | Role membership |
-| `core` | `script` | Executable scripts (C#, PowerShell, Python) |
-| `core` | `event_service` | Event-driven script triggers |
-| `core` | `workflow` | Workflow definitions |
-| `core` | `exec_log` | Execution history |
-| `core` | `process` | Process definitions |
-| `core` | `schedule` | Scheduling configuration |
-| `core` | `server_node` | Registered server nodes |
-| `core` | `nav_menu` | Navigation menu structure |
-| `core` | `data_source` | Database connection definitions |
-| `core` | `sql` | Named SQL queries |
+| Table | Purpose |
+|-------|---------|
+| `org` | Organizations |
+| `principal` | Users/principals |
+| `principal_org` | User-to-org mapping |
+| `operation` | Permissioned operations |
+| `op_role` | Authorization roles |
+| `op_role_map` | Operation-to-role mapping |
+| `op_role_member` | Role membership |
+| `script` | Executable scripts (C# / PowerShell / Python on .NET, Rhai on Rust) |
+| `event_service` | Event-driven script triggers |
+| `workflow` | Workflow definitions |
+| `exec_log` | Execution history |
+| `process` | Process definitions |
+| `schedule` | Scheduling configuration |
+| `server_node` | Registered server nodes |
+| `nav_menu` | Navigation menu structure |
+| `data_source` | Database connection definitions |
+| `sql` | Named SQL queries |
 
 Static lookup tables (enums):
-`exec_status`, `agent_status`, `on_failure`, `script_type`, `server_node_type`, `workflow_type`, `server_node_status`
+`exec_status`, `agent_status`, `on_failure`, `script_type`, `server_node_type`, `workflow_type`, `server_node_status`, and the cron component lookups (`cron_minute`, `cron_hour`, `cron_dom`, `cron_month`, `cron_dow`, `cron_every`)
 
 ## Global CSV (Audit Columns)
 
@@ -132,32 +131,38 @@ Static lookup tables (enums):
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `is_active` | `integer` | Soft delete flag (1=active, 0=deleted) |
+| `is_active` | `integer` | Soft delete / current-version flag (1=active, 0=inactive) |
 | `created_by` | `varchar(50)` | Username who created the record |
 | `last_updated` | `timestamp` | Last modification timestamp |
 | `last_updated_by` | `varchar(50)` | Username who last modified |
-| `version` | `integer` | Optimistic concurrency version |
+| `txn_id` | `bigint` | Transaction id -- unique per row version; the primary key of audited tables |
 
-These columns are managed automatically by the persistence layer on insert and update operations.
+These columns are managed automatically by the persistence layer. On audited tables (`IS_AUDITED=1`), an update writes a *new* row with a fresh `txn_id` and marks the previous version `is_active=0`, so full history is kept in place; `id` identifies the logical record across versions.
 
 ## Type Mapping
 
-### PostgreSQL to .NET
+PostgreSQL is the canonical type system. Each `DATA_TYPE` maps to a language type in whichever backend you generate:
 
-| PostgreSQL | .NET Type | Convert Method |
-|-----------|-----------|---------------|
-| `integer` | `int` | `Convert.ToInt32` |
-| `bigint` | `long` | `Convert.ToInt64` |
-| `smallint` | `short` | `Convert.ToInt16` |
-| `boolean` | `bool` | `Convert.ToBoolean` |
-| `varchar` | `string` | `Convert.ToString` |
-| `text` | `string` | `Convert.ToString` |
-| `date` | `DateTime` | `Convert.ToDateTime` |
-| `timestamp` | `DateTime` | `Convert.ToDateTime` |
-| `numeric` | `decimal` | `Convert.ToDecimal` |
-| `uuid` | `Guid` | `Guid.Parse` |
-| `bytea` | `byte[]` | -- |
-| `json` | `string` | -- |
+### PostgreSQL to .NET and Rust
+
+| PostgreSQL | .NET Type | Rust Type | .NET Convert Method |
+|-----------|-----------|-----------|---------------------|
+| `integer` | `int` | `i32` | `Convert.ToInt32` |
+| `bigint` | `long` | `i64` | `Convert.ToInt64` |
+| `smallint` | `short` | `i16` | `Convert.ToInt16` |
+| `boolean` | `bool` | `bool` | `Convert.ToBoolean` |
+| `real` | `float` | `f32` | `Convert.ToSingle` |
+| `double precision` | `double` | `f64` | `Convert.ToDouble` |
+| `varchar` | `string` | `String` | `Convert.ToString` |
+| `text` | `string` | `String` | `Convert.ToString` |
+| `date` | `DateTime` | `chrono::NaiveDateTime` | `Convert.ToDateTime` |
+| `timestamp` | `DateTime` | `chrono::NaiveDateTime` | `Convert.ToDateTime` |
+| `numeric` | `decimal` | `rust_decimal::Decimal` | `Convert.ToDecimal` |
+| `uuid` | `Guid` | `uuid::Uuid` | `Guid.Parse` |
+| `bytea` | `byte[]` | `Vec<u8>` | -- |
+| `json` | `string` | `String` | -- |
+
+In the Rust backend, temporal/decimal/uuid values are stored in the dictionary-backed object as strings (ISO-8601 / decimal / canonical uuid) and parsed by the typed accessors -- see the [Rust Backend Reference](rust/index.md).
 
 ### PostgreSQL to SQL Server
 

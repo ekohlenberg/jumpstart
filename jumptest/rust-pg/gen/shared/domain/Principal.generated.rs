@@ -72,6 +72,15 @@ impl Principal {
         self.base.set("email", serde_json::json!(value));
     }
     
+    /// Enabled
+    pub fn enabled(&self) -> i32 {
+        self.base.get("enabled").as_i64().unwrap_or_default() as i32
+    }
+
+    pub fn set_enabled(&mut self, value: i32) {
+        self.base.set("enabled", serde_json::json!(value));
+    }
+    
     /// Created
     pub fn created_date(&self) -> chrono::NaiveDateTime {
         self.base.get("created_date").as_str().and_then(|s| chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S%.f").ok()).unwrap_or_else(|| chrono::DateTime::from_timestamp(0, 0).unwrap().naive_utc())
@@ -162,6 +171,8 @@ impl DomainObject for Principal {
             
             ColumnInfo::new("email", "Email", "", "", "", "", "varchar"),
             
+            ColumnInfo::new("enabled", "Enabled", "", "", "", "", "integer"),
+            
             ColumnInfo::new("created_date", "Created", "", "", "", "", "timestamp"),
             
             ColumnInfo::new("last_login_date", "Last Login", "", "", "", "", "timestamp"),
@@ -189,6 +200,8 @@ impl DomainObject for Principal {
         self.base.rwk = vec![
 
             "email".to_string(),
+            
+            "enabled".to_string(),
                     ];
 
 
@@ -201,6 +214,8 @@ impl DomainObject for Principal {
         self.base.defaults.entry("username".to_string()).or_insert(serde_json::Value::Null);
         
         self.base.defaults.entry("email".to_string()).or_insert(serde_json::Value::Null);
+        
+        self.base.defaults.entry("enabled".to_string()).or_insert(serde_json::Value::Null);
         
         self.base.defaults.entry("created_date".to_string()).or_insert(serde_json::Value::Null);
         

@@ -1,49 +1,38 @@
 ---
 layout: default
-title: Rust Runtime
+title: Rust Backend
 nav_order: 7
 has_children: true
 ---
 
-# Rust Runtime
+# Rust Backend Reference
 
-Jumpstart can generate the application stack as a set of **Rust** crates, as an
-alternative to the .NET output. The Rust runtime mirrors the .NET architecture
-layer for layer, but adapts the patterns to Rust where reflection, runtime code
-generation, and class inheritance are not available.
+Jumpstart's Rust target (`server-rust`, `test-rust`, `tools-rust`) generates the application stack as a workspace of **Rust crates**. It is a full peer of the .NET target — same layers, same REST contract, same security and audit model — with the patterns adapted to a language that has no reflection, no runtime code generation, and no class inheritance.
 
-The Rust templates live under `templates/shared/rust` and `templates/server/rust`,
-and are driven by their own template-inventory CSVs (`templates/server-rust.csv`
-for the libraries, `templates/test-rust.csv` for the test harnesses).
+This section documents what is *specific* to the Rust backend. The shared architecture is covered in [Generated Application](../generated-application/).
+
+The Rust templates live under `templates/shared/rust`, `templates/server/rust`, `templates/test/rust`, and `templates/tools/rust`.
 
 ## Crate layout
 
-Generated output is a Cargo workspace of path-dependent crates:
+Generated output is a Cargo workspace of path-dependent crates, layered lowest to highest:
 
-```
-gen/shared/common     -> common      (foundation: BaseObject, Config, Logger, DB providers)
-gen/shared/domain     -> domain      (per-table domain objects + core enums)
-gen/shared/persist    -> persist     (ADO-style data access over the postgres driver)
-gen/shared/logic      -> logic       (business logic, dispatch + AOP interception)
-gen/shared/script     -> script      (Rhai runtime scripting)
-gen/test/test-persist -> test-persist (persistence smoke test)
-gen/test/test-script  -> test-script  (Rhai scripting harness)
-```
+| Crate | Location | .NET counterpart | Responsibility |
+|-------|----------|------------------|----------------|
+| `common` | `gen/shared/common` | `shared/common` | `BaseObject`, `ColumnInfo`/`ClassInfo`, `Config`, `Logger`, `Util`, JSON/enum helpers, the `DatabaseProvider` trait + Postgres/SQL Server providers, Auth0 |
+| `domain` | `gen/shared/domain` | `shared/domain` | One struct per table with typed accessors, plus `View`/`History` wrappers and the core enums (`Workflow`, `Execution`, `Script`, `ServerNode`) |
+| `persist` | `gen/shared/persist` | `shared/persist` | `DBPersist` (`select`/`get`/`insert`/`update`/`put`/`exec_cmd`/named-query cache), audited / basic / import strategies, the `postgres`-backed `DbConnection` |
+| `logic` | `gen/shared/logic` | `shared/logic` | The dispatch model and interception (`LogicExec`, `LogicDispatch`, `LogicContext`, the hook registry), authorization, notifications |
+| `script` | `gen/shared/script` | script host in `common` | `ScriptHost` running database-stored scripts on the **Rhai** engine |
+| `api`, `scheduler`, `scriptagent` | `gen/server/*` | `server/*` | The three servers (rouille REST / cron dispatch / script execution) |
+| `test-*` | `gen/test/*` | `test/*` | Test harnesses |
+| `import`, `export` | `gen/tools/*` | `tools/*` | CSV data tools |
 
-| Crate | .NET counterpart | Responsibility |
-|-------|------------------|----------------|
-| `common` | `shared/dotnet/common` | `BaseObject`, `ColumnInfo`/`ClassInfo`, `Config`, `Logger`, `Util`, `JsonHelper`, `EnumHelper`, the `DatabaseProvider` trait + Postgres/SQL Server providers |
-| `domain` | `shared/dotnet/domain` | One struct per table with typed accessors, plus `View`/`History` wrappers and the core enum modules (`Workflow`, `Execution`, `Script`, `ServerNode`) |
-| `persist` | `shared/dotnet/persist` | `DBPersist` (`select`/`get`/`insert`/`update`/`put`/`exec_cmd`/named-query cache), audit vs. basic strategies, the `postgres`-backed `DbConnection` |
-| `logic` | `shared/dotnet/logic` | The dispatch model and AOP interception (`LogicExec`, `LogicDispatch`, `LogicContext`, the proxy hook registry), authorization (`OpRoleMemberLogic`) |
-| `script` | `shared/dotnet/common` (script host) | `ScriptHost` running database-stored scripts on the **Rhai** engine |
+The shared crates are path dependencies of the servers and tests, so building any binary compiles the whole chain. Release binaries are statically linked and self-contained.
 
 ## The dictionary-backed object model
 
-The single most important design choice carried over from .NET: every domain
-object is **dictionary-backed**. `BaseObject` wraps a
-`HashMap<String, serde_json::Value>` (the live column values) plus metadata
-(table name, schema, RWK columns, audit flag):
+The single most important design choice shared with .NET: every domain object is **dictionary-backed**. `BaseObject` wraps a `HashMap<String, serde_json::Value>` (the live column values) plus metadata (table name, schema, RWK columns, audit flag):
 
 ```rust
 pub struct BaseObject {
@@ -56,9 +45,7 @@ pub struct BaseObject {
 }
 ```
 
-Generated domain types are thin typed views over that map. For a `customer`
-table the generator emits a `Customer` struct that holds a `BaseObject` and
-exposes typed getters/setters that read and write the underlying dictionary:
+Generated domain types are thin typed views over that map. For a `customer` table the generator emits a `Customer` struct that holds a `BaseObject` and exposes typed getters/setters that read and write the underlying dictionary:
 
 ```rust
 pub struct Customer {
@@ -76,17 +63,11 @@ impl Customer {
 }
 ```
 
-Because the data lives in a `HashMap<String, Value>`, objects serialize to/from
-JSON for free, flow across the API boundary unchanged, and can be handed to
-scripts as object maps. Rust has no runtime reflection, so the .NET
-`ColumnInfoAttribute` reflection is replaced by generated metadata: each type
-provides `columns()` returning `Vec<ColumnInfo>`, which the persistence layer
-uses to build SQL.
+Because the data lives in a `HashMap<String, Value>`, objects serialize to/from JSON for free, flow across the API boundary unchanged, and can be handed to scripts as object maps. Rust has no runtime reflection, so the .NET `ColumnInfoAttribute` reflection is replaced by generated metadata: each type provides `columns()` returning `Vec<ColumnInfo>`, which the persistence layer uses to build SQL and the API uses to type JSON output.
 
 ## Type mapping
 
-Each column's PostgreSQL `DATA_TYPE` maps to a Rust type for the typed
-accessors:
+Each column's PostgreSQL `DATA_TYPE` maps to a Rust type for the typed accessors:
 
 | PostgreSQL | .NET | Rust |
 |-----------|------|------|
@@ -102,17 +83,11 @@ accessors:
 | `varchar` / `text` | `string` | `String` |
 | `bytea` | `byte[]` | `Vec<u8>` |
 
-Temporal, decimal, and uuid values are stored in the backing map **as strings**
-(ISO-8601 / decimal / canonical uuid), so they round-trip cleanly through JSON
-and the typed accessors parse them on read.
+Temporal, decimal, and uuid values are stored in the backing map **as strings** (ISO-8601 / decimal / canonical uuid), so they round-trip cleanly through JSON and the typed accessors parse them on read. On the wire, `numeric` columns are coerced back to JSON numbers via `ColumnInfo`, matching the .NET serializer.
 
-## Partial classes -> generated + user modules
+## Generated + user modules
 
-The .NET "generated + user partial class" convention becomes a pair of files
-spliced into one Rust module. The crate root `include!`s both a regenerated
-`<Obj>.generated.rs` (always overwritten, `FORCE=TRUE`) and a hand-editable
-`<Obj>.user.rs` (created once, `FORCE=FALSE`) into the same module, so the user
-file's `impl` block extends the generated type:
+The .NET "generated + user partial class" convention becomes a pair of files spliced into one Rust module. The crate root `include!`s both a regenerated `<Obj>.generated.rs` (`gen/`, `FORCE=TRUE`) and a hand-editable `<Obj>.user.rs` (`usr/`, `FORCE=FALSE`) into the same module, so the user file's `impl` block extends the generated type:
 
 ```rust
 pub mod customer {
@@ -121,29 +96,16 @@ pub mod customer {
 }
 ```
 
-The same pattern applies in the `domain` and `logic` crates.
+The same pattern applies in the `domain` and `logic` crates, and the API's `user_api.rs` route hook.
 
-> **`gen/` vs `usr/`.** Files under `gen/` are regenerated on every run — never
-> hand-edit them. Files under `usr/` are created once and never overwritten —
-> that is where your customizations live. A corollary worth remembering:
-> anything the *generated* code calls must be defined in *generated* code,
-> because the generator cannot retroactively update an existing `usr/` file.
+> **`gen/` vs `usr/`.** Files under `gen/` are regenerated on every run — never hand-edit them. Files under `usr/` are created once and never overwritten. A corollary worth remembering: anything the *generated* code calls must be defined in *generated* code, because the generator cannot retroactively update an existing `usr/` file.
 
 ## Building
 
-Each generated crate is an ordinary Cargo crate with a `makefile` wrapping
-`cargo build` / `cargo run`. The shared libraries are path dependencies of the
-servers and tests, so building a binary (e.g. `test-persist`) compiles the whole
-chain.
-
-Database connection details are read at runtime from `~/.<namespace>.json` by
-the `common` `Config` loader (the same per-namespace config file the .NET
-runtime uses).
+Each generated crate is an ordinary Cargo crate with a `makefile` wrapping `cargo build` and deploying the binary plus `*.sh`/`*.cmd` launchers into the project `bin/`. Database connections, logging, and Auth0 settings are read at runtime from `~/.<namespace>.json` by the `common` `Config` loader — the same per-namespace config file the .NET runtime uses.
 
 ## Continue
 
-- [Logic & the dispatch model](logic-dispatch.md) — how interception,
-  authorization, and the AOP pipeline work, and how to extend the model from
-  `usr/` code.
-- [Scripting with Rhai](scripting.md) — running database-stored scripts in
-  process, the capabilities exposed to them, and sample calls.
+- [Logic & the dispatch model](logic-dispatch.md) — how interception, authorization, and the hook pipeline work, and how to extend the model from `usr/` code.
+- [Scripting with Rhai](scripting.md) — running database-stored scripts in process, the capabilities exposed to them, and sample calls.
+- [Operations Notes](../operations.md) — Rust-specific build/run gotchas (code signing, launchers, ports).

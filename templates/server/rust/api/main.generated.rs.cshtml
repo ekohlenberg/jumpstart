@@ -17,20 +17,25 @@
 //   GET    /api/<obj>/{id}/<child>_<role> -> [childView, ...]    (children)
 //   GET    /api/NavMenu/byparent?parent_id=&orderby=
 //   POST   /api/Notification/publish      (accepted; SignalR not ported)
-//   GET    /api/Workflow/run/{id}         (503; workflow engine not ported)
+//   GET    /api/Workflow/run/{id}         (dispatches to the Scheduler; 503 if
+//                                          no Scheduler is registered/reachable)
 //
-// Inbound requests are authenticated with an Auth0 RS256 JWT (see auth0.rs and
-// docs/auth0-setup.md); the validated email/sub claim becomes the principal for
-// the logic-layer authorization check. Domain/Audience are read at runtime from
-// this app's own ~/.<namespace>.json (see common::Config::auth0_settings). If
-// that file has no `auth0` section, Auth0 is treated as unconfigured and the
-// server falls back to an optional `X-User` request header instead, so local
-// development and `jumptest` keep working without a real Auth0 tenant. On
-// startup the server registers itself in core.server_node (see
-// `register_api_server`), mirroring the .NET API server's RegisterApiServer task.
-// Real-time notifications use Server-Sent Events (GET /api/notification/stream +
-// POST /api/Notification/publish) instead of SignalR, so the same Blazor client
-// can consume updates from either the .NET or Rust backend.
+// Inbound requests are authenticated with an Auth0 RS256 JWT (see
+// common::auth0 and docs/auth0-setup.md); the validated email/sub claim
+// becomes the principal for the logic-layer authorization check.
+// Domain/audiences are read at runtime from this app's own
+// ~/.<namespace>.json (see common::Config::auth0_settings). If that file has
+// no `auth0` section (or no "api" audience), Auth0 is treated as unconfigured
+// and the server falls back to an optional `X-User` request header instead,
+// so local development and `jumptest` keep working without a real Auth0
+// tenant. The API's own outbound call to the Scheduler (`workflow_run`)
+// attaches an M2M bearer token the same way -- see common::auth0::m2m_token
+// and docs/auth0-m2m.md. On startup the server registers itself in
+// core.server_node (see `register_api_server`), mirroring the .NET API
+// server's RegisterApiServer task. Real-time notifications use Server-Sent
+// Events (GET /api/notification/stream + POST /api/Notification/publish)
+// instead of SignalR, so the same Blazor client can consume updates from
+// either the .NET or Rust backend.
 // </auto-generated>
 #![allow(dead_code)]
 #![allow(clippy::all)]
@@ -41,7 +46,7 @@ use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Mutex, OnceLock};
 use std::time::Duration;
 
-use common::{to_typed_json, BaseObject, DomainObject, LogLevel, Logger, SessionInfo, Util};
+use common::{auth0, to_typed_json, BaseObject, DomainObject, LogLevel, Logger, SessionInfo, Util};
 use domain::server_node_core::{ServerNodeStatus, ServerNodeType};
 use domain::NavMenu;
 use logic::{
@@ -49,9 +54,6 @@ use logic::{
 };
 use rouille::{Request, Response, ResponseBody, Upgrade};
 use serde_json::Value;
-
-// Auth0 JWT (RS256) validation -- see auth0.rs.
-mod auth0;
 
 // Hand-written custom routes (FORCE=FALSE; created once under usr/server/api).
 // Any request the generated router does not match is offered to
@@ -95,14 +97,14 @@ fn main() {
         // tenant's JWKS) and set the principal for the logic-layer
         // authorization check. Cleared on every request (even failures) so a
         // reused worker thread can't leak a previous request's user.
-        match auth0::authenticate(request.header("Authorization")) {
+        match auth0::authenticate_inbound("api", request.header("Authorization")) {
             auth0::AuthOutcome::Authenticated(user) => {
                 OpRoleMemberLogic::set_current_user(Some(user.as_str()));
             }
             auth0::AuthOutcome::Unconfigured => {
-                // No `auth0` section in ~/.<namespace>.json (see
-                // docs/auth0-setup.md) -- fall back to the pre-Auth0 X-User
-                // header so local development / jumptest keep working.
+                // No "api" audience in ~/.<namespace>.json's `auth0` section
+                // (see docs/auth0-setup.md) -- fall back to the pre-Auth0
+                // X-User header so local development / jumptest keep working.
                 OpRoleMemberLogic::set_current_user(request.header("X-User"));
             }
             auth0::AuthOutcome::Missing => {
@@ -505,13 +507,69 @@ fn start_sse_heartbeat() {
     });
 }
 
+/// Dispatch a workflow run to the Scheduler, mirroring the .NET
+/// `SchedulerClient.ExecuteAsync`: resolve an online Scheduler node from
+/// `core.server_node`, POST the workflow id to its `/api/scheduler/execute`,
+/// attaching an M2M bearer token when the API->Scheduler M2M client is
+/// configured (see docs/auth0-m2m.md; unauthenticated otherwise, for local
+/// development).
 fn workflow_run(id: i64) -> Response {
-    // The workflow execution engine (scheduler) is not yet ported.
-    Logger::error(format!(
-        "workflow run {} requested, but the workflow engine is not ported",
-        id
-    ));
-    Response::text("workflow engine not available").with_status_code(503)
+    let url = match scheduler_url() {
+        Some(u) => u,
+        None => {
+            Logger::error(format!(
+                "workflow run {} requested, but no online Scheduler is registered",
+                id
+            ));
+            return Response::text("no scheduler available").with_status_code(503);
+        }
+    };
+
+    let endpoint = format!("{}/api/scheduler/execute", url.trim_end_matches('/'));
+    let mut req = ureq::post(&endpoint).set("Content-Type", "application/json");
+    match auth0::m2m_token("scheduler") {
+        Ok(Some(token)) => req = req.set("Authorization", &format!("Bearer {}", token)),
+        Ok(None) => {} // M2M not configured for the Scheduler -- call unauthenticated.
+        Err(e) => Logger::warning(format!(
+            "workflow run {}: M2M token fetch failed, calling unauthenticated: {}",
+            id, e
+        )),
+    }
+
+    match req.send_string(&id.to_string()) {
+        Ok(_) => {
+            Logger::info(format!("workflow run {} dispatched to scheduler at {}", id, url));
+            Response::json(&serde_json::json!(id))
+        }
+        Err(e) => {
+            Logger::error(format!("workflow run {} dispatch to scheduler failed: {}", id, e));
+            Response::text("scheduler dispatch failed").with_status_code(502)
+        }
+    }
+}
+
+/// URL of an online Scheduler node in core.server_node, if any (parity with
+/// the .NET SchedulerClient, which is constructed from the Scheduler's
+/// ServerNode row).
+fn scheduler_url() -> Option<String> {
+    let sql = format!(
+        "SELECT * FROM core.server_node \
+         WHERE server_node_type_id = {} AND server_node_status_id = {} AND is_active = 1 \
+         ORDER BY registered_at DESC LIMIT 1",
+        ServerNodeType::Scheduler as i64,
+        ServerNodeStatus::Online as i64
+    );
+    let rows = match persist::DBPersist::select(&sql, "default") {
+        Ok(r) => r,
+        Err(e) => {
+            Logger::error(format!("scheduler lookup failed: {}", e));
+            return None;
+        }
+    };
+    rows.into_iter().find_map(|row| match row.get("url") {
+        Some(Value::String(u)) if !u.is_empty() => Some(u.clone()),
+        _ => None,
+    })
 }
 
 fn error_response(e: LogicError) -> Response {

@@ -2,265 +2,156 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
+[![Rust](https://img.shields.io/badge/Rust-stable-orange.svg)](https://www.rust-lang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-blue.svg)](https://www.microsoft.com/en-us/sql-server/sql-server-2022)
 
-> **Jumpstart** is an enterprise-grade code generation framework that creates full-stack applications from metadata specifications. It generates production-ready scaffolds for machine learning applications, business systems, and data-driven applications.
+> **Jumpstart** is a metadata-driven code generation framework that turns a CSV data model into a complete, production-ready full-stack application — database, backend servers, web frontend, test suites, and data tools.
 
-## 🚀 Overview
+## Overview
 
-Jumpstart transforms tabular metadata into complete, production-ready applications including:
+You describe your application as tabular metadata (one CSV row per column). Jumpstart generates everything else, in your choice of stack:
 
-- **Database Layer**: PostgreSQL DDL scripts with audit trails, sequences, and real-world keys
-- **Backend API**: .NET 9 REST API with authentication, authorization, and business logic
-- **Frontend**: Blazor WebAssembly with modern UI components
-- **Testing**: Generated test suites for both API and persist layers
-- **Infrastructure**: Logging and monitoring capabilities
+| Layer | Targets |
+|-------|---------|
+| **Database** | PostgreSQL, SQL Server — DDL, sequences, views, seed data |
+| **Backend** | **.NET 9** (ASP.NET Core) or **Rust** (rouille) — API, logic, persistence, scheduler, script agent |
+| **Frontend** | **Blazor WebAssembly** or **React + TypeScript (Vite)** |
+| **Testing** | Generated integration test harnesses per layer |
+| **Tools** | CSV import/export utilities |
 
-## ✨ Key Features
+The two backends and two frontends are peers: they implement the same REST contract, the same dictionary-backed object model, the same authorization and audit design, and the same real-time notification protocol (Server-Sent Events). Any frontend works against any backend.
 
-### 🔧 **Metadata-Driven Generation**
-- Accepts CSV-based metadata specifications
-- Generates complete application stacks from data models
-- Supports complex relationships, constraints, and business rules
+## Key Features
 
-### 🏗️ **Full-Stack Architecture**
-- **Database**: PostgreSQL and MS SQL Server support with audit trails and sequences
-- **Backend**: .NET 9 REST API with dependency injection
-- **Frontend**: Blazor WebAssembly with responsive design
-- **Testing**: Dual test suites (API and persist layer testing)
+- **Metadata-driven generation** — a single CSV defines tables, columns, labels, relationships (enum / parent / map), navigation, and audit behavior.
+- **Layered architecture** — domain, persistence, logic (with AOP interception), API, and web layers with strict separation.
+- **Row-versioned audit** — audited tables keep every version of every record in place (`txn_id`-keyed), giving full history without a separate audit store.
+- **RBAC authorization** — every logic operation is checked against operation/role/member tables; scripts and custom methods inherit the same checks.
+- **Workflow engine** — cron-driven scheduler and script agents with self-registration, live status, and real-time UI updates over SSE.
+- **In-process scripting** — database-stored scripts: C#, PowerShell, Python on .NET; sandboxed Rhai on Rust.
+- **Auth0 integration** — SPA login (OIDC + PKCE) and machine-to-machine JWTs between servers.
+- **Safe regeneration** — generated code (`gen/`) is always overwritten; your code (`usr/`) is never touched. Re-run the generator any time.
 
-### 🔐 **Enterprise Security**
-- Role-based access control (RBAC)
-- Object-level permissions (RWX authorization) (future)
-- OAuth authentication support (future)
-- Audit logging and compliance features
+## Prerequisites
 
-### 🚀 **Developer Experience**
-- Hot reload during development
-- Comprehensive logging and debugging
-- Automated testing and CI/CD ready
+- **.NET 9 SDK** — required to build and run the generator (and the .NET backend)
+- **Rust toolchain** (stable) — for the Rust backend
+- **Node.js 20+** — for the React frontend
+- **PostgreSQL 15+** or **SQL Server 2019+**
 
-## 🛠️ Technology Stack
+## Quick Start
 
-| Component | Technology |
-|-----------|------------|
-| **Backend** | .NET 9, ASP.NET Core |
-| **Database** | MS SQL Server 2019+, PostgreSQL 15+ |
-| **Frontend** | Blazor WebAssembly |
-| **Testing** | Generated Persist and HTTP Client |
-| **Templating** | RazorLight |
-
-## 📋 Prerequisites
-
-- **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download)
-- **PostgreSQL 15+** - [Download](https://www.postgresql.org/download/)
-- **Git** - [Download](https://git-scm.com/downloads)
-
-## 🚀 Quick Start
-
-### 1. Clone the Repository
+### 1. Build the generator
 
 ```bash
 git clone https://github.com/your-org/jumpstart.git
-cd jumpstart
-```
-
-### 2. Build the Project
-
-```bash
 cd jumpstart/src
 dotnet build
-
 ```
 
-### 3. Generate an Application
-
-```bash
-# Generate from a metadata CSV file
-dotnet run --project src/jumpstart.csproj -- model.csv
-
-# Or use the executable directly
-./jumpstart model.csv
-```
-
-### 4. Run the Generated Application
-
-```bash
-cd generated-app
-dotnet run --project server/api/api.csproj
-```
-
-## 📖 Usage
-
-### Metadata Specification
-
-Jumpstart uses CSV files to define your application's data model. Here's a basic example:
-
-```csv
-SCHEMA_NAME,OBJECT_NAME,ATTRIBUTE_NAME,DATA_TYPE,IS_NULLABLE,IS_PRIMARY_KEY,IS_FOREIGN_KEY,REFERENCED_TABLE
-app,User,id,BIGINT,false,true,false,
-app,User,username,VARCHAR(50),false,false,false,
-app,User,email,VARCHAR(100),false,false,false,
-app,User,created_date,TIMESTAMP,false,false,false,
-```
-
-### Command Line Options
-
-```bash
-# Generate application from metadata
-jumpstart model.csv
-
-# Generate with custom output directory
-jumpstart model.csv --output ./my-app
-
-# Generate with specific template set
-jumpstart model.csv --template-set enterprise
-```
-
-## 🏗️ Generated Application Structure
-
-```
-generated-app/
-├── database/
-│   ├── ddl/           # Database schema scripts
-│   └── data/          # Seed data scripts
-├── server/
-│   ├── api/           # REST API (.NET 9)
-│   ├── logic/         # Business logic layer
-│   ├── persist/       # Data access layer
-│   ├── test-api/      # API integration tests
-│   └── test-persist/  # Persist layer tests
-├── shared/
-│   ├── common/        # Shared utilities
-│   └── domain/        # Domain models
-└── web/
-    └── blazor/        # Blazor WebAssembly frontend
-```
-
-## 🔧 Configuration
-
-### Database Connection
-
-Jumpstart reads database connection parrameters from a file in your home directory:
-
-```bash
-# Model configuration file location
-~/.jumpstart-model
-```
-
-The appsettings.json file contains your application's runtime configuration in the *appsettings* section.
-
-### Application Settings
-
-Update `appsettings.json` in your generated application:
+### 2. Configure `~/.jumpstart.json`
 
 ```json
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AllowedHosts": "*",
-        "appsettings": {
-                "logwriters": "<your-model-name>.LogFileWriter,<your-model-name>.LogTableWriter,<your-model-name>.LogConsoleWriter",
-                "loglevel": "debug" ,
-                "db.type": "mssql"
-        }
+  "modelpath": "~/projects/myapp/myapp.csv",
+  "templatedefs": ["database-pgsql", "server-rust", "web-nodejs", "test-rust", "tools-rust"]
 }
 ```
 
+The model filename becomes the application namespace (`myapp.csv` → `myapp`).
 
+### 3. Generate
 
-
-## 🧪 Testing
-
-Jumpstart generates comprehensive test suites:
-
-### API Testing
 ```bash
-cd server/test-api
-dotnet test
+jumpstart                              # uses ~/.jumpstart.json
+jumpstart myapp.csv server-rust        # or explicit: <model.csv> <template-def>
 ```
 
-### Persist Layer Testing
+### 4. Build and run
+
 ```bash
-cd server/test-persist
-dotnet test
+cd gen/database/ddl  && ./build.sh     # create the database
+cd ../data           && ./load.sh      # load seed data
+make -C gen/server/api                 # build + deploy the API server to bin/
+make -C gen/web                        # build the web client
+./bin/api.sh                           # run (API picks a port in 5200-5300)
 ```
 
-## 📚 Sample Applications
+Runtime configuration (database connections, logging, Auth0) lives in `~/.<namespace>.json` — see [docs/namespace.json.example](docs/namespace.json.example).
 
-Jumpstart can generate various application types:
+## Template Definitions
 
-- **📊 Accounting System** - Double-entry bookkeeping with GL accounts
-- **👥 CRM System** - Customer relationship management
-- **🐛 Project Management** - Bug tracking and task management
-- **📈 Analytics Dashboard** - Data visualization and reporting
-- **🔐 Identity Management** - User and role management
+Each template definition is a CSV registry (`templates/<name>.csv`) mapping templates to output paths:
 
-## 🤝 Contributing
+| Definition | Generates |
+|------------|-----------|
+| `database-pgsql` / `database-mssql` | DDL, sequences, RWK indexes, views, seed data, build/load scripts |
+| `server-dotnet` | .NET backend: common, domain, persist, logic, API, scheduler, script agent |
+| `server-rust` | Rust backend: the same layers as Cargo crates, plus the Rhai script crate |
+| `web-blazor` | Blazor WebAssembly frontend |
+| `web-nodejs` | React + TypeScript (Vite) frontend |
+| `test-dotnet` / `test-rust` | Test harnesses: persist, script, scheduler, script agent (+ API on .NET) |
+| `tools-dotnet` / `tools-rust` | CSV import/export utilities |
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+## Generated Project Layout
 
-### Development Setup
+```
+myapp/
+├── gen/                  # regenerated every run — never edit
+│   ├── database/         #   ddl/ and data/ scripts
+│   ├── shared/           #   common, domain, persist, logic (+ script on Rust)
+│   ├── server/           #   api, scheduler, scriptagent
+│   ├── web/              #   Blazor or React app
+│   ├── test/             #   test-persist, test-script, test-scheduler, ...
+│   └── tools/            #   import, export
+├── usr/                  # created once, never overwritten — your code
+│   ├── shared/domain     #   <Obj>.user.* domain extensions
+│   ├── shared/logic      #   <Obj>Logic.user.* custom operations
+│   ├── server/api        #   custom API routes
+│   ├── database/data     #   hand-written seed data
+│   └── web/              #   custom pages
+└── bin/                  # deployed binaries + launch scripts
+```
 
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Make your changes**
-4. **Run tests**
-   ```bash
-   dotnet test
-   ```
-5. **Submit a pull request**
+The `gen/` vs `usr/` split is the core convention: templates marked `FORCE=TRUE` regenerate into `gen/`; templates marked `FORCE=FALSE` create one-time stubs in `usr/` that are yours to edit. Anything generated code calls must live in generated code — the generator never modifies an existing `usr/` file.
 
-## 📋 Roadmap
+## Extending with Custom Methods
 
-### 🎯 Upcoming Features
+Custom business operations are first-class citizens:
 
-- **🤖 AI-Powered Generation**
-  - GenAI integration for metadata creation
-  - AI-assisted business logic implementation
-  - Natural language to code generation
+- **.NET** — logic and controller classes are `partial`; override virtual operations or add endpoints in `usr/` partial classes.
+- **Rust** — add methods in `usr/shared/logic/<Obj>Logic.user.rs`. Wrap them in `LogicExec::call_with` to get authorization and audit under their own `(domain, method)` name, expose them to string dispatch via the `dispatch_user` hook, and add REST routes in `usr/server/api/user_api.rs`.
 
-- **🔧 Enhanced Templates**
-  - Dynamic pivoting capabilities
-  - Advanced scripting (triggers, stored procedures)
-  - Multi-database support (SQL Server, SQLite)
+Grant access by inserting an `operation` row and mapping it to a role — custom methods use exactly the same RBAC pipeline as built-in CRUD.
 
-- **🚀 Performance & Scalability**
-  - Microservices architecture support
-  - Horizontal scaling capabilities
-  - Advanced caching strategies
+## Testing
 
-- **🔐 Security Enhancements**
-  - Multi-factor authentication
-  - Advanced encryption options
-  - Compliance frameworks (SOC2, GDPR)
+Jumpstart generates its test tooling alongside the application:
 
-## 📄 License
+- **test-persist** — inserts and updates every domain object twice with generated test data, then reads back and verifies.
+- **test-script** — exercises the script host (Rhai / C#).
+- **test-scheduler** / **test-scriptagent** — drive the workflow REST surfaces end to end.
+- **test-api** (.NET) — HTTP integration tests per endpoint.
+- **jumptest** — a self-testing application: a Jumpstart model of the software-testing domain (test plans, cases, runs, results) that Jumpstart generates and then uses to test itself. See [`jumptest/`](jumptest/).
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+make -C gen/test/test-persist    # build + run a harness
+```
 
-## 🙏 Acknowledgments
+## Documentation
 
-- **RazorLight** - For the powerful templating engine
-- **CsvHelper** - For robust CSV parsing
-- **PostgreSQL** - For the excellent database support
-- **Blazor** - For the modern web framework
+Full documentation is in [docs/](docs/index.md):
 
-## 📞 Support
+- [Getting Started](docs/getting-started.md)
+- [Metadata Specification](docs/metadata.md)
+- [Generator Internals](docs/generator.md)
+- [Generated Application](docs/generated-application/index.md) — database, servers, web, dual-stack details
+- [Rust Backend Reference](docs/rust/index.md) — crate layout, dispatch model, Rhai scripting
+- [Testing & Tools](docs/testing.md)
+- [Auth0 Setup](docs/auth0-setup.md) and [M2M Authentication](docs/auth0-m2m.md)
+- [Operations Notes](docs/operations.md) — ports, config, troubleshooting
 
-- **📧 Email**: support@jumpstart.dev
-- **💬 Discord**: [Join our community](https://discord.gg/jumpstart)
-- **🐛 Issues**: [GitHub Issues](https://github.com/your-org/jumpstart/issues)
-- **📖 Documentation**: [Wiki](https://github.com/your-org/jumpstart/wiki)
+## License
 
----
-
-**Made with ❤️ by the Jumpstart Team**
+MIT — see [LICENSE](LICENSE).

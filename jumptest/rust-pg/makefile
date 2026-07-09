@@ -5,7 +5,7 @@ default: build
 build:
 	@jumpstart ./jumptest.csv database-pgsql
 	@jumpstart ./jumptest.csv server-rust
-	@jumpstart ./jumptest.csv web-blazor
+	@jumpstart ./jumptest.csv web-nodejs
 	@jumpstart ./jumptest.csv tools-rust
 	@jumpstart ./jumptest.csv test-rust
 
@@ -47,6 +47,11 @@ cleanusr:
 
 cleanbin:
 	@rm -rf ./bin
+
+cleanweb:
+	@rm -rf ./gen/web
+	@rm -rf ./usr/web
+	@rm -rf ./bin/web*
 
 cleanall:
 	@rm -rf ./bin

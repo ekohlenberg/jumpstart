@@ -1,0 +1,225 @@
+@using System.Collections.Generic;
+@using System.Linq;
+@using jumpstart;
+@{
+    // Mirrors web/blazor/Pages/Listtemplate.razor.cshtml. One of these is
+    // generated per domain object (TEMPLATE_TYPE=object), same as the Blazor
+    // version, and the output filename follows the same "template" ->
+    // model.FileName substitution (Listtemplate.tsx.cshtml -> ListCustomer.tsx).
+    //
+    // Blazor derives its table columns at runtime via reflection over
+    // [ColumnInfo] attributes on the generated {DomainObj}View class. TS/JS
+    // has no attribute reflection, so this template computes the equivalent
+    // column list right here, at *generation* time, from the same
+    // MetaObject.Attributes + FK-view data that the C# ColumnInfo attributes
+    // are built from (see shared/dotnet/domain/template.generated.cs.cshtml).
+    string domainObj = Model.DomainObj;
+    string domainVar = Model.DomainVar;
+    // For a genuine "*_view" table this is just DomainObj (no API-side View
+    // wrapper class exists); for a regular table it's "{DomainObj}View".
+    // Mirrors MetaObject.DomainObjView, used the same way by the C# domain
+    // template when it decides whether to emit a separate View class.
+    string domainObjView = Model.DomainObjView;
+
+    // Type conversion lives in TypeMapping.ToTsType (src/metamodel.cs) rather
+    // than a local `Func<string, string>` here -- RazorLight chokes on a
+    // local variable of that delegate type assigned via a multi-line lambda
+    // inside an `@{ }` block.
+
+    // Same FK -> RWK column synthesis the C# {DomainObj}View class performs:
+    // for every FK attribute, pull in the referenced table's RWK columns as
+    // "{alias}_{rwkColumn}" fields (e.g. org_id -> org_name).
+    var fkViewColumns = new List<(string Key, string Label, string TsType)>();
+    if (!Model.IsView)
+    {
+        var usedAliases = new HashSet<string>();
+        foreach (var fk in Model.Attributes)
+        {
+            if (string.IsNullOrEmpty(fk.FkObject)) { continue; }
+
+            MetaObject fkObject = null;
+            foreach (var obj in Model.Model.Objects)
+            {
+                if (obj.TableName == fk.FkTable) { fkObject = obj; break; }
+            }
+            if (fkObject == null) { continue; }
+
+            var aliasBase = fk.Name.EndsWith("_id") ? fk.Name.Substring(0, fk.Name.Length - 3) : fk.Name;
+            var alias = aliasBase;
+            var counter = 1;
+            while (usedAliases.Contains(alias)) { alias = aliasBase + "_" + counter; counter++; }
+            usedAliases.Add(alias);
+
+            foreach (var rwkAttr in fkObject.Attributes)
+            {
+                if (rwkAttr.RWK != "1") { continue; }
+                var key = alias + "_" + rwkAttr.Name;
+                var colLabel = fk.Label + (rwkAttr.Name.ToLower().StartsWith("name") ? "" : " " + rwkAttr.Label);
+                fkViewColumns.Add((key, colLabel, TypeMapping.ToTsType(rwkAttr.DotNetType)));
+            }
+        }
+    }
+
+    // Display columns = every attribute except raw FK id columns (they end in
+    // "_id" and are replaced by their resolved "*_name" counterpart above),
+    // plus the synthesized FK-view columns -- same filter DataTable.razor's
+    // ReflectionHelper.GetDisplayProperties applies.
+    var displayColumns = new List<(string Key, string Label)>();
+    foreach (var attr in Model.Attributes)
+    {
+        if (attr.Name.EndsWith("_id")) { continue; }
+        displayColumns.Add((attr.Name, attr.Label));
+    }
+    foreach (var col in fkViewColumns)
+    {
+        displayColumns.Add((col.Key, col.Label));
+    }
+}
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useApiClient, type ApiClient } from "../api/apiClient";
+import DataTable, { type DataTableColumn } from "../components/DataTable";
+
+// Row shape returned by GET /api/@(domainVar) and /api/@(domainVar)/view/{id}
+// -- matches the @(domainObjView) class generated for the dotnet/rust servers.
+export interface @(domainObjView) {
+@foreach (var attr in Model.Attributes)
+{
+<text>  @(attr.Name): @(TypeMapping.ToTsType(attr.DotNetType));
+</text>
+}
+@foreach (var col in fkViewColumns)
+{
+<text>  @(col.Key): @(col.TsType);
+</text>
+}
+}
+
+const DOMAIN_OBJECT_NAME = "@(domainObj)";
+
+const columns: DataTableColumn[] = [
+@foreach (var col in displayColumns)
+{
+<text>  { key: "@(col.Key)", label: "@(col.Label)" },
+</text>
+}
+];
+
+// Matches the server's PropertyUpdateMessage (see
+// server/dotnet/api/EventAggregator.core.cs.cshtml and
+// shared/rust/logic/notification.core.rs.cshtml) -- PascalCase field names
+// and all, since it is serialized once and shared verbatim by every client,
+// Blazor included.
+interface PropertyUpdateMessage {
+  DomainObjectName: string;
+  InstanceId: number;
+  JsonData: string;
+  Timestamp: string;
+}
+
+async function fetchList(api: ApiClient): Promise<@(domainObjView)[]> {
+  return api.get<@(domainObjView)[]>("/api/@(domainVar)");
+}
+
+export default function List@(domainObj)() {
+  const api = useApiClient();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [list, setList] = useState<@(domainObjView)[] | null>(null);
+  // Typed via the initial value's "as" cast (rather than useRef<EventSource
+  // | null>(...)) -- a bare `Identifier<...>` outside a `<text>`-wrapped code
+  // region can make RazorLight's markup parser mistake it for an HTML/JSX
+  // tag opening.
+  const sseRef = useRef(null as EventSource | null);
+
+  // Mirrors the current `list` state so the SSE handler below (registered
+  // once per `api` change, not per render) always sees the latest data
+  // instead of the value captured when the effect first ran.
+  const listRef = useRef<@(domainObjView)[] | null>(null);
+  useEffect(() => {
+    listRef.current = list;
+  }, [list]);
+
+  const reloadList = useCallback(async () => {
+    try {
+      setList(await fetchList(api));
+    } catch (err) {
+      console.error("List@(domainObj): error reloading list", err);
+    }
+  }, [api]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchList(api)
+      .then((data) => {
+        if (!cancelled) setList(data);
+      })
+      .catch((err) => console.error("List@(domainObj): error loading list", err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [api]);
+
+  // Real-time updates arrive over Server-Sent Events -- the same
+  // GET /api/Notification/stream the Blazor client's notifications.js
+  // interop connects to. The browser's native EventSource needs no interop
+  // layer here and reconnects on its own; we just clean up on unmount.
+  useEffect(() => {
+    const source = new EventSource(`${api.baseUrl}/api/Notification/stream`);
+    sseRef.current = source;
+
+    // MessageEvent's generic parameter defaults to `any` when omitted, so
+    // this stays a bare `MessageEvent` rather than `MessageEvent<string>`
+    // (same reasoning as the sseRef declaration above).
+    source.addEventListener("PropertyUpdated", async (event: MessageEvent) => {
+      try {
+        const message: PropertyUpdateMessage = JSON.parse(event.data);
+        if (message.DomainObjectName !== DOMAIN_OBJECT_NAME) return;
+
+        const index = (listRef.current ?? []).findIndex((item) => item.id === message.InstanceId);
+        if (index >= 0) {
+          const updated = await api.get<@(domainObjView)>(`/api/@(domainVar)/view/${message.InstanceId}`);
+          setList((current) => {
+            if (!current) return current;
+            const next = [...current];
+            const i = next.findIndex((item) => item.id === message.InstanceId);
+            if (i >= 0) next[i] = updated;
+            return next;
+          });
+        } else {
+          await reloadList();
+        }
+      } catch (err) {
+        console.error("List@(domainObj): error handling notification", err);
+      }
+    });
+
+    return () => {
+      source.close();
+      sseRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [api]);
+
+  function onAdd() {
+    const returnUrl = encodeURIComponent(location.pathname);
+    navigate(`/edit-@(domainVar)?returnUrl=${returnUrl}`);
+  }
+
+  function onEdit(item: @(domainObjView)) {
+    const returnUrl = encodeURIComponent(location.pathname);
+    navigate(`/edit-@(domainVar)/${item.id}?returnUrl=${returnUrl}`);
+  }
+
+  return (
+    <>
+      <h1>@(Model.Label)</h1>
+      <p>This page demonstrates fetching @(Model.Label) data from the server.</p>
+
+      <DataTable data={list} columns={columns} showActions showAddButton onEdit={onEdit} onAdd={onAdd} />
+    </>
+  );
+}

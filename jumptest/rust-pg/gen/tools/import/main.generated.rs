@@ -4,12 +4,18 @@
 //   import --table <domainVar> --input <path>
 //
 // Each non-empty CSV field is set on a BaseObject and inserted through the
-// unchecked logic path (logic::object_exec_unchecked). The `id` column and the
-// global audit columns (is_active, created_by, last_updated, last_updated_by,
-// txn_id) are skipped — the database assigns the id and the persist layer applies
-// audit defaults. Values are passed as strings; PostgreSQL casts the quoted
-// literals to each column's type, so no per-column parsing is needed. CSV columns
-// must have a header row with names matching the table.
+// unchecked logic path (logic::object_exec_unchecked). The design expects the
+// data file to already carry real primary key values (`id`, and `txn_id` for
+// audited tables), so — unlike a normal insert — they are read from the CSV
+// instead of being dropped. To keep the persist layer from generating a fresh
+// identity and clobbering them, the process switches to the `Import` persist
+// strategy for the whole run via `DBPersist::set_import_mode(true)` before any
+// row is processed; it takes effect regardless of whether the target object is
+// audited or basic. The remaining global audit columns (is_active, created_by,
+// last_updated, last_updated_by) are still skipped from the CSV — the persist
+// layer stamps those. Values are passed as strings; PostgreSQL casts the
+// quoted literals to each column's type, so no per-column parsing is needed.
+// CSV columns must have a header row with names matching the table.
 // </auto-generated>
 #![allow(dead_code)]
 #![allow(clippy::all)]
@@ -18,16 +24,16 @@ use std::process::exit;
 
 use common::BaseObject;
 use logic::{object_exec_unchecked, LogicContext};
+use persist::DBPersist;
 use serde_json::json;
 
-/// Columns never set from the CSV (DB-assigned id + persist-managed audit fields).
+/// Columns never set from the CSV (persist-managed audit fields; `id` and
+/// `txn_id` ARE read from the CSV — see the module doc above).
 const SKIP_COLUMNS: &[&str] = &[
-    "id",
     "is_active",
     "created_by",
     "last_updated",
     "last_updated_by",
-    "txn_id",
 ];
 
 const TABLES: &[&str] = &[
@@ -55,7 +61,6 @@ const TABLES: &[&str] = &[
     "testcase",
     "testrun",
     "principalorg",
-    "principalpassword",
     "oprolemap",
     "oprolemember",
     "schedule",
@@ -70,6 +75,10 @@ const TABLES: &[&str] = &[
 ];
 
 fn main() {
+    // Preserve pk values from the data file instead of generating new ones —
+    // see the module doc above.
+    DBPersist::set_import_mode(true);
+
     let args: Vec<String> = std::env::args().collect();
     let mut table: Option<String> = None;
     let mut input: Option<String> = None;
@@ -124,8 +133,9 @@ fn print_usage() {
     println!("  --input    Input CSV file path (required)");
     println!();
     println!("Notes:");
-    println!("  - The 'id' column is ignored; the database assigns new IDs.");
-    println!("  - Global columns (is_active, created_by, etc.) are set to defaults.");
+    println!("  - The 'id' (and 'txn_id', for audited tables) column is used as-is from");
+    println!("    the file; the persist layer will not generate a new identity for it.");
+    println!("  - Global audit columns (is_active, created_by, etc.) are set to defaults.");
     println!("  - CSV must have a header row with column names matching the table.");
     println!();
     println!("Available tables:");

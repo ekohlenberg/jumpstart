@@ -22,11 +22,15 @@ pub mod db_provider;
 pub mod postgres_provider;
 pub mod sqlserver_provider;
 pub mod db_provider_factory;
+pub mod auth0;
 
 // Flattened re-exports so domain/persist/logic/api can `use common::*`.
 pub use attributes::{to_typed_json, ClassInfo, ColumnInfo};
 pub use base_object::{BaseObject, DomainObject};
-pub use config::{Auth0Config, Config, DataSourceConfig, NamespaceConfig, NAMESPACE};
+pub use config::{
+    Auth0Config, Auth0Settings, Config, DataSourceConfig, M2MClientConfig, M2MClientSettings,
+    NamespaceConfig, NAMESPACE,
+};
 pub use db_provider::DatabaseProvider;
 pub use db_provider_factory::DatabaseProviderFactory;
 pub use enum_helper::EnumHelper;

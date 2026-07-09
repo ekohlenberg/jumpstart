@@ -522,17 +522,6 @@ insert into core.operation (id, txn_id, objectname, methodname, is_active, last_
 		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalOrg', 'children', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 
 		
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'select', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'get', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'view', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'insert', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'put', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'update', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'delete', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'history', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'PrincipalPassword', 'children', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
-
-		
 		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'OpRoleMap', 'select', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'OpRoleMap', 'get', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;
 		insert into core.operation (id, txn_id, objectname, methodname, is_active, last_updated, created_by, last_updated_by) SELECT n, n, 'OpRoleMap', 'view', 1, current_timestamp, current_user, current_user FROM (SELECT nextval('core.operation_identity') n) t;

@@ -98,16 +98,35 @@ pub fn publish(domain_object: &str, instance_id: i64, json_data: String) {
         })
         .to_string();
 
+        // The API's inbound gate validates an Auth0 JWT when the `api` audience
+        // is configured, so this inter-service call needs an M2M bearer token —
+        // exactly as the scheduler attaches one when calling the scriptagent.
+        // One token for the `api` audience covers every API node. `m2m_token`
+        // returns Ok(None) when no `api` client is configured (local/dev), in
+        // which case the call is made unauthenticated and works against an
+        // Auth0-unconfigured API.
+        let api_token = match common::auth0::m2m_token("api") {
+            Ok(token) => token,
+            Err(e) => {
+                Logger::warning(format!(
+                    "notification: M2M token for 'api' unavailable, publishing without it: {}",
+                    e
+                ));
+                None
+            }
+        };
+
         for url in urls {
             // Already delivered in-process to this node; don't loop back over HTTP.
             if self_url.as_deref() == Some(url.as_str()) {
                 continue;
             }
             let endpoint = format!("{}/api/Notification/publish", url.trim_end_matches('/'));
-            match ureq::post(&endpoint)
-                .set("Content-Type", "application/json")
-                .send_string(&body)
-            {
+            let mut req = ureq::post(&endpoint).set("Content-Type", "application/json");
+            if let Some(token) = &api_token {
+                req = req.set("Authorization", &format!("Bearer {}", token));
+            }
+            match req.send_string(&body) {
                 Ok(_) => Logger::debug(format!(
                     "notification: published {}[{}] to {}",
                     domain, instance_id, url

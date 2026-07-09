@@ -67,8 +67,6 @@ pub fn object_exec(
         
         "principalorg" | "principal_org" => crate::PrincipalOrgLogic::exec(method, ctx),
         
-        "principalpassword" | "principal_password" => crate::PrincipalPasswordLogic::exec(method, ctx),
-        
         "oprolemap" | "op_role_map" => crate::OpRoleMapLogic::exec(method, ctx),
         
         "oprolemember" | "op_role_member" => crate::OpRoleMemberLogic::exec(method, ctx),
@@ -152,8 +150,6 @@ pub fn object_exec_unchecked(
         "testrun" | "test_run" => crate::TestRunLogic::exec_unchecked(method, ctx),
         
         "principalorg" | "principal_org" => crate::PrincipalOrgLogic::exec_unchecked(method, ctx),
-        
-        "principalpassword" | "principal_password" => crate::PrincipalPasswordLogic::exec_unchecked(method, ctx),
         
         "oprolemap" | "op_role_map" => crate::OpRoleMapLogic::exec_unchecked(method, ctx),
         

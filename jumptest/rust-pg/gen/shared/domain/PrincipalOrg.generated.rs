@@ -264,6 +264,15 @@ impl PrincipalOrgView {
     pub fn set_principal_email(&mut self, value: String) {
         self.inner.base.set("principal_email", serde_json::json!(value));
     }
+                        
+    /// Principal ID Enabled
+    pub fn principal_enabled(&self) -> i32 {
+        self.inner.base.get("principal_enabled").as_i64().unwrap_or_default() as i32
+    }
+
+    pub fn set_principal_enabled(&mut self, value: i32) {
+        self.inner.base.set("principal_enabled", serde_json::json!(value));
+    }
                         }
 
 impl DomainObject for PrincipalOrgView {

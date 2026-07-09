@@ -39,15 +39,11 @@ SELECT n, n, (SELECT id FROM core.nav_menu WHERE parent_id = 0 AND name = 'Admin
 FROM (SELECT nextval('core.nav_menu_identity') n) t;
         
 INSERT INTO core.nav_menu(id, txn_id, parent_id, ordinal, name, link, is_active, created_by, last_updated, last_updated_by)
-SELECT n, n, (SELECT id FROM core.nav_menu WHERE parent_id = 0 AND name = 'Admin' AND is_active = 1), 2, 'Password', '/principalpassword', 1, current_user, now(), current_user
+SELECT n, n, (SELECT id FROM core.nav_menu WHERE parent_id = 0 AND name = 'Admin' AND is_active = 1), 2, 'Operations', '/operation', 1, current_user, now(), current_user
 FROM (SELECT nextval('core.nav_menu_identity') n) t;
         
 INSERT INTO core.nav_menu(id, txn_id, parent_id, ordinal, name, link, is_active, created_by, last_updated, last_updated_by)
-SELECT n, n, (SELECT id FROM core.nav_menu WHERE parent_id = 0 AND name = 'Admin' AND is_active = 1), 3, 'Operations', '/operation', 1, current_user, now(), current_user
-FROM (SELECT nextval('core.nav_menu_identity') n) t;
-        
-INSERT INTO core.nav_menu(id, txn_id, parent_id, ordinal, name, link, is_active, created_by, last_updated, last_updated_by)
-SELECT n, n, (SELECT id FROM core.nav_menu WHERE parent_id = 0 AND name = 'Admin' AND is_active = 1), 4, 'Operation Role', '/oprole', 1, current_user, now(), current_user
+SELECT n, n, (SELECT id FROM core.nav_menu WHERE parent_id = 0 AND name = 'Admin' AND is_active = 1), 3, 'Operation Role', '/oprole', 1, current_user, now(), current_user
 FROM (SELECT nextval('core.nav_menu_identity') n) t;
         
 -- Insert parent menu item

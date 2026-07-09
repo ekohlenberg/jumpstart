@@ -1,0 +1,482 @@
+@using System.Collections.Generic;
+@using System.Linq;
+@using jumpstart;
+@{
+    // Mirrors web/blazor/Pages/Edittemplate.razor.cshtml. One of these is
+    // generated per domain object (TEMPLATE_TYPE=object), same as the Blazor
+    // version, and the output filename follows the same "template" ->
+    // model.FileName substitution (Edittemplate.tsx.cshtml -> EditCustomer.tsx).
+    //
+    // Blazor builds the form by reflecting over [ColumnInfo] attributes at
+    // runtime (ReflectionHelper.GetEditFormProperties) and hand-assembling a
+    // RenderTreeBuilder tree per input type. TS/JS has no attribute
+    // reflection, so this template computes the same field metadata at
+    // *generation* time from MetaObject.Attributes and renders ordinary JSX
+    // from it -- no RenderTreeBuilder equivalent needed, since JSX already
+    // is the "buildable tree" Blazor's C# API is standing in for.
+    string domainObj = Model.DomainObj;
+    string domainVar = Model.DomainVar;
+    string label = Model.Label;
+
+    // Type/kind conversion lives in TypeMapping.ToTsType / ToFormKind
+    // (src/metamodel.cs) rather than local `Func<string, string>` variables
+    // here -- RazorLight chokes on locals of that delegate type assigned via
+    // a multi-line lambda inside an `@{ }` block. ToFormKind alone doesn't
+    // know about FK columns (an "enum" kind field is still a plain number on
+    // the wire, e.g. org_id, but needs a <select> instead of a number
+    // input), so the FK check below layers "enum" on top of it.
+
+    // Every attribute is editable here (unlike the list page's columns,
+    // which drop "_id" columns) -- mirrors GetEditFormProperties applying no
+    // "_id" filter, since the raw FK id column is exactly what the form edits.
+    var formFields = new List<(string Key, string Label, string Kind, string FkVar)>();
+    foreach (var attr in Model.Attributes)
+    {
+        bool isFk = !string.IsNullOrEmpty(attr.FkObject) && !string.IsNullOrEmpty(attr.FkType) &&
+                    (attr.FkType.ToLower() == "enum" || attr.FkType.ToLower() == "parent");
+        string kind = isFk ? "enum" : TypeMapping.ToFormKind(attr.DotNetType);
+        string fkVar = isFk ? attr.FkObject.ToLower() : "";
+        formFields.Add((attr.Name, attr.Label, kind, fkVar));
+    }
+
+    // "Real World Key" columns, shown next to "Edit" in the page title --
+    // mirrors BaseObject.getRwkString() (join non-"_id" RWK column values
+    // with a space).
+    var rwkKeys = new List<string>();
+    foreach (var attr in Model.Attributes)
+    {
+        if (attr.RWK == "1" && !attr.Name.EndsWith("_id"))
+        {
+            rwkKeys.Add(attr.Name);
+        }
+    }
+    string rwkArrayLiteral = "[" + string.Join(", ", rwkKeys.Select(k => "formData." + k)) + "]";
+
+    // This object's own display columns (raw attributes, no FK-view
+    // synthesis) for the History tab -- same reflection filter DataTable.razor
+    // applies when given typeof(@(domainObj)History): every attribute except
+    // the ones ending in "_id".
+    var ownColumns = new List<(string Key, string Label)>();
+    foreach (var attr in Model.Attributes)
+    {
+        if (!attr.Name.EndsWith("_id")) { ownColumns.Add((attr.Name, attr.Label)); }
+    }
+
+    var children = Model.Children;
+
+    // One raw-attribute row interface + display-column list per distinct
+    // child domain object (a table can be a child via more than one
+    // FK/role -- e.g. two roles pointing at the same table -- so generate
+    // its shape once, keyed by DomainObj). Skips the current object's own
+    // DomainObj (self-referential FK, e.g. a "parent_id" pointing back at
+    // the same table): that shape is already covered by the @(domainObj)
+    // interface + ownColumns above.
+    var childRowFields = new Dictionary<string, List<(string Key, string TsType)>>();
+    var childColumns = new Dictionary<string, List<(string Key, string Label)>>();
+    foreach (var child in children)
+    {
+        var childObj = child.Object;
+        if (childObj.DomainObj == domainObj) { continue; }
+        if (childRowFields.ContainsKey(childObj.DomainObj)) { continue; }
+
+        var fields = new List<(string, string)>();
+        var cols = new List<(string, string)>();
+        foreach (var a in childObj.Attributes)
+        {
+            fields.Add((a.Name, TypeMapping.ToTsType(a.DotNetType)));
+            if (!a.Name.EndsWith("_id")) { cols.Add((a.Name, a.Label)); }
+        }
+        childRowFields[childObj.DomainObj] = fields;
+        childColumns[childObj.DomainObj] = cols;
+    }
+
+    // Type/columns to use for a given child relationship's DataTable: see
+    // MetaObject.ChildRowTypeName / ChildColumnsConstName (src/metamodel.cs)
+    // -- same RazorLight limitation, so these are instance methods on Model
+    // (the current MetaObject) instead of local `Func<MetaObject, string>`
+    // variables. They reuse this object's own type/columns for the
+    // self-referential case handled above instead of a second, identical
+    // declaration.
+}
+import { useEffect, useMemo, useState, type FormEventHandler, type ReactNode } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useApiClient } from "../api/apiClient";
+import DataTable, { type DataTableColumn } from "../components/DataTable";
+import TabControl, { type TabItem } from "../components/TabControl";
+import "../styles/editForm.css";
+
+// Raw shape sent/received by GET|POST|PUT /api/@(domainVar)[/{id}] -- matches
+// the @(domainObj) domain class generated for the dotnet/rust servers (every
+// attribute, unlike the *View interface the list page works with).
+export interface @(domainObj) {
+@foreach (var attr in Model.Attributes)
+{
+<text>  @(attr.Name): @(TypeMapping.ToTsType(attr.DotNetType));
+</text>
+}
+}
+
+// History rows are the same shape as the live record (see
+// shared/dotnet/domain/template.generated.cs.cshtml's "@(domainObj)History : @(domainObj)").
+export type @(domainObj)History = @(domainObj);
+
+@foreach (var kv in childRowFields)
+{
+<text>
+// Raw shape returned by GET /api/@(domainVar)/{id}/{child}_{role} for the
+// "@(kv.Key)" child relationship(s) below.
+interface @(kv.Key)Row {
+</text>
+foreach (var f in kv.Value)
+{
+<text>  @(f.Key): @(f.TsType);
+</text>
+}
+<text>}
+</text>
+}
+
+// Matches EnumHelper (shared/dotnet/common/EnumHelper.cs.cshtml): the option
+// list behind every FK/enum <select>.
+interface EnumOption {
+  id: number;
+  rwkString: string;
+}
+
+interface FormField {
+  key: string;
+  label: string;
+  kind: "string" | "number" | "boolean" | "date" | "enum";
+  fkVar: string;
+}
+
+const FORM_FIELDS: FormField[] = [
+@foreach (var f in formFields)
+{
+<text>  { key: "@(f.Key)", label: "@(f.Label)", kind: "@(f.Kind)", fkVar: "@(f.FkVar)" },
+</text>
+}
+];
+
+const OWN_COLUMNS: DataTableColumn[] = [
+@foreach (var col in ownColumns)
+{
+<text>  { key: "@(col.Key)", label: "@(col.Label)" },
+</text>
+}
+];
+
+@foreach (var kv in childColumns)
+{
+<text>
+const @((kv.Key + "_COLUMNS").ToUpperInvariant()): DataTableColumn[] = [
+</text>
+foreach (var col in kv.Value)
+{
+<text>  { key: "@(col.Key)", label: "@(col.Label)" },
+</text>
+}
+<text>];
+</text>
+}
+
+function defaultValueForKind(kind: FormField["kind"]): string | number | boolean {
+  switch (kind) {
+    case "number":
+    case "enum":
+      return 0;
+    case "boolean":
+      return false;
+    default:
+      return "";
+  }
+}
+
+function createEmpty@(domainObj)(): @(domainObj) {
+  // Plain index-signature object type here (rather than Record<string,
+  // unknown>) -- RazorLight's markup parser can mistake a bare
+  // `Identifier<...>` for the start of an HTML/JSX tag when it appears
+  // outside a `<text>`-wrapped code region, so every such generic in this
+  // file is written to avoid a bare `&lt;` following an identifier.
+  const obj: { [key: string]: unknown } = {};
+  for (const field of FORM_FIELDS) {
+    obj[field.key] = defaultValueForKind(field.kind);
+  }
+  return obj as unknown as @(domainObj);
+}
+
+// Not generic (only ever called with FORM_FIELDS below) -- a bare `<T>`
+// here trips the same RazorLight tag-detection issue as Record<...> above.
+function chunkFormFields(items: FormField[], size: number): FormField[][] {
+  const rows: FormField[][] = [];
+  for (let i = 0; i &lt; items.length; i += size) {
+    rows.push(items.slice(i, i + size));
+  }
+  return rows;
+}
+
+export default function Edit@(domainObj)() {
+  const api = useApiClient();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+  const id = params.id ? Number(params.id) : null;
+
+  const returnUrl = useMemo(() => new URLSearchParams(location.search).get("returnUrl"), [location.search]);
+
+  const [formData, setFormData] = useState<@(domainObj)>(() => createEmpty@(domainObj)());
+  const [historyList, setHistoryList] = useState<@(domainObj)History[] | null>(null);
+  const [enumOptions, setEnumOptions] = useState({} as { [key: string]: EnumOption[] });
+  const [activeTab, setActiveTab] = useState(0);
+@if (children.Count > 0)
+{
+<text>  const [activeChildTab, setActiveChildTab] = useState(0);
+</text>
+}
+@foreach (var child in children)
+{
+<text>  const [@(child.Object.DomainVar)_@(child.Role)List, set_@(child.Object.DomainVar)_@(child.Role)List] = useState<@(Model.ChildRowTypeName(child.Object))[] | null>(null);
+</text>
+}
+
+  // Loads the record (plus history/children) when editing an existing row;
+  // resets to a blank record when navigating to the "create" route.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      if (id == null) {
+        setFormData(createEmpty@(domainObj)());
+        setHistoryList(null);
+        return;
+      }
+
+      try {
+        const record = await api.get<@(domainObj)>(`/api/@(domainVar)/${id}`);
+        if (!cancelled) setFormData(record);
+      } catch (err) {
+        console.error("Edit@(domainObj): error loading record", err);
+      }
+
+      try {
+        const history = await api.get<@(domainObj)History[]>(`/api/@(domainVar)/${id}/history`);
+        if (!cancelled) setHistoryList(history);
+      } catch (err) {
+        console.error("Edit@(domainObj): error loading history", err);
+        if (!cancelled) setHistoryList([]);
+      }
+@foreach (var child in children)
+{
+<text>
+      try {
+        const @(child.Object.DomainVar)_@(child.Role) = await api.get<@(Model.ChildRowTypeName(child.Object))[]>(
+          `/api/@(domainVar)/${id}/@(child.Object.DomainVar)_@(child.Role)`,
+        );
+        if (!cancelled) set_@(child.Object.DomainVar)_@(child.Role)List(@(child.Object.DomainVar)_@(child.Role));
+      } catch (err) {
+        console.error("Edit@(domainObj): error loading @(child.Object.DomainVar)_@(child.Role)", err);
+        if (!cancelled) set_@(child.Object.DomainVar)_@(child.Role)List([]);
+      }
+</text>
+}
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, api]);
+
+  // Enum/parent dropdown options -- needed for both create and edit, same as
+  // Blazor's LoadEnumData() (called unconditionally in OnParametersSetAsync).
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.all(
+      FORM_FIELDS.filter((f) => f.kind === "enum").map(async (field) => {
+        const options = (await api.get(`/api/${field.fkVar}/enum`)) as EnumOption[];
+        return [field.key, options] as const;
+      }),
+    )
+      .then((entries) => {
+        if (!cancelled) setEnumOptions(Object.fromEntries(entries));
+      })
+      .catch((err) => console.error("Edit@(domainObj): error loading enum options", err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [api]);
+
+  function setField(key: string, value: string | number | boolean) {
+    setFormData((current) => ({ ...current, [key]: value }));
+  }
+
+  // Typed via the FormEventHandler variable annotation (using its default
+  // type parameter) rather than an inline `(e: FormEvent<HTMLFormElement>)`
+  // parameter annotation -- same bare-generic issue as elsewhere in this file.
+  const handleSubmit: FormEventHandler = async (e) => {
+    e.preventDefault();
+    try {
+      if (id == null) {
+        await api.post<@(domainObj)>("/api/@(domainVar)", formData);
+      } else {
+        await api.put<@(domainObj)>(`/api/@(domainVar)/${id}`, formData);
+      }
+    } catch (err) {
+      console.error("Edit@(domainObj): error saving @(domainVar)", err);
+    }
+    navigate(returnUrl ?? "/@(domainVar)");
+  };
+
+  function handleCancel() {
+    navigate(returnUrl ?? "/@(domainVar)");
+  }
+
+  const rwkString = @(rwkArrayLiteral)
+    .filter((v) => v !== null && v !== undefined && v !== "")
+    .join(" ");
+
+  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  const values = formData as unknown as { [key: string]: unknown };
+
+  const editTabContent: ReactNode = (
+    <form onSubmit={handleSubmit}>
+      <div className="form-group">
+        <table className="table table-borderless">
+          <tbody>
+            {fieldRows.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((field) => (
+                  <td key={field.key} style={{ width: "33%", padding: "0.5rem" }}>
+                    <div className="mb-2">
+                      <label htmlFor={field.key} className="form-label">
+                        {field.label}
+                      </label>
+                      {field.kind === "enum" ? (
+                        <select
+                          id={field.key}
+                          className="form-control"
+                          value={String(values[field.key] ?? "")}
+                          onChange={(e) => setField(field.key, Number(e.target.value) || 0)}
+                        >
+                          <option value="">-- Select --</option>
+                          {(enumOptions[field.key] ?? []).map((opt) => (
+                            <option key={opt.id} value={opt.id}>
+                              {opt.rwkString}
+                            </option>
+                          ))}
+                        </select>
+                      ) : field.kind === "boolean" ? (
+                        <input
+                          id={field.key}
+                          type="checkbox"
+                          className="form-check-input"
+                          checked={Boolean(values[field.key])}
+                          onChange={(e) => setField(field.key, e.target.checked)}
+                        />
+                      ) : field.kind === "number" ? (
+                        <input
+                          id={field.key}
+                          type="number"
+                          className="form-control"
+                          value={String(values[field.key] ?? 0)}
+                          onChange={(e) => setField(field.key, Number(e.target.value) || 0)}
+                        />
+                      ) : field.kind === "date" ? (
+                        <input
+                          id={field.key}
+                          type="date"
+                          className="form-control"
+                          value={String(values[field.key] ?? "").slice(0, 10)}
+                          onChange={(e) => setField(field.key, e.target.value)}
+                        />
+                      ) : (
+                        <input
+                          id={field.key}
+                          type="text"
+                          className="form-control"
+                          value={String(values[field.key] ?? "")}
+                          onChange={(e) => setField(field.key, e.target.value)}
+                        />
+                      )}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mb-3">
+        <button type="submit" className="btn btn-primary">
+          Save
+        </button>
+        <button type="button" className="btn btn-secondary ms-2" onClick={handleCancel}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+
+  const historyTabContent: ReactNode = (
+    <div className="mt-3">
+      <div className="alert alert-info">History records: {historyList?.length ?? 0}</div>
+      <DataTable data={historyList} columns={OWN_COLUMNS} showActions={false} showAddButton={false} />
+    </div>
+  );
+
+  const editTabs: TabItem[] = [
+    { title: "Edit", content: editTabContent },
+    { title: "History", content: historyTabContent },
+  ];
+
+@if (children.Count > 0)
+{
+<text>
+  const childTabs: TabItem[] = [
+</text>
+foreach (var child in children)
+{
+<text>
+    {
+      title: "@(child.Object.Label)",
+      content: (
+        <div className="mt-3">
+          <div className="alert alert-info">
+            @(child.Label) records: {@(child.Object.DomainVar)_@(child.Role)List?.length ?? 0}
+          </div>
+          <DataTable
+            data={@(child.Object.DomainVar)_@(child.Role)List}
+            columns={@(Model.ChildColumnsConstName(child.Object))}
+            showActions={false}
+            showAddButton={false}
+          />
+        </div>
+      ),
+    },
+</text>
+}
+<text>
+  ];
+</text>
+}
+
+  return (
+    <>
+      {id == null ? <h3>Create @(label)</h3> : <h3>Edit @(label) {rwkString}</h3>}
+
+      <TabControl id="editTabs" tabs={editTabs} activeTab={activeTab} onTabChanged={setActiveTab} />
+@if (children.Count > 0)
+{
+<text>
+      <div className="mt-4">
+        <h4>Related Records</h4>
+        <TabControl id="childTabs" tabs={childTabs} activeTab={activeChildTab} onTabChanged={setActiveChildTab} />
+      </div>
+</text>
+}
+    </>
+  );
+}
