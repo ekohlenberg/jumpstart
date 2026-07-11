@@ -104,6 +104,11 @@ impl TestCaseLogic {
     pub(crate) fn update(&self, id: i64, testcase: &mut TestCase) -> Result<(), LogicError> {
         Logger::debug(format!("Processing TestCaseLogic update ID={}", id));
         testcase.base.set("id", Value::from(id));
+        // A normal save always (re)activates the record -- explicit here
+        // (matching insert/put above) now that db_persist_audit::update() no
+        // longer forces is_active=1 itself, since delete() below relies on
+        // that function honoring the is_active it sets.
+        testcase.base.set("is_active", Value::from(1));
         DBPersist::update(testcase, "default")?;
         Ok(())
     }

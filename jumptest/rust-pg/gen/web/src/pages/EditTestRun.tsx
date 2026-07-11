@@ -57,20 +57,21 @@ interface FormField {
   label: string;
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
+  isGlobal: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
-  { key: "id", label: "Test Run ID", kind: "number", fkVar: "" },
-  { key: "name", label: "Name", kind: "string", fkVar: "" },
-  { key: "test_plan_id", label: "Test Plan", kind: "enum", fkVar: "testplan" },
-  { key: "run_at", label: "Run At", kind: "date", fkVar: "" },
-  { key: "run_by", label: "Run By", kind: "string", fkVar: "" },
-  { key: "notes", label: "Notes", kind: "string", fkVar: "" },
-  { key: "is_active", label: "Active", kind: "number", fkVar: "" },
-  { key: "created_by", label: "Created By", kind: "string", fkVar: "" },
-  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "" },
-  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "" },
-  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "" },
+  { key: "id", label: "Test Run ID", kind: "number", fkVar: "", isGlobal: false },
+  { key: "name", label: "Name", kind: "string", fkVar: "", isGlobal: false },
+  { key: "test_plan_id", label: "Test Plan", kind: "enum", fkVar: "testplan", isGlobal: false },
+  { key: "run_at", label: "Run At", kind: "date", fkVar: "", isGlobal: false },
+  { key: "run_by", label: "Run By", kind: "string", fkVar: "", isGlobal: false },
+  { key: "notes", label: "Notes", kind: "string", fkVar: "", isGlobal: false },
+  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true },
+  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true },
+  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true },
+  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true },
+  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true },
 ];
 
 const OWN_COLUMNS: DataTableColumn[] = [
@@ -97,6 +98,15 @@ const TESTRESULT_COLUMNS: DataTableColumn[] = [
   { key: "last_updated", label: "Last Updated" },
   { key: "last_updated_by", label: "Last Updated By" },
 ];
+
+// Read-only display text for global/audit fields (field.isGlobal below) --
+// same null/blank handling as DataTable.tsx.cshtml's formatValue, plus a
+// friendlier Yes/No for booleans like is_active.
+function formatReadOnlyValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  return String(value);
+}
 
 function defaultValueForKind(kind: FormField["kind"]): string | number | boolean {
   switch (kind) {
@@ -239,6 +249,25 @@ export default function EditTestRun() {
     navigate(returnUrl ?? "/testrun");
   }
 
+  // Soft delete -- DELETE /api/testrun/{id} sets is_active=0 server-side
+  // (see TestRunLogic.delete() / server/dotnet/api/template.api.generated.cs.cshtml's
+  // Delete action), it doesn't remove the row. Only meaningful for an
+  // existing record, so the button below is hidden while creating a new one.
+  async function handleDelete() {
+    if (id == null) return;
+    // window.confirm here (rather than a custom modal) matches the plain
+    // browser confirm() the Blazor Edit page uses via JS interop below --
+    // keeps both clients' delete confirmation behavior identical.
+    if (!window.confirm(`Delete this Test Run? This cannot be undone.`)) return;
+    try {
+      await api.del(`/api/testrun/${id}`);
+    } catch (err) {
+      console.error("EditTestRun: error deleting testrun", err);
+      return;
+    }
+    navigate(returnUrl ?? "/testrun");
+  }
+
   const rwkString = [formData.name]
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
@@ -259,7 +288,11 @@ export default function EditTestRun() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.kind === "enum" ? (
+                      {field.isGlobal ? (
+                        <div id={field.key} className="form-control-plaintext">
+                          {formatReadOnlyValue(values[field.key])}
+                        </div>
+                      ) : field.kind === "enum" ? (
                         <select
                           id={field.key}
                           className="form-control"
@@ -315,13 +348,25 @@ export default function EditTestRun() {
         </table>
       </div>
 
-      <div className="mb-3">
-        <button type="submit" className="btn btn-primary">
-          Save
-        </button>
-        <button type="button" className="btn btn-secondary ms-2" onClick={handleCancel}>
-          Cancel
-        </button>
+      <div className="mb-3 d-flex justify-content-between align-items-center">
+        <div>
+          <button type="submit" className="btn btn-primary">
+            Save
+          </button>
+          <button type="button" className="btn btn-secondary ms-2" onClick={handleCancel}>
+            Cancel
+          </button>
+        </div>
+        {id != null && (
+          <button
+            type="button"
+            className="btn"
+            style={{ backgroundColor: "#8b0000", color: "#fff" }}
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
+        )}
       </div>
     </form>
   );

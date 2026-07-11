@@ -9,6 +9,12 @@
 
 main {
   flex: 1;
+  /* Flex items default to min-width: auto, which lets a wide child (e.g. a
+     DataTable with many columns) inflate main -- and with it the sticky
+     top-row parent menu -- past the viewport instead of staying put. min-width: 0
+     lets main shrink to the row's available space; the wide content then
+     scrolls inside .content below instead of pushing the menu off-screen. */
+  min-width: 0;
 }
 
 .sidebar {
@@ -83,6 +89,13 @@ main {
     padding-left: 2rem !important;
     padding-right: 1.5rem !important;
   }
+}
+
+/* Wide page content (e.g. a DataTable with many columns) scrolls inside
+   this box instead of stretching main -- keeps the sticky top-row parent
+   menu and login display fully visible regardless of window width. */
+.content {
+  overflow-x: auto;
 }
 
 /* Navigation button text color for main content area */

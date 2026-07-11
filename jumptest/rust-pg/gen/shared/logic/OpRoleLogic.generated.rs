@@ -104,6 +104,11 @@ impl OpRoleLogic {
     pub(crate) fn update(&self, id: i64, oprole: &mut OpRole) -> Result<(), LogicError> {
         Logger::debug(format!("Processing OpRoleLogic update ID={}", id));
         oprole.base.set("id", Value::from(id));
+        // A normal save always (re)activates the record -- explicit here
+        // (matching insert/put above) now that db_persist_audit::update() no
+        // longer forces is_active=1 itself, since delete() below relies on
+        // that function honoring the is_active it sets.
+        oprole.base.set("is_active", Value::from(1));
         DBPersist::update(oprole, "default")?;
         Ok(())
     }

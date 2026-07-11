@@ -3,6 +3,7 @@
 @@inject HttpClient Http
 @@inject IHttpClientFactory ClientFactory
 @@inject NavigationManager Navigation
+@@inject IJSRuntime JS
 @@rendermode @@(new InteractiveWebAssemblyRenderMode(prerender: false))
 @@using System.Reflection
 @@using Microsoft.AspNetCore.Components.Forms
@@ -225,8 +226,21 @@ else
 					
 					// Input field based on type
 					var underlyingType = Nullable.GetUnderlyingType(propInfo.PropertyType) ?? propInfo.PropertyType;
-					
-					if (IsEnumForeignKey(propInfo))
+
+					if (ReflectionHelper.IsGlobalProperty(propInfo))
+					{
+						// Global/audit column (is_active, created_by, last_updated,
+						// last_updated_by, txn_id) -- managed by the persistence
+						// layer, so render as a read-only label instead of an
+						// editable input. Mirrors field.isGlobal in
+						// web/nodejs/src/pages/Edittemplate.tsx.cshtml.
+						editBuilder.OpenElement(17 + i + j, "div");
+						editBuilder.AddAttribute(18 + i + j, "id", propInfo.Name);
+						editBuilder.AddAttribute(19 + i + j, "class", "form-control-plaintext");
+						editBuilder.AddContent(20 + i + j, GetReadOnlyDisplayValue(propInfo));
+						editBuilder.CloseElement(); // div
+					}
+					else if (IsEnumForeignKey(propInfo))
 					{
 						// Enum dropdown
 						editBuilder.OpenElement(17 + i + j, "select");
@@ -329,24 +343,48 @@ else
 			editBuilder.CloseElement(); // table
 			editBuilder.CloseElement(); // div
 			
-			// Add buttons
+			// Add buttons -- Save/Cancel grouped on the left, Delete (when
+			// editing an existing record) right-justified via the flex
+			// container. Mirrors the button layout in
+			// web/nodejs/src/pages/Edittemplate.tsx.cshtml.
 			editBuilder.OpenElement(9, "div");
-			editBuilder.AddAttribute(10, "class", "mb-3");
-			
-			editBuilder.OpenElement(11, "button");
-			editBuilder.AddAttribute(12, "type", "submit");
-			editBuilder.AddAttribute(13, "class", "btn btn-primary");
-			editBuilder.AddContent(14, "Save");
+			editBuilder.AddAttribute(10, "class", "mb-3 d-flex justify-content-between align-items-center");
+
+			editBuilder.OpenElement(11, "div");
+
+			editBuilder.OpenElement(12, "button");
+			editBuilder.AddAttribute(13, "type", "submit");
+			editBuilder.AddAttribute(14, "class", "btn btn-primary");
+			editBuilder.AddContent(15, "Save");
 			editBuilder.CloseElement(); // button
-			
-			editBuilder.OpenElement(15, "button");
-			editBuilder.AddAttribute(16, "type", "button");
-			editBuilder.AddAttribute(17, "class", "btn btn-secondary");
-			editBuilder.AddAttribute(18, "onclick", EventCallback.Factory.Create(this, Cancel));
-			editBuilder.AddContent(19, "Cancel");
+
+			editBuilder.OpenElement(16, "button");
+			editBuilder.AddAttribute(17, "type", "button");
+			editBuilder.AddAttribute(18, "class", "btn btn-secondary");
+			editBuilder.AddAttribute(19, "onclick", EventCallback.Factory.Create(this, Cancel));
+			editBuilder.AddContent(20, "Cancel");
 			editBuilder.CloseElement(); // button
-			
-			editBuilder.CloseElement(); // div
+
+			editBuilder.CloseElement(); // div (Save/Cancel group)
+
+			if (id is not null)
+			{
+				// Soft delete -- DELETE api/@(Model.DomainVar)/{id} sets
+				// is_active=0 server-side (see @(Model.DomainObj)Logic.delete() /
+				// server/dotnet/api/template.api.generated.cs.cshtml's Delete
+				// action), it doesn't remove the row. Only shown for an
+				// existing record, since there's nothing to delete while
+				// creating a new one.
+				editBuilder.OpenElement(21, "button");
+				editBuilder.AddAttribute(22, "type", "button");
+				editBuilder.AddAttribute(23, "class", "btn");
+				editBuilder.AddAttribute(24, "style", "background-color:#8b0000;color:#fff;");
+				editBuilder.AddAttribute(25, "onclick", EventCallback.Factory.Create(this, HandleDelete));
+				editBuilder.AddContent(26, "Delete");
+				editBuilder.CloseElement(); // button
+			}
+
+			editBuilder.CloseElement(); // div (mb-3 flex container)
 		}));
 		builder.CloseComponent(); // EditForm
 	};
@@ -585,6 +623,36 @@ else
 		Navigation.NavigateTo(_returnUrl ?? "/@(Model.DomainVar)");
 	}
 
+	async Task HandleDelete()
+	{
+		if (id is null)
+		{
+			return;
+		}
+
+		// Plain browser confirm() via JS interop -- matches window.confirm in
+		// web/nodejs/src/pages/Edittemplate.tsx.cshtml's handleDelete, so both
+		// clients behave identically.
+		bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete this @(Model.Label)? This cannot be undone.");
+		if (!confirmed)
+		{
+			return;
+		}
+
+		try
+		{
+			var remoteClient = ClientFactory.CreateClient("RemoteAPI");
+			await remoteClient.DeleteAsync($"api/@(Model.DomainVar)/{id}");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error deleting @(Model.DomainVar): {ex.Message}");
+			return;
+		}
+
+		Navigation.NavigateTo(_returnUrl ?? "/@(Model.DomainVar)");
+	}
+
 	// Helper methods using ReflectionHelper
 	private System.Reflection.PropertyInfo[] GetEditableProperties()
 	{
@@ -600,6 +668,19 @@ else
 	private string GetStringProperty(System.Reflection.PropertyInfo propInfo)
 	{
 		return ReflectionHelper.GetPropertyValueAsString(@(Model.DomainVar), propInfo);
+	}
+
+	// Display text for global/audit fields (see ReflectionHelper.IsGlobalProperty
+	// above) -- same value as GetStringProperty, with a friendlier Yes/No for
+	// boolean columns like is_active.
+	private string GetReadOnlyDisplayValue(System.Reflection.PropertyInfo propInfo)
+	{
+		var underlyingType = Nullable.GetUnderlyingType(propInfo.PropertyType) ?? propInfo.PropertyType;
+		if (underlyingType == typeof(bool))
+		{
+			return GetBoolProperty(propInfo) ? "Yes" : "No";
+		}
+		return GetStringProperty(propInfo);
 	}
 
 	private int GetIntProperty(System.Reflection.PropertyInfo propInfo)

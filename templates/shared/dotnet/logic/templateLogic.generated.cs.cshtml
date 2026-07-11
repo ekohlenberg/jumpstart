@@ -208,6 +208,11 @@ namespace @namespaceName
             Logger.Debug($"Processing @(domainObj)Logic update: ID = {id}\n{@(domainVar)}");
 
             @(domainVar).id = id;
+            // A normal save always (re)activates the record -- explicit here
+            // (matching insert/put above) now that DBPersistAudit.update() no
+            // longer forces is_active=1 itself, since delete() below relies on
+            // that method honoring the is_active it sets.
+            @(domainVar).is_active = 1;
             DBPersist.update(@(domainVar));
         }
 

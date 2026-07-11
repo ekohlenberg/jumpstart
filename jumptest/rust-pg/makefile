@@ -1,13 +1,19 @@
 TARGETDIR=./bin/Debug/net9.0
 
-default: build
+default: generate
 
-build:
+generate:
 	@jumpstart ./jumptest.csv database-pgsql
 	@jumpstart ./jumptest.csv server-rust
 	@jumpstart ./jumptest.csv web-nodejs
 	@jumpstart ./jumptest.csv tools-rust
 	@jumpstart ./jumptest.csv test-rust
+
+build:
+	@$(MAKE) -C ./gen/server/api
+	@$(MAKE) -C ./gen/server/scheduler
+	@$(MAKE) -C ./gen/server/scriptagent
+	@$(MAKE) -C ./gen/web
 
 database:
 	@chmod +x ./gen/database/ddl/build.sh

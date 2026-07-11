@@ -104,6 +104,11 @@ impl WorkflowLogic {
     pub(crate) fn update(&self, id: i64, workflow: &mut Workflow) -> Result<(), LogicError> {
         Logger::debug(format!("Processing WorkflowLogic update ID={}", id));
         workflow.base.set("id", Value::from(id));
+        // A normal save always (re)activates the record -- explicit here
+        // (matching insert/put above) now that db_persist_audit::update() no
+        // longer forces is_active=1 itself, since delete() below relies on
+        // that function honoring the is_active it sets.
+        workflow.base.set("is_active", Value::from(1));
         DBPersist::update(workflow, "default")?;
         Ok(())
     }

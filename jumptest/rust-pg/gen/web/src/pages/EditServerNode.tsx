@@ -46,27 +46,28 @@ interface FormField {
   label: string;
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
+  isGlobal: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
-  { key: "id", label: "Server Node ID", kind: "number", fkVar: "" },
-  { key: "server_node_type_id", label: "Server Node Type", kind: "enum", fkVar: "servernodetype" },
-  { key: "hostname", label: "Hostname", kind: "string", fkVar: "" },
-  { key: "ip_address", label: "Address", kind: "string", fkVar: "" },
-  { key: "port", label: "Port", kind: "number", fkVar: "" },
-  { key: "username", label: "Username", kind: "string", fkVar: "" },
-  { key: "url", label: "URL", kind: "string", fkVar: "" },
-  { key: "user_domain", label: "User Domain", kind: "string", fkVar: "" },
-  { key: "os_name", label: "OS Name", kind: "string", fkVar: "" },
-  { key: "os_version", label: "OS Version", kind: "string", fkVar: "" },
-  { key: "architecture", label: "Architecture", kind: "string", fkVar: "" },
-  { key: "registered_at", label: "Registered At", kind: "date", fkVar: "" },
-  { key: "server_node_status_id", label: "Status", kind: "enum", fkVar: "servernodestatus" },
-  { key: "is_active", label: "Active", kind: "number", fkVar: "" },
-  { key: "created_by", label: "Created By", kind: "string", fkVar: "" },
-  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "" },
-  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "" },
-  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "" },
+  { key: "id", label: "Server Node ID", kind: "number", fkVar: "", isGlobal: false },
+  { key: "server_node_type_id", label: "Server Node Type", kind: "enum", fkVar: "servernodetype", isGlobal: false },
+  { key: "hostname", label: "Hostname", kind: "string", fkVar: "", isGlobal: false },
+  { key: "ip_address", label: "Address", kind: "string", fkVar: "", isGlobal: false },
+  { key: "port", label: "Port", kind: "number", fkVar: "", isGlobal: false },
+  { key: "username", label: "Username", kind: "string", fkVar: "", isGlobal: false },
+  { key: "url", label: "URL", kind: "string", fkVar: "", isGlobal: false },
+  { key: "user_domain", label: "User Domain", kind: "string", fkVar: "", isGlobal: false },
+  { key: "os_name", label: "OS Name", kind: "string", fkVar: "", isGlobal: false },
+  { key: "os_version", label: "OS Version", kind: "string", fkVar: "", isGlobal: false },
+  { key: "architecture", label: "Architecture", kind: "string", fkVar: "", isGlobal: false },
+  { key: "registered_at", label: "Registered At", kind: "date", fkVar: "", isGlobal: false },
+  { key: "server_node_status_id", label: "Status", kind: "enum", fkVar: "servernodestatus", isGlobal: false },
+  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true },
+  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true },
+  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true },
+  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true },
+  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true },
 ];
 
 const OWN_COLUMNS: DataTableColumn[] = [
@@ -87,6 +88,15 @@ const OWN_COLUMNS: DataTableColumn[] = [
   { key: "last_updated_by", label: "Last Updated By" },
 ];
 
+
+// Read-only display text for global/audit fields (field.isGlobal below) --
+// same null/blank handling as DataTable.tsx.cshtml's formatValue, plus a
+// friendlier Yes/No for booleans like is_active.
+function formatReadOnlyValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  return String(value);
+}
 
 function defaultValueForKind(kind: FormField["kind"]): string | number | boolean {
   switch (kind) {
@@ -217,6 +227,25 @@ export default function EditServerNode() {
     navigate(returnUrl ?? "/servernode");
   }
 
+  // Soft delete -- DELETE /api/servernode/{id} sets is_active=0 server-side
+  // (see ServerNodeLogic.delete() / server/dotnet/api/template.api.generated.cs.cshtml's
+  // Delete action), it doesn't remove the row. Only meaningful for an
+  // existing record, so the button below is hidden while creating a new one.
+  async function handleDelete() {
+    if (id == null) return;
+    // window.confirm here (rather than a custom modal) matches the plain
+    // browser confirm() the Blazor Edit page uses via JS interop below --
+    // keeps both clients' delete confirmation behavior identical.
+    if (!window.confirm(`Delete this Server Node? This cannot be undone.`)) return;
+    try {
+      await api.del(`/api/servernode/${id}`);
+    } catch (err) {
+      console.error("EditServerNode: error deleting servernode", err);
+      return;
+    }
+    navigate(returnUrl ?? "/servernode");
+  }
+
   const rwkString = [formData.hostname, formData.port]
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
@@ -237,7 +266,11 @@ export default function EditServerNode() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.kind === "enum" ? (
+                      {field.isGlobal ? (
+                        <div id={field.key} className="form-control-plaintext">
+                          {formatReadOnlyValue(values[field.key])}
+                        </div>
+                      ) : field.kind === "enum" ? (
                         <select
                           id={field.key}
                           className="form-control"
@@ -293,13 +326,25 @@ export default function EditServerNode() {
         </table>
       </div>
 
-      <div className="mb-3">
-        <button type="submit" className="btn btn-primary">
-          Save
-        </button>
-        <button type="button" className="btn btn-secondary ms-2" onClick={handleCancel}>
-          Cancel
-        </button>
+      <div className="mb-3 d-flex justify-content-between align-items-center">
+        <div>
+          <button type="submit" className="btn btn-primary">
+            Save
+          </button>
+          <button type="button" className="btn btn-secondary ms-2" onClick={handleCancel}>
+            Cancel
+          </button>
+        </div>
+        {id != null && (
+          <button
+            type="button"
+            className="btn"
+            style={{ backgroundColor: "#8b0000", color: "#fff" }}
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
+        )}
       </div>
     </form>
   );
