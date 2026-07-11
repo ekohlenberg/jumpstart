@@ -184,5 +184,28 @@
     }
   },
   "active": "c98898d726d977d9",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "jumptest/rust-pg/bin/scriptagent-2026-07-10.log",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/work-products.bin",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/query-cache.bin",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/eyw8w9cnjyaucbn355c7tvt6c.o",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/eyd8g9fh2k9x57kj5i40rtgnn.o",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/esh6azr2e68fql3n8f1asn3xm.o",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/eryfca8s6wv5kn0xeapbys7ih.o",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/efual2pcqq4xi8b457jf9ldns.o",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/e7zbabned7mxuapa661dciqc5.o",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/dyp7hev9zhqg6y8pst3ftqdps.o",
+    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/e6rltrzw43q900mqwz4d1528o.o",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-9.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-8.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-7.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-6.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-5.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-4.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-3.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-2.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-status-1.png",
+    "jumptest/rust-pg/bin/web/dist/images/exec-states.png",
+    "jumpstart-rust-nodejs-blog.md"
+  ]
 }
