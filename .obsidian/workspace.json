@@ -185,6 +185,8 @@
   },
   "active": "c98898d726d977d9",
   "lastOpenFiles": [
+    "jumptest/rust-pg/bin/web/dist/assets/index-qEDK7-NP.js",
+    "jumptest/rust-pg/gen/web/dist/assets/index-qEDK7-NP.js",
     "jumptest/rust-pg/bin/scriptagent-2026-07-10.log",
     "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/work-products.bin",
     "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/query-cache.bin",
@@ -194,8 +196,6 @@
     "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/eryfca8s6wv5kn0xeapbys7ih.o",
     "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/efual2pcqq4xi8b457jf9ldns.o",
     "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/e7zbabned7mxuapa661dciqc5.o",
-    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/dyp7hev9zhqg6y8pst3ftqdps.o",
-    "jumptest/rust-pg/gen/server/scriptagent/target/debug/incremental/scriptagent-3gvsbtxmjn10c/s-hka2enwx35-1m0o0y9-0q6egkye1ea1yrrm8pr56wcqy/e6rltrzw43q900mqwz4d1528o.o",
     "jumptest/rust-pg/bin/web/dist/images/exec-status-9.png",
     "jumptest/rust-pg/bin/web/dist/images/exec-status-8.png",
     "jumptest/rust-pg/bin/web/dist/images/exec-status-7.png",
