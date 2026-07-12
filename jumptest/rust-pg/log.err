@@ -1,0 +1,118 @@
+2026-07-12 20:57:53 DEBUG erickohlenberg api Setting current user to Some("eric.kohlenberg@gmail.com")
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Setting current user to Some("eric.kohlenberg@gmail.com")'); on connection 'default'.
+2026-07-12 20:57:53 INFO erickohlenberg api Invoking Principal.put.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Checking eric.kohlenberg@gmail.com authorization for Principal.put.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Checking authorization for eric.kohlenberg@gmail.com on Principal.put
+2026-07-12 20:57:53 DEBUG erickohlenberg api Processing PrincipalLogic put
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql select * from "core"."principal" where "email"='test@person.com' and "enabled"=1 and is_active=1 on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql SELECT nextval('core.principal_identity'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'INFO', 'erickohlenberg', 'api', '', 0, '', 'Invoking Principal.put.'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."principal" ("id","first_name","last_name","username","email","enabled","created_date","last_login_date","is_active","created_by","last_updated","last_updated_by","txn_id") values (1002,'Test','Person','testperson','test@person.com',1,'2026-07-12','',1,'erickohlenberg','2026-07-12T20:57:53.210502','erickohlenberg',1002); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Checking eric.kohlenberg@gmail.com authorization for Principal.put.'); on connection 'default'.
+2026-07-12 20:57:53 ERROR erickohlenberg api db error: 22007: invalid input syntax for type timestamp: "": insert into "core"."principal" ("id","first_name","last_name","username","email","enabled","created_date","last_login_date","is_active","created_by","last_updated","last_updated_by","txn_id") values (1002,'Test','Person','testperson','test@person.com',1,'2026-07-12','',1,'erickohlenberg','2026-07-12T20:57:53.210502','erickohlenberg',1002); on connection 'default'
+2026-07-12 20:57:53 INFO erickohlenberg api After invoking put.
+2026-07-12 20:57:53 ERROR erickohlenberg api api error: db error: 22007: invalid input syntax for type timestamp: ""
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Checking authorization for eric.kohlenberg@gmail.com on Principal.put'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Setting current user to None
+2026-07-12 20:57:53 DEBUG erickohlenberg api Setting current user to Some("eric.kohlenberg@gmail.com")
+2026-07-12 20:57:53 INFO erickohlenberg api Invoking Principal.select.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Checking eric.kohlenberg@gmail.com authorization for Principal.select.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Checking authorization for eric.kohlenberg@gmail.com on Principal.select
+2026-07-12 20:57:53 DEBUG erickohlenberg api Processing PrincipalLogic select
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql SELECT
+        core.principal.id,
+            principal.first_name,
+            principal.last_name,
+            principal.username,
+            principal.email,
+            principal.enabled,
+            principal.created_date,
+            principal.last_login_date,
+            principal.is_active,
+            principal.created_by,
+            principal.last_updated,
+            principal.last_updated_by,
+            principal.txn_id
+    FROM core.principal
+    WHERE core.principal.is_active = 1
+    ORDER BY core.principal.id; on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Processing PrincipalLogic put'); on connection 'default'.
+2026-07-12 20:57:53 INFO erickohlenberg api After invoking select.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Setting current user to Some("eric.kohlenberg@gmail.com")
+2026-07-12 20:57:53 INFO erickohlenberg api Invoking Principal.select.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Checking eric.kohlenberg@gmail.com authorization for Principal.select.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Checking authorization for eric.kohlenberg@gmail.com on Principal.select
+2026-07-12 20:57:53 DEBUG erickohlenberg api Processing PrincipalLogic select
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql SELECT
+        core.principal.id,
+            principal.first_name,
+            principal.last_name,
+            principal.username,
+            principal.email,
+            principal.enabled,
+            principal.created_date,
+            principal.last_login_date,
+            principal.is_active,
+            principal.created_by,
+            principal.last_updated,
+            principal.last_updated_by,
+            principal.txn_id
+    FROM core.principal
+    WHERE core.principal.is_active = 1
+    ORDER BY core.principal.id; on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Executing sql select * from "core"."principal" where "email"=''test@person.com'' and "enabled"=1 and is_active=1 on connection ''default''.'); on connection 'default'.
+2026-07-12 20:57:53 INFO erickohlenberg api After invoking select.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Executing sql SELECT nextval(''core.principal_identity''); on connection ''default''.'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Executing sql insert into "core"."principal" ("id","first_name","last_name","username","email","enabled","created_date","last_login_date","is_active","created_by","last_updated","last_updated_by","txn_id") values (1002,''Test'',''Person'',''testperson'',''test@person.com'',1,''2026-07-12'','''',1,''erickohlenberg'',''2026-07-12T20:57:53.210502'',''erickohlenberg'',1002); on connection ''default''.'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'ERROR', 'erickohlenberg', 'api', '', 0, '', 'db error: 22007: invalid input syntax for type timestamp: "": insert into "core"."principal" ("id","first_name","last_name","username","email","enabled","created_date","last_login_date","is_active","created_by","last_updated","last_updated_by","txn_id") values (1002,''Test'',''Person'',''testperson'',''test@person.com'',1,''2026-07-12'','''',1,''erickohlenberg'',''2026-07-12T20:57:53.210502'',''erickohlenberg'',1002); on connection ''default'''); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'INFO', 'erickohlenberg', 'api', '', 0, '', 'After invoking put.'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'ERROR', 'erickohlenberg', 'api', '', 0, '', 'api error: db error: 22007: invalid input syntax for type timestamp: ""'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Setting current user to None'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Setting current user to Some("eric.kohlenberg@gmail.com")'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'INFO', 'erickohlenberg', 'api', '', 0, '', 'Invoking Principal.select.'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Checking eric.kohlenberg@gmail.com authorization for Principal.select.'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Checking authorization for eric.kohlenberg@gmail.com on Principal.select'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Processing PrincipalLogic select'); on connection 'default'.
+2026-07-12 20:57:53 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Executing sql SELECT
+        core.principal.id,
+            principal.first_name,
+            principal.last_name,
+            principal.username,
+            principal.email,
+            principal.enabled,
+            principal.created_date,
+            principal.last_login_date,
+            principal.is_active,
+            principal.created_by,
+            principal.last_updated,
+            principal.last_updated_by,
+            principal.txn_id
+    FROM core.principal
+    WHERE core.principal.is_active = 1
+    ORDER BY core.principal.id; on connection ''default''.'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'INFO', 'erickohlenberg', 'api', '', 0, '', 'After invoking select.'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Setting current user to Some("eric.kohlenberg@gmail.com")'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'INFO', 'erickohlenberg', 'api', '', 0, '', 'Invoking Principal.select.'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Checking eric.kohlenberg@gmail.com authorization for Principal.select.'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Checking authorization for eric.kohlenberg@gmail.com on Principal.select'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Processing PrincipalLogic select'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'DEBUG', 'erickohlenberg', 'api', '', 0, '', 'Executing sql SELECT
+        core.principal.id,
+            principal.first_name,
+            principal.last_name,
+            principal.username,
+            principal.email,
+            principal.enabled,
+            principal.created_date,
+            principal.last_login_date,
+            principal.is_active,
+            principal.created_by,
+            principal.last_updated,
+            principal.last_updated_by,
+            principal.txn_id
+    FROM core.principal
+    WHERE core.principal.is_active = 1
+    ORDER BY core.principal.id; on connection ''default''.'); on connection 'default'.
+2026-07-12 20:57:54 DEBUG erickohlenberg api Executing sql insert into "core"."log" (timestamp, level, principalname, program, filepath, linenumber, membername, message) values ('2026-07-12 20:57:53', 'INFO', 'erickohlenberg', 'api', '', 0, '', 'After invoking select.'); on connection 'default'.
+
+

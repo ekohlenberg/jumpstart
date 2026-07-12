@@ -70,6 +70,14 @@
 
     var children = Model.Children;
 
+    // Many-to-many relationships reachable through a junction table (see
+    // MetaObject.MapRelationships / MetaObject.ProcessMapRelationships) --
+    // rendered as checklist tabs alongside the child-relationship tabs below,
+    // in the same "Related Records" TabControl. Checkbox state is tracked
+    // locally (per-relationship useState<Set<number>>) and only persisted
+    // (inserted/deleted junction rows) when the user clicks Save.
+    var mapRelationships = Model.MapRelationships;
+
     // One raw-attribute row interface + display-column list per distinct
     // child domain object (a table can be a child via more than one
     // FK/role -- e.g. two roles pointing at the same table -- so generate
@@ -110,6 +118,11 @@ import { useApiClient } from "../api/apiClient";
 import DataTable, { type DataTableColumn } from "../components/DataTable";
 import TabControl, { type TabItem } from "../components/TabControl";
 import "../styles/editForm.css";
+@if (mapRelationships.Count > 0)
+{
+<text>import type { Dispatch, SetStateAction } from "react";
+</text>
+}
 
 // Raw shape sent/received by GET|POST|PUT /api/@(domainVar)[/{id}] -- matches
 // the @(domainObj) domain class generated for the dotnet/rust servers (every
@@ -143,10 +156,39 @@ foreach (var f in kv.Value)
 }
 
 // Matches EnumHelper (shared/dotnet/common/EnumHelper.cs.cshtml): the option
-// list behind every FK/enum <select>.
+// list behind every FK/enum dropdown.
 interface EnumOption {
   id: number;
   rwkString: string;
+}
+
+@if (mapRelationships.Count > 0)
+{
+<text>
+// Matches MapOption (shared/dotnet/common/MapOption.cs.cshtml): one row of a
+// many-to-many relationship checklist tab -- GET /api/@(domainVar)/{id}/map/{other}_{role}.
+interface MapOption {
+  id: number;
+  label: string;
+  mapped: boolean;
+}
+
+// Flips one option's checked state within a Set&lt;id&gt; -- shared by every
+// map-relationship checklist tab below (each backed by its own
+// useState&lt;Set&lt;number&gt;&gt;). Entity-escaped nested generics here --
+// bare nested generic brackets inside this markup excursion get parsed as
+// HTML tags by RazorLight's markup tokenizer, which never finds a matching
+// close and fails. Avoid writing angle brackets literally in comments in
+// this region -- use words instead, or entity-escape them.
+function toggleMapChecked(setChecked: Dispatch&lt;SetStateAction&lt;Set&lt;number&gt;&gt;&gt;, optionId: number, checked: boolean) {
+  setChecked((current) => {
+    const next = new Set(current);
+    if (checked) next.add(optionId);
+    else next.delete(optionId);
+    return next;
+  });
+}
+</text>
 }
 
 interface FormField {
@@ -209,11 +251,11 @@ function defaultValueForKind(kind: FormField["kind"]): string | number | boolean
 }
 
 function createEmpty@(domainObj)(): @(domainObj) {
-  // Plain index-signature object type here (rather than Record<string,
-  // unknown>) -- RazorLight's markup parser can mistake a bare
-  // `Identifier<...>` for the start of an HTML/JSX tag when it appears
-  // outside a `<text>`-wrapped code region, so every such generic in this
-  // file is written to avoid a bare `&lt;` following an identifier.
+  // Plain index-signature object type here (rather than a generic
+  // Record-of-string-to-unknown type) -- RazorLight's markup parser can
+  // mistake a bare generic type argument for the start of an HTML/JSX tag
+  // when it appears in markup mode, so every such generic in this file is
+  // written to avoid a bare angle bracket following an identifier.
   const obj: { [key: string]: unknown } = {};
   for (const field of FORM_FIELDS) {
     obj[field.key] = defaultValueForKind(field.kind);
@@ -221,8 +263,9 @@ function createEmpty@(domainObj)(): @(domainObj) {
   return obj as unknown as @(domainObj);
 }
 
-// Not generic (only ever called with FORM_FIELDS below) -- a bare `<T>`
-// here trips the same RazorLight tag-detection issue as Record<...> above.
+// Not written as a generic function (only ever called with FORM_FIELDS
+// below) -- a bare type-parameter angle bracket here trips the same
+// RazorLight tag-detection issue described above.
 function chunkFormFields(items: FormField[], size: number): FormField[][] {
   const rows: FormField[][] = [];
   for (let i = 0; i &lt; items.length; i += size) {
@@ -244,7 +287,7 @@ export default function Edit@(domainObj)() {
   const [historyList, setHistoryList] = useState<@(domainObj)History[] | null>(null);
   const [enumOptions, setEnumOptions] = useState({} as { [key: string]: EnumOption[] });
   const [activeTab, setActiveTab] = useState(0);
-@if (children.Count > 0)
+@if (children.Count > 0 || mapRelationships.Count > 0)
 {
 <text>  const [activeChildTab, setActiveChildTab] = useState(0);
 </text>
@@ -252,6 +295,12 @@ export default function Edit@(domainObj)() {
 @foreach (var child in children)
 {
 <text>  const [@(child.Object.DomainVar)_@(child.Role)List, set_@(child.Object.DomainVar)_@(child.Role)List] = useState<@(Model.ChildRowTypeName(child.Object))[] | null>(null);
+</text>
+}
+@foreach (var map in mapRelationships)
+{
+<text>  const [@(map.OtherObject.DomainVar)_@(map.Role)_Options, set_@(map.OtherObject.DomainVar)_@(map.Role)_Options] = useState<MapOption[] | null>(null);
+  const [@(map.OtherObject.DomainVar)_@(map.Role)_Checked, set_@(map.OtherObject.DomainVar)_@(map.Role)_Checked] = useState&lt;Set&lt;number&gt;&gt;(() => new Set());
 </text>
 }
 
@@ -295,6 +344,25 @@ export default function Edit@(domainObj)() {
       }
 </text>
 }
+@foreach (var map in mapRelationships)
+{
+<text>
+      try {
+        const @(map.OtherObject.DomainVar)_@(map.Role)_options = await api.get<MapOption[]>(
+          `/api/@(domainVar)/${id}/map/@(map.OtherObject.DomainVar)_@(map.Role)`,
+        );
+        if (!cancelled) {
+          set_@(map.OtherObject.DomainVar)_@(map.Role)_Options(@(map.OtherObject.DomainVar)_@(map.Role)_options);
+          set_@(map.OtherObject.DomainVar)_@(map.Role)_Checked(
+            new Set(@(map.OtherObject.DomainVar)_@(map.Role)_options.filter((o) => o.mapped).map((o) => o.id)),
+          );
+        }
+      } catch (err) {
+        console.error("Edit@(domainObj): error loading @(map.OtherObject.DomainVar)_@(map.Role) map", err);
+        if (!cancelled) set_@(map.OtherObject.DomainVar)_@(map.Role)_Options([]);
+      }
+</text>
+}
     }
 
     load();
@@ -329,8 +397,8 @@ export default function Edit@(domainObj)() {
   }
 
   // Typed via the FormEventHandler variable annotation (using its default
-  // type parameter) rather than an inline `(e: FormEvent<HTMLFormElement>)`
-  // parameter annotation -- same bare-generic issue as elsewhere in this file.
+  // type parameter) rather than an inline generic FormEvent parameter
+  // annotation -- same bare-generic issue as elsewhere in this file.
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
     try {
@@ -338,6 +406,24 @@ export default function Edit@(domainObj)() {
         await api.post<@(domainObj)>("/api/@(domainVar)", formData);
       } else {
         await api.put<@(domainObj)>(`/api/@(domainVar)/${id}`, formData);
+
+        // Apply every map-relationship checklist alongside the object save --
+        // only meaningful for an existing record, since a brand-new record
+        // has no checklist to have edited yet (mirrors the Delete button
+        // above, and the child-relationship tabs, which are likewise only
+        // loaded once id is known).
+@foreach (var map in mapRelationships)
+{
+<text>        try {
+          await api.put<void>(
+            `/api/@(domainVar)/${id}/map/@(map.OtherObject.DomainVar)_@(map.Role)`,
+            Array.from(@(map.OtherObject.DomainVar)_@(map.Role)_Checked),
+          );
+        } catch (err) {
+          console.error("Edit@(domainObj): error saving @(map.OtherObject.DomainVar)_@(map.Role) map", err);
+        }
+</text>
+}
       }
     } catch (err) {
       console.error("Edit@(domainObj): error saving @(domainVar)", err);
@@ -483,7 +569,7 @@ export default function Edit@(domainObj)() {
     { title: "History", content: historyTabContent },
   ];
 
-@if (children.Count > 0)
+@if (children.Count > 0 || mapRelationships.Count > 0)
 {
 <text>
   const childTabs: TabItem[] = [
@@ -509,6 +595,38 @@ foreach (var child in children)
     },
 </text>
 }
+foreach (var map in mapRelationships)
+{
+<text>
+    {
+      title: "@(map.OtherObject.Label)",
+      content: (
+        <div className="mt-3">
+          <div className="alert alert-info">
+            @(map.OtherObject.Label) mapped: {@(map.OtherObject.DomainVar)_@(map.Role)_Checked.size} of{" "}
+            {@(map.OtherObject.DomainVar)_@(map.Role)_Options?.length ?? 0}
+          </div>
+          {(@(map.OtherObject.DomainVar)_@(map.Role)_Options ?? []).map((option) => (
+            <div className="form-check" key={option.id}>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={`@(map.OtherObject.DomainVar)_@(map.Role)_${option.id}`}
+                checked={@(map.OtherObject.DomainVar)_@(map.Role)_Checked.has(option.id)}
+                onChange={(e) =>
+                  toggleMapChecked(set_@(map.OtherObject.DomainVar)_@(map.Role)_Checked, option.id, e.target.checked)
+                }
+              />
+              <label className="form-check-label" htmlFor={`@(map.OtherObject.DomainVar)_@(map.Role)_${option.id}`}>
+                {option.label}
+              </label>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+</text>
+}
 <text>
   ];
 </text>
@@ -519,7 +637,7 @@ foreach (var child in children)
       {id == null ? <h3>Create @(label)</h3> : <h3>Edit @(label) {rwkString}</h3>}
 
       <TabControl id="editTabs" tabs={editTabs} activeTab={activeTab} onTabChanged={setActiveTab} />
-@if (children.Count > 0)
+@if (children.Count > 0 || mapRelationships.Count > 0)
 {
 <text>
       <div className="mt-4">

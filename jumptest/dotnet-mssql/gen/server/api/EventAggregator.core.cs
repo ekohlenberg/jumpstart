@@ -1,0 +1,102 @@
+using System;
+using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Threading.Channels;
+using System.Threading.Tasks;
+using jumptest;
+
+namespace jumptest
+{
+    /// <summary>
+    /// Interface for the object-update event aggregation service.
+    /// </summary>
+    public interface IEventAggregator
+    {
+        /// <summary>
+        /// Publishes an object update event to all connected clients.
+        /// </summary>
+        global::System.Threading.Tasks.Task PublishAsync(string domainObjectName, long instanceId, string jsonData);
+    }
+
+    /// <summary>
+    /// Routes object-update notifications to connected web clients over
+    /// Server-Sent Events. This replaces the SignalR EventAggregator + Hub with a
+    /// transport the Blazor client consumes via the browser's EventSource and
+    /// that both the .NET and Rust API servers serve identically. Each connected
+    /// client holds an unbounded channel; Publish writes the serialized message
+    /// to every channel and the stream endpoint drains it to the socket.
+    /// </summary>
+    public class SseNotificationService : IEventAggregator
+    {
+        private readonly ConcurrentDictionary<Guid, Channel<string>> _clients = new();
+
+        /// <summary>
+        /// Registers a new SSE client and returns its id (for removal on
+        /// disconnect) and the read side of its message channel.
+        /// </summary>
+        public (Guid id, ChannelReader<string> reader) AddClient()
+        {
+            var channel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = false
+            });
+            var id = Guid.NewGuid();
+            _clients[id] = channel;
+            Logger.Info($"SSE client connected ({_clients.Count} total)");
+            return (id, channel.Reader);
+        }
+
+        /// <summary>
+        /// Removes a disconnected client and completes its channel.
+        /// </summary>
+        public void RemoveClient(Guid id)
+        {
+            if (_clients.TryRemove(id, out var channel))
+            {
+                channel.Writer.TryComplete();
+                Logger.Info($"SSE client disconnected ({_clients.Count} remaining)");
+            }
+        }
+
+        /// <summary>
+        /// Serializes a PropertyUpdateMessage and pushes it to every connected
+        /// client. The client filters by domain object name on arrival.
+        /// </summary>
+        public global::System.Threading.Tasks.Task PublishAsync(string domainObjectName, long instanceId, string jsonData)
+        {
+            if (string.IsNullOrWhiteSpace(domainObjectName))
+            {
+                throw new ArgumentException("Domain object name cannot be null or empty", nameof(domainObjectName));
+            }
+
+            var message = JsonSerializer.Serialize(new PropertyUpdateMessage
+            {
+                DomainObjectName = domainObjectName,
+                InstanceId = instanceId,
+                JsonData = jsonData,
+                Timestamp = DateTime.UtcNow
+            });
+
+            foreach (var kv in _clients)
+            {
+                kv.Value.Writer.TryWrite(message);
+            }
+
+            Logger.Info($"Published object update: {domainObjectName}[{instanceId}] to {_clients.Count} client(s)");
+            return global::System.Threading.Tasks.Task.CompletedTask;
+        }
+    }
+
+    /// <summary>
+    /// Message structure for object update notifications (serialized into the SSE
+    /// data field; the Blazor client deserializes the same shape).
+    /// </summary>
+    public class PropertyUpdateMessage
+    {
+        public string DomainObjectName { get; set; }
+        public long InstanceId { get; set; }
+        public string JsonData { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
+}

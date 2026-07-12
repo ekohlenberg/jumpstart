@@ -14,6 +14,8 @@ build:
 	@$(MAKE) -C ./gen/server/scheduler
 	@$(MAKE) -C ./gen/server/scriptagent
 	@$(MAKE) -C ./gen/web
+	@$(MAKE) -C ./gen/tools/export
+	@$(MAKE) -C ./gen/tools/import
 
 database:
 	@chmod +x ./gen/database/ddl/build.sh

@@ -1,0 +1,102 @@
+-- =====================================
+-- 1) Create Account for Current OS Principal
+-- admin_email is passed in from load.ps1 via: sqlcmd -v admin_email=user@example.com
+-- =====================================
+DECLARE @admin_email NVARCHAR(200) = '$(admin_email)';
+DECLARE @os_user NVARCHAR(50) =
+    CASE
+        WHEN CHARINDEX('\', SYSTEM_USER) > 0
+        THEN RIGHT(SYSTEM_USER, LEN(SYSTEM_USER) - CHARINDEX('\', SYSTEM_USER))
+        ELSE SYSTEM_USER
+    END;
+DECLARE @principal_id BIGINT, @password_id BIGINT, @role_member_id BIGINT;
+
+SELECT @principal_id = NEXT VALUE FOR core.principal_identity;
+INSERT INTO core.principal(
+    id,
+    txn_id,
+    first_name,
+    last_name,
+    username,
+    email,
+    created_date,
+    last_login_date,
+    is_active,
+    created_by,
+    last_updated,
+    last_updated_by
+)
+VALUES (
+    @principal_id,
+    @principal_id,
+    'Current',
+    'Principal',
+    @os_user,
+    @admin_email,
+    GETDATE(),
+    null,
+    1,
+    'system',
+    GETDATE(),
+    'system'
+);
+
+SELECT @password_id = NEXT VALUE FOR core.principal_password_identity;
+
+WITH os_user_principal_id AS (
+    SELECT id FROM core.principal WHERE email = @admin_email AND is_active = 1
+)
+INSERT INTO core.principal_password(
+    id, txn_id, principal_id, password_hash, expiry, needs_reset, is_active, created_by, last_updated, last_updated_by)
+SELECT @password_id,
+    @password_id,
+    os_user_principal_id.id,
+    CAST(FLOOR(RAND(CHECKSUM(NEWID())) * 100000 + 1) AS NVARCHAR(10)),
+    GETDATE(),
+    1,
+    1,
+    SYSTEM_USER,
+    GETDATE(),
+    SYSTEM_USER
+FROM os_user_principal_id;
+
+
+
+-- =====================================
+-- 2) Map os_user Principal to Administrator Role
+--    Using sub-selects on core.principal (by email)
+--    and core.op_role (by name)
+-- =====================================
+SELECT @role_member_id = NEXT VALUE FOR core.op_role_member_identity;
+
+WITH os_user_principal_id AS (
+    SELECT id FROM core.principal WHERE email = @admin_email AND is_active = 1
+),
+os_user_role_id AS (
+    SELECT id FROM core.op_role WHERE name = 'Administrator' AND is_active = 1
+)
+INSERT INTO core.op_role_member(
+    id,
+    txn_id,
+    principal_id,
+    op_role_id,
+    is_active,
+    created_by,
+    last_updated,
+    last_updated_by
+)
+SELECT
+    @role_member_id,
+    @role_member_id,
+    os_user_principal_id.id,
+    os_user_role_id.id,
+    1,
+    'system',
+    GETDATE(),
+    'system'
+FROM os_user_principal_id
+CROSS JOIN os_user_role_id;
+
+-- =====================================
+-- Done!
+-- =====================================

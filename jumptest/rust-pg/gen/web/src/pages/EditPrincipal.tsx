@@ -4,6 +4,7 @@ import { useApiClient } from "../api/apiClient";
 import DataTable, { type DataTableColumn } from "../components/DataTable";
 import TabControl, { type TabItem } from "../components/TabControl";
 import "../styles/editForm.css";
+import type { Dispatch, SetStateAction } from "react";
 
 // Raw shape sent/received by GET|POST|PUT /api/principal[/{id}] -- matches
 // the Principal domain class generated for the dotnet/rust servers (every
@@ -30,10 +31,35 @@ export type PrincipalHistory = Principal;
 
 
 // Matches EnumHelper (shared/dotnet/common/EnumHelper.cs.cshtml): the option
-// list behind every FK/enum <select>.
+// list behind every FK/enum dropdown.
 interface EnumOption {
   id: number;
   rwkString: string;
+}
+
+
+// Matches MapOption (shared/dotnet/common/MapOption.cs.cshtml): one row of a
+// many-to-many relationship checklist tab -- GET /api/principal/{id}/map/{other}_{role}.
+interface MapOption {
+  id: number;
+  label: string;
+  mapped: boolean;
+}
+
+// Flips one option's checked state within a Set<id> -- shared by every
+// map-relationship checklist tab below (each backed by its own
+// useState<Set<number>>). Entity-escaped nested generics here --
+// bare nested generic brackets inside this markup excursion get parsed as
+// HTML tags by RazorLight's markup tokenizer, which never finds a matching
+// close and fails. Avoid writing angle brackets literally in comments in
+// this region -- use words instead, or entity-escape them.
+function toggleMapChecked(setChecked: Dispatch<SetStateAction<Set<number>>>, optionId: number, checked: boolean) {
+  setChecked((current) => {
+    const next = new Set(current);
+    if (checked) next.add(optionId);
+    else next.delete(optionId);
+    return next;
+  });
 }
 
 interface FormField {
@@ -98,11 +124,11 @@ function defaultValueForKind(kind: FormField["kind"]): string | number | boolean
 }
 
 function createEmptyPrincipal(): Principal {
-  // Plain index-signature object type here (rather than Record<string,
-  // unknown>) -- RazorLight's markup parser can mistake a bare
-  // `Identifier<...>` for the start of an HTML/JSX tag when it appears
-  // outside a `<text>`-wrapped code region, so every such generic in this
-  // file is written to avoid a bare `<` following an identifier.
+  // Plain index-signature object type here (rather than a generic
+  // Record-of-string-to-unknown type) -- RazorLight's markup parser can
+  // mistake a bare generic type argument for the start of an HTML/JSX tag
+  // when it appears in markup mode, so every such generic in this file is
+  // written to avoid a bare angle bracket following an identifier.
   const obj: { [key: string]: unknown } = {};
   for (const field of FORM_FIELDS) {
     obj[field.key] = defaultValueForKind(field.kind);
@@ -110,8 +136,9 @@ function createEmptyPrincipal(): Principal {
   return obj as unknown as Principal;
 }
 
-// Not generic (only ever called with FORM_FIELDS below) -- a bare `<T>`
-// here trips the same RazorLight tag-detection issue as Record<...> above.
+// Not written as a generic function (only ever called with FORM_FIELDS
+// below) -- a bare type-parameter angle bracket here trips the same
+// RazorLight tag-detection issue described above.
 function chunkFormFields(items: FormField[], size: number): FormField[][] {
   const rows: FormField[][] = [];
   for (let i = 0; i < items.length; i += size) {
@@ -133,6 +160,11 @@ export default function EditPrincipal() {
   const [historyList, setHistoryList] = useState<PrincipalHistory[] | null>(null);
   const [enumOptions, setEnumOptions] = useState({} as { [key: string]: EnumOption[] });
   const [activeTab, setActiveTab] = useState(0);
+  const [activeChildTab, setActiveChildTab] = useState(0);
+  const [org_org_Options, set_org_org_Options] = useState<MapOption[] | null>(null);
+  const [org_org_Checked, set_org_org_Checked] = useState<Set<number>>(() => new Set());
+  const [oprole_op_role_Options, set_oprole_op_role_Options] = useState<MapOption[] | null>(null);
+  const [oprole_op_role_Checked, set_oprole_op_role_Checked] = useState<Set<number>>(() => new Set());
 
   // Loads the record (plus history/children) when editing an existing row;
   // resets to a blank record when navigating to the "create" route.
@@ -159,6 +191,36 @@ export default function EditPrincipal() {
       } catch (err) {
         console.error("EditPrincipal: error loading history", err);
         if (!cancelled) setHistoryList([]);
+      }
+
+      try {
+        const org_org_options = await api.get<MapOption[]>(
+          `/api/principal/${id}/map/org_org`,
+        );
+        if (!cancelled) {
+          set_org_org_Options(org_org_options);
+          set_org_org_Checked(
+            new Set(org_org_options.filter((o) => o.mapped).map((o) => o.id)),
+          );
+        }
+      } catch (err) {
+        console.error("EditPrincipal: error loading org_org map", err);
+        if (!cancelled) set_org_org_Options([]);
+      }
+
+      try {
+        const oprole_op_role_options = await api.get<MapOption[]>(
+          `/api/principal/${id}/map/oprole_op_role`,
+        );
+        if (!cancelled) {
+          set_oprole_op_role_Options(oprole_op_role_options);
+          set_oprole_op_role_Checked(
+            new Set(oprole_op_role_options.filter((o) => o.mapped).map((o) => o.id)),
+          );
+        }
+      } catch (err) {
+        console.error("EditPrincipal: error loading oprole_op_role map", err);
+        if (!cancelled) set_oprole_op_role_Options([]);
       }
     }
 
@@ -194,8 +256,8 @@ export default function EditPrincipal() {
   }
 
   // Typed via the FormEventHandler variable annotation (using its default
-  // type parameter) rather than an inline `(e: FormEvent<HTMLFormElement>)`
-  // parameter annotation -- same bare-generic issue as elsewhere in this file.
+  // type parameter) rather than an inline generic FormEvent parameter
+  // annotation -- same bare-generic issue as elsewhere in this file.
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
     try {
@@ -203,6 +265,28 @@ export default function EditPrincipal() {
         await api.post<Principal>("/api/principal", formData);
       } else {
         await api.put<Principal>(`/api/principal/${id}`, formData);
+
+        // Apply every map-relationship checklist alongside the object save --
+        // only meaningful for an existing record, since a brand-new record
+        // has no checklist to have edited yet (mirrors the Delete button
+        // above, and the child-relationship tabs, which are likewise only
+        // loaded once id is known).
+        try {
+          await api.put<void>(
+            `/api/principal/${id}/map/org_org`,
+            Array.from(org_org_Checked),
+          );
+        } catch (err) {
+          console.error("EditPrincipal: error saving org_org map", err);
+        }
+        try {
+          await api.put<void>(
+            `/api/principal/${id}/map/oprole_op_role`,
+            Array.from(oprole_op_role_Checked),
+          );
+        } catch (err) {
+          console.error("EditPrincipal: error saving oprole_op_role map", err);
+        }
       }
     } catch (err) {
       console.error("EditPrincipal: error saving principal", err);
@@ -349,11 +433,76 @@ export default function EditPrincipal() {
   ];
 
 
+  const childTabs: TabItem[] = [
+
+    {
+      title: "Organization",
+      content: (
+        <div className="mt-3">
+          <div className="alert alert-info">
+            Organization mapped: {org_org_Checked.size} of{" "}
+            {org_org_Options?.length ?? 0}
+          </div>
+          {(org_org_Options ?? []).map((option) => (
+            <div className="form-check" key={option.id}>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={`org_org_${option.id}`}
+                checked={org_org_Checked.has(option.id)}
+                onChange={(e) =>
+                  toggleMapChecked(set_org_org_Checked, option.id, e.target.checked)
+                }
+              />
+              <label className="form-check-label" htmlFor={`org_org_${option.id}`}>
+                {option.label}
+              </label>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+
+    {
+      title: "Operation Role",
+      content: (
+        <div className="mt-3">
+          <div className="alert alert-info">
+            Operation Role mapped: {oprole_op_role_Checked.size} of{" "}
+            {oprole_op_role_Options?.length ?? 0}
+          </div>
+          {(oprole_op_role_Options ?? []).map((option) => (
+            <div className="form-check" key={option.id}>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={`oprole_op_role_${option.id}`}
+                checked={oprole_op_role_Checked.has(option.id)}
+                onChange={(e) =>
+                  toggleMapChecked(set_oprole_op_role_Checked, option.id, e.target.checked)
+                }
+              />
+              <label className="form-check-label" htmlFor={`oprole_op_role_${option.id}`}>
+                {option.label}
+              </label>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+
+  ];
+
   return (
     <>
       {id == null ? <h3>Create Principal</h3> : <h3>Edit Principal {rwkString}</h3>}
 
       <TabControl id="editTabs" tabs={editTabs} activeTab={activeTab} onTabChanged={setActiveTab} />
+
+      <div className="mt-4">
+        <h4>Related Records</h4>
+        <TabControl id="childTabs" tabs={childTabs} activeTab={activeChildTab} onTabChanged={setActiveChildTab} />
+      </div>
     </>
   );
 }

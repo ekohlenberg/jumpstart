@@ -4,6 +4,7 @@ import { useApiClient } from "../api/apiClient";
 import DataTable, { type DataTableColumn } from "../components/DataTable";
 import TabControl, { type TabItem } from "../components/TabControl";
 import "../styles/editForm.css";
+import type { Dispatch, SetStateAction } from "react";
 
 // Raw shape sent/received by GET|POST|PUT /api/org[/{id}] -- matches
 // the Org domain class generated for the dotnet/rust servers (every
@@ -24,10 +25,35 @@ export type OrgHistory = Org;
 
 
 // Matches EnumHelper (shared/dotnet/common/EnumHelper.cs.cshtml): the option
-// list behind every FK/enum <select>.
+// list behind every FK/enum dropdown.
 interface EnumOption {
   id: number;
   rwkString: string;
+}
+
+
+// Matches MapOption (shared/dotnet/common/MapOption.cs.cshtml): one row of a
+// many-to-many relationship checklist tab -- GET /api/org/{id}/map/{other}_{role}.
+interface MapOption {
+  id: number;
+  label: string;
+  mapped: boolean;
+}
+
+// Flips one option's checked state within a Set<id> -- shared by every
+// map-relationship checklist tab below (each backed by its own
+// useState<Set<number>>). Entity-escaped nested generics here --
+// bare nested generic brackets inside this markup excursion get parsed as
+// HTML tags by RazorLight's markup tokenizer, which never finds a matching
+// close and fails. Avoid writing angle brackets literally in comments in
+// this region -- use words instead, or entity-escape them.
+function toggleMapChecked(setChecked: Dispatch<SetStateAction<Set<number>>>, optionId: number, checked: boolean) {
+  setChecked((current) => {
+    const next = new Set(current);
+    if (checked) next.add(optionId);
+    else next.delete(optionId);
+    return next;
+  });
 }
 
 interface FormField {
@@ -80,11 +106,11 @@ function defaultValueForKind(kind: FormField["kind"]): string | number | boolean
 }
 
 function createEmptyOrg(): Org {
-  // Plain index-signature object type here (rather than Record<string,
-  // unknown>) -- RazorLight's markup parser can mistake a bare
-  // `Identifier<...>` for the start of an HTML/JSX tag when it appears
-  // outside a `<text>`-wrapped code region, so every such generic in this
-  // file is written to avoid a bare `<` following an identifier.
+  // Plain index-signature object type here (rather than a generic
+  // Record-of-string-to-unknown type) -- RazorLight's markup parser can
+  // mistake a bare generic type argument for the start of an HTML/JSX tag
+  // when it appears in markup mode, so every such generic in this file is
+  // written to avoid a bare angle bracket following an identifier.
   const obj: { [key: string]: unknown } = {};
   for (const field of FORM_FIELDS) {
     obj[field.key] = defaultValueForKind(field.kind);
@@ -92,8 +118,9 @@ function createEmptyOrg(): Org {
   return obj as unknown as Org;
 }
 
-// Not generic (only ever called with FORM_FIELDS below) -- a bare `<T>`
-// here trips the same RazorLight tag-detection issue as Record<...> above.
+// Not written as a generic function (only ever called with FORM_FIELDS
+// below) -- a bare type-parameter angle bracket here trips the same
+// RazorLight tag-detection issue described above.
 function chunkFormFields(items: FormField[], size: number): FormField[][] {
   const rows: FormField[][] = [];
   for (let i = 0; i < items.length; i += size) {
@@ -115,6 +142,9 @@ export default function EditOrg() {
   const [historyList, setHistoryList] = useState<OrgHistory[] | null>(null);
   const [enumOptions, setEnumOptions] = useState({} as { [key: string]: EnumOption[] });
   const [activeTab, setActiveTab] = useState(0);
+  const [activeChildTab, setActiveChildTab] = useState(0);
+  const [principal_principal_Options, set_principal_principal_Options] = useState<MapOption[] | null>(null);
+  const [principal_principal_Checked, set_principal_principal_Checked] = useState<Set<number>>(() => new Set());
 
   // Loads the record (plus history/children) when editing an existing row;
   // resets to a blank record when navigating to the "create" route.
@@ -141,6 +171,21 @@ export default function EditOrg() {
       } catch (err) {
         console.error("EditOrg: error loading history", err);
         if (!cancelled) setHistoryList([]);
+      }
+
+      try {
+        const principal_principal_options = await api.get<MapOption[]>(
+          `/api/org/${id}/map/principal_principal`,
+        );
+        if (!cancelled) {
+          set_principal_principal_Options(principal_principal_options);
+          set_principal_principal_Checked(
+            new Set(principal_principal_options.filter((o) => o.mapped).map((o) => o.id)),
+          );
+        }
+      } catch (err) {
+        console.error("EditOrg: error loading principal_principal map", err);
+        if (!cancelled) set_principal_principal_Options([]);
       }
     }
 
@@ -176,8 +221,8 @@ export default function EditOrg() {
   }
 
   // Typed via the FormEventHandler variable annotation (using its default
-  // type parameter) rather than an inline `(e: FormEvent<HTMLFormElement>)`
-  // parameter annotation -- same bare-generic issue as elsewhere in this file.
+  // type parameter) rather than an inline generic FormEvent parameter
+  // annotation -- same bare-generic issue as elsewhere in this file.
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
     try {
@@ -185,6 +230,20 @@ export default function EditOrg() {
         await api.post<Org>("/api/org", formData);
       } else {
         await api.put<Org>(`/api/org/${id}`, formData);
+
+        // Apply every map-relationship checklist alongside the object save --
+        // only meaningful for an existing record, since a brand-new record
+        // has no checklist to have edited yet (mirrors the Delete button
+        // above, and the child-relationship tabs, which are likewise only
+        // loaded once id is known).
+        try {
+          await api.put<void>(
+            `/api/org/${id}/map/principal_principal`,
+            Array.from(principal_principal_Checked),
+          );
+        } catch (err) {
+          console.error("EditOrg: error saving principal_principal map", err);
+        }
       }
     } catch (err) {
       console.error("EditOrg: error saving org", err);
@@ -331,11 +390,48 @@ export default function EditOrg() {
   ];
 
 
+  const childTabs: TabItem[] = [
+
+    {
+      title: "Principal",
+      content: (
+        <div className="mt-3">
+          <div className="alert alert-info">
+            Principal mapped: {principal_principal_Checked.size} of{" "}
+            {principal_principal_Options?.length ?? 0}
+          </div>
+          {(principal_principal_Options ?? []).map((option) => (
+            <div className="form-check" key={option.id}>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={`principal_principal_${option.id}`}
+                checked={principal_principal_Checked.has(option.id)}
+                onChange={(e) =>
+                  toggleMapChecked(set_principal_principal_Checked, option.id, e.target.checked)
+                }
+              />
+              <label className="form-check-label" htmlFor={`principal_principal_${option.id}`}>
+                {option.label}
+              </label>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+
+  ];
+
   return (
     <>
       {id == null ? <h3>Create Organization</h3> : <h3>Edit Organization {rwkString}</h3>}
 
       <TabControl id="editTabs" tabs={editTabs} activeTab={activeTab} onTabChanged={setActiveTab} />
+
+      <div className="mt-4">
+        <h4>Related Records</h4>
+        <TabControl id="childTabs" tabs={childTabs} activeTab={activeChildTab} onTabChanged={setActiveChildTab} />
+      </div>
     </>
   );
 }

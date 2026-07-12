@@ -306,6 +306,30 @@ fn handle(request: &Request) -> Response {
             }
         }
 
+        ("GET", 4) => {
+            let (obj, a, b, c) = (rest[0], rest[1], rest[2], rest[3]);
+            if b.eq_ignore_ascii_case("map") {
+                match a.parse::<i64>() {
+                    Ok(id) => map_list_response(obj, id, c),
+                    Err(_) => Response::empty_404(),
+                }
+            } else {
+                Response::empty_404()
+            }
+        }
+
+        ("PUT", 4) => {
+            let (obj, a, b, c) = (rest[0], rest[1], rest[2], rest[3]);
+            if b.eq_ignore_ascii_case("map") {
+                match a.parse::<i64>() {
+                    Ok(id) => map_sync_response(request, obj, id, c),
+                    Err(_) => Response::empty_404(),
+                }
+            } else {
+                Response::empty_404()
+            }
+        }
+
         // Unmatched: offer the request to hand-written custom routes, else 404.
         _ => user_api::handle(request).unwrap_or_else(Response::empty_404),
     }
@@ -352,6 +376,38 @@ fn children_response(obj: &str, id: i64, child_key: &str) -> Response {
     ctx.set_arg("child_suffix", Value::String(suffix));
     match object_exec(obj, "children", &mut ctx) {
         Ok(value) => Response::json(&value),
+        Err(e) => error_response(e),
+    }
+}
+
+fn map_list_response(obj: &str, id: i64, map_key: &str) -> Response {
+    // The route segment is "<othervar>_<role>"; the map-query suffix is
+    // "<othervar>-<role>" (only the first underscore is the separator --
+    // domain vars never contain underscores). Mirrors children_response above.
+    let suffix = map_key.replacen('_', "-", 1);
+    let mut ctx = LogicContext::for_id(id);
+    ctx.set_arg("map_suffix", Value::String(suffix));
+    match object_exec(obj, "maplist", &mut ctx) {
+        Ok(value) => Response::json(&value),
+        Err(e) => error_response(e),
+    }
+}
+
+fn map_sync_response(request: &Request, obj: &str, id: i64, map_key: &str) -> Response {
+    // Body is a bare JSON array of ids (the full checked set), not an
+    // object -- read_json parses any valid JSON value, so this reuses it
+    // directly rather than needing a separate array-specific reader.
+    let body = match read_json(request) {
+        Some(b) => b,
+        None => return Response::text("invalid JSON body").with_status_code(400),
+    };
+
+    let suffix = map_key.replacen('_', "-", 1);
+    let mut ctx = LogicContext::for_id(id);
+    ctx.set_arg("map_suffix", Value::String(suffix));
+    ctx.set_arg("checked_other_ids", body);
+    match object_exec(obj, "mapsync", &mut ctx) {
+        Ok(_) => Response::text("").with_status_code(200),
         Err(e) => error_response(e),
     }
 }

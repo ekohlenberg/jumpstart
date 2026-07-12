@@ -11,6 +11,7 @@ dotnet server templates-common,model,shared/dotnet/common/PostgreSQLProvider.cs.
 dotnet server templates-common,model,shared/dotnet/common/SqlServerProvider.cs.cshtml,./gen/shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/JsonHelper.cs.cshtml,./gen/shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/EnumHelper.cs.cshtml,./gen/shared/common,TRUE
+dotnet server templates-common,model,shared/dotnet/common/MapOption.cs.cshtml,./gen/shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/DatabaseProviderFactory.cs.cshtml,./gen/shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/SessionInfo.core.cs.cshtml,./gen/shared/common,TRUE
 dotnet server templates-common,model,shared/dotnet/common/CSharpCompiler.core.cs.cshtml,./gen/shared/common,TRUE
