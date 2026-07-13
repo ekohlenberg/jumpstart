@@ -278,6 +278,8 @@ fn handle(request: &Request) -> Response {
         ("POST", 2) => {
             if rest[0].eq_ignore_ascii_case("notification") && rest[1].eq_ignore_ascii_case("publish") {
                 notification_publish(request)
+            } else if rest[0].eq_ignore_ascii_case("admin") && rest[1].eq_ignore_ascii_case("clear-auth-cache") {
+                admin_clear_auth_cache()
             } else {
                 Response::empty_404()
             }
@@ -445,6 +447,25 @@ fn notification_publish(request: &Request) -> Response {
             sse_broadcast("PropertyUpdated", &body.to_string());
         }
     }
+    Response::text("").with_status_code(200)
+}
+
+// Infrastructure-only route with no backing domain object, so (unlike the
+// generated per-object routes) there is no core.operation row for it and
+// therefore no per-operation authorization check -- same convention as
+// notification_publish/nav_menu_by_parent/workflow_run above. Callers still
+// need a valid bearer token: `authenticate_inbound` runs ahead of `handle`
+// for every request.
+//
+// OpRoleMemberLogic::authorized(...) caches every (user, object, method)
+// result forever (see op_role_member_logic.core.rs.cshtml) -- a deliberate
+// perf tradeoff, but it means a permission change (a freshly reloaded
+// database with a new/changed core.operation row or op_role_map grant) is
+// invisible to a long-running process until it either restarts or this runs.
+// Call this after reloading the database with permission changes instead of
+// restarting the API.
+fn admin_clear_auth_cache() -> Response {
+    OpRoleMemberLogic::clear_auth_cache();
     Response::text("").with_status_code(200)
 }
 

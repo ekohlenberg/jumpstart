@@ -79,6 +79,21 @@ where
             return result;
         }
 
+        // Busts the entire authorization cache. Entries never expire on their
+        // own (see Authorized above), so a permission/operation-seed change
+        // (e.g. reloading the database with a newly generated core.operation
+        // row) is invisible to a long-running process until either it
+        // restarts or this runs. Exposed via POST /api/admin/clear-auth-cache
+        // (see AdminController) so that doesn't require a restart during
+        // iterative development.
+        public static void ClearAuthCache()
+        {
+            lock (cacheLock)
+            {
+                authorizedCache.Clear();
+            }
+        }
+
     }
 }
 

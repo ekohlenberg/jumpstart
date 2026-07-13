@@ -58,6 +58,7 @@ dotnet server templates-api,model,server/dotnet/api/Workflow.api.core.cs.cshtml,
 dotnet server templates-api,model,server/dotnet/api/EventAggregator.core.cs.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/NotificationHub.core.cs.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/NotificationController.core.cs.cshtml,./gen/server/api,TRUE
+dotnet server templates-api,model,server/dotnet/api/AdminController.core.cs.cshtml,./gen/server/api,TRUE
 dotnet server templates-api,model,server/dotnet/api/appsettings.json.cshtml,./usr/server/api,FALSE
 dotnet server templates-api,model,server/dotnet/api/appsettings.Development.json.cshtml,./usr/server/api,FALSE
 dotnet server templates-api,model,server/dotnet/api/Properties/launchSettings.json.cshtml,./usr/server/api/Properties,FALSE
