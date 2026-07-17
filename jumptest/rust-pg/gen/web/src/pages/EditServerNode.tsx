@@ -48,27 +48,28 @@ interface FormField {
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
   isGlobal: boolean;
+  isId: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
-  { key: "id", label: "Server Node ID", kind: "number", fkVar: "", isGlobal: false },
-  { key: "server_node_type_id", label: "Server Node Type", kind: "enum", fkVar: "servernodetype", isGlobal: false },
-  { key: "hostname", label: "Hostname", kind: "string", fkVar: "", isGlobal: false },
-  { key: "ip_address", label: "Address", kind: "string", fkVar: "", isGlobal: false },
-  { key: "port", label: "Port", kind: "number", fkVar: "", isGlobal: false },
-  { key: "username", label: "Username", kind: "string", fkVar: "", isGlobal: false },
-  { key: "url", label: "URL", kind: "string", fkVar: "", isGlobal: false },
-  { key: "user_domain", label: "User Domain", kind: "string", fkVar: "", isGlobal: false },
-  { key: "os_name", label: "OS Name", kind: "string", fkVar: "", isGlobal: false },
-  { key: "os_version", label: "OS Version", kind: "string", fkVar: "", isGlobal: false },
-  { key: "architecture", label: "Architecture", kind: "string", fkVar: "", isGlobal: false },
-  { key: "registered_at", label: "Registered At", kind: "date", fkVar: "", isGlobal: false },
-  { key: "server_node_status_id", label: "Status", kind: "enum", fkVar: "servernodestatus", isGlobal: false },
-  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true },
-  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true },
-  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true },
+  { key: "id", label: "Server Node ID", kind: "number", fkVar: "", isGlobal: false, isId: true },
+  { key: "server_node_type_id", label: "Server Node Type", kind: "enum", fkVar: "servernodetype", isGlobal: false, isId: false },
+  { key: "hostname", label: "Hostname", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "ip_address", label: "Address", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "port", label: "Port", kind: "number", fkVar: "", isGlobal: false, isId: false },
+  { key: "username", label: "Username", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "url", label: "URL", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "user_domain", label: "User Domain", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "os_name", label: "OS Name", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "os_version", label: "OS Version", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "architecture", label: "Architecture", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "registered_at", label: "Registered At", kind: "date", fkVar: "", isGlobal: false, isId: false },
+  { key: "server_node_status_id", label: "Status", kind: "enum", fkVar: "servernodestatus", isGlobal: false, isId: false },
+  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true, isId: false },
+  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true, isId: false },
 ];
 
 const OWN_COLUMNS: DataTableColumn[] = [
@@ -258,7 +259,11 @@ export default function EditServerNode() {
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
 
-  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  // The "id" field is dropped from the form entirely while creating a new
+  // record (there's no id yet) and rendered read-only below while editing an
+  // existing one -- see the isId comment on formFields above.
+  const visibleFields = id == null ? FORM_FIELDS.filter((f) => !f.isId) : FORM_FIELDS;
+  const fieldRows = chunkFormFields(visibleFields, 3);
   const values = formData as unknown as { [key: string]: unknown };
 
   const editTabContent: ReactNode = (
@@ -274,7 +279,7 @@ export default function EditServerNode() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.isGlobal ? (
+                      {field.isGlobal || field.isId ? (
                         <div id={field.key} className="form-control-plaintext">
                           {formatReadOnlyValue(values[field.key])}
                         </div>

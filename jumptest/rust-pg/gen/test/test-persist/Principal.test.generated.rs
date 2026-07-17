@@ -30,7 +30,7 @@ impl PrincipalTest {
         record.set("email", v);
         
         let v = BaseTest::get_test_data(&record, "INTEGER", "enabled", "NULL");
-        record.set("enabled", v);
+        record.set("status", v);
         
         let v = BaseTest::get_test_data(&record, "TIMESTAMP", "random", "NULL");
         record.set("created_date", v);
@@ -47,7 +47,7 @@ impl PrincipalTest {
         let mut verify_ctx = LogicContext::for_id(id);
         let persisted = PrincipalLogic::exec("get", &mut verify_ctx)?;
         let verify_fields: &[&str] = &[
-"first_name", "last_name", "username", "email", "enabled",         ];
+"first_name", "last_name", "username", "email", "status",         ];
         BaseTest::assert_persisted("Principal::insert", &ctx.transaction, &persisted, verify_fields)?;
         Ok(())
     }
@@ -76,7 +76,7 @@ impl PrincipalTest {
         record.set("email", v);
         
         let v = BaseTest::get_test_data(&record, "INTEGER", "enabled", "NULL");
-        record.set("enabled", v);
+        record.set("status", v);
         
         let v = BaseTest::get_test_data(&record, "TIMESTAMP", "random", "NULL");
         record.set("created_date", v);
@@ -92,7 +92,7 @@ impl PrincipalTest {
         let mut verify_ctx = LogicContext::for_id(last_id);
         let persisted = PrincipalLogic::exec("get", &mut verify_ctx)?;
         let verify_fields: &[&str] = &[
-"first_name", "last_name", "username", "email", "enabled",         ];
+"first_name", "last_name", "username", "email", "status",         ];
         BaseTest::assert_persisted("Principal::update", &ctx.transaction, &persisted, verify_fields)?;
         Ok(())
     }

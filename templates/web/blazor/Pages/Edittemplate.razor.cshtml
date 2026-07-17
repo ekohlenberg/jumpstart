@@ -242,8 +242,17 @@ else
 			editBuilder.OpenElement(6, "table");
 			editBuilder.AddAttribute(7, "class", "table table-borderless");
 			
-			// Generate dynamic form fields
+			// Generate dynamic form fields. The "id" column (primary key) is
+			// dropped entirely while creating a new record (there's no id
+			// yet -- id is the [Parameter] route id, null on the create
+			// route) and rendered read-only below while editing an existing
+			// one. Mirrors the isId filtering in
+			// web/nodejs/src/pages/Edittemplate.tsx.cshtml.
 			var properties = GetEditableProperties();
+			if (id is null)
+			{
+				properties = properties.Where(p => p.Name.ToLower() != "id").ToArray();
+			}
 			var propertiesPerRow = 3;
 			
 			for (int i = 0; i < properties.Length; i += propertiesPerRow)
@@ -269,12 +278,15 @@ else
 					// Input field based on type
 					var underlyingType = Nullable.GetUnderlyingType(propInfo.PropertyType) ?? propInfo.PropertyType;
 
-					if (ReflectionHelper.IsGlobalProperty(propInfo))
+					if (ReflectionHelper.IsGlobalProperty(propInfo) || propInfo.Name.ToLower() == "id")
 					{
 						// Global/audit column (is_active, created_by, last_updated,
 						// last_updated_by, txn_id) -- managed by the persistence
-						// layer, so render as a read-only label instead of an
-						// editable input. Mirrors field.isGlobal in
+						// layer -- or the "id" primary key column (only reached here
+						// when editing an existing record, since the create route
+						// filters it out of `properties` above) -- render as a
+						// read-only label instead of an editable input. Mirrors
+						// field.isGlobal || field.isId in
 						// web/nodejs/src/pages/Edittemplate.tsx.cshtml.
 						editBuilder.OpenElement(17 + i + j, "div");
 						editBuilder.AddAttribute(18 + i + j, "id", propInfo.Name);
@@ -485,10 +497,22 @@ else
 		builder.AddAttribute(7, "DataType", typeof(@(childDomainObj)));
 		builder.AddAttribute(8, "ShowActions", false);
 		builder.AddAttribute(9, "ShowAddButton", false);
+		builder.AddAttribute(10, "OnEdit", EventCallback.Factory.Create<object>(this, OnEdit@(childDomainVar)_@(childRole)));
 		builder.CloseComponent(); // DataTable
-		
+
 		builder.CloseElement(); // div
 	};
+
+	// Navigates to the edit page for a "@(childLabel)" child row -- mirrors
+	// OnEdit@(Model.DomainObj) in web/blazor/Pages/Listtemplate.razor.cshtml,
+	// wired into DataTable's OnEdit above (rendered as an id-column hyperlink
+	// by DataTable.razor.cshtml whenever OnEdit.HasDelegate).
+	void OnEdit@(childDomainVar)_@(childRole)(object item)
+	{
+		var childItem = (@(childDomainObj))item;
+		var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+		Navigation.NavigateTo($"edit-@(childDomainVar)/{childItem.id}?returnUrl={Uri.EscapeDataString(currentPath)}");
+	}
 
 			</text>
 		}

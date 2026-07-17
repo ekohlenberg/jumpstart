@@ -72,13 +72,13 @@ impl Principal {
         self.base.set("email", serde_json::json!(value));
     }
     
-    /// Enabled
-    pub fn enabled(&self) -> i32 {
-        self.base.get("enabled").as_i64().unwrap_or_default() as i32
+    /// Status
+    pub fn status(&self) -> i32 {
+        self.base.get("status").as_i64().unwrap_or_default() as i32
     }
 
-    pub fn set_enabled(&mut self, value: i32) {
-        self.base.set("enabled", serde_json::json!(value));
+    pub fn set_status(&mut self, value: i32) {
+        self.base.set("status", serde_json::json!(value));
     }
     
     /// Created
@@ -171,7 +171,7 @@ impl DomainObject for Principal {
             
             ColumnInfo::new("email", "Email", "", "", "", "", "varchar"),
             
-            ColumnInfo::new("enabled", "Enabled", "", "", "", "", "integer"),
+            ColumnInfo::new("status", "Status", "PrincipalStatus", "enum", "principal_status", "principalstatus", "integer"),
             
             ColumnInfo::new("created_date", "Created", "", "", "", "", "timestamp"),
             
@@ -201,7 +201,7 @@ impl DomainObject for Principal {
 
             "email".to_string(),
             
-            "enabled".to_string(),
+            "status".to_string(),
                     ];
 
 
@@ -215,7 +215,7 @@ impl DomainObject for Principal {
         
         self.base.defaults.entry("email".to_string()).or_insert(serde_json::Value::Null);
         
-        self.base.defaults.entry("enabled".to_string()).or_insert(serde_json::Value::Null);
+        self.base.defaults.entry("status".to_string()).or_insert(serde_json::Value::Null);
         
         self.base.defaults.entry("created_date".to_string()).or_insert(serde_json::Value::Null);
         
@@ -311,7 +311,16 @@ impl PrincipalView {
     pub fn from_base(base: BaseObject) -> Self {
         PrincipalView { inner: Principal::from_base(base) }
     }
-}
+
+    /// Status
+    pub fn status_name(&self) -> String {
+        self.inner.base.get("status_name").as_str().unwrap_or_default().to_string()
+    }
+
+    pub fn set_status_name(&mut self, value: String) {
+        self.inner.base.set("status_name", serde_json::json!(value));
+    }
+                        }
 
 impl DomainObject for PrincipalView {
     fn base(&self) -> &BaseObject {

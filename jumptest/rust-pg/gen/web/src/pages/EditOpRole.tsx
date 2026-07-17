@@ -62,16 +62,17 @@ interface FormField {
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
   isGlobal: boolean;
+  isId: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
-  { key: "id", label: "Role ID", kind: "number", fkVar: "", isGlobal: false },
-  { key: "name", label: "Role Name", kind: "string", fkVar: "", isGlobal: false },
-  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true },
-  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true },
-  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true },
+  { key: "id", label: "Role ID", kind: "number", fkVar: "", isGlobal: false, isId: true },
+  { key: "name", label: "Role Name", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true, isId: false },
+  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true, isId: false },
 ];
 
 const OWN_COLUMNS: DataTableColumn[] = [
@@ -289,7 +290,7 @@ export default function EditOpRole() {
     // window.confirm here (rather than a custom modal) matches the plain
     // browser confirm() the Blazor Edit page uses via JS interop below --
     // keeps both clients' delete confirmation behavior identical.
-    if (!window.confirm(`Delete this Operation Role? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete this Role? This cannot be undone.`)) return;
     try {
       await api.del(`/api/oprole/${id}`);
     } catch (err) {
@@ -303,7 +304,11 @@ export default function EditOpRole() {
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
 
-  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  // The "id" field is dropped from the form entirely while creating a new
+  // record (there's no id yet) and rendered read-only below while editing an
+  // existing one -- see the isId comment on formFields above.
+  const visibleFields = id == null ? FORM_FIELDS.filter((f) => !f.isId) : FORM_FIELDS;
+  const fieldRows = chunkFormFields(visibleFields, 3);
   const values = formData as unknown as { [key: string]: unknown };
 
   const editTabContent: ReactNode = (
@@ -319,7 +324,7 @@ export default function EditOpRole() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.isGlobal ? (
+                      {field.isGlobal || field.isId ? (
                         <div id={field.key} className="form-control-plaintext">
                           {formatReadOnlyValue(values[field.key])}
                         </div>
@@ -477,7 +482,7 @@ export default function EditOpRole() {
 
   return (
     <>
-      {id == null ? <h3>Create Operation Role</h3> : <h3>Edit Operation Role {rwkString}</h3>}
+      {id == null ? <h3>Create Role</h3> : <h3>Edit Role {rwkString}</h3>}
 
       <TabControl id="editTabs" tabs={editTabs} activeTab={activeTab} onTabChanged={setActiveTab} />
 

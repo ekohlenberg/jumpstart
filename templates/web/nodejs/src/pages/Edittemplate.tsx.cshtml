@@ -35,14 +35,21 @@
     // layer, so they're rendered read-only here rather than as editable
     // inputs -- mirrors ReadOnlyGlobalFields in
     // web/blazor/Pages/Edittemplate.razor.cshtml.
-    var formFields = new List<(string Key, string Label, string Kind, string FkVar, bool IsGlobal)>();
+    //
+    // The "id" column (primary key) is likewise not user-editable: it's
+    // rendered read-only while editing an existing record, and dropped
+    // entirely from the form while creating a new one (there's no id yet).
+    // Mirrors the same propInfo.Name.ToLower() == "id" check in
+    // web/blazor/Pages/Edittemplate.razor.cshtml.
+    var formFields = new List<(string Key, string Label, string Kind, string FkVar, bool IsGlobal, bool IsId)>();
     foreach (var attr in Model.Attributes)
     {
         bool isFk = !string.IsNullOrEmpty(attr.FkObject) && !string.IsNullOrEmpty(attr.FkType) &&
                     (attr.FkType.ToLower() == "enum" || attr.FkType.ToLower() == "parent");
         string kind = isFk ? "enum" : TypeMapping.ToFormKind(attr.DotNetType);
         string fkVar = isFk ? attr.FkObject.ToLower() : "";
-        formFields.Add((attr.Name, attr.Label, kind, fkVar, attr.IsGlobal()));
+        bool isId = attr.Name.ToLower() == "id";
+        formFields.Add((attr.Name, attr.Label, kind, fkVar, attr.IsGlobal(), isId));
     }
 
     // "Real World Key" columns, shown next to "Edit" in the page title --
@@ -85,6 +92,20 @@
     // DomainObj (self-referential FK, e.g. a "parent_id" pointing back at
     // the same table): that shape is already covered by the @(domainObj)
     // interface + ownColumns above.
+    //
+    // Display columns walk childObj.Attributes in metadata (ORDINAL_POSITION)
+    // order, same as ownColumns/OWN_COLUMNS above -- no reordering, so a
+    // raw "_id" FK column is replaced *in place* rather than being dropped
+    // or moved. Every other FK column (parent or enum) is resolved to its
+    // referenced object's RWK column(s), keyed "{alias}_{rwkColumn}" -- the
+    // same alias/key scheme the generated child SQL uses (see
+    // database/*/data/template.children.generated.sql.cshtml, which already
+    // LEFT JOINs and selects these columns) and the same synthesis
+    // Listtemplate.tsx.cshtml performs for its own FK columns. The one FK
+    // that IS this child relationship (child.Role, e.g. "test_run" when
+    // listing TestResult under the TestRun this page is editing) is skipped
+    // entirely rather than resolved -- that value is implied by which Edit
+    // page the table is rendered on, so showing it back would be redundant.
     var childRowFields = new Dictionary<string, List<(string Key, string TsType)>>();
     var childColumns = new Dictionary<string, List<(string Key, string Label)>>();
     foreach (var child in children)
@@ -95,10 +116,42 @@
 
         var fields = new List<(string, string)>();
         var cols = new List<(string, string)>();
+        var usedAliases = new HashSet<string>();
         foreach (var a in childObj.Attributes)
         {
             fields.Add((a.Name, TypeMapping.ToTsType(a.DotNetType)));
-            if (!a.Name.EndsWith("_id")) { cols.Add((a.Name, a.Label)); }
+
+            if (!a.Name.EndsWith("_id"))
+            {
+                cols.Add((a.Name, a.Label));
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(a.FkObject) || string.IsNullOrEmpty(a.FkTable)) { continue; }
+
+            var aliasBase = a.Name.Substring(0, a.Name.Length - 3);
+            if (aliasBase == child.Role) { continue; }
+
+            MetaObject fkObject = null;
+            foreach (var obj in Model.Model.Objects)
+            {
+                if (obj.TableName == a.FkTable) { fkObject = obj; break; }
+            }
+            if (fkObject == null) { continue; }
+
+            var alias = aliasBase;
+            var counter = 1;
+            while (usedAliases.Contains(alias)) { alias = aliasBase + "_" + counter; counter++; }
+            usedAliases.Add(alias);
+
+            foreach (var rwkAttr in fkObject.Attributes)
+            {
+                if (rwkAttr.RWK != "1") { continue; }
+                var key = alias + "_" + rwkAttr.Name;
+                var colLabel = a.Label + (rwkAttr.Name.ToLower().StartsWith("name") ? "" : " " + rwkAttr.Label);
+                fields.Add((key, TypeMapping.ToTsType(rwkAttr.DotNetType)));
+                cols.Add((key, colLabel));
+            }
         }
         childRowFields[childObj.DomainObj] = fields;
         childColumns[childObj.DomainObj] = cols;
@@ -197,12 +250,13 @@ interface FormField {
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
   isGlobal: boolean;
+  isId: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
 @foreach (var f in formFields)
 {
-<text>  { key: "@(f.Key)", label: "@(f.Label)", kind: "@(f.Kind)", fkVar: "@(f.FkVar)", isGlobal: @(f.IsGlobal ? "true" : "false") },
+<text>  { key: "@(f.Key)", label: "@(f.Label)", kind: "@(f.Kind)", fkVar: "@(f.FkVar)", isGlobal: @(f.IsGlobal ? "true" : "false"), isId: @(f.IsId ? "true" : "false") },
 </text>
 }
 ];
@@ -458,7 +512,11 @@ export default function Edit@(domainObj)() {
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
 
-  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  // The "id" field is dropped from the form entirely while creating a new
+  // record (there's no id yet) and rendered read-only below while editing an
+  // existing one -- see the isId comment on formFields above.
+  const visibleFields = id == null ? FORM_FIELDS.filter((f) => !f.isId) : FORM_FIELDS;
+  const fieldRows = chunkFormFields(visibleFields, 3);
   const values = formData as unknown as { [key: string]: unknown };
 
   const editTabContent: ReactNode = (
@@ -474,7 +532,7 @@ export default function Edit@(domainObj)() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.isGlobal ? (
+                      {field.isGlobal || field.isId ? (
                         <div id={field.key} className="form-control-plaintext">
                           {formatReadOnlyValue(values[field.key])}
                         </div>
@@ -589,6 +647,10 @@ foreach (var child in children)
             columns={@(Model.ChildColumnsConstName(child.Object))}
             showActions={false}
             showAddButton={false}
+            onEdit={(item) => {
+              const childReturnUrl = encodeURIComponent(location.pathname);
+              navigate(`/edit-@(child.Object.DomainVar)/${item.id}?returnUrl=${childReturnUrl}`);
+            }}
           />
         </div>
       ),

@@ -33,9 +33,15 @@ interface TestResultRow {
   id: number;
   test_run_id: number;
   test_case_id: number;
+  test_case_test_plan_id: number;
+  test_case_code: string;
+  test_case_title: string;
   test_result_status_id: number;
+  test_result_status_name: string;
   executed_at: string;
-  executed_by: string;
+  executed_by_id: number;
+  executed_by_email: string;
+  executed_by_status: number;
   actual_result: string;
   notes: string;
   is_active: number;
@@ -59,20 +65,21 @@ interface FormField {
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
   isGlobal: boolean;
+  isId: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
-  { key: "id", label: "Test Run ID", kind: "number", fkVar: "", isGlobal: false },
-  { key: "name", label: "Name", kind: "string", fkVar: "", isGlobal: false },
-  { key: "test_plan_id", label: "Test Plan", kind: "enum", fkVar: "testplan", isGlobal: false },
-  { key: "run_at", label: "Run At", kind: "date", fkVar: "", isGlobal: false },
-  { key: "run_by", label: "Run By", kind: "string", fkVar: "", isGlobal: false },
-  { key: "notes", label: "Notes", kind: "string", fkVar: "", isGlobal: false },
-  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true },
-  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true },
-  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true },
+  { key: "id", label: "Test Run ID", kind: "number", fkVar: "", isGlobal: false, isId: true },
+  { key: "name", label: "Name", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "test_plan_id", label: "Test Plan", kind: "enum", fkVar: "testplan", isGlobal: false, isId: false },
+  { key: "run_at", label: "Run At", kind: "date", fkVar: "", isGlobal: false, isId: false },
+  { key: "run_by", label: "Run By", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "notes", label: "Notes", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true, isId: false },
+  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true, isId: false },
 ];
 
 const OWN_COLUMNS: DataTableColumn[] = [
@@ -90,8 +97,13 @@ const OWN_COLUMNS: DataTableColumn[] = [
 
 const TESTRESULT_COLUMNS: DataTableColumn[] = [
   { key: "id", label: "Test Result ID" },
+  { key: "test_case_test_plan_id", label: "Test Case Test Plan" },
+  { key: "test_case_code", label: "Test Case Code" },
+  { key: "test_case_title", label: "Test Case Title" },
+  { key: "test_result_status_name", label: "Status" },
   { key: "executed_at", label: "Executed At" },
-  { key: "executed_by", label: "Executed By" },
+  { key: "executed_by_email", label: "Executed By Email" },
+  { key: "executed_by_status", label: "Executed By Status" },
   { key: "actual_result", label: "Actual Result" },
   { key: "notes", label: "Notes" },
   { key: "is_active", label: "Active" },
@@ -280,7 +292,11 @@ export default function EditTestRun() {
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
 
-  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  // The "id" field is dropped from the form entirely while creating a new
+  // record (there's no id yet) and rendered read-only below while editing an
+  // existing one -- see the isId comment on formFields above.
+  const visibleFields = id == null ? FORM_FIELDS.filter((f) => !f.isId) : FORM_FIELDS;
+  const fieldRows = chunkFormFields(visibleFields, 3);
   const values = formData as unknown as { [key: string]: unknown };
 
   const editTabContent: ReactNode = (
@@ -296,7 +312,7 @@ export default function EditTestRun() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.isGlobal ? (
+                      {field.isGlobal || field.isId ? (
                         <div id={field.key} className="form-control-plaintext">
                           {formatReadOnlyValue(values[field.key])}
                         </div>
@@ -406,6 +422,10 @@ export default function EditTestRun() {
             columns={TESTRESULT_COLUMNS}
             showActions={false}
             showAddButton={false}
+            onEdit={(item) => {
+              const childReturnUrl = encodeURIComponent(location.pathname);
+              navigate(`/edit-testresult/${item.id}?returnUrl=${childReturnUrl}`);
+            }}
           />
         </div>
       ),

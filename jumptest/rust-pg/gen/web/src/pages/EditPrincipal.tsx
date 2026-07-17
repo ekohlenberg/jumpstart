@@ -15,7 +15,7 @@ export interface Principal {
   last_name: string;
   username: string;
   email: string;
-  enabled: number;
+  status: number;
   created_date: string;
   last_login_date: string;
   is_active: number;
@@ -68,22 +68,23 @@ interface FormField {
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
   isGlobal: boolean;
+  isId: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
-  { key: "id", label: "Principal ID", kind: "number", fkVar: "", isGlobal: false },
-  { key: "first_name", label: "First", kind: "string", fkVar: "", isGlobal: false },
-  { key: "last_name", label: "Last", kind: "string", fkVar: "", isGlobal: false },
-  { key: "username", label: "Username", kind: "string", fkVar: "", isGlobal: false },
-  { key: "email", label: "Email", kind: "string", fkVar: "", isGlobal: false },
-  { key: "enabled", label: "Enabled", kind: "number", fkVar: "", isGlobal: false },
-  { key: "created_date", label: "Created", kind: "date", fkVar: "", isGlobal: false },
-  { key: "last_login_date", label: "Last Login", kind: "date", fkVar: "", isGlobal: false },
-  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true },
-  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true },
-  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true },
+  { key: "id", label: "Principal ID", kind: "number", fkVar: "", isGlobal: false, isId: true },
+  { key: "first_name", label: "First", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "last_name", label: "Last", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "username", label: "Username", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "email", label: "Email", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "status", label: "Status", kind: "enum", fkVar: "principalstatus", isGlobal: false, isId: false },
+  { key: "created_date", label: "Created", kind: "date", fkVar: "", isGlobal: false, isId: false },
+  { key: "last_login_date", label: "Last Login", kind: "date", fkVar: "", isGlobal: false, isId: false },
+  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true, isId: false },
+  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true, isId: false },
 ];
 
 const OWN_COLUMNS: DataTableColumn[] = [
@@ -92,7 +93,7 @@ const OWN_COLUMNS: DataTableColumn[] = [
   { key: "last_name", label: "Last" },
   { key: "username", label: "Username" },
   { key: "email", label: "Email" },
-  { key: "enabled", label: "Enabled" },
+  { key: "status", label: "Status" },
   { key: "created_date", label: "Created" },
   { key: "last_login_date", label: "Last Login" },
   { key: "is_active", label: "Active" },
@@ -317,11 +318,15 @@ export default function EditPrincipal() {
     navigate(returnUrl ?? "/principal");
   }
 
-  const rwkString = [formData.email, formData.enabled]
+  const rwkString = [formData.email, formData.status]
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
 
-  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  // The "id" field is dropped from the form entirely while creating a new
+  // record (there's no id yet) and rendered read-only below while editing an
+  // existing one -- see the isId comment on formFields above.
+  const visibleFields = id == null ? FORM_FIELDS.filter((f) => !f.isId) : FORM_FIELDS;
+  const fieldRows = chunkFormFields(visibleFields, 3);
   const values = formData as unknown as { [key: string]: unknown };
 
   const editTabContent: ReactNode = (
@@ -337,7 +342,7 @@ export default function EditPrincipal() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.isGlobal ? (
+                      {field.isGlobal || field.isId ? (
                         <div id={field.key} className="form-control-plaintext">
                           {formatReadOnlyValue(values[field.key])}
                         </div>
@@ -464,11 +469,11 @@ export default function EditPrincipal() {
     },
 
     {
-      title: "Operation Role",
+      title: "Role",
       content: (
         <div className="mt-3">
           <div className="alert alert-info">
-            Operation Role mapped: {oprole_op_role_Checked.size} of{" "}
+            Role mapped: {oprole_op_role_Checked.size} of{" "}
             {oprole_op_role_Options?.length ?? 0}
           </div>
           {(oprole_op_role_Options ?? []).map((option) => (

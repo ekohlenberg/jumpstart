@@ -65,26 +65,27 @@ interface FormField {
   kind: "string" | "number" | "boolean" | "date" | "enum";
   fkVar: string;
   isGlobal: boolean;
+  isId: boolean;
 }
 
 const FORM_FIELDS: FormField[] = [
-  { key: "id", label: "Workflow ID", kind: "number", fkVar: "", isGlobal: false },
-  { key: "workflow_type_id", label: "Type", kind: "enum", fkVar: "workflowtype", isGlobal: false },
-  { key: "parent_id", label: "Parent", kind: "enum", fkVar: "workflow", isGlobal: false },
-  { key: "name", label: "Name", kind: "string", fkVar: "", isGlobal: false },
-  { key: "seq", label: "Sequence", kind: "number", fkVar: "", isGlobal: false },
-  { key: "server_node_id", label: "Agent", kind: "enum", fkVar: "servernode", isGlobal: false },
-  { key: "process_id", label: "Process", kind: "enum", fkVar: "process", isGlobal: false },
-  { key: "exec_status_id", label: "Status", kind: "enum", fkVar: "execstatus", isGlobal: false },
-  { key: "last_start_time", label: "Last Start Time", kind: "date", fkVar: "", isGlobal: false },
-  { key: "last_end_time", label: "LastEnd Time", kind: "date", fkVar: "", isGlobal: false },
-  { key: "schedule_id", label: "Schedule", kind: "enum", fkVar: "schedule", isGlobal: false },
-  { key: "on_failure_action_id", label: "On Failure", kind: "enum", fkVar: "onfailure", isGlobal: false },
-  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true },
-  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true },
-  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true },
-  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true },
+  { key: "id", label: "Workflow ID", kind: "number", fkVar: "", isGlobal: false, isId: true },
+  { key: "workflow_type_id", label: "Type", kind: "enum", fkVar: "workflowtype", isGlobal: false, isId: false },
+  { key: "parent_id", label: "Parent", kind: "enum", fkVar: "workflow", isGlobal: false, isId: false },
+  { key: "name", label: "Name", kind: "string", fkVar: "", isGlobal: false, isId: false },
+  { key: "seq", label: "Sequence", kind: "number", fkVar: "", isGlobal: false, isId: false },
+  { key: "server_node_id", label: "Agent", kind: "enum", fkVar: "servernode", isGlobal: false, isId: false },
+  { key: "process_id", label: "Process", kind: "enum", fkVar: "process", isGlobal: false, isId: false },
+  { key: "exec_status_id", label: "Status", kind: "enum", fkVar: "execstatus", isGlobal: false, isId: false },
+  { key: "last_start_time", label: "Last Start Time", kind: "date", fkVar: "", isGlobal: false, isId: false },
+  { key: "last_end_time", label: "LastEnd Time", kind: "date", fkVar: "", isGlobal: false, isId: false },
+  { key: "schedule_id", label: "Schedule", kind: "enum", fkVar: "schedule", isGlobal: false, isId: false },
+  { key: "on_failure_action_id", label: "On Failure", kind: "enum", fkVar: "onfailure", isGlobal: false, isId: false },
+  { key: "is_active", label: "Active", kind: "number", fkVar: "", isGlobal: true, isId: false },
+  { key: "created_by", label: "Created By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated", label: "Last Updated", kind: "date", fkVar: "", isGlobal: true, isId: false },
+  { key: "last_updated_by", label: "Last Updated By", kind: "string", fkVar: "", isGlobal: true, isId: false },
+  { key: "txn_id", label: "Txn Id", kind: "number", fkVar: "", isGlobal: true, isId: false },
 ];
 
 const OWN_COLUMNS: DataTableColumn[] = [
@@ -304,7 +305,11 @@ export default function EditWorkflow() {
     .filter((v) => v !== null && v !== undefined && v !== "")
     .join(" ");
 
-  const fieldRows = chunkFormFields(FORM_FIELDS, 3);
+  // The "id" field is dropped from the form entirely while creating a new
+  // record (there's no id yet) and rendered read-only below while editing an
+  // existing one -- see the isId comment on formFields above.
+  const visibleFields = id == null ? FORM_FIELDS.filter((f) => !f.isId) : FORM_FIELDS;
+  const fieldRows = chunkFormFields(visibleFields, 3);
   const values = formData as unknown as { [key: string]: unknown };
 
   const editTabContent: ReactNode = (
@@ -320,7 +325,7 @@ export default function EditWorkflow() {
                       <label htmlFor={field.key} className="form-label">
                         {field.label}
                       </label>
-                      {field.isGlobal ? (
+                      {field.isGlobal || field.isId ? (
                         <div id={field.key} className="form-control-plaintext">
                           {formatReadOnlyValue(values[field.key])}
                         </div>
@@ -430,6 +435,10 @@ export default function EditWorkflow() {
             columns={EXECLOG_COLUMNS}
             showActions={false}
             showAddButton={false}
+            onEdit={(item) => {
+              const childReturnUrl = encodeURIComponent(location.pathname);
+              navigate(`/edit-execlog/${item.id}?returnUrl=${childReturnUrl}`);
+            }}
           />
         </div>
       ),
@@ -447,6 +456,10 @@ export default function EditWorkflow() {
             columns={OWN_COLUMNS}
             showActions={false}
             showAddButton={false}
+            onEdit={(item) => {
+              const childReturnUrl = encodeURIComponent(location.pathname);
+              navigate(`/edit-workflow/${item.id}?returnUrl=${childReturnUrl}`);
+            }}
           />
         </div>
       ),
