@@ -965,6 +965,15 @@ public class ViewRelationship
         /// <summary>Auth0 API audience, e.g. "https://your-api-identifier"</summary>
         public string Auth0Audience { get; set; } = string.Empty;
 
+        // ── Selected stack (populated from ~/.jumpstart.json "templatedefs") ──
+        // The full list of template registry names requested for this run, e.g.
+        // ["database-pgsql", "server-rust", "web-nodejs", "test-rust", "tools-rust"].
+        // Only meaningful when driven via ~/.jumpstart.json, since that's the only
+        // mode where all registries for a project are known in a single invocation.
+        // Templates reference this as @Model.TemplateDefNames to conditionally emit
+        // stack-specific content (see templates/root/makefile.cshtml).
+        public List<string> TemplateDefNames { get; set; } = new();
+
         public MetaModel(string _namespace)
         {
             Name = _namespace;

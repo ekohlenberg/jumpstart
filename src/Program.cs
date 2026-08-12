@@ -107,6 +107,11 @@ namespace jumpstart {
                 metaModel.Auth0ClientId = auth0Config.clientId;
                 metaModel.Auth0Audience = auth0Config.audience;
 
+                // Wire the full set of selected registries into the model so
+                // build-level templates (e.g. the root makefile) can see the
+                // whole stack, not just whichever registry they belong to.
+                metaModel.TemplateDefNames = templDefNames;
+
                 // Create an instance of the CSVLoader
                 var csvLoader = new CSVLoader();
 
