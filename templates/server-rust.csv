@@ -69,3 +69,7 @@ rust server templates-scheduler,model,server/rust/scheduler/makefile.cshtml,./ge
 rust server templates-scheduler,model,server/rust/scheduler/appsettings.json.cshtml,./gen/server/scheduler,TRUE
 rust server templates-scheduler,model,server/rust/scheduler/scheduler.sh.cshtml,./gen/server/scheduler,TRUE
 rust server templates-scheduler,model,server/rust/scheduler/scheduler.cmd.cshtml,./gen/server/scheduler,TRUE
+rust server templates-bin,model,server/rust/bin/start.sh.cshtml,./bin,TRUE
+rust server templates-bin,model,server/rust/bin/start.cmd.cshtml,./bin,TRUE
+rust server templates-bin,model,server/rust/bin/stop.sh.cshtml,./bin,TRUE
+rust server templates-bin,model,server/rust/bin/stop.cmd.cshtml,./bin,TRUE
