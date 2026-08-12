@@ -278,6 +278,8 @@ fn handle(request: &Request) -> Response {
         ("POST", 2) => {
             if rest[0].eq_ignore_ascii_case("notification") && rest[1].eq_ignore_ascii_case("publish") {
                 notification_publish(request)
+            } else if rest[0].eq_ignore_ascii_case("admin") && rest[1].eq_ignore_ascii_case("clear-auth-cache") {
+                admin_clear_auth_cache()
             } else {
                 Response::empty_404()
             }
@@ -303,6 +305,30 @@ fn handle(request: &Request) -> Response {
                     Ok(id) => children_response(obj, id, b),
                     Err(_) => Response::empty_404(),
                 }
+            }
+        }
+
+        ("GET", 4) => {
+            let (obj, a, b, c) = (rest[0], rest[1], rest[2], rest[3]);
+            if b.eq_ignore_ascii_case("map") {
+                match a.parse::<i64>() {
+                    Ok(id) => map_list_response(obj, id, c),
+                    Err(_) => Response::empty_404(),
+                }
+            } else {
+                Response::empty_404()
+            }
+        }
+
+        ("PUT", 4) => {
+            let (obj, a, b, c) = (rest[0], rest[1], rest[2], rest[3]);
+            if b.eq_ignore_ascii_case("map") {
+                match a.parse::<i64>() {
+                    Ok(id) => map_sync_response(request, obj, id, c),
+                    Err(_) => Response::empty_404(),
+                }
+            } else {
+                Response::empty_404()
             }
         }
 
@@ -356,6 +382,38 @@ fn children_response(obj: &str, id: i64, child_key: &str) -> Response {
     }
 }
 
+fn map_list_response(obj: &str, id: i64, map_key: &str) -> Response {
+    // The route segment is "<othervar>_<role>"; the map-query suffix is
+    // "<othervar>-<role>" (only the first underscore is the separator --
+    // domain vars never contain underscores). Mirrors children_response above.
+    let suffix = map_key.replacen('_', "-", 1);
+    let mut ctx = LogicContext::for_id(id);
+    ctx.set_arg("map_suffix", Value::String(suffix));
+    match object_exec(obj, "maplist", &mut ctx) {
+        Ok(value) => Response::json(&value),
+        Err(e) => error_response(e),
+    }
+}
+
+fn map_sync_response(request: &Request, obj: &str, id: i64, map_key: &str) -> Response {
+    // Body is a bare JSON array of ids (the full checked set), not an
+    // object -- read_json parses any valid JSON value, so this reuses it
+    // directly rather than needing a separate array-specific reader.
+    let body = match read_json(request) {
+        Some(b) => b,
+        None => return Response::text("invalid JSON body").with_status_code(400),
+    };
+
+    let suffix = map_key.replacen('_', "-", 1);
+    let mut ctx = LogicContext::for_id(id);
+    ctx.set_arg("map_suffix", Value::String(suffix));
+    ctx.set_arg("checked_other_ids", body);
+    match object_exec(obj, "mapsync", &mut ctx) {
+        Ok(_) => Response::text("").with_status_code(200),
+        Err(e) => error_response(e),
+    }
+}
+
 fn nav_menu_by_parent(request: &Request) -> Response {
     let parent_id: i64 = request
         .get_param("parent_id")
@@ -389,6 +447,25 @@ fn notification_publish(request: &Request) -> Response {
             sse_broadcast("PropertyUpdated", &body.to_string());
         }
     }
+    Response::text("").with_status_code(200)
+}
+
+// Infrastructure-only route with no backing domain object, so (unlike the
+// generated per-object routes) there is no core.operation row for it and
+// therefore no per-operation authorization check -- same convention as
+// notification_publish/nav_menu_by_parent/workflow_run above. Callers still
+// need a valid bearer token: `authenticate_inbound` runs ahead of `handle`
+// for every request.
+//
+// OpRoleMemberLogic::authorized(...) caches every (user, object, method)
+// result forever (see op_role_member_logic.core.rs.cshtml) -- a deliberate
+// perf tradeoff, but it means a permission change (a freshly reloaded
+// database with a new/changed core.operation row or op_role_map grant) is
+// invisible to a long-running process until it either restarts or this runs.
+// Call this after reloading the database with permission changes instead of
+// restarting the API.
+fn admin_clear_auth_cache() -> Response {
+    OpRoleMemberLogic::clear_auth_cache();
     Response::text("").with_status_code(200)
 }
 

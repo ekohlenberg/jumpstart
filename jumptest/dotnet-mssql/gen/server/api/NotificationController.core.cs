@@ -1,0 +1,115 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using jumptest;
+
+namespace jumptest.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class NotificationController : ControllerBase
+    {
+        private readonly SseNotificationService _sse;
+
+        public NotificationController(SseNotificationService sse)
+        {
+            _sse = sse;
+        }
+
+        // POST api/Notification/publish
+        // A node's logic layer (NotificationRegistrar) posts object changes here;
+        // the change is then fanned out to connected SSE clients.
+        [HttpPost("publish")]
+        public async Task<ActionResult> Publish([FromBody] NotificationRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest("Notification request cannot be null");
+                }
+                if (string.IsNullOrWhiteSpace(request.DomainObjectName))
+                {
+                    return BadRequest("DomainObjectName is required");
+                }
+                if (string.IsNullOrWhiteSpace(request.JsonData))
+                {
+                    return BadRequest("JsonData is required");
+                }
+
+                await _sse.PublishAsync(request.DomainObjectName, request.InstanceId, request.JsonData);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error publishing notification: {ex.Message}", ex);
+                return StatusCode(500, "Internal server error while publishing notification");
+            }
+        }
+
+        // GET api/Notification/stream
+        // Server-Sent Events stream. Replaces the SignalR /notificationHub; the
+        // Blazor client connects via EventSource and filters by domain object.
+        [HttpGet("stream")]
+        public async Task Stream()
+        {
+            Response.ContentType = "text/event-stream";
+            Response.Headers.Append("Cache-Control", "no-cache");
+            Response.Headers.Append("X-Accel-Buffering", "no");
+            HttpContext.Features.Get<IHttpResponseBodyFeature>()?.DisableBuffering();
+
+            var cancellation = HttpContext.RequestAborted;
+            var (id, reader) = _sse.AddClient();
+            try
+            {
+                // Prime the connection so the client opens immediately.
+                await Response.WriteAsync(": connected\n\n", cancellation);
+                await Response.Body.FlushAsync(cancellation);
+
+                while (!cancellation.IsCancellationRequested)
+                {
+                    using var heartbeat = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+                    heartbeat.CancelAfter(TimeSpan.FromSeconds(20));
+                    try
+                    {
+                        if (await reader.WaitToReadAsync(heartbeat.Token))
+                        {
+                            while (reader.TryRead(out var msg))
+                            {
+                                await Response.WriteAsync($"event: PropertyUpdated\ndata: {msg}\n\n", cancellation);
+                            }
+                            await Response.Body.FlushAsync(cancellation);
+                        }
+                    }
+                    catch (OperationCanceledException) when (!cancellation.IsCancellationRequested)
+                    {
+                        // Heartbeat tick: keep the connection alive through proxies.
+                        await Response.WriteAsync(": keepalive\n\n", cancellation);
+                        await Response.Body.FlushAsync(cancellation);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Client disconnected; fall through to cleanup.
+            }
+            finally
+            {
+                _sse.RemoveClient(id);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Request model for publishing object updates.
+    /// </summary>
+    public class NotificationRequest
+    {
+        public string DomainObjectName { get; set; }
+        public long InstanceId { get; set; }
+        public string JsonData { get; set; }
+    }
+}
